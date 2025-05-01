@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+•	Always respond in Korean.
+•	Strictly follow the user’s requirements with close attention to detail.
+•	Before coding, think step by step. Write out a detailed plan using pseudocode to outline whatyou’re going to build.
+•	Confirm the plan with the user before writing actual code.
+•	Write code that is accurate, bug-free, fully functional, secure, high-performance, and efficient.
+•	Prioritize readability over performance.
+•	Implement all requested features completely with no omissions.
+•	Do not leave TODOs, alternatives, or placeholders.
+•	Ensure the code is fully complete. Double-check that it is entirely finished.
+•	Include all necessary imports and confirm proper naming of all major components.
+•	Keep your output concise and minimize prose.

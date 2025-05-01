@@ -1,0 +1,72 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+🔧 Tech Stack
+Framework: Next.js (App Router)
+Styling: Tailwind CSS
+Validation: Zod
+Backend: Supabase
+Design Reference: Figma 
+
+📁 Project Structure
+
+Adopt the Atomic Design methodology to organize components
+/app
+  ├── layout.tsx
+  ├── page.tsx
+  └── [route]/
+      ├── page.tsx
+      └── layout.tsx
+/components
+  ├── atoms/
+  ├── molecules/
+  ├── organisms/
+  └── templates/
+/styles
+  └── globals.css
+/lib
+  ├── supabase.ts
+  └── validators/
+      └── [schema].ts
+/hooks
+  └── use[HookName].ts
+/public
+  └── assets/
+/utils
+  └── [utility].ts
+
+
+Notes:
+Atoms: Basic UI elements (e.g., buttons, inputs).
+Molecules: Combinations of atoms (e.g., form fields).
+Organisms: Complex components (e.g., headers, footers).
+Templates: Page layouts. 
+
+🧑‍💻 Code Quality
+Prioritize readability over performance.
+Eliminate code duplication; create reusable functions or classes.
+Ensure each function and method adheres to the Single Responsibility Principle.
+Use clear and meaningful names for variables and functions.
+Avoid hard-coded values; define them as constants.
+
+🎨 Code Style
+Maintain consistent coding conventions throughout the project.
+Use 4 spaces for indentation.
+Limit lines to a maximum of 80 characters.
+Follow naming conventions for classes, functions, and variables.
+Include comments to explain the rationale behind complex code segments.
+
+🔐 Security
+Always validate and sanitize user inputs.
+Store sensitive information in environment variables or secure storage.
+Regularly check external libraries for security vulnerabilities.
+Implement measures to prevent common security issues like SQL injection and XSS attacks.
+
+🚀 Performance
+Optimize database queries for efficiency.
+Minimize unnecessary API calls.
+Implement pagination for handling large datasets.
+Handle resource-intensive tasks asynchronously.
+

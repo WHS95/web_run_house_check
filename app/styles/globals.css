@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background-dark font-sans;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card-top p-4;
+  }
+  
+  .notice-tag {
+    @apply px-2 py-1 rounded-notice bg-white opacity-14 text-white text-sm font-normal;
+  }
+  
+  .notice-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-white ml-auto;
+  }
+  
+  .hero-gradient {
+    @apply bg-gradient-to-b from-gradient-from to-gradient-to opacity-90;
+  }
+  
+  .ranking-text {
+    @apply text-primary-teal;
+  }
+  
+  .stacked-cards {
+    @apply relative overflow-visible;
+  }
+  
+  .card-shadow {
+    @apply shadow-lg;
+  }
+  
+  .text-gradient {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-primary-teal to-primary-blue;
+  }
+}
+
+/* 필요한 폰트 추가 */
+@font-face {
+  font-family: 'Apple SD Gothic Neo';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Apple SD Gothic Neo Light');
+}
+
+@font-face {
+  font-family: 'Apple SD Gothic Neo';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Apple SD Gothic Neo Regular');
+}
+
+@font-face {
+  font-family: 'Apple SD Gothic Neo';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Apple SD Gothic Neo Bold');
+}
+
+@font-face {
+  font-family: 'SF Pro Text';
+  font-style: normal;
+  font-weight: 400;
+  src: local('SF Pro Text Regular');
+}
+
+@font-face {
+  font-family: 'SF Pro Text';
+  font-style: normal;
+  font-weight: 600;
+  src: local('SF Pro Text Semibold');
+} 

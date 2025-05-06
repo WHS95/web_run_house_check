@@ -9,7 +9,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang='ko'>
-      <body className='bg-background-dark'>
+      <body>
         <div className='h-screen overflow-hidden'>{children}</div>
       </body>
     </html>

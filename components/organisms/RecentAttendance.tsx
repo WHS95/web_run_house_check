@@ -2,7 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { User, Clock, MapPin } from "lucide-react";
-import { AttendanceRecord } from "@/lib/api/attendance";
+
+// AttendanceRecord 타입을 직접 정의합니다.
+interface AttendanceRecord {
+  id: string;
+  userName: string;
+  timestamp: string;
+  location: string;
+  exerciseType: string;
+}
 
 // 임시 데이터 - 실제로는 API를 통해 가져옵니다
 const mockRecentAttendance: AttendanceRecord[] = [

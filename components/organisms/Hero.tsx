@@ -27,7 +27,7 @@ const Hero: React.FC<HeroProps> = ({ username, rank, score }) => {
       {/* 텍스트 콘텐츠 - 중앙 배치 */}
       <div className='absolute inset-0 z-30 flex flex-col justify-center items-center'>
         <div className='text-center max-w-md mx-auto '>
-          <p className='text-4xl font-light leading-[1.3] text-left text-white'>
+          <p className='text-2xl font-light leading-[1.3] text-left text-white'>
             안녕하세요👋🏻 {username} 님,
             <br />
             현재 랭킹은

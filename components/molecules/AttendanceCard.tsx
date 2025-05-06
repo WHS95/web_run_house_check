@@ -5,7 +5,10 @@ import Link from "next/link";
 const AttendanceCard: React.FC = () => {
   return (
     <Link href='/attendance'>
-      <Card className='rounded-card-top min-h-[120px] shadow-lg cursor-pointer bg-primary-purple'>
+      <Card
+        bgColor='bg-primary-purple'
+        className='rounded-card-top min-h-[120px] shadow-lg cursor-pointer'
+      >
         <div className='flex items-center justify-between py-5'>
           <div>
             <h3 className='text-white text-15 font-normal mb-2'>

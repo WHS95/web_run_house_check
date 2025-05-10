@@ -33,10 +33,12 @@ const MemberDetailTemplate: React.FC<MemberDetailTemplateProps> = ({ memberId })
     alert(`회원 ${member.name} 탈퇴 처리`);
   };
 
+  
+
   return (
     <div className="min-h-screen bg-white flex flex-col pb-16"> {/* 하단 네비 높이만큼 패딩 추가 */} 
       <div className="p-4 flex-shrink-0">
-        <PageHeader title="회원 상세" iconColor="black" backLink="/" />
+        <PageHeader title="회원 상세" iconColor="black" backLink="/" borderColor="gray-300" />
       </div>
       
       <div className="flex-1 overflow-y-auto px-4 pb-4">

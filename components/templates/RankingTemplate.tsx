@@ -1,3 +1,6 @@
+
+"use client";
+
 import React from 'react';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import RankingInfo from '@/components/organisms/ranking/RankingInfo';
@@ -19,12 +22,14 @@ const dummyRankingData = [
 const RankingTemplate: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#223150] text-white flex flex-col">
-      <div className="p-2 flex-shrink-0">
+      <div className="flex-shrink-0">
         <div className="mb-4">
           <PageHeader title="랭킹" iconColor="white" />
         </div>
-        <RankingInfo />
-        <RankingTabs />
+      </div>
+      <div className="px-2">
+        <RankingInfo date={"2025-05-10"} totalMembers={132} currentRank={1} />
+        <RankingTabs tabs={["종합", "참여", "개설"]} initialTab="종합" />
       </div>
       
       <div className="flex-1 bg-white rounded-t-3xl overflow-y-auto text-black">

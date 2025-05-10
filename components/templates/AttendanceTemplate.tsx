@@ -14,7 +14,7 @@ const AttendanceTemplate: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <div className="px-2 flex-shrink-0">
+      <div className="flex-shrink-0">
         <div className="mb-4">
           <PageHeader title="출석 체크" iconColor="black" />
         </div>

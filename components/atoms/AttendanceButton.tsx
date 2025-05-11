@@ -21,7 +21,7 @@ const AttendanceButton: React.FC<AttendanceButtonProps> = ({
         }
       `}
     >
-      출석하기
+      출석
     </button>
   );
 };

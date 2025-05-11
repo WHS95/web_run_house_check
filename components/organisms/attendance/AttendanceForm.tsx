@@ -1,177 +1,191 @@
 import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import InputField from "@/components/atoms/InputField";
+import DateField from "@/components/atoms/DateField";
+import SearchableSelectField from "@/components/atoms/SearchableSelectField";
+import RadioGroup from "@/components/molecules/FormFieldGroup";
 
-// 라디오 버튼 컴포넌트
-interface RadioButtonProps {
-  label: string;
-  value: string;
-  name: string;
-  checked: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+// Zod 스키마 정의
+const attendanceSchema = z.object({
+  name: z.string().min(1, "이름을 입력해주세요"),
+  age: z.string().min(1, "나이를 입력해주세요"),
+  date: z.string().min(1, "참여일을 선택해주세요"),
+  location: z.string().min(1, "참여 장소를 선택해주세요"),
+  exerciseType: z.string().min(1, "운동 종류를 선택해주세요"),
+  isHost: z.string().min(1, "개설자 여부를 선택해주세요"),
+});
+
+// 폼 데이터 타입
+type AttendanceFormData = z.infer<typeof attendanceSchema>;
+
+// AttendanceForm Props 인터페이스 정의
+interface AttendanceFormProps {
+  initialData?: Partial<AttendanceFormData>;
+  locationOptions: { value: string; label: string }[];
+  exerciseOptions: { value: string; label: string }[];
+  showHostField?: boolean;
+  onSubmit?: (data: AttendanceFormData) => void;
 }
 
-const RadioButton: React.FC<RadioButtonProps> = ({
-  label,
-  value,
-  name,
-  checked,
-  onChange,
+const AttendanceForm: React.FC<AttendanceFormProps> = ({
+  initialData,
+  locationOptions,
+  exerciseOptions,
+  showHostField = true,
+  onSubmit,
 }) => {
-  return (
-    <label className='flex items-center mr-4 cursor-pointer'>
-      <input
-        type='radio'
-        name={name}
-        value={value}
-        checked={checked}
-        onChange={onChange}
-        className='hidden'
-      />
-      <span
-        className={`w-5 h-5 rounded-full border-2 border-[#E3E3EA] mr-2 flex items-center justify-center 
-        ${checked ? "bg-primary-blue border-primary-blue" : "bg-white"}
-      `}
-      >
-        {checked && <span className='w-2 h-2 rounded-full bg-white'></span>}
-      </span>
-      <span
-        className={`text-sm ${
-          checked ? "font-medium text-primary-blue" : "text-black/60"
-        }`}
-      >
-        {label}
-      </span>
-    </label>
-  );
-};
-
-// 입력 필드 컴포넌트
-interface InputFieldProps {
-  label: string;
-  value: string;
-  placeholder: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-const InputField: React.FC<InputFieldProps> = ({
-  label,
-  value,
-  placeholder,
-  onChange,
-}) => {
-  return (
-    <div className='mb-4'>
-      <label className='block text-sm font-semibold mb-2'>{label}</label>
-      <input
-        type='text'
-        value={value}
-        placeholder={placeholder}
-        onChange={onChange}
-        className='w-full p-3 border border-[#EAEAF3] rounded-md bg-[#F8F8FD] text-sm placeholder-black/60 focus:outline-none focus:ring-1 focus:ring-primary-blue'
-      />
-    </div>
-  );
-};
-
-const AttendanceForm: React.FC = () => {
-  // TODO: Form 상태 관리 (useState, Zod 등) 필요
-  const [formData, setFormData] = React.useState({
-    name: "홍길동",
-    age: "1993",
-    date: "2024.2.22",
-    location: "반포 한강 공원",
-    exerciseType: "러닝",
-    isHost: "아니오",
+  // React Hook Form 설정
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<AttendanceFormData>({
+    resolver: zodResolver(attendanceSchema),
+    defaultValues: {
+      name: initialData?.name || "",
+      age: initialData?.age || "",
+      date: initialData?.date || "",
+      location:
+        initialData?.location ||
+        (locationOptions.length > 0 ? locationOptions[0].value : ""),
+      exerciseType:
+        initialData?.exerciseType ||
+        (exerciseOptions.length > 0 ? exerciseOptions[0].value : ""),
+      isHost: initialData?.isHost || "아니오",
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  // 현재 폼 값 구독
+  const formValues = watch();
+
+  // 날짜 포맷 변환 (YYYY-MM-DD 형식으로)
+  const formatDateForInput = (dateString: string) => {
+    if (!dateString) return "";
+
+    // YYYY.MM.DD 형식을 YYYY-MM-DD로 변환
+    const parts = dateString.split(".");
+    if (parts.length === 3) {
+      return `${parts[0]}-${parts[1].padStart(2, "0")}-${parts[2].padStart(
+        2,
+        "0"
+      )}`;
+    }
+
+    return dateString;
   };
 
+  // YYYY-MM-DD 형식에서 YYYY.MM.DD 형식으로 변환 (표시용)
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const parts = value.split("-");
+    if (parts.length === 3) {
+      const formattedDate = `${parts[0]}.${parts[1]}.${parts[2]}`;
+      setValue("date", formattedDate);
+    } else {
+      setValue("date", value);
+    }
+  };
+
+  // 라디오 버튼 변경 처리
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setValue("isHost", e.target.value);
+  };
+
+  // 검색 가능한 셀렉트 박스 변경 처리
+  const handleSearchableSelectChange = (value: string, name: string) => {
+    setValue(name as keyof AttendanceFormData, value);
+  };
+
+  const hostOptions = [
+    { value: "예", label: "예" },
+    { value: "아니오", label: "아니오" },
+  ];
+
+  const submitForm = (data: AttendanceFormData) => {
+    if (onSubmit) {
+      onSubmit(data);
+    }
   };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit(submitForm)}>
       <InputField
         label='이름'
-        value={formData.name}
+        value={formValues.name}
         placeholder='이름 입력'
-        onChange={handleChange}
+        onChange={(e) => setValue("name", e.target.value)}
+        name='name'
+        disabled={true}
       />
+      {errors.name && (
+        <p className='mt-1 text-xs text-red-500'>{errors.name.message}</p>
+      )}
+
       <InputField
         label='나이'
-        value={formData.age}
+        value={formValues.age}
         placeholder='나이 입력'
-        onChange={handleChange}
+        onChange={(e) => setValue("age", e.target.value)}
+        name='age'
+        disabled={true}
       />
-      <InputField
+      {errors.age && (
+        <p className='mt-1 text-xs text-red-500'>{errors.age.message}</p>
+      )}
+
+      <DateField
         label='참여일'
-        value={formData.date}
-        placeholder='YYYY.MM.DD'
-        onChange={handleChange}
+        value={formatDateForInput(formValues.date)}
+        onChange={handleDateChange}
       />
-      <InputField
+      {errors.date && (
+        <p className='mt-1 text-xs text-red-500'>{errors.date.message}</p>
+      )}
+
+      <SearchableSelectField
         label='참여 장소'
-        value={formData.location}
-        placeholder='참여 장소 입력'
-        onChange={handleChange}
+        value={formValues.location}
+        options={locationOptions}
+        name='location'
+        placeholder='장소 검색...'
+        onChange={handleSearchableSelectChange}
       />
+      {errors.location && (
+        <p className='mt-1 text-xs text-red-500'>{errors.location.message}</p>
+      )}
 
-      <div className='mb-4'>
-        <label className='block text-sm font-semibold mb-2'>운동 종류</label>
-        <div className='flex'>
-          <RadioButton
-            label='러닝'
-            value='러닝'
-            name='exerciseType'
-            checked={formData.exerciseType === "러닝"}
-            onChange={handleRadioChange}
-          />
-          <RadioButton
-            label='등산'
-            value='등산'
-            name='exerciseType'
-            checked={formData.exerciseType === "등산"}
-            onChange={handleRadioChange}
-          />
-          <RadioButton
-            label='자전거'
-            value='자전거'
-            name='exerciseType'
-            checked={formData.exerciseType === "자전거"}
-            onChange={handleRadioChange}
-          />
-          <RadioButton
-            label='기타'
-            value='기타'
-            name='exerciseType'
-            checked={formData.exerciseType === "기타"}
-            onChange={handleRadioChange}
-          />
-        </div>
-      </div>
+      <SearchableSelectField
+        label='운동 종류'
+        value={formValues.exerciseType}
+        options={exerciseOptions}
+        name='exerciseType'
+        placeholder='운동 검색...'
+        onChange={handleSearchableSelectChange}
+      />
+      {errors.exerciseType && (
+        <p className='mt-1 text-xs text-red-500'>
+          {errors.exerciseType.message}
+        </p>
+      )}
 
-      <div className='mb-4'>
-        <label className='block text-sm font-semibold mb-2'>개설자 여부</label>
-        <div className='flex'>
-          <RadioButton
-            label='예'
-            value='예'
+      {showHostField && (
+        <>
+          <RadioGroup
+            label='개설자 여부'
             name='isHost'
-            checked={formData.isHost === "예"}
+            options={hostOptions}
+            selectedValue={formValues.isHost}
             onChange={handleRadioChange}
           />
-          <RadioButton
-            label='아니오'
-            value='아니오'
-            name='isHost'
-            checked={formData.isHost === "아니오"}
-            onChange={handleRadioChange}
-          />
-        </div>
-      </div>
+          {errors.isHost && (
+            <p className='mt-1 text-xs text-red-500'>{errors.isHost.message}</p>
+          )}
+        </>
+      )}
     </form>
   );
 };

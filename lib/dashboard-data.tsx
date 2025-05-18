@@ -42,12 +42,6 @@ export const getStatsCardsData = (): StatsCardData[] => [
     value: "240명",
     bgColor: "bg-blue-900",
   },
-  //   {
-  //     icon: <DollarSign size={20} className="text-white" />,
-  //     title: "예산",
-  //     value: "3,845,200원",
-  //     bgColor: "bg-amber-500",
-  //   },
   {
     icon: <Calendar size={20} className='text-white' />,
     title: "오늘 출석자",

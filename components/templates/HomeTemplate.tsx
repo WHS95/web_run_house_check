@@ -12,6 +12,10 @@ const HomeTemplate: React.FC = () => {
     rank: 1,
     score: 15
   };
+
+  const crewData = {
+    name: 'ETC_RUNHOUSE',
+  };
   
   const noticeText = '2024 정기런 장소 가이드입니다.';
 
@@ -24,27 +28,30 @@ const HomeTemplate: React.FC = () => {
       
       {/* 헤더 */}
       <div className="relative z-50">
-        <Header />
+        <Header title={crewData.name} />
       </div>
       
       {/* 공지사항 */}
       <div className="absolute top-[120px] left-0 right-0 z-40 px-4">
-        <div className="max-w-md mx-auto">
+        <div className="mx-auto">
           <NoticeBar noticeText={noticeText} />
         </div>
       </div>
       
       {/* 카드 섹션 - 화면 하단에 고정 */}
-      <div className="absolute left-0 right-0 bottom-0 z-40">
-        <div className="relative">
-          {/* 랭킹 카드 - 뒤에 위치 */}
-          <div className="absolute -top-[280px] inset-x-0 z-10">
-            <RankingCard />
-          </div>
-          
-          {/* 출석 체크 카드 - 앞에 위치 */}
-          <div className="absolute -top-[150px] inset-x-0 z-20">
-            <AttendanceCard />
+      <div className="absolute left-0 right-0 bottom-0 z-10">
+        <div className="mx-auto">
+          {/* 카드 스택 컨테이너 */}
+          <div className="relative h-[380px] bg-transparent">
+            {/* 파란색 랭킹 카드 - 하단에 위치 */}
+            <div className="absolute bottom-0 left-0 right-0 z-40">
+              <RankingCard />
+            </div>
+            
+            {/* 보라색 출석 체크 카드 - 상단에 위치하며 파란색 카드 위로 겹침 */}
+            <div className="absolute bottom-[60px] left-0 right-0 z-20">
+              <AttendanceCard />
+            </div>
           </div>
         </div>
       </div>

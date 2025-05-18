@@ -34,7 +34,7 @@ const RankingTabs: React.FC<RankingTabsProps> = ({
         <button
           key={tab}
           onClick={() => handleTabClick(tab)}
-          className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors duration-200 
+          className={`flex-1 py-2 rounded-t-md text-sm font-medium transition-colors duration-200 
             ${
               activeTab === tab
                 ? "bg-primary-blue text-white shadow-md"

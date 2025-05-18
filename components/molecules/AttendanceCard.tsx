@@ -1,42 +1,38 @@
+"use client";
+
 import React from "react";
 import Card from "../atoms/Card";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { ChevronRight } from "lucide-react";
 
 const AttendanceCard: React.FC = () => {
   return (
     <Link href='/attendance'>
-      <Card
-        bgColor='bg-primary-purple'
-        className='rounded-card-top min-h-[120px] shadow-lg cursor-pointer'
+      <motion.div
+        className='pb-5 bg-primary-purple rounded-card-top'
+        whileHover={{
+          y: -20,
+          transition: { duration: 0.3, ease: "easeOut" },
+        }}
       >
-        <div className='flex items-center justify-between py-5'>
-          <div>
-            <h3 className='text-white text-15 font-normal mb-2'>
-              출첵하고 상품을 받으세요!
-            </h3>
+        <Card
+          bgColor='bg-primary-purple'
+          className='rounded-card-top min-h-[100px] shadow-lg cursor-pointer'
+        >
+          <div className='flex items-center justify-between h-full py-5'>
             <div className='flex items-center'>
-              <p className='text-white text-15 font-semibold'>출석 체크</p>
-              <div className='ml-2'>
-                <svg
-                  width='20'
-                  height='20'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    d='M9 18L15 12L9 6'
-                    stroke='white'
-                    strokeWidth='2'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </svg>
-              </div>
+              <h3 className='font-bold text-white text-20'>
+                출석 체크 하러가기
+              </h3>
+            </div>
+            <div className='flex items-center'>
+              <p className='font-semibold text-white text-15'>출석 체크</p>
+              <ChevronRight className='w-5 h-5 text-white' />
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </motion.div>
     </Link>
   );
 };

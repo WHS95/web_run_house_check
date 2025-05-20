@@ -62,7 +62,7 @@ export default function AttendanceCalendarPage() {
     const isSelected = selectedDate.toDateString() === date.toDateString();
     const isSunday = date.getDay() === 0;
 
-    let className = "flex justify-center items-center w-full h-full rounded-md";
+    let className = "flex items-center justify-center w-full h-full rounded-md";
 
     if (!isCurrentMonth) {
       className += " text-gray-400 opacity-40";
@@ -131,26 +131,26 @@ export default function AttendanceCalendarPage() {
   return (
     <div className='pb-4'>
       {/* 캘린더 헤더 */}
-      <div className='flex justify-center items-center p-4'>
+      <div className='flex items-center justify-center p-4'>
         <button
           onClick={() => changeMonth(-1)}
-          className='p-2 rounded-full border border-gray-200'
+          className='p-2 border border-gray-200 rounded-full'
         >
           <ChevronLeft size={18} className='text-gray-600' />
         </button>
         <h2 className='mx-4 text-lg font-semibold'>{formatMonth()}</h2>
         <button
           onClick={() => changeMonth(1)}
-          className='p-2 rounded-full border border-gray-200'
+          className='p-2 border border-gray-200 rounded-full'
         >
           <ChevronRight size={18} className='text-gray-600' />
         </button>
       </div>
 
       {/* 캘린더 */}
-      <div className='mx-4 bg-white rounded-lg shadow-md overflow-hidden mb-6'>
+      <div className='mx-4 mb-6 overflow-hidden bg-white rounded-lg shadow-md'>
         {/* 요일 헤더 */}
-        <div className='grid grid-cols-7 text-center py-2 text-xs text-gray-500 border-b'>
+        <div className='grid grid-cols-7 py-2 text-xs text-center text-gray-500 border-b'>
           {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((day, i) => (
             <div key={i} className='px-2'>
               {day}
@@ -174,11 +174,11 @@ export default function AttendanceCalendarPage() {
 
       {/* 출석자 정보 */}
       <div className='mx-4'>
-        <div className='flex justify-between items-center mb-4'>
+        <div className='flex items-center justify-between mb-4'>
           <h3 className='text-sm font-semibold'>
             출석자 총 {attendees.length}명
           </h3>
-          <button className='bg-blue-500 text-white py-2 px-4 rounded text-sm'>
+          <button className='px-4 py-2 text-sm text-white bg-blue-500 rounded'>
             한번에 출석 체크
           </button>
         </div>
@@ -186,18 +186,18 @@ export default function AttendanceCalendarPage() {
         {/* 장소별 출석자 목록 */}
         {Object.entries(attendeesByLocation).map(([location, data], index) => (
           <div key={index} className='mb-6'>
-            <div className='flex justify-between items-center mb-2'>
+            <div className='flex items-center justify-between mb-2'>
               <h4 className='font-semibold'>{location}</h4>
               <span className='text-gray-500 opacity-40'>{data.time}</span>
             </div>
-            <div className='bg-white rounded-lg divide-y'>
+            <div className='bg-white divide-y rounded-lg'>
               {data.attendees.map((attendee) => (
                 <div
                   key={attendee.id}
-                  className='p-4 flex justify-between items-center'
+                  className='flex items-center justify-between p-4'
                 >
                   <div className='flex items-center'>
-                    <div className='w-8 h-8 bg-gray-200 rounded-full flex justify-center items-center mr-2 opacity-30'>
+                    <div className='flex items-center justify-center w-8 h-8 mr-2 bg-gray-200 rounded-full opacity-30'>
                       <svg
                         width='16'
                         height='16'
@@ -219,7 +219,7 @@ export default function AttendanceCalendarPage() {
                       {attendee.name}({attendee.birthYear})
                     </span>
                   </div>
-                  <button className='border border-gray-200 px-4 py-1 text-xs rounded text-black opacity-80'>
+                  <button className='px-4 py-1 text-xs text-black border border-gray-200 rounded opacity-80'>
                     취소
                   </button>
                 </div>

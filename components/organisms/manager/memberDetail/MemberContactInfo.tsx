@@ -7,7 +7,7 @@ interface InfoFieldProps {
 
 const InfoField: React.FC<InfoFieldProps> = ({ label, value }) => (
   <div className='mb-4'>
-    <label className='block text-sm font-semibold mb-2 text-black'>
+    <label className='block mb-2 text-sm font-semibold text-black'>
       {label}
     </label>
     <div className='w-full p-3 border border-[#EAEAF3] rounded-md bg-[#F8F8FD] text-sm text-black/60'>

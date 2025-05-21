@@ -21,6 +21,7 @@ export default async function VerifyCrewPage() {
 
   // 사용자가 이미 크루에 인증되어 있는지 확인
   const { data: userData, error: userDataError } = await supabase
+    .schema("attendance")
     .from("users")
     .select(
       `is_crew_verified, 

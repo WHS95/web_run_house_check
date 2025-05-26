@@ -28,7 +28,7 @@ const MemberContactInfo: React.FC<MemberContactInfoProps> = ({
   return (
     <div className='mb-6'>
       <InfoField label='이메일' value={email} />
-      <InfoField label='연락처' value={phone} />
+      {/* <InfoField label='연락처' value={phone} /> */}
     </div>
   );
 };

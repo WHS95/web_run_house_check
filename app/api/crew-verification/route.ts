@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
 
     // 사용자 크루 인증 처리
     const { error: updateError } = await supabase
+      .schema("attendance")
       .from("users")
       .update({
         verified_crew_id: codeData?.crewId,
@@ -157,6 +158,7 @@ export async function GET(request: NextRequest) {
 
     // 사용자의 크루 인증 상태 조회
     const { data: userData, error: userDataError } = await supabase
+      .schema("attendance")
       .from("users")
       .select(
         "is_crew_verified, verified_crew_id, crews:verified_crew_id(id, name)"

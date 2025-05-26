@@ -5,6 +5,7 @@ export async function middleware(req: NextRequest) {
   // 특정 경로는 인증 검사를 건너뜀
   const PUBLIC_ROUTES = [
     "/auth/login",
+    "/auth/signup",
     "/auth/callback",
     "/auth/verify-crew",
     "/auth/auth-code-error",

@@ -34,6 +34,7 @@ export async function createCrewInviteCode(
     const inviteCode = generateInviteCode();
 
     const { data, error } = await supabase
+      .schema("attendance")
       .from("crew_invite_codes")
       .insert({
         crew_id: crewId,
@@ -63,6 +64,7 @@ export async function verifyCrewInviteCode(inviteCode: string) {
 
     // 코드 조회
     const { data: codeData, error: codeError } = await supabase
+      .schema("attendance")
       .from("crew_invite_codes")
       .select("*, crews:crew_id(id, name)")
       .eq("invite_code", inviteCode)

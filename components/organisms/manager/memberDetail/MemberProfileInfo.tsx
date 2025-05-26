@@ -15,7 +15,7 @@ const MemberProfileInfo: React.FC<MemberProfileInfoProps> = ({
 }) => {
   return (
     <div className='flex items-center mb-6'>
-      {/* 임시 프로필 아이콘 */}
+      {/* 임시 프로필 아이콘
       <div className='w-16 h-16 rounded-full bg-[#476565]/30 flex items-center justify-center mr-4 flex-shrink-0'>
         <Image
           src='/assets/profile-placeholder.svg'
@@ -24,10 +24,10 @@ const MemberProfileInfo: React.FC<MemberProfileInfoProps> = ({
           height={32}
           className='filter invert brightness-0'
         />
-      </div>
+      </div> */}
       <div className='flex-1'>
         <div className='flex items-center mb-1'>
-          <h2 className='text-xl font-medium mr-2'>{name}</h2>
+          <h2 className='mr-2 text-xl font-medium'>{name}</h2>
           <Image
             src='/assets/star-icon-yellow.svg'
             alt='등급'
@@ -35,7 +35,7 @@ const MemberProfileInfo: React.FC<MemberProfileInfoProps> = ({
             height={16}
           />
         </div>
-        <div className='flex text-sm text-gray-600 space-x-4'>
+        <div className='flex space-x-4 text-sm text-gray-600'>
           <span>가입일 {joinDate}</span>
           <span>등급 {grade}</span>
         </div>

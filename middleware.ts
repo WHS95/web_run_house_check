@@ -84,6 +84,7 @@ export async function middleware(req: NextRequest) {
   // 사용자가 인증되어 있지만, 크루 인증 여부 확인
   try {
     const { data: userData } = await supabase
+      .schema("attendance")
       .from("users")
       .select("is_crew_verified")
       .eq("id", session.user.id)

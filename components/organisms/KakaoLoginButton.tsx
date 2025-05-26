@@ -41,7 +41,7 @@ const KakaoLoginButton: React.FC = () => {
               />
             </svg>
           </div>
-          카카오톡으로 로그인
+          카카오톡 로그인
         </>
       )}
       {error && <div className='mt-2 text-red-500'>{error}</div>}

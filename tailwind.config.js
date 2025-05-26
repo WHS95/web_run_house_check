@@ -6,6 +6,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        "login-bg": "url('/backGround.png')",
+      },
       colors: {
         primary: {
           blue: "#579EE2", // 랭킹 카드 배경색

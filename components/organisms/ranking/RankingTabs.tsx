@@ -1,30 +1,28 @@
 import React from "react";
+
+export interface TabItem {
+  id: string;
+  label: string;
+}
+
 interface RankingTabsProps {
-  tabs: string[];
-  initialTab?: string;
-  onTabChange?: (tab: string) => void;
+  tabs: TabItem[];
+  activeTabId: string;
+  onTabChange: (tabId: string) => void;
 }
 
 const RankingTabs: React.FC<RankingTabsProps> = ({
   tabs,
-  initialTab,
+  activeTabId,
   onTabChange,
 }) => {
-  // tabs 배열이 비어있지 않은지 확인하고, initialTab이 없을 경우 첫 번째 탭을 사용
-  const defaultTab = tabs.length > 0 ? tabs[0] : "";
-  const [activeTab, setActiveTab] = React.useState<string>(
-    initialTab || defaultTab
-  );
-
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
+  const handleTabClick = (tabId: string) => {
     if (onTabChange) {
-      onTabChange(tab);
+      onTabChange(tabId);
     }
   };
 
-  // tabs 배열이 비어있으면 아무것도 렌더링하지 않음
-  if (!tabs.length) {
+  if (!tabs || tabs.length === 0) {
     return null;
   }
 
@@ -32,17 +30,17 @@ const RankingTabs: React.FC<RankingTabsProps> = ({
     <div className='bg-[#192642] rounded-lg p-1 flex mb-6'>
       {tabs.map((tab) => (
         <button
-          key={tab}
-          onClick={() => handleTabClick(tab)}
-          className={`flex-1 py-2 rounded-t-md text-sm font-medium transition-colors duration-200 
+          key={tab.id}
+          onClick={() => handleTabClick(tab.id)}
+          className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors duration-200 
             ${
-              activeTab === tab
+              activeTabId === tab.id
                 ? "bg-primary-blue text-white shadow-md"
-                : "text-white/40"
+                : "text-white/40 hover:text-white/70"
             }
           `}
         >
-          {tab}
+          {tab.label}
         </button>
       ))}
     </div>

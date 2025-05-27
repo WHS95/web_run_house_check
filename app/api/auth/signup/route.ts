@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { signupSchema } from "@/lib/validators/signupSchema";
+import { error } from "console";
 
 // TODO: Zod 스키마 import 및 유효성 검사 추가
 // import { signupSchema } from "@/lib/validators/signupSchema";
@@ -101,6 +102,7 @@ export async function POST(request: Request) {
     // id 필드를 updateUserData 객체에 추가
     updateUserData.id = user!.id;
 
+    //user 테이블에 등록
     const { error: upsertError } = await supabase
       .schema("attendance")
       .from("users")
@@ -128,7 +130,29 @@ export async function POST(request: Request) {
         "Failed to increment crew_invite_codes used_count:",
         incrementError
       );
-      // 이 오류는 회원가입 자체를 실패시키지는 않음 (중요도에 따라 결정)
+    }
+
+    //유저-크루 테이블에 등록
+    const { error: userCrewError } = await supabase
+      .schema("attendance")
+      .from("user_crews")
+      .upsert(
+        {
+          user_id: user.id,
+          crew_id: verifiedCrewId,
+        },
+        { onConflict: "user_id, crew_id" }
+      );
+
+    if (userCrewError) {
+      console.error(
+        "Error inserting user-crew data in 'user_crews' table:",
+        userCrewError
+      );
+      return NextResponse.json(
+        { success: false, message: "회원가입 중 오류가 발생했습니다." },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(

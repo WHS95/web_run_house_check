@@ -10,6 +10,9 @@ import {
   type SignupFormData,
 } from "@/lib/validators/signupSchema"; // Zod 스키마
 import { IoArrowBack } from "react-icons/io5"; // 새로운 아이콘 추가
+import PopupNotification, {
+  type NotificationType,
+} from "@/components/molecules/common/PopupNotification"; // 경로 수정 및 타입 임포트
 
 // TODO: 실제 카카오 사용자 정보 타입 정의 또는 import
 interface KakaoUser {
@@ -51,6 +54,12 @@ export default function SignupPage() {
   const [isCrewCodeVerifying, setIsCrewCodeVerifying] = useState(false);
   const [crewCodeVerified, setCrewCodeVerified] = useState(false);
   const [crewCodeError, setCrewCodeError] = useState<string | null>(null);
+
+  // 알림 상태 변수 수정 및 추가
+  const [isNotificationVisible, setIsNotificationVisible] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] =
+    useState<NotificationType>("success"); // 초기값은 success이나, 사용 전 항상 설정됨
 
   useEffect(() => {
     const fetchUserSession = async () => {
@@ -133,20 +142,27 @@ export default function SignupPage() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        alert("회원가입이 완료되었습니다!");
-        router.push("/");
+        setNotificationMessage("회원가입에 성공했습니다.");
+        setNotificationType("success");
+        setIsNotificationVisible(true);
       } else {
-        setFormError("root.serverError", {
-          type: "manual",
-          message: result.message || "회원가입에 실패했습니다.",
-        });
+        setNotificationMessage(result.message || "회원가입에 실패했습니다.");
+        setNotificationType("error");
+        setIsNotificationVisible(true);
       }
     } catch (error) {
       console.error("Signup error:", error);
-      setFormError("root.serverError", {
-        type: "manual",
-        message: "회원가입 중 오류가 발생했습니다.",
-      });
+      setNotificationMessage("회원가입 중 오류가 발생했습니다.");
+      setNotificationType("error");
+      setIsNotificationVisible(true);
+    }
+  };
+
+  const handleNotificationClose = () => {
+    setIsNotificationVisible(false);
+    // 메시지나 타입 초기화는 필수는 아님. isVisible로 제어.
+    if (notificationType === "success") {
+      router.push("/");
     }
   };
 
@@ -162,6 +178,13 @@ export default function SignupPage() {
 
   return (
     <div className='flex flex-col min-h-screen bg-gray-50'>
+      <PopupNotification
+        isVisible={isNotificationVisible}
+        message={notificationMessage}
+        duration={3000} // 3초로 설정
+        onClose={handleNotificationClose}
+        type={notificationType}
+      />
       {/* 헤더 시작 */}
       <header className='sticky top-0 z-10 w-full bg-white shadow-sm'>
         <div className='max-w-md px-4 mx-auto'>
@@ -293,12 +316,6 @@ export default function SignupPage() {
                 </p>
               )}
             </div>
-
-            {errors.root?.serverError && (
-              <p className='py-2 text-sm text-center text-red-600'>
-                {errors.root.serverError.message}
-              </p>
-            )}
 
             <div className='pt-4'>
               <button

@@ -17,7 +17,7 @@ import Link from "next/link";
 import { FiBell, FiMenu, FiUser } from "react-icons/fi"; // react-icons import 추가
 
 const Header: React.FC = () => {
-  const mypageLink = "/mypage/1";
+  const mypageLink = "/mypage";
   return (
     <header className='flex items-center justify-between w-full p-4 bg-black'>
       <div className='flex items-center justify-between w-full mx-auto'>

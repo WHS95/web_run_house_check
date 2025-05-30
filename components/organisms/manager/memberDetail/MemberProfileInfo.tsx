@@ -28,16 +28,16 @@ const MemberProfileInfo: React.FC<MemberProfileInfoProps> = ({
       <div className='flex-1'>
         <div className='flex items-center mb-1'>
           <h2 className='mr-2 text-xl font-medium'>{name}</h2>
-          <Image
+          {/* <Image
             src='/assets/star-icon-yellow.svg'
             alt='등급'
             width={16}
             height={16}
-          />
+          /> */}
         </div>
         <div className='flex space-x-4 text-sm text-gray-600'>
           <span>가입일 {joinDate}</span>
-          <span>등급 {grade}</span>
+          {/* <span>등급 {grade}</span> */}
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ interface PageHeaderProps {
   backLink?: string;
   iconColor?: "white" | "black";
   borderColor?: string;
+  rightAction?: React.ReactNode;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
@@ -14,6 +15,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   backLink = "/",
   iconColor = "black",
   borderColor,
+  rightAction,
 }) => {
   const textColor = iconColor === "white" ? "text-white" : "text-black";
   const borderClass = borderColor ? `border-b border-${borderColor}` : "";
@@ -26,6 +28,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         <FiChevronLeft size={24} color={iconColor} />
       </Link>
       <h1 className={`text-base font-semibold ${textColor}`}>{title}</h1>
+      {rightAction && (
+        <div className='absolute right-0 px-3'>{rightAction}</div>
+      )}
     </header>
   );
 };

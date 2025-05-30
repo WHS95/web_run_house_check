@@ -35,6 +35,21 @@ interface UserProfileForMyPage {
   email: string | null;
   phone: string | null;
   profileImageUrl?: string | null;
+  isAdmin: boolean; // 관리자 권한 여부 추가
+}
+
+// 활동 데이터 인터페이스 추가
+interface Activity {
+  type: "attendance" | "create_meeting";
+  date: string;
+  location: string;
+  exerciseType: string;
+}
+
+interface ActivityData {
+  attendanceCount: number;
+  meetingsCreatedCount: number;
+  activities: Activity[];
 }
 
 async function getMyPageData(
@@ -49,6 +64,7 @@ async function getMyPageData(
     rankName: null,
     joinDate: null,
     phone: null,
+    isAdmin: false, // 기본값 false
   };
 
   // 1. users 테이블에서 상세 정보 조회 (join_date, phone 추가)
@@ -87,6 +103,19 @@ async function getMyPageData(
   }
 
   const currentCrewId = userData.verified_crew_id;
+
+  // 2. 사용자 권한 확인 (ADMIN 권한 여부)
+  const { data: userRoleData, error: userRoleError } = await supabaseClient
+    .schema("attendance")
+    .from("user_roles")
+    .select("roles(name)")
+    .eq("user_id", user.id);
+
+  if (!userRoleError && userRoleData) {
+    userProfile.isAdmin = userRoleData.some(
+      (role: any) => role.roles?.name === "ADMIN"
+    );
+  }
 
   if (currentCrewId) {
     // 크루 이름은 MemberDetailTemplate에서 직접 표시하지 않으므로 조회 생략 가능
@@ -131,6 +160,80 @@ async function getMyPageData(
   return userProfile;
 }
 
+// 활동 데이터를 가져오는 함수 추가
+async function getActivityData(
+  supabaseClient: any,
+  user: User
+): Promise<ActivityData> {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  try {
+    // 최근 30일간의 출석 기록 조회 (장소와 운동 종류 정보 포함)
+    const { data: records, error: recordsError } = await supabaseClient
+      .schema("attendance")
+      .from("attendance_records")
+      .select(
+        `
+        attendance_timestamp, 
+        is_host, 
+        location,
+        exercise_types!attendance_records_exercise_type_id_fkey(name)
+      `
+      )
+      .eq("user_id", user.id)
+      .gte("attendance_timestamp", thirtyDaysAgo.toISOString())
+      .order("attendance_timestamp", { ascending: false })
+      .limit(5);
+
+    if (recordsError) {
+      console.error("Error fetching activity data:", recordsError);
+      return {
+        attendanceCount: 0,
+        meetingsCreatedCount: 0,
+        activities: [],
+      };
+    }
+
+    // 출석 횟수와 모임 개설 횟수 계산
+    const attendanceCount = records?.length || 0;
+    const meetingsCreatedCount =
+      records?.filter((record: { is_host: boolean }) => record.is_host)
+        .length || 0;
+
+    // 활동 내역 포맷팅
+    const activities =
+      records?.map(
+        (record: {
+          is_host: boolean;
+          attendance_timestamp: string;
+          location: string;
+          exercise_types: { name: string } | null;
+        }) => ({
+          type: record.is_host
+            ? ("create_meeting" as const)
+            : ("attendance" as const),
+          date: record.attendance_timestamp,
+          location: record.location || "알 수 없음",
+          exerciseType: record.exercise_types?.name || "알 수 없음",
+        })
+      ) || [];
+
+    return {
+      attendanceCount,
+      meetingsCreatedCount,
+      activities,
+    };
+  } catch (error) {
+    console.error("Error in getActivityData:", error);
+    return {
+      attendanceCount: 0,
+      meetingsCreatedCount: 0,
+      activities: [],
+    };
+  }
+}
+
 export default async function MyPage() {
   const supabase = createSupabaseServerClient();
 
@@ -149,6 +252,7 @@ export default async function MyPage() {
   }
 
   const userProfileData = await getMyPageData(supabase, user);
+  const activityData = await getActivityData(supabase, user);
 
   if (!userProfileData) {
     // getMyPageData에서 오류 발생 시 초기 userProfile 객체가 반환될 수 있음
@@ -167,10 +271,17 @@ export default async function MyPage() {
           phone: null,
           rankName: "-",
           profileImageUrl: user.user_metadata?.avatar_url || null,
+          isAdmin: false, // 기본값 false
         }}
+        activityData={activityData}
       />
     );
   }
 
-  return <MemberDetailTemplate userProfile={userProfileData} />;
+  return (
+    <MemberDetailTemplate
+      userProfile={userProfileData}
+      activityData={activityData}
+    />
+  );
 }

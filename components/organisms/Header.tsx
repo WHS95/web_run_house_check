@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
-  const mypageLink = "/mypage/1";
+  const mypageLink = "/mypage";
   return (
     <header className='flex items-center justify-between w-full px-3 py-4'>
       <div className='flex items-center justify-between w-full mx-auto'>

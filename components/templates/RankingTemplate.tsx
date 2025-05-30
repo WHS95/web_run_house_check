@@ -86,7 +86,7 @@ const RankingTemplate: React.FC<RankingTemplateProps> = ({ initialData, onMonthC
       <div className="flex-shrink-0">
         <div className="mb-4 bg-white">
           {/* crewName을 사용하여 동적 타이틀 */}
-          <PageHeader title={`${crewName} 랭킹`} iconColor="black" />
+          <PageHeader title={`랭킹`} iconColor="black" />
         </div>
       </div>
       <div className="px-2">

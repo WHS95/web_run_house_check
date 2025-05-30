@@ -133,9 +133,8 @@ const AttendanceTemplate: React.FC<AttendanceTemplateProps> = ({
           duration={3000}
           onClose={() => {
             setShowNotification(false);
-            // 성공 시 추가 작업 (예: 페이지 리프레시, 폼 초기화 등)
             if (notificationType === "success") {
-              // window.location.reload(); // 단순 새로고침
+              window.location.href = "/";
             }
           }}
         />

@@ -38,7 +38,7 @@ const HomeTemplate: React.FC<HomeTemplateProps> = ({
 
       {/* 헤더 */}
       <div className="relative z-50">
-        <Header title={crewName || "런하우스"} /> {/* 크루 이름이 없으면 기본값 */}
+        <Header title={"RUN HOUSE"} /> {/* 크루 이름이 없으면 기본값 */}
       </div>
 
       {/* 공지사항 */}
@@ -54,14 +54,14 @@ const HomeTemplate: React.FC<HomeTemplateProps> = ({
       <div className="absolute left-0 right-0 bottom-0 z-10">
         <div className="mx-auto">
           {/* 카드 스택 컨테이너 */}
-          <div className="relative h-[380px] bg-transparent">
+          <div className="relative h-[400px] bg-transparent">
             {/* 파란색 랭킹 카드 - 하단에 위치 */}
             <div className="absolute bottom-0 left-0 right-0 z-40">
               <RankingCard />
             </div>
 
             {/* 보라색 출석 체크 카드 - 상단에 위치하며 파란색 카드 위로 겹침 */}
-            <div className="absolute bottom-[60px] left-0 right-0 z-20">
+            <div className="absolute bottom-[90px] left-0 right-0 z-20">
               <AttendanceCard />
             </div>
           </div>

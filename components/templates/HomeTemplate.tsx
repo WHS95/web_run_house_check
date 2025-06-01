@@ -24,7 +24,7 @@ const HomeTemplate: React.FC<HomeTemplateProps> = ({
   const heroRankDisplay = rankName; // 또는 별도 포맷팅
 
   return (
-    <div className="relative min-h-screen bg-background-dark overflow-hidden">
+    <div className="relative min-h-screen bg-black overflow-hidden">
       {/* Hero 섹션이 화면 전체를 채움 */}
       <div className="absolute inset-0 z-0">
         {username && ( // username이 있을 때만 Hero 렌더링 (예시)

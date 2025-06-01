@@ -6,8 +6,8 @@ interface NoticeBarProps {
 
 const NoticeBar: React.FC<NoticeBarProps> = ({ noticeText }) => {
   return (
-    <div className='relative flex items-center gap-3 p-3 bg-[#4c525e] rounded-notice backdrop-blur-md'>
-      <div className='px-2 py-1 font-normal text-white bg-black rounded-notice text-15'>
+    <div className='relative flex items-center gap-3 p-3 bg-[#4c525e] rounded-lg backdrop-blur-md border-spacing-1'>
+      <div className='px-2 py-1 font-normal text-white bg-black rounded-lg text-15'>
         공지
       </div>
       <p className='font-normal text-white text-15'>{noticeText}</p>

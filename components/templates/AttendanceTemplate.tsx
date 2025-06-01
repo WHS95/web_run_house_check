@@ -39,6 +39,36 @@ const AttendanceTemplate: React.FC<AttendanceTemplateProps> = ({
     );
   }
   
+  // 현재 시간을 10분 단위로 가장 가까운 시간으로 설정
+  const getCurrentTime = () => {
+    const now = new Date();
+    const currentMinutes = now.getMinutes();
+    const currentSeconds = now.getSeconds();
+    
+    // 현재 분을 10분 단위로 나눈 나머지
+    const remainder = currentMinutes % 10;
+    
+    let adjustedMinutes;
+    let adjustedHours = now.getHours();
+    
+    // 5분 이상이면 다음 10분 단위로, 5분 미만이면 현재 10분 단위로
+    if (remainder >= 5 || (remainder === 4 && currentSeconds >= 30)) {
+      // 다음 10분 단위로 올림
+      adjustedMinutes = currentMinutes + (10 - remainder);
+    } else {
+      // 현재 10분 단위로 내림
+      adjustedMinutes = currentMinutes - remainder;
+    }
+    
+    // 60분을 넘어가면 시간 조정
+    if (adjustedMinutes >= 60) {
+      adjustedHours = (adjustedHours + 1) % 24;
+      adjustedMinutes = 0;
+    }
+    
+    return `${adjustedHours.toString().padStart(2, '0')}:${adjustedMinutes.toString().padStart(2, '0')}`;
+  };
+  
   // initialData는 AttendanceForm에 전달하기 전에 한 번만 설정되도록 useEffect나 useMemo 사용 고려 가능
   // 여기서는 props 변경 시 리렌더링되면서 initialData도 업데이트됨
   const today = new Date(); // 사용자 브라우저 기준 오늘 날짜 (KST 사용자는 KST 기준)
@@ -49,8 +79,8 @@ const AttendanceTemplate: React.FC<AttendanceTemplateProps> = ({
 
   const initialAttendanceData = {
     name: currentUser.name || "사용자",
-    // age 필드는 AttendanceForm에서 사용하지 않거나, birthYear를 전달하는 방식으로 변경 필요
     date: todayKST_YYYYMMDD, // "YYYY-MM-DD" 형식으로 변경
+    time: getCurrentTime(), // 현재 시간 (10분 단위)
     location: fetchedLocationOptions.length > 0 ? fetchedLocationOptions[0].value : "",
     exerciseType: fetchedExerciseOptions.length > 0 ? fetchedExerciseOptions[0].value : "",
     isHost: "아니오",
@@ -65,13 +95,27 @@ const AttendanceTemplate: React.FC<AttendanceTemplateProps> = ({
       return;
     }
 
+    // 날짜와 시간을 합쳐서 ISO 문자열로 변환
+    const attendanceDateTime = new Date(`${formData.date}T${formData.time}:00`);
+    const currentDateTime = new Date();
+    console.log('참여 일시:', attendanceDateTime);
+    console.log('현재 시간:', currentDateTime);
+
+    // 참여 일시가 현재 시간보다 빠른지 검증
+    if (attendanceDateTime > currentDateTime) {
+      setNotificationType("error");
+      setNotificationMessage("참여 일시를 확인해 주세요.");
+      setShowNotification(true);
+      return;
+    }
+
     const submissionData = {
       userId: currentUser.id,
       crewId: crewInfo.id,
       locationId: formData.location, // AttendanceForm의 location 필드 value가 ID여야 함
       exerciseTypeId: formData.exerciseType, // AttendanceForm의 exerciseType 필드 value가 ID여야 함
       isHost: formData.isHost === '예', // '예'/'아니오' 문자열을 boolean으로
-      attendanceTimestamp: new Date().toISOString(),
+      attendanceTimestamp: attendanceDateTime.toISOString(),
     };
 
     try {
@@ -130,7 +174,7 @@ const AttendanceTemplate: React.FC<AttendanceTemplateProps> = ({
           isVisible={showNotification} 
           message={notificationMessage}
           type={notificationType}
-          duration={3000}
+          duration={2000}
           onClose={() => {
             setShowNotification(false);
             if (notificationType === "success") {

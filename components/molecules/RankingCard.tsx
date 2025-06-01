@@ -9,7 +9,7 @@ const RankingCard: React.FC = () => {
   return (
     <Link href='/ranking'>
       <Card
-        bgColor='bg-[#4c525e]'
+        bgColor='bg-basic-gray'
         className='rounded-card-top min-h-[100px] cursor-pointer shadow-lg'
       >
         <div className='flex items-center justify-between h-full py-5'>

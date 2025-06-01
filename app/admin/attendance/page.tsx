@@ -1,151 +1,134 @@
-"use client";
-
-import React from "react";
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { getMonthlyAttendanceData } from "@/lib/supabase/admin";
 import AdminAttendanceManagement from "@/components/organisms/AdminAttendanceManagement";
 
-// 타입들을 직접 정의
-interface AttendanceRecord {
-  id: string;
-  userId: string;
-  userName: string;
-  checkInTime: string;
-  location: string;
-  exerciseType: string;
-  status: "present" | "late" | "absent";
-  isHost: boolean;
+// 로딩 스켈레톤 컴포넌트
+function AttendanceLoadingSkeleton() {
+  return (
+    <div className='flex flex-col h-screen bg-gray-50'>
+      {/* 헤더 스켈레톤 */}
+      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
+        <div className='px-4 py-4'>
+          <div className='flex items-center justify-between'>
+            <div>
+              <div className='w-24 h-6 bg-gray-200 rounded animate-pulse'></div>
+              <div className='w-32 h-4 mt-1 bg-gray-100 rounded animate-pulse'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 메인 컨텐츠 스켈레톤 */}
+      <div className='flex-1 px-4 py-4 pb-24 overflow-y-auto'>
+        <div className='space-y-6'>
+          {/* 달력 스켈레톤 */}
+          <div className='p-4 bg-white border border-gray-200 rounded-lg'>
+            <div className='flex items-center justify-between mb-4'>
+              <div className='w-8 h-8 bg-gray-200 rounded animate-pulse'></div>
+              <div className='w-32 h-6 bg-gray-200 rounded animate-pulse'></div>
+              <div className='w-8 h-8 bg-gray-200 rounded animate-pulse'></div>
+            </div>
+
+            {/* 요일 헤더 */}
+            <div className='grid grid-cols-7 gap-1 mb-2'>
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className='py-2 text-center'>
+                  <div className='w-4 h-4 mx-auto bg-gray-200 rounded animate-pulse'></div>
+                </div>
+              ))}
+            </div>
+
+            {/* 달력 날짜들 */}
+            <div className='grid grid-cols-7 gap-1' style={{ height: "80%" }}>
+              {Array.from({ length: 35 }).map((_, i) => (
+                <div
+                  key={i}
+                  className='h-10 bg-gray-100 rounded animate-pulse'
+                ></div>
+              ))}
+            </div>
+          </div>
+
+          {/* 안내 메시지 스켈레톤 */}
+          <div className='p-4 bg-white border border-gray-200 rounded-lg'>
+            <div className='text-center'>
+              <div className='w-8 h-8 mx-auto mb-2 bg-gray-200 rounded animate-pulse'></div>
+              <div className='w-48 h-4 mx-auto mb-1 bg-gray-200 rounded animate-pulse'></div>
+              <div className='w-40 h-4 mx-auto bg-gray-200 rounded animate-pulse'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-interface AttendanceSummary {
-  date: string;
-  count: number;
-}
+// 메인 출석 관리 컴포넌트
+async function AttendanceManagementContent() {
+  const supabase = await createClient();
 
-type AttendanceDetailData = {
-  [key: string]: AttendanceRecord[];
-};
+  // 사용자 인증 확인
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-// 임시 출석 요약 데이터 (서버에서 받을 형태)
-const mockAttendanceSummary: AttendanceSummary[] = [
-  { date: "2025-01-05", count: 2 },
-  { date: "2025-01-10", count: 1 },
-  { date: "2025-01-15", count: 3 },
-  { date: "2025-01-20", count: 2 },
-  { date: "2025-01-25", count: 1 },
-];
+  if (authError || !user) {
+    redirect("/login");
+  }
 
-// 임시 출석 상세 데이터 (클릭 시 서버에서 받을 형태)
-const mockAttendanceDetailData: AttendanceDetailData = {
-  "2025-01-05": [
-    {
-      id: "1",
-      userId: "1",
-      userName: "김러너",
-      checkInTime: "2025-01-05 06:30",
-      location: "올림픽공원 평화의문",
-      exerciseType: "러닝",
-      status: "present",
-      isHost: false,
-    },
-    {
-      id: "2",
-      userId: "2",
-      userName: "박달리기",
-      checkInTime: "2025-01-05 06:45",
-      location: "올림픽공원 평화의문",
-      exerciseType: "러닝",
-      status: "late",
-      isHost: true,
-    },
-  ],
-  "2025-01-10": [
-    {
-      id: "3",
-      userId: "3",
-      userName: "이조깅",
-      checkInTime: "2025-01-10 06:25",
-      location: "한강공원 뚝섬",
-      exerciseType: "러닝",
-      status: "present",
-      isHost: false,
-    },
-  ],
-  "2025-01-15": [
-    {
-      id: "4",
-      userId: "4",
-      userName: "최마라톤",
-      checkInTime: "2025-01-15 07:00",
-      location: "올림픽공원 평화의문",
-      exerciseType: "러닝",
-      status: "late",
-      isHost: false,
-    },
-    {
-      id: "5",
-      userId: "5",
-      userName: "정스프린트",
-      checkInTime: "2025-01-15 06:20",
-      location: "남산공원",
-      exerciseType: "등산",
-      status: "present",
-      isHost: true,
-    },
-    {
-      id: "6",
-      userId: "6",
-      userName: "김헬스",
-      checkInTime: "2025-01-15 07:30",
-      location: "헬스장",
-      exerciseType: "헬스",
-      status: "present",
-      isHost: false,
-    },
-  ],
-  "2025-01-20": [
-    {
-      id: "7",
-      userId: "7",
-      userName: "정헬스",
-      checkInTime: "2025-01-20 07:00",
-      location: "헬스장",
-      exerciseType: "헬스",
-      status: "present",
-      isHost: true,
-    },
-    {
-      id: "8",
-      userId: "8",
-      userName: "이요가",
-      checkInTime: "2025-01-20 07:15",
-      location: "요가스튜디오",
-      exerciseType: "요가",
-      status: "present",
-      isHost: false,
-    },
-  ],
-  "2025-01-25": [
-    {
-      id: "9",
-      userId: "9",
-      userName: "최등산",
-      checkInTime: "2025-01-25 05:30",
-      location: "북한산",
-      exerciseType: "등산",
-      status: "present",
-      isHost: true,
-    },
-  ],
-};
+  // 사용자 정보 조회
+  const { data: userData, error: userError } = await supabase
+    .schema("attendance")
+    .from("users")
+    .select("id, first_name, is_crew_verified, verified_crew_id")
+    .eq("id", user.id)
+    .single();
 
-export default function AdminAttendancePage() {
-  // 실제 서버 연동 시에는 여기서 API 호출
-  // const attendanceSummary = await fetchAttendanceSummary();
-  // const attendanceDetailData = await fetchAttendanceDetailData();
+  if (userError || !userData) {
+    redirect("/login");
+  }
+
+  // 크루 인증 확인
+  if (!userData.is_crew_verified || !userData.verified_crew_id) {
+    redirect("/crew-verification");
+  }
+
+  // 현재 날짜 기준으로 월별 출석 데이터 조회
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  const {
+    summary,
+    detailData,
+    error: attendanceError,
+  } = await getMonthlyAttendanceData(
+    userData.verified_crew_id,
+    currentYear,
+    currentMonth
+  );
+
+  if (attendanceError) {
+    console.error("출석 데이터 조회 오류:", attendanceError);
+    // 에러가 발생해도 빈 데이터로 렌더링
+  }
 
   return (
     <AdminAttendanceManagement
-      attendanceSummary={mockAttendanceSummary}
-      attendanceDetailData={mockAttendanceDetailData}
+      attendanceSummary={summary || []}
+      attendanceDetailData={detailData || {}}
     />
+  );
+}
+
+// 메인 페이지 컴포넌트
+export default function AttendancePage() {
+  return (
+    <Suspense fallback={<AttendanceLoadingSkeleton />}>
+      <AttendanceManagementContent />
+    </Suspense>
   );
 }

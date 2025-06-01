@@ -3,9 +3,8 @@ import Link from 'next/link';
 import { FiSettings } from 'react-icons/fi';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import MemberProfileInfo from '@/components/organisms/manager/memberDetail/MemberProfileInfo';
-import MemberContactInfo from '@/components/organisms/manager/memberDetail/MemberContactInfo';
-import MemberActivityInfo from '@/components/organisms/manager/memberDetail/MemberActivityInfo';
 import MemberActivityHistory from '@/components/organisms/manager/memberDetail/MemberActivityHistory';
+import ActivityContributionGraph from '@/components/molecules/ActivityContributionGraph';
 
 interface Activity {
     type: 'attendance' | 'create_meeting';
@@ -39,7 +38,7 @@ interface MemberDetailTemplateProps {
 const MemberDetailTemplate: React.FC<MemberDetailTemplateProps> = ({ userProfile, activityData }) => {
     if (!userProfile) {
         return (
-            <div className="min-h-screen bg-white flex flex-col">
+            <div className="h-screen bg-white flex flex-col">
                 <div className="flex-shrink-0">
                     <PageHeader title="내 정보" iconColor="black" backLink="/" borderColor="gray-300" />
                 </div>
@@ -66,8 +65,9 @@ const MemberDetailTemplate: React.FC<MemberDetailTemplateProps> = ({ userProfile
     ) : null;
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
-            <div className="flex-shrink-0">
+        <div className="flex flex-col h-screen">
+            {/* 고정된 헤더 */}
+            <div className="sticky top-0 z-10">
                 <PageHeader 
                     title="내 정보" 
                     iconColor="black" 
@@ -77,19 +77,15 @@ const MemberDetailTemplate: React.FC<MemberDetailTemplateProps> = ({ userProfile
                 />
             </div>
             
+            {/* 스크롤 가능한 전체 콘텐츠 영역 */}
             <div className="flex-1 overflow-y-auto px-4 py-4">
                 <MemberProfileInfo 
                     name={displayName}
                     joinDate={userProfile.joinDate || '-'}
                     grade={userProfile.rankName || '-'}
                 />
-                <MemberContactInfo 
-                    email={userProfile.email || '-'}
-                    phone={userProfile.phone || '-'}
-                />
-                <MemberActivityInfo 
-                    attendanceCount={activityData.attendanceCount}
-                    meetingsCreatedCount={activityData.meetingsCreatedCount}
+                <ActivityContributionGraph 
+                    activities={activityData.activities}
                 />
                 <MemberActivityHistory 
                     activities={activityData.activities}

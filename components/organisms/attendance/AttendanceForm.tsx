@@ -3,20 +3,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import InputField from "@/components/atoms/InputField";
-import DateField from "@/components/atoms/DateField";
+import DateTimeField from "@/components/atoms/DateTimeField";
 import SearchableSelectField from "@/components/atoms/SearchableSelectField";
 import RadioGroup from "@/components/molecules/FormFieldGroup";
 
-// Zod 스키마 정의 (age 필드 제거됨)
+// Zod 스키마 정의 (time 필드 추가)
 const attendanceSchema = z.object({
   name: z.string().optional(),
   date: z.string().min(1, "참여일을 선택해주세요"),
+  time: z.string().min(1, "참여 시간을 선택해주세요"),
   location: z.string().min(1, "참여 장소를 선택해주세요"),
   exerciseType: z.string().min(1, "운동 종류를 선택해주세요"),
   isHost: z.string().min(1, "개설자 여부를 선택해주세요"),
 });
 
-// 폼 데이터 타입 (age 필드 제거됨)
+// 폼 데이터 타입 (time 필드 추가)
 type AttendanceFormData = z.infer<typeof attendanceSchema>;
 
 // AttendanceForm Props 인터페이스 정의
@@ -36,6 +37,38 @@ const AttendanceForm: React.FC<AttendanceFormProps> = ({
   showHostField = true,
   onSubmit,
 }) => {
+  // 현재 시간을 10분 단위로 가장 가까운 시간으로 설정
+  const getCurrentTime = () => {
+    const now = new Date();
+    const currentMinutes = now.getMinutes();
+    const currentSeconds = now.getSeconds();
+
+    // 현재 분을 10분 단위로 나눈 나머지
+    const remainder = currentMinutes % 10;
+
+    let adjustedMinutes;
+    let adjustedHours = now.getHours();
+
+    // 5분 이상이면 다음 10분 단위로, 5분 미만이면 현재 10분 단위로
+    if (remainder >= 5 || (remainder === 4 && currentSeconds >= 30)) {
+      // 다음 10분 단위로 올림
+      adjustedMinutes = currentMinutes + (10 - remainder);
+    } else {
+      // 현재 10분 단위로 내림
+      adjustedMinutes = currentMinutes - remainder;
+    }
+
+    // 60분을 넘어가면 시간 조정
+    if (adjustedMinutes >= 60) {
+      adjustedHours = (adjustedHours + 1) % 24;
+      adjustedMinutes = 0;
+    }
+
+    return `${adjustedHours.toString().padStart(2, "0")}:${adjustedMinutes
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   const {
     register,
     handleSubmit,
@@ -48,6 +81,7 @@ const AttendanceForm: React.FC<AttendanceFormProps> = ({
     defaultValues: {
       name: initialData?.name || "",
       date: initialData?.date || new Date().toISOString().split("T")[0],
+      time: initialData?.time || getCurrentTime(),
       location:
         initialData?.location ||
         (locationOptions.length > 0 ? locationOptions[0].value : ""),
@@ -62,6 +96,10 @@ const AttendanceForm: React.FC<AttendanceFormProps> = ({
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue("date", e.target.value);
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setValue("time", e.target.value);
   };
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,13 +136,18 @@ const AttendanceForm: React.FC<AttendanceFormProps> = ({
         <p className='mt-1 text-xs text-red-500'>{errors.name.message}</p>
       )}
 
-      <DateField
-        label='참여일'
-        value={formValues.date}
-        onChange={handleDateChange}
+      <DateTimeField
+        label='참여일시'
+        dateValue={formValues.date}
+        timeValue={formValues.time}
+        onDateChange={handleDateChange}
+        onTimeChange={handleTimeChange}
       />
       {errors.date && (
         <p className='mt-1 text-xs text-red-500'>{errors.date.message}</p>
+      )}
+      {errors.time && (
+        <p className='mt-1 text-xs text-red-500'>{errors.time.message}</p>
       )}
 
       <SearchableSelectField

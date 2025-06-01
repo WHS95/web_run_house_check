@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MoreVertical, ArrowUpDown } from "lucide-react";
+import { Search, MoreVertical, ArrowUpDown, Edit } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +13,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
+import UserEditModal from "@/components/molecules/UserEditModal";
+import {
+  UserForAdmin,
+  updateUserStatus,
+  updateUserInfo,
+} from "@/lib/supabase/admin";
+
+interface AdminUserManagementProps {
+  initialUsers: UserForAdmin[];
+}
 
 // 오늘 기준 몇일 전인지 계산하는 함수
-const getDaysAgo = (dateString: string): string => {
+const getDaysAgo = (dateString: string | null): string => {
+  if (!dateString) return "출석 기록 없음";
+
   const today = new Date();
   const targetDate = new Date(dateString);
   const diffTime = today.getTime() - targetDate.getTime();
@@ -26,83 +38,46 @@ const getDaysAgo = (dateString: string): string => {
   return `${diffDays}일 전`;
 };
 
-// 임시 사용자 데이터
-const mockUsers = [
-  {
-    id: "1",
-    name: "김러너",
-    phone: "010-1234-5678",
-    status: "active",
-    joinDate: "2024-01-15",
-    lastAttendance: "2025-01-20",
-  },
-  {
-    id: "2",
-    name: "박달리기",
-    phone: "010-2345-6789",
-    status: "inactive",
-    joinDate: "2024-02-01",
-    lastAttendance: "2025-01-18",
-  },
-  {
-    id: "3",
-    name: "이조깅",
-    phone: "010-3456-7890",
-    status: "active",
-    joinDate: "2024-02-20",
-    lastAttendance: "2025-01-21",
-  },
-  {
-    id: "4",
-    name: "최마라톤",
-    phone: "010-4567-8901",
-    status: "active",
-    joinDate: "2024-03-01",
-    lastAttendance: "2025-01-19",
-  },
-  {
-    id: "5",
-    name: "정스프린트",
-    phone: "010-5678-9012",
-    status: "inactive",
-    joinDate: "2024-01-10",
-    lastAttendance: "2025-01-15",
-  },
-  {
-    id: "6",
-    name: "한러닝",
-    phone: "010-6789-0123",
-    status: "active",
-    joinDate: "2024-03-15",
-    lastAttendance: "2025-01-21",
-  },
-];
-
-export default function AdminUserManagement() {
+export default function AdminUserManagement({
+  initialUsers,
+}: AdminUserManagementProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("전체");
   const [sortBy, setSortBy] = useState("lastAttendance"); // 기본값: 최근 참석일
   const [sortOrder, setSortOrder] = useState("desc"); // desc: 최신순, asc: 오래된순
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState(initialUsers);
+  const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserForAdmin | null>(null);
 
   // 정렬 함수
-  const sortUsers = (users: typeof mockUsers) => {
+  const sortUsers = (users: UserForAdmin[]) => {
     return [...users].sort((a, b) => {
       switch (sortBy) {
         case "lastAttendance":
-          const aDate = new Date(a.lastAttendance).getTime();
-          const bDate = new Date(b.lastAttendance).getTime();
+          const aDate = a.last_attendance_date
+            ? new Date(a.last_attendance_date).getTime()
+            : 0;
+          const bDate = b.last_attendance_date
+            ? new Date(b.last_attendance_date).getTime()
+            : 0;
           return sortOrder === "desc" ? bDate - aDate : aDate - bDate;
         case "joinDate":
-          const aJoinDate = new Date(a.joinDate).getTime();
-          const bJoinDate = new Date(b.joinDate).getTime();
+          const aJoinDate = a.join_date
+            ? new Date(a.join_date).getTime()
+            : new Date(a.created_at).getTime();
+          const bJoinDate = b.join_date
+            ? new Date(b.join_date).getTime()
+            : new Date(b.created_at).getTime();
           return sortOrder === "desc"
             ? bJoinDate - aJoinDate
             : aJoinDate - bJoinDate;
         case "name":
+          const aName = a.first_name || "이름 없음";
+          const bName = b.first_name || "이름 없음";
           return sortOrder === "asc"
-            ? a.name.localeCompare(b.name)
-            : b.name.localeCompare(a.name);
+            ? aName.localeCompare(bName)
+            : bName.localeCompare(aName);
         default:
           return 0;
       }
@@ -111,28 +86,93 @@ export default function AdminUserManagement() {
 
   const filteredUsers = sortUsers(
     users.filter((user) => {
+      const userName = user.first_name || "";
+      const userPhone = user.phone || "";
+      const userEmail = user.email || "";
+
       const matchesSearch =
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phone.includes(searchTerm);
+        userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        userPhone.includes(searchTerm) ||
+        userEmail.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const isActive = user.status === "active" || user.status === null;
       const matchesStatus =
         statusFilter === "전체" ||
-        (statusFilter === "활성" && user.status === "active") ||
-        (statusFilter === "비활성" && user.status === "inactive");
+        (statusFilter === "활성" && isActive) ||
+        (statusFilter === "비활성" && !isActive);
+
       return matchesSearch && matchesStatus;
     })
   );
 
-  const handleToggleUserStatus = (userId: string) => {
-    setUsers(
-      users.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              status: user.status === "active" ? "inactive" : "active",
-            }
-          : user
-      )
-    );
+  const handleToggleUserStatus = async (userId: string) => {
+    setIsUpdating(userId);
+
+    try {
+      const currentUser = users.find((u) => u.id === userId);
+      if (!currentUser) return;
+
+      const isCurrentlyActive =
+        currentUser.status === "active" || currentUser.status === null;
+      const newStatus = !isCurrentlyActive;
+      const { error } = await updateUserStatus(userId, newStatus);
+
+      if (error) {
+        console.error("사용자 상태 업데이트 실패:", error);
+        alert("사용자 상태 변경에 실패했습니다.");
+        return;
+      }
+
+      // 로컬 상태 업데이트
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId
+            ? { ...user, status: newStatus ? "active" : "suspended" }
+            : user
+        )
+      );
+    } catch (error) {
+      console.error("사용자 상태 업데이트 오류:", error);
+      alert("사용자 상태 변경 중 오류가 발생했습니다.");
+    } finally {
+      setIsUpdating(null);
+    }
+  };
+
+  const handleEditUser = (user: UserForAdmin) => {
+    setSelectedUser(user);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveUserInfo = async (userData: {
+    first_name: string;
+    phone: string;
+    birth_year: number;
+  }) => {
+    if (!selectedUser) return;
+
+    try {
+      const { error } = await updateUserInfo(selectedUser.id, userData);
+
+      if (error) {
+        console.error("사용자 정보 업데이트 실패:", error);
+        alert("사용자 정보 수정에 실패했습니다.");
+        return;
+      }
+
+      // 로컬 상태 업데이트
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === selectedUser.id ? { ...user, ...userData } : user
+        )
+      );
+
+      setEditModalOpen(false);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error("사용자 정보 업데이트 오류:", error);
+      alert("사용자 정보 수정 중 오류가 발생했습니다.");
+    }
   };
 
   const handleSort = (newSortBy: string) => {
@@ -144,26 +184,28 @@ export default function AdminUserManagement() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return (
-          <Badge className='text-green-800 bg-green-100 hover:bg-green-100'>
-            활성
-          </Badge>
-        );
-      case "inactive":
-        return (
-          <Badge className='text-gray-800 bg-gray-100 hover:bg-gray-100'>
-            비활성
-          </Badge>
-        );
-      default:
-        return <Badge variant='secondary'>알 수 없음</Badge>;
+  const getStatusBadge = (status: string | null) => {
+    // status가 'active' 또는 null이면 활성, 'suspended'면 비활성
+    const isActive = status === "active" || status === null;
+
+    if (isActive) {
+      return (
+        <Badge className='text-green-800 bg-green-100 hover:bg-green-100'>
+          활성
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge className='text-gray-800 bg-gray-100 hover:bg-gray-100'>
+          비활성
+        </Badge>
+      );
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "정보 없음";
+
     const date = new Date(dateString);
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
       2,
@@ -182,6 +224,14 @@ export default function AdminUserManagement() {
       default:
         return "정렬";
     }
+  };
+
+  const getUserDisplayName = (user: UserForAdmin) => {
+    return user.first_name || "이름 없음";
+  };
+
+  const getUserContactInfo = (user: UserForAdmin) => {
+    return user.phone || user.email || "연락처 없음";
   };
 
   return (
@@ -206,7 +256,7 @@ export default function AdminUserManagement() {
         <div className='relative'>
           <Search className='absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2' />
           <Input
-            placeholder='이름 또는 전화번호로 검색'
+            placeholder='이름, 전화번호 또는 이메일로 검색'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className='pl-10 bg-white border-gray-200 rounded-lg'
@@ -271,9 +321,16 @@ export default function AdminUserManagement() {
                   <div className='flex-1'>
                     <div className='flex items-center justify-between mb-2'>
                       <div className='flex items-center space-x-3'>
-                        <h3 className='font-semibold text-gray-900'>
-                          {user.name}
-                        </h3>
+                        <div className='flex items-center space-x-2'>
+                          <h3 className='font-semibold text-gray-900'>
+                            {getUserDisplayName(user)}
+                          </h3>
+                          {user.birth_year && (
+                            <span className='text-sm text-gray-500'>
+                              ({user.birth_year}년생)
+                            </span>
+                          )}
+                        </div>
                         {getStatusBadge(user.status)}
                       </div>
                       <DropdownMenu>
@@ -282,15 +339,27 @@ export default function AdminUserManagement() {
                             variant='ghost'
                             size='icon'
                             className='w-8 h-8'
+                            disabled={isUpdating === user.id}
                           >
                             <MoreVertical className='w-4 h-4' />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
                           <DropdownMenuItem
-                            onClick={() => handleToggleUserStatus(user.id)}
+                            onClick={() => handleEditUser(user)}
                           >
-                            {user.status === "active" ? "비활성화" : "활성화"}
+                            <Edit className='w-4 h-4 mr-2' />
+                            정보 수정
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleToggleUserStatus(user.id)}
+                            disabled={isUpdating === user.id}
+                          >
+                            {isUpdating === user.id
+                              ? "처리 중..."
+                              : user.status === "active" || user.status === null
+                              ? "비활성화"
+                              : "활성화"}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -298,27 +367,33 @@ export default function AdminUserManagement() {
 
                     <div className='space-y-1 text-sm text-gray-600'>
                       <div className='flex justify-between'>
-                        <span>전화번호</span>
-                        <span>{user.phone}</span>
+                        <span>연락처</span>
+                        <span>{getUserContactInfo(user)}</span>
                       </div>
                       <div className='flex justify-between'>
                         <span>가입일</span>
-                        <span>{formatDate(user.joinDate)}</span>
+                        <span>
+                          {formatDate(user.join_date || user.created_at)}
+                        </span>
                       </div>
                       <div className='flex justify-between'>
                         <span>최근 참석일</span>
                         <span
                           className={`font-medium ${
-                            new Date(user.lastAttendance) >
-                            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                            user.last_attendance_date &&
+                            new Date(user.last_attendance_date) >
+                              new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                               ? "text-green-600"
-                              : new Date(user.lastAttendance) >
-                                new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                              : user.last_attendance_date &&
+                                new Date(user.last_attendance_date) >
+                                  new Date(
+                                    Date.now() - 30 * 24 * 60 * 60 * 1000
+                                  )
                               ? "text-yellow-600"
                               : "text-red-600"
                           }`}
                         >
-                          {getDaysAgo(user.lastAttendance)}
+                          {getDaysAgo(user.last_attendance_date)}
                         </span>
                       </div>
                     </div>
@@ -338,6 +413,19 @@ export default function AdminUserManagement() {
 
       {/* 하단 네비게이션 */}
       <AdminBottomNavigation />
+
+      {/* 사용자 정보 수정 모달 */}
+      {selectedUser && (
+        <UserEditModal
+          isOpen={editModalOpen}
+          onClose={() => {
+            setEditModalOpen(false);
+            setSelectedUser(null);
+          }}
+          user={selectedUser}
+          onSave={handleSaveUserInfo}
+        />
+      )}
     </div>
   );
 }

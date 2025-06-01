@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 // import Image from "next/image"; // Image 컴포넌트 제거
-import { FiBell, FiMenu, FiUser } from "react-icons/fi"; // react-icons import 추가
+import { FaRegUserCircle } from "react-icons/fa"; // react-icons import 추가
 
 interface HeaderProps {
   title?: string;
@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
         <div className='flex items-center gap-3 text-white'>
           <div className='relative w-6 h-6 cursor-pointer'>
             <Link href={mypageLink}>
-              <FiUser size={24} />
+              <FaRegUserCircle size={24} />
             </Link>
           </div>
         </div>

@@ -17,7 +17,7 @@ const AttendanceButton: React.FC<AttendanceButtonProps> = ({
         ${
           disabled
             ? "bg-gray-400 cursor-not-allowed"
-            : "bg-primary-blue hover:bg-blue-700"
+            : "bg-blue-600 hover:bg-blue-700"
         }
       `}
     >

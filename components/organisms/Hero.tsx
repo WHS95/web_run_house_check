@@ -14,7 +14,9 @@ const Hero: React.FC<HeroProps> = ({ username }) => {
           <p className='text-2xl font-light leading-[1.3] text-left text-white'>
             안녕하세요 👋🏻
             <br />
-            <div className='text-2xl font-bold text-white'>{username} 님,</div>
+            <span className='text-2xl font-bold text-white'>
+              {username} 님,
+            </span>
             <br />
             오늘도 즐거운
             <br />

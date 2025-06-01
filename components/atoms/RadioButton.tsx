@@ -26,15 +26,21 @@ const RadioButton: React.FC<RadioButtonProps> = ({
         className='hidden'
       />
       <span
-        className={`w-5 h-5 rounded-full border-2 border-[#E3E3EA] mr-2 flex items-center justify-center 
-        ${checked ? "bg-primary-blue border-primary-blue" : "bg-white"}
+        className={`w-5 h-5 rounded-full border-2 mr-2 flex items-center justify-center transition-all duration-200
+        ${
+          checked
+            ? "bg-blue-600 border-blue-600 shadow-md"
+            : "bg-white border-gray-300 hover:border-gray-400"
+        }
       `}
       >
-        {checked && <span className='w-2 h-2 bg-white rounded-full'></span>}
+        {checked && <span className='w-2.5 h-2.5 bg-white rounded-full'></span>}
       </span>
       <span
-        className={`text-sm ${
-          checked ? "font-medium text-primary-blue" : "text-black/60"
+        className={`text-sm transition-colors duration-200 ${
+          checked
+            ? "font-semibold text-blue-600"
+            : "font-normal text-gray-600 hover:text-gray-800"
         }`}
       >
         {label}

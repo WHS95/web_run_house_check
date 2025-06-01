@@ -161,12 +161,12 @@ async function getMyPageData(
 }
 
 // 활동 데이터를 가져오는 함수 추가
-async function getActivityData(
+async function getActivityData( 
   supabaseClient: any,
   user: User
 ): Promise<ActivityData> {
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
   try {
     // 최근 30일간의 출석 기록 조회 (장소와 운동 종류 정보 포함)
@@ -182,9 +182,8 @@ async function getActivityData(
       `
       )
       .eq("user_id", user.id)
-      .gte("attendance_timestamp", thirtyDaysAgo.toISOString())
-      .order("attendance_timestamp", { ascending: false })
-      .limit(5);
+      .gte("attendance_timestamp", ninetyDaysAgo.toISOString())
+      .order("attendance_timestamp", { ascending: false });
 
     if (recordsError) {
       console.error("Error fetching activity data:", recordsError);

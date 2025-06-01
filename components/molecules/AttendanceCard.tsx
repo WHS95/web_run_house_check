@@ -11,7 +11,7 @@ const AttendanceCard: React.FC = () => {
     <Link href='/attendance'>
       <Card
         // bgColor='bg-[#49eafc]'
-        bgColor='bg-[#669ff2]'
+        bgColor='bg-basic-blue'
         // bgColor='bg-gray-300'
         className='rounded-card-top min-h-[100px] shadow-lg cursor-pointer'
       >

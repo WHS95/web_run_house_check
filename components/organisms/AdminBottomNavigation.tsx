@@ -36,7 +36,7 @@ const navigationItems = [
     name: "설정",
     href: "/admin/settings",
     icon: Settings,
-    isComingSoon: true,
+    isComingSoon: false,
   },
 ];
 

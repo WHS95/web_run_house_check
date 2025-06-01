@@ -44,8 +44,14 @@ export async function POST(request: Request) {
       );
     }
     // 검증된 데이터 사용 - profileImageUrl, phone 제거됨
-    const { firstName, email, birthYear, verifiedCrewId, crewCode } =
-      validation.data;
+    const {
+      firstName,
+      email,
+      phoneNumber,
+      birthYear,
+      verifiedCrewId,
+      crewCode,
+    } = validation.data;
 
     if (!verifiedCrewId || !crewCode) {
       return NextResponse.json(
@@ -67,9 +73,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // updateUserData에서 profile_image_url, phone 제거
+    // updateUserData에서 phone_number 추가
     const updateUserData: Record<string, any> = {
       first_name: firstName,
+      phone: phoneNumber,
       birth_year: birthYear,
       is_crew_verified: true,
       verified_crew_id: verifiedCrewId,

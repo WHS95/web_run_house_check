@@ -19,9 +19,7 @@ const LoginTemplate: React.FC = () => {
 
             {/* 버튼 블록 */}
             <div className="w-full max-w-xs">
-                <KakaoLoginButton 
-                    classNameProps="w-full bg-basic-black text-white py-3.5 rounded-full text-lg font-bold hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors"
-                />
+                <KakaoLoginButton />
                 
                 {error && (
                     <div className="mt-4 text-sm text-red-600 text-center">

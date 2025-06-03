@@ -137,10 +137,8 @@ const RankingTemplate: React.FC<RankingTemplateProps> = ({ initialData, onMonthC
                 <RankingListItem 
                   key={item.user_id} // key를 user_id로 변경
                   rank={item.rank}
-                  name={item.name || '알 수 없음'}
-                  profileImageUrl={item.profile_image_url}
+                  name={item.name || '알 수 없음'}          
                   score={item.value}
-                  isCurrentUser={item.is_current_user}
                 />
               ))}
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useAdminContext } from "@/app/admin/layout";
+import { useAdminContext } from "@/app/admin/AdminContextProvider";
 
 const AdminHeader: React.FC = () => {
   const { firstName, crewId } = useAdminContext();

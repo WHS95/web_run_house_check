@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signupSchema, SignupFormValues } from "@/lib/validators/signupSchema";
+import { signupSchema, SignupFormData } from "@/lib/validators/signupSchema";
 import { createClient } from "@/lib/supabase/client"; // 클라이언트 Supabase 사용
 import { useRouter } from "next/navigation";
 import PopupNotification, {
@@ -27,57 +27,26 @@ const SignupForm: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupFormValues>({
+  } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       firstName: "",
       email: "",
-      password: "",
-      confirmPassword: "",
+      phoneNumber: "",
       birthYear: undefined,
-      phone: undefined,
-    } as SignupFormValues,
+      verifiedCrewId: "",
+      crewCode: "",
+      privacyConsent: false,
+      termsOfService: false,
+    } as SignupFormData,
   });
 
-  const onSubmit: SubmitHandler<SignupFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<SignupFormData> = async (data) => {
     setIsLoading(true);
     setNotificationMessage("");
     setNotificationType(null);
     setShowNotification(false);
 
-    const birthYearForSupabase =
-      data.birthYear === undefined ? null : data.birthYear;
-    const phoneForSupabase = data.phone === undefined ? null : data.phone;
-
-    const { error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          first_name: data.firstName,
-          birth_year: birthYearForSupabase,
-          phone: phoneForSupabase,
-        },
-      },
-    });
-
-    if (error) {
-      console.error("회원가입 오류:", error);
-      setNotificationMessage(
-        error.message || "회원가입 중 오류가 발생했습니다."
-      );
-      setNotificationType("error");
-    } else {
-      // 회원가입 성공 시, users 테이블에 추가 정보 저장 (선택적)
-      // Supabase auth.signUp에서 options.data로 전달하면 자동으로 users 테이블의 메타데이터로 들어가지 않음.
-      // 별도의 함수를 호출하거나, Supabase function (Edge function)을 트리거로 연결하여 users 테이블에 저장 필요.
-      // 현재는 이메일 확인을 위해 다음 단계로 안내하는 메시지를 표시합니다.
-      setNotificationMessage(
-        "회원가입이 거의 완료되었습니다! 이메일을 확인하여 계정을 활성화해주세요."
-      );
-      setNotificationType("success");
-      // router.push('/auth/verify-email'); // 이메일 확인 안내 페이지로 이동 (필요시 생성)
-    }
     setShowNotification(true);
     setIsLoading(false);
   };
@@ -131,42 +100,6 @@ const SignupForm: React.FC = () => {
 
           <div>
             <label
-              htmlFor='password'
-              className='block text-sm font-medium text-gray-700'
-            >
-              비밀번호
-            </label>
-            <input
-              id='password'
-              type='password'
-              {...register("password")}
-              className={inputStyle}
-            />
-            {errors.password && (
-              <p className={errorTextStyle}>{errors.password.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor='confirmPassword'
-              className='block text-sm font-medium text-gray-700'
-            >
-              비밀번호 확인
-            </label>
-            <input
-              id='confirmPassword'
-              type='password'
-              {...register("confirmPassword")}
-              className={inputStyle}
-            />
-            {errors.confirmPassword && (
-              <p className={errorTextStyle}>{errors.confirmPassword.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label
               htmlFor='birthYear'
               className='block text-sm font-medium text-gray-700'
             >
@@ -194,12 +127,12 @@ const SignupForm: React.FC = () => {
             <input
               id='phone'
               type='tel'
-              {...register("phone")}
+              {...register("phoneNumber")}
               className={inputStyle}
               placeholder='010-1234-5678'
             />
-            {errors.phone && (
-              <p className={errorTextStyle}>{errors.phone.message}</p>
+            {errors.phoneNumber && (
+              <p className={errorTextStyle}>{errors.phoneNumber.message}</p>
             )}
           </div>
 

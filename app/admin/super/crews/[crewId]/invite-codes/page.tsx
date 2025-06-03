@@ -6,7 +6,7 @@ import { Eye, ToggleLeft, ToggleRight } from "lucide-react";
 import InviteCodeCreateButton from "@/components/admin/crew/InviteCodeCreateButton";
 
 interface UserInfo {
-  display_name: string | null;
+  first_name: string | null;
   email: string | null;
 }
 
@@ -161,7 +161,7 @@ export default async function CrewInviteCodesPage({
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className='text-sm text-gray-900'>
                       {code.users && code.users.length > 0
-                        ? code.users[0].display_name
+                        ? code.users[0].first_name
                         : "Unknown"}
                     </div>
                     <div className='text-xs text-gray-500'>

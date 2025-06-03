@@ -108,21 +108,21 @@ export default async function CrewMembersPage({
                       {member.profile_image_url ? (
                         <img
                           src={member.profile_image_url}
-                          alt={member.display_name || "프로필 이미지"}
+                          alt={member.first_name || "프로필 이미지"}
                           className='w-10 h-10 mr-3 rounded-full'
                         />
                       ) : (
                         <div className='flex items-center justify-center w-10 h-10 mr-3 bg-gray-200 rounded-full'>
                           <span className='font-medium text-gray-500'>
                             {(
-                              member.display_name?.charAt(0) || "U"
+                              member.first_name?.charAt(0) || "U"
                             ).toUpperCase()}
                           </span>
                         </div>
                       )}
                       <div>
                         <div className='text-sm font-medium text-gray-900'>
-                          {member.display_name || "이름 없음"}
+                          {member.first_name || "이름 없음"}
                         </div>
                         <div className='text-sm text-gray-500'>
                           {member.email}
@@ -147,7 +147,7 @@ export default async function CrewMembersPage({
                   <td className='px-6 py-4 text-sm font-medium text-right whitespace-nowrap'>
                     <RemoveMemberButton
                       memberId={member.id}
-                      memberName={member.display_name || "이름 없음"}
+                      memberName={member.first_name || "이름 없음"}
                       userCrewId={member.user_crew_id}
                     />
                   </td>

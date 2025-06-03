@@ -30,7 +30,6 @@ const HomeTemplate: React.FC<HomeTemplateProps> = ({
         {username && ( // username이 있을 때만 Hero 렌더링 (예시)
           <Hero
             username={username}
-            rank={heroRankDisplay} /* rankName 또는 포맷팅된 값 */
             // score prop 제거
           />
         )}

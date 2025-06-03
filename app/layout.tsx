@@ -1,6 +1,6 @@
 import "./styles/globals.css";
 import { ReactNode } from "react";
-import { StagewiseToolbar } from "@stagewise/toolbar-next";
+// import { StagewiseToolbar } from "@stagewise/toolbar-next";
 
 export const metadata = {
   title: "런하우스",
@@ -58,31 +58,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <link rel='manifest' href='/manifest.json' />
         <link rel='shortcut icon' href='/favicon.ico' />
-
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      // console.log('SW registered: ', registration);
-                    })
-                    .catch(function(registrationError) {
-                      // console.log('SW registration failed: ', registrationError);
-                    });
-                });
-              }
-            `,
-          }}
-        />
       </head>
       <body>
-        <StagewiseToolbar
-          config={{
-            plugins: [], // 필요한 경우 여기에 사용자 정의 플러그인을 추가할 수 있습니다.
-          }}
-        />
         <div className='h-screen overflow-hidden'>{children}</div>
       </body>
     </html>

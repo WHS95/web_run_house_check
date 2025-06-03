@@ -1,8 +1,8 @@
-import { Suspense } from "react";
+"use client";
+
+import { Suspense, useEffect, useState } from "react";
 import AdminDashboard from "@/components/organisms/AdminDashboard";
-import { getAdminStats } from "@/lib/admin-stats";
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { useAdminContext } from "./AdminContextProvider";
 
 // 로딩 컴포넌트
 function AdminDashboardSkeleton() {
@@ -66,45 +66,60 @@ function AdminDashboardSkeleton() {
   );
 }
 
-// 실제 데이터를 가져오는 컴포넌트
-async function AdminDashboardWithData() {
-  // 1. 사용자 인증 확인
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+// 메인 페이지 컴포넌트 - 클라이언트 컴포넌트로 변경
+export default function AdminPage() {
+  const { crewId } = useAdminContext();
+  const [stats, setStats] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (userError || !user) {
-    redirect("/login");
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/admin/stats?crewId=${crewId}`);
+
+        if (!response.ok) {
+          throw new Error("통계 데이터를 가져오는데 실패했습니다.");
+        }
+
+        const data = await response.json();
+        setStats(data);
+      } catch (err) {
+        console.error("통계 데이터 조회 오류:", err);
+        setError(
+          err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (crewId) {
+      fetchStats();
+    }
+  }, [crewId]);
+
+  if (isLoading) {
+    return <AdminDashboardSkeleton />;
   }
 
-  // 2. 사용자의 crew 정보 직접 조회
-  const { data: userData, error: userDataError } = await supabase
-    .schema("attendance")
-    .from("users")
-    .select("is_crew_verified, verified_crew_id")
-    .eq("id", user.id)
-    .single();
-
-  if (
-    userDataError ||
-    !userData?.is_crew_verified ||
-    !userData?.verified_crew_id
-  ) {
-    redirect("/crew-verification");
+  if (error) {
+    return (
+      <div className='flex items-center justify-center min-h-screen bg-gray-50'>
+        <div className='p-6 text-center bg-white border border-red-200 rounded-lg shadow-sm'>
+          <h3 className='mb-2 text-lg font-semibold text-gray-900'>
+            오류 발생
+          </h3>
+          <p className='text-gray-600'>{error}</p>
+        </div>
+      </div>
+    );
   }
 
-  // 3. crew 기준으로 통계 데이터 가져오기
-  const stats = await getAdminStats(userData.verified_crew_id);
+  if (!stats) {
+    return <AdminDashboardSkeleton />;
+  }
 
   return <AdminDashboard stats={stats} />;
-}
-
-export default function AdminPage() {
-  return (
-    <Suspense fallback={<AdminDashboardSkeleton />}>
-      <AdminDashboardWithData />
-    </Suspense>
-  );
 }

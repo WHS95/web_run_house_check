@@ -26,7 +26,7 @@ export default function UnverifiedUserModal({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-basic-black bg-opacity-50'>
       <div className='bg-white rounded-lg p-6 max-w-md w-full mx-4'>
         <div className='text-center mb-6'>
           <div className='inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-100 text-yellow-500 mb-4'>

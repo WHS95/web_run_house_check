@@ -4,11 +4,11 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { attendanceSubmissionSchema } from "@/lib/validators/attendanceSchema";
 
 // 서버용 Supabase 클라이언트 (환경 변수 설정 확인 필요)
-const createSupabaseServerClient = () => {
-  const cookieStore = cookies();
+const createSupabaseServerClient = async () => {
+  const cookieStore = await cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -22,7 +22,7 @@ const createSupabaseServerClient = () => {
 };
 
 export async function POST(request: Request) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   try {
     const body = await request.json();
@@ -131,4 +131,9 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+  const cookieStore = await cookies();
+  // ... existing code ...
 }

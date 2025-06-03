@@ -5,11 +5,11 @@ import AttendanceTemplate from "@/components/templates/AttendanceTemplate";
 import { type User } from "@supabase/supabase-js";
 
 // 서버용 Supabase 클라이언트 (lib/supabase/server.ts로 분리 권장)
-const createSupabaseServerClient = () => {
-  const cookieStore = cookies();
+const createSupabaseServerClient = async () => {
+  const cookieStore = await cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -176,7 +176,7 @@ async function getAttendancePageData(
 }
 
 export default async function AttendancePage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { session },
     error: sessionError,

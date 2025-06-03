@@ -52,6 +52,12 @@ export const signupSchema = z.object({
     .string()
     .uuid({ message: "인증된 크루 ID가 유효하지 않습니다." }),
   crewCode: z.string().min(1, { message: "크루 코드를 입력해야 합니다." }),
+  privacyConsent: z.boolean().refine((val) => val === true, {
+    message: "개인정보 수집·이용에 동의해주세요.",
+  }),
+  termsOfService: z.boolean().refine((val) => val === true, {
+    message: "서비스 이용약관에 동의해주세요.",
+  }),
 });
 
 export type SignupFormData = z.infer<typeof signupSchema>;

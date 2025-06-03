@@ -1,7 +1,7 @@
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getMonthlyAttendanceData } from "@/lib/supabase/admin";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAdminContext } from "../AdminContextProvider";
 import AdminAttendanceManagement from "@/components/organisms/AdminAttendanceManagement";
 
 // 로딩 스켈레톤 컴포넌트
@@ -65,70 +65,70 @@ function AttendanceLoadingSkeleton() {
   );
 }
 
-// 메인 출석 관리 컴포넌트
-async function AttendanceManagementContent() {
-  const supabase = await createClient();
+// 메인 페이지 컴포넌트
+export default function AttendancePage() {
+  const { crewId } = useAdminContext();
+  const [attendanceData, setAttendanceData] = useState<{
+    summary: any[];
+    detailData: any;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 사용자 인증 확인
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  useEffect(() => {
+    async function fetchAttendanceData() {
+      try {
+        setIsLoading(true);
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
 
-  if (authError || !user) {
-    redirect("/login");
+        const response = await fetch(
+          `/api/admin/attendance?crewId=${crewId}&year=${currentYear}&month=${currentMonth}`
+        );
+
+        if (!response.ok) {
+          throw new Error("출석 데이터를 가져오는데 실패했습니다.");
+        }
+
+        const data = await response.json();
+        setAttendanceData(data);
+      } catch (err) {
+        console.error("출석 데이터 조회 오류:", err);
+        setError(
+          err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (crewId) {
+      fetchAttendanceData();
+    }
+  }, [crewId]);
+
+  if (isLoading) {
+    return <AttendanceLoadingSkeleton />;
   }
 
-  // 사용자 정보 조회
-  const { data: userData, error: userError } = await supabase
-    .schema("attendance")
-    .from("users")
-    .select("id, first_name, is_crew_verified, verified_crew_id")
-    .eq("id", user.id)
-    .single();
-
-  if (userError || !userData) {
-    redirect("/login");
-  }
-
-  // 크루 인증 확인
-  if (!userData.is_crew_verified || !userData.verified_crew_id) {
-    redirect("/crew-verification");
-  }
-
-  // 현재 날짜 기준으로 월별 출석 데이터 조회
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-
-  const {
-    summary,
-    detailData,
-    error: attendanceError,
-  } = await getMonthlyAttendanceData(
-    userData.verified_crew_id,
-    currentYear,
-    currentMonth
-  );
-
-  if (attendanceError) {
-    console.error("출석 데이터 조회 오류:", attendanceError);
-    // 에러가 발생해도 빈 데이터로 렌더링
+  if (error) {
+    return (
+      <div className='flex items-center justify-center min-h-screen bg-gray-50'>
+        <div className='p-6 text-center bg-white border border-red-200 rounded-lg shadow-sm'>
+          <h3 className='mb-2 text-lg font-semibold text-gray-900'>
+            오류 발생
+          </h3>
+          <p className='text-gray-600'>{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <AdminAttendanceManagement
-      attendanceSummary={summary || []}
-      attendanceDetailData={detailData || {}}
+      attendanceSummary={attendanceData?.summary || []}
+      attendanceDetailData={attendanceData?.detailData || {}}
     />
-  );
-}
-
-// 메인 페이지 컴포넌트
-export default function AttendancePage() {
-  return (
-    <Suspense fallback={<AttendanceLoadingSkeleton />}>
-      <AttendanceManagementContent />
-    </Suspense>
   );
 }

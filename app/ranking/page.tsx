@@ -8,11 +8,11 @@ import RankingTemplate, {
 import { type User } from "@supabase/supabase-js";
 
 // 서버용 Supabase 클라이언트
-const createSupabaseServerClient = () => {
-  const cookieStore = cookies();
+const createSupabaseServerClient = async () => {
+  const cookieStore = await cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -224,7 +224,7 @@ interface RankingPageProps {
 }
 
 export default async function RankingPage({ searchParams }: RankingPageProps) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();

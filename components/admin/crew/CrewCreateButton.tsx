@@ -61,7 +61,7 @@ export default function CrewCreateButton() {
         <div className='fixed inset-0 z-50 overflow-y-auto'>
           <div className='flex items-center justify-center min-h-screen p-4'>
             <div
-              className='fixed inset-0 bg-black bg-opacity-30'
+              className='fixed inset-0 bg-basic-black bg-opacity-30'
               onClick={() => setIsModalOpen(false)}
             ></div>
 

@@ -19,8 +19,8 @@ const RankingInfo: React.FC<RankingInfoProps> = ({
   return (
     <div className='flex flex-col items-center justify-center mb-1'>
       <p className='text-sm font-semibold'>{formattedDate}</p>
-      <p className='text-2xl font-semibold'>현재 {currentRank}위</p>
-      <p className='text-xs text-white/80'>전체 {totalMembers}명</p>
+      <p className='text-2xl font-semibold'> 나의 랭킹 {currentRank}위</p>
+      <p className='text-xs text-white/80'>전체 인원 {totalMembers}명</p>
     </div>
   );
 };

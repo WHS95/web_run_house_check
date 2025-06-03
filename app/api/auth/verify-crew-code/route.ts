@@ -3,12 +3,12 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr"; // 변�
 import { cookies } from "next/headers"; // 유지
 
 export async function POST(request: Request) {
-  const cookieStore = cookies(); // 유지
+  const cookieStore = await cookies(); // 유지
 
   const supabase = createServerClient(
     // 변경 시작
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {

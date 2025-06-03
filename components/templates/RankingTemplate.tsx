@@ -83,60 +83,71 @@ const RankingTemplate: React.FC<RankingTemplateProps> = ({ initialData, onMonthC
 
   return (
     <div className="min-h-screen bg-[#223150] text-white flex flex-col">
+      {/* 상단 고정 영역 */}
       <div className="flex-shrink-0">
         <div className="mb-4 bg-white">
           {/* crewName을 사용하여 동적 타이틀 */}
           <PageHeader title={`랭킹`} iconColor="black" />
         </div>
-      </div>
-      <div className="px-2">
-        <div className="mb-6 mt-6 flex items-center justify-between">
-          <button 
-            onClick={handlePrevMonth} 
-            className="p-2 rounded-md hover:bg-white/10 transition-colors"
-            aria-label="이전 달"
-          >
-            <IoMdArrowDropleft className="h-6 w-6" />
-          </button>
-          {/* RankingInfo에 동적 데이터 전달 (totalMembers, currentRank는 임시) */}
-          <RankingInfo 
-            date={dateForRankingInfo} 
-            totalMembers={placeholderTotalMembers} // TODO: 실제 크루 멤버 수 또는 랭킹 참여자 수
-            currentRank={placeholderCurrentRank} // TODO: 현재 사용자의 실제 랭킹
+        
+        <div className="px-2">
+          <div className="mb-6 mt-6 flex items-center justify-between">
+            <button 
+              onClick={handlePrevMonth} 
+              className="p-2 rounded-md hover:bg-white/10 transition-colors"
+              aria-label="이전 달"
+            >
+              <IoMdArrowDropleft className="h-6 w-6" />
+            </button>
+            {/* RankingInfo에 동적 데이터 전달 (totalMembers, currentRank는 임시) */}
+            <RankingInfo 
+              date={dateForRankingInfo} 
+              totalMembers={placeholderTotalMembers} // TODO: 실제 크루 멤버 수 또는 랭킹 참여자 수
+              currentRank={placeholderCurrentRank} // TODO: 현재 사용자의 실제 랭킹
+            />
+            <button 
+              onClick={handleNextMonth} 
+              className="p-2 rounded-md hover:bg-white/10 transition-colors"
+              aria-label="다음 달"
+            >
+              <IoMdArrowDropright className="h-6 w-6" />
+            </button>
+          </div>
+          {/* RankingTabs에 수정된 props 전달 */}
+          <RankingTabs 
+            tabs={tabs} 
+            activeTabId={activeTab} 
+            onTabChange={(tabId) => setActiveTab(tabId)} 
           />
-          <button 
-            onClick={handleNextMonth} 
-            className="p-2 rounded-md hover:bg-white/10 transition-colors"
-            aria-label="다음 달"
-          >
-            <IoMdArrowDropright className="h-6 w-6" />
-          </button>
         </div>
-        {/* RankingTabs에 수정된 props 전달 */}
-        <RankingTabs 
-          tabs={tabs} 
-          activeTabId={activeTab} 
-          onTabChange={(tabId) => setActiveTab(tabId)} 
-        />
       </div>
       
-      <div className="flex-1 bg-white rounded-t-3xl overflow-y-auto text-black">
-        {/* RankingListHeader에 동적 헤더 전달 */}
-        <RankingListHeader headers={['등수', '프로필', '이름', activeTab === 'attendance' ? '출석횟수' : '주최횟수']} />
-        <div className="pb-4">
+      {/* 스크롤 가능한 랭킹 리스트 영역 */}
+      <div className="flex-1 bg-white rounded-t-3xl text-black flex flex-col min-h-0">
+        {/* 고정 헤더 */}
+        <div className="flex-shrink-0">
+          <RankingListHeader headers={['등수', '프로필', '이름', activeTab === 'attendance' ? '출석횟수' : '개설횟수']} />
+        </div>
+        
+        {/* 스크롤 가능한 랭킹 아이템들 */}
+        <div className="flex-1 overflow-y-auto">
           {currentRankingData.length > 0 ? (
-            currentRankingData.map((item) => (
-              <RankingListItem 
-                key={item.user_id} // key를 user_id로 변경
-                rank={item.rank}
-                name={item.name || '알 수 없음'}
-                profileImageUrl={item.profile_image_url}
-                score={item.value}
-                isCurrentUser={item.is_current_user}
-              />
-            ))
+            <div className="pb-4">
+              {currentRankingData.map((item) => (
+                <RankingListItem 
+                  key={item.user_id} // key를 user_id로 변경
+                  rank={item.rank}
+                  name={item.name || '알 수 없음'}
+                  profileImageUrl={item.profile_image_url}
+                  score={item.value}
+                  isCurrentUser={item.is_current_user}
+                />
+              ))}
+            </div>
           ) : (
-            <p className="text-center py-10 text-gray-500">해당 월의 랭킹 데이터가 없습니다.</p>
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-center text-gray-500">해당 월의 랭킹 데이터가 없습니다.</p>
+            </div>
           )}
         </div>
       </div>

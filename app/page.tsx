@@ -6,11 +6,11 @@ import { type User } from "@supabase/supabase-js";
 
 // 서버용 Supabase 클라이언트 인스턴스를 생성하는 헬퍼 함수
 // 실제 프로덕션에서는 @/lib/supabase/server.ts와 같은 별도 파일로 분리하는 것이 좋습니다.
-const createSupabaseServerClient = () => {
-  const cookieStore = cookies();
+const createSupabaseServerClient = async () => {
+  const cookieStore = await cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -141,7 +141,7 @@ async function getHomePageData(supabaseClient: any, user: User) {
 }
 
 export default async function HomePage() {
-  const supabase = createSupabaseServerClient(); // 여기서 클라이언트 생성
+  const supabase = await createSupabaseServerClient(); // 여기서 클라이언트 생성
 
   const {
     data: { session },

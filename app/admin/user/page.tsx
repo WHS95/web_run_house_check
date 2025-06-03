@@ -1,8 +1,8 @@
-import { Suspense } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAdminContext } from "../AdminContextProvider";
 import AdminUserManagement from "@/components/organisms/AdminUserManagement";
-import { getUsersByCrewId } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 
 // 로딩 컴포넌트
 function AdminUserManagementSkeleton() {
@@ -68,42 +68,45 @@ function AdminUserManagementSkeleton() {
   );
 }
 
-// 실제 데이터를 가져오는 컴포넌트
-async function AdminUserManagementWithData() {
-  // 1. 사용자 인증 확인
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+// 메인 페이지 컴포넌트
+export default function AdminUserPage() {
+  const { crewId } = useAdminContext();
+  const [users, setUsers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (userError || !user) {
-    redirect("/login");
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/admin/users?crewId=${crewId}`);
+
+        if (!response.ok) {
+          throw new Error("사용자 데이터를 가져오는데 실패했습니다.");
+        }
+
+        const data = await response.json();
+        setUsers(data.users || []);
+      } catch (err) {
+        console.error("사용자 데이터 조회 오류:", err);
+        setError(
+          err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (crewId) {
+      fetchUsers();
+    }
+  }, [crewId]);
+
+  if (isLoading) {
+    return <AdminUserManagementSkeleton />;
   }
-
-  // 2. 사용자의 crew 정보 직접 조회
-  const { data: userData, error: userDataError } = await supabase
-    .schema("attendance")
-    .from("users")
-    .select("is_crew_verified, verified_crew_id")
-    .eq("id", user.id)
-    .single();
-
-  if (
-    userDataError ||
-    !userData?.is_crew_verified ||
-    !userData?.verified_crew_id
-  ) {
-    redirect("/crew-verification");
-  }
-
-  // 3. 해당 크루의 사용자 목록 데이터 가져오기
-  const { data: users, error } = await getUsersByCrewId(
-    userData.verified_crew_id
-  );
 
   if (error) {
-    console.error("사용자 데이터 조회 실패:", error);
     return (
       <div className='flex flex-col h-screen bg-gray-50'>
         <div className='flex items-center justify-center flex-1'>
@@ -111,22 +114,12 @@ async function AdminUserManagementWithData() {
             <h2 className='mb-2 text-lg font-semibold text-gray-900'>
               데이터를 불러올 수 없습니다
             </h2>
-            <p className='text-gray-600'>
-              사용자 정보를 가져오는 중 오류가 발생했습니다.
-            </p>
+            <p className='text-gray-600'>{error}</p>
           </div>
         </div>
       </div>
     );
   }
 
-  return <AdminUserManagement initialUsers={users || []} />;
-}
-
-export default function AdminUserPage() {
-  return (
-    <Suspense fallback={<AdminUserManagementSkeleton />}>
-      <AdminUserManagementWithData />
-    </Suspense>
-  );
+  return <AdminUserManagement initialUsers={users} />;
 }

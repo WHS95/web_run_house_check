@@ -178,7 +178,7 @@ const AttendanceTemplate: React.FC<AttendanceTemplateProps> = ({
           onClose={() => {
             setShowNotification(false);
             if (notificationType === "success") {
-              window.location.href = "/";
+              window.location.href = "/ranking";
             }
           }}
         />

@@ -1,33 +1,32 @@
-// "use client";
-
-// export default function AdminHeader() {
-//   return (
-//     <header className='bg-white border-b border-gray-200'>
-//       <div className='flex items-center justify-center h-12'>
-//         <h1 className='text-xl font-bold'>TCRC Admin</h1>
-//       </div>
-//       <div className='h-1 bg-gray-200'></div>
-//     </header>
-//   );
-// }
+"use client";
 
 import React from "react";
-import Link from "next/link";
-// import Image from "next/image"; // Image 컴포넌트 제거
-import { FiBell, FiMenu, FiUser } from "react-icons/fi"; // react-icons import 추가
+import { useAdminContext } from "@/app/admin/layout";
 
-const Header: React.FC = () => {
-  const mypageLink = "/mypage";
+const AdminHeader: React.FC = () => {
+  const { firstName, crewId } = useAdminContext();
+
   return (
-    <header className='flex items-center justify-between w-full p-4 bg-black'>
-      <div className='flex items-center justify-between w-full mx-auto'>
-        <div>
-          <h1 className='text-2xl font-bold tracking-wider text-white'>TCRC</h1>
+    <header className='sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm'>
+      <div className='px-4 py-3'>
+        <div className='flex items-center justify-between'>
+          <div>
+            <h1 className='text-xl font-bold text-gray-900'>관리자 대시보드</h1>
+            <p className='text-sm text-gray-600'>
+              {firstName}님 환영합니다 (Crew ID: {crewId})
+            </p>
+          </div>
+          <div className='flex items-center space-x-2'>
+            <div className='flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full'>
+              <span className='text-sm font-semibold text-white'>
+                {firstName.charAt(0)}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className='flex items-center gap-3 text-white'></div>
       </div>
     </header>
   );
 };
 
-export default Header;
+export default AdminHeader;

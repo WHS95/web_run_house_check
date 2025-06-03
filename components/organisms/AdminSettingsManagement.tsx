@@ -32,19 +32,11 @@ import {
 import { useRouter } from "next/navigation";
 
 interface AdminSettingsManagementProps {
-  crewData: {
-    id: string;
-    name: string;
-    description: string | null;
-    created_at: string;
-    updated_at: string;
-  };
   initialLocations: CrewLocation[];
   crewId: string;
 }
 
 export default function AdminSettingsManagement({
-  crewData,
   initialLocations,
   crewId,
 }: AdminSettingsManagementProps) {
@@ -202,9 +194,7 @@ export default function AdminSettingsManagement({
           <div className='flex items-center space-x-3'>
             <div>
               <h1 className='text-xl font-bold text-gray-900'>크루 설정</h1>
-              <p className='text-sm text-gray-500'>
-                {crewData.name} 크루 운영을 위한 기본 설정
-              </p>
+              <p className='text-sm text-gray-500'>운영 설정</p>
             </div>
           </div>
         </div>

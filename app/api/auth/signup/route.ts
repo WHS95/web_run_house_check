@@ -2,16 +2,12 @@ import { NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { signupSchema } from "@/lib/validators/signupSchema";
-import { error } from "console";
-
-// TODO: Zod 스키마 import 및 유효성 검사 추가
-// import { signupSchema } from "@/lib/validators/signupSchema";
 
 export async function POST(request: Request) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -51,6 +47,8 @@ export async function POST(request: Request) {
       birthYear,
       verifiedCrewId,
       crewCode,
+      privacyConsent,
+      termsOfService,
     } = validation.data;
 
     if (!verifiedCrewId || !crewCode) {
@@ -76,11 +74,20 @@ export async function POST(request: Request) {
     // updateUserData에서 phone_number 추가
     const updateUserData: Record<string, any> = {
       first_name: firstName,
+      email: email,
       phone: phoneNumber,
       birth_year: birthYear,
       is_crew_verified: true,
       verified_crew_id: verifiedCrewId,
+      privacy_consent_agreed: privacyConsent,
+      privacy_consent_agreed_at: privacyConsent
+        ? new Date().toISOString()
+        : null,
       updated_at: new Date().toISOString(),
+      terms_of_service_agreed: termsOfService,
+      terms_of_service_agreed_at: new Date().toISOString(),
+      profile_image_url:
+        user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
     };
 
     // 사용자 이메일 변경이 필요하다면 supabase.auth.updateUser 사용
@@ -174,21 +181,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-/*
--- Supabase SQL Editor에 다음 함수 생성 필요 (used_count 증가용)
-CREATE OR REPLACE FUNCTION attendance.increment_crew_invite_code_used_count(input_code TEXT)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER -- 중요: 호출한 사용자의 권한이 아닌, 함수 정의자의 권한으로 실행
-AS $$
-BEGIN
-  UPDATE attendance.crew_invite_codes
-  SET used_count = used_count + 1, updated_at = NOW()
-  WHERE invite_code = input_code AND is_active = TRUE;
-  -- 참고: used_count >= max_uses 체크는 이미 verify-crew-code API에서 했으므로 여기서는 생략하거나, 
-  -- 중복으로 더 엄격하게 체크할 수도 있습니다.
-  -- (예: AND (max_uses IS NULL OR used_count < max_uses -1)) -- 업데이트 전 기준으로 체크
-END;
-$$;
-*/

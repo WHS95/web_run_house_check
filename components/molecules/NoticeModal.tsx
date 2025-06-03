@@ -24,7 +24,7 @@ const NoticeModal: React.FC<NoticeModalProps> = ({
     <div className='fixed inset-0 z-50 flex items-center justify-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 bg-black/50 backdrop-blur-sm'
+        className='absolute inset-0 bg-basic-black/50 backdrop-blur-sm'
         onClick={onClose}
       />
 
@@ -42,7 +42,7 @@ const NoticeModal: React.FC<NoticeModalProps> = ({
           {/* 완료 버튼 */}
           <Button
             onClick={onClose}
-            className='w-full py-4 text-lg font-medium text-white transition-colors bg-black rounded-2xl hover:bg-gray-800'
+            className='w-full py-4 text-lg font-medium text-white transition-colors bg-basic-black rounded-2xl hover:bg-gray-800'
           >
             {buttonText}
           </Button>

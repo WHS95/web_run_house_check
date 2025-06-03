@@ -29,7 +29,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
         className={`w-5 h-5 rounded-full border-2 mr-2 flex items-center justify-center transition-all duration-200
         ${
           checked
-            ? "bg-blue-600 border-blue-600 shadow-md"
+            ? "bg-basic-blue border-basic-blue shadow-md"
             : "bg-white border-gray-300 hover:border-gray-400"
         }
       `}
@@ -39,7 +39,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
       <span
         className={`text-sm transition-colors duration-200 ${
           checked
-            ? "font-semibold text-blue-600"
+            ? "font-semibold text-basic-blue"
             : "font-normal text-gray-600 hover:text-gray-800"
         }`}
       >

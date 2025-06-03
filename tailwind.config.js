@@ -53,6 +53,7 @@ module.exports = {
         },
         "basic-blue": "#669ff2",
         "basic-gray": "#4c525e",
+        "basic-black": "#1d2530",
       },
       borderRadius: {
         lg: "var(--radius)",

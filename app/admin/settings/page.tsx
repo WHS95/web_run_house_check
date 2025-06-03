@@ -1,7 +1,7 @@
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getCrewLocations, getCrewById } from "@/lib/supabase/admin";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useAdminContext } from "../AdminContextProvider";
 import AdminSettingsManagement from "@/components/organisms/AdminSettingsManagement";
 
 // 로딩 스켈레톤 컴포넌트
@@ -55,71 +55,64 @@ function SettingsLoadingSkeleton() {
   );
 }
 
-// 메인 설정 관리 컴포넌트
-async function SettingsManagementContent() {
-  const supabase = await createClient();
+// 메인 페이지 컴포넌트
+export default function AdminSettingsPage() {
+  const { crewId } = useAdminContext();
+  const [settingsData, setSettingsData] = useState<{
+    crewData: any;
+    locations: any[];
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 사용자 인증 확인
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  useEffect(() => {
+    async function fetchSettingsData() {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/admin/settings?crewId=${crewId}`);
 
-  if (authError || !user) {
-    redirect("/login");
+        if (!response.ok) {
+          throw new Error("설정 데이터를 가져오는데 실패했습니다.");
+        }
+
+        const data = await response.json();
+        setSettingsData(data);
+      } catch (err) {
+        console.error("설정 데이터 조회 오류:", err);
+        setError(
+          err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (crewId) {
+      fetchSettingsData();
+    }
+  }, [crewId]);
+
+  if (isLoading) {
+    return <SettingsLoadingSkeleton />;
   }
 
-  // 사용자 정보 조회
-  const { data: userData, error: userError } = await supabase
-    .schema("attendance")
-    .from("users")
-    .select("id, first_name, is_crew_verified, verified_crew_id")
-    .eq("id", user.id)
-    .single();
-
-  if (userError || !userData) {
-    redirect("/login");
-  }
-
-  // 크루 인증 확인
-  if (!userData.is_crew_verified || !userData.verified_crew_id) {
-    redirect("/crew-verification");
-  }
-
-  // 크루 정보 조회
-  const { data: crewData, error: crewError } = await getCrewById(
-    userData.verified_crew_id
-  );
-
-  if (crewError || !crewData) {
-    console.error("크루 정보 조회 오류:", crewError);
-    redirect("/admin");
-  }
-
-  // 크루 모임 장소 목록 조회
-  const { data: locations, error: locationsError } = await getCrewLocations(
-    userData.verified_crew_id
-  );
-
-  if (locationsError) {
-    console.error("크루 모임 장소 조회 오류:", locationsError);
-    // 에러가 발생해도 빈 배열로 렌더링
+  if (error) {
+    return (
+      <div className='flex items-center justify-center min-h-screen bg-gray-50'>
+        <div className='p-6 text-center bg-white border border-red-200 rounded-lg shadow-sm'>
+          <h3 className='mb-2 text-lg font-semibold text-gray-900'>
+            오류 발생
+          </h3>
+          <p className='text-gray-600'>{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <AdminSettingsManagement
-      crewData={crewData}
-      initialLocations={locations || []}
-      crewId={userData.verified_crew_id}
+      initialLocations={settingsData?.locations || []}
+      crewId={crewId}
     />
-  );
-}
-
-// 메인 페이지 컴포넌트
-export default function AdminSettingsPage() {
-  return (
-    <Suspense fallback={<SettingsLoadingSkeleton />}>
-      <SettingsManagementContent />
-    </Suspense>
   );
 }

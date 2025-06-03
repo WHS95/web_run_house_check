@@ -5,11 +5,11 @@ import MemberDetailTemplate from "@/components/templates/MemberDetailTemplate";
 import { type User } from "@supabase/supabase-js";
 
 // 서버용 Supabase 클라이언트 (app/page.tsx와 동일한 방식, 추후 lib/supabase/server.ts로 분리 권장)
-const createSupabaseServerClient = () => {
-  const cookieStore = cookies();
+const createSupabaseServerClient = async () => {
+  const cookieStore = await cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -161,7 +161,7 @@ async function getMyPageData(
 }
 
 // 활동 데이터를 가져오는 함수 추가
-async function getActivityData( 
+async function getActivityData(
   supabaseClient: any,
   user: User
 ): Promise<ActivityData> {
@@ -234,7 +234,7 @@ async function getActivityData(
 }
 
 export default async function MyPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   const {
     data: { session },

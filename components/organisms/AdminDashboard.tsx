@@ -55,20 +55,8 @@ const renderChangeIndicator = (change: number | null) => {
 export default function AdminDashboard({ stats }: AdminDashboardProps) {
   return (
     <div className='flex flex-col h-screen'>
-      {/* iOS 스타일 헤더 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
-        <div className='px-4 py-3'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <h1 className='text-2xl font-bold text-gray-900'>관리자</h1>
-              <p className='text-sm text-gray-500'>운영 관리</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className='flex-1 pb-24 overflow-y-auto bg-gray-50'>
-        <div className='max-w-md px-4 py-3 mx-auto'>
+        <div className='max-w-md px-4 py-6 mx-auto'>
           {/* 기본 통계 섹션 */}
           <div className='space-y-4'>
             <div className='grid grid-cols-3 gap-3'>
@@ -227,12 +215,10 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               </Card>
             </div>
           </div>
-
-          {/* 추가 여백 */}
-          <div className='h-4'></div>
         </div>
       </div>
 
+      {/* 하단 네비게이션 */}
       <AdminBottomNavigation />
     </div>
   );

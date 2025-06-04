@@ -368,20 +368,8 @@ export default function AdminAttendanceManagement({
 
   return (
     <div className='flex flex-col h-screen bg-gray-50'>
-      {/* 헤더 - admin/page.tsx와 동일한 스타일 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
-        <div className='px-4 py-4'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <h1 className='text-xl font-bold text-gray-900'>출석 관리</h1>
-              <p className='text-sm text-gray-500'>월별 출석 현황 및 관리</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* 메인 컨텐츠 - 스크롤 가능, 하단 바텀에 가려지지 않게 pb-24 적용 */}
-      <div className='flex-1 px-4 py-4 pb-24 overflow-y-auto'>
+      <div className='flex-1 px-4 py-6 pb-24 overflow-y-auto'>
         <div className='space-y-6'>
           {/* 월별 달력 - 높이를 80%로 조정 */}
           <Card className='ios-card'>

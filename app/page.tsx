@@ -1,8 +1,53 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr"; // middleware.ts와 동일한 방식으로 임시 사용
-import HomeTemplate from "@/components/templates/HomeTemplate";
+import EnhancedHomeTemplate from "@/components/templates/EnhancedHomeTemplate";
 import { type User } from "@supabase/supabase-js";
+import type { Metadata } from "next";
+
+// 메타데이터 설정
+export const metadata: Metadata = {
+  title: "런하우스 - 홈",
+  description:
+    "러닝크루원들과 함께하는 출석관리와 모임 참여. 간편한 QR 체크인과 실시간 출석 현황 확인",
+  openGraph: {
+    title: "런하우스 - 홈",
+    description:
+      "러닝크루원들과 함께하는 출석관리와 모임 참여. 간편한 QR 체크인과 실시간 출석 현황 확인",
+    type: "website",
+    locale: "ko_KR",
+    url: "/",
+    siteName: "런하우스",
+    images: [
+      {
+        url: "/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "런하우스 - 러닝크루 관리 플랫폼",
+        type: "image/png",
+      },
+      {
+        url: "/logo.png",
+        width: 400,
+        height: 400,
+        alt: "런하우스 로고",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "런하우스 - 홈",
+    description: "러닝크루원들과 함께하는 출석관리와 모임 참여",
+    images: ["/android-chrome-512x512.png"],
+  },
+  // 카카오톡 공유용 추가 메타데이터
+  other: {
+    "kakao:title": "런하우스 - 홈",
+    "kakao:description": "러닝크루원들과 함께하는 출석관리와 모임 참여",
+    "kakao:image": "/android-chrome-512x512.png",
+  },
+};
 
 // 서버용 Supabase 클라이언트 인스턴스를 생성하는 헬퍼 함수
 // 실제 프로덕션에서는 @/lib/supabase/server.ts와 같은 별도 파일로 분리하는 것이 좋습니다.
@@ -164,7 +209,7 @@ export default async function HomePage() {
   const pageData = await getHomePageData(supabase, user);
 
   return (
-    <HomeTemplate
+    <EnhancedHomeTemplate
       username={pageData.userName}
       crewName={pageData.crewName}
       rankName={pageData.rankName}

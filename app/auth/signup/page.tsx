@@ -186,7 +186,7 @@ export default function SignupPage() {
       <PopupNotification
         isVisible={isNotificationVisible}
         message={notificationMessage}
-        duration={3000}
+        duration={1500}
         onClose={handleNotificationClose}
         type={notificationType}
       />

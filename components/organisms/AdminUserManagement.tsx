@@ -236,22 +236,8 @@ export default function AdminUserManagement({
 
   return (
     <div className='flex flex-col h-screen bg-gray-50'>
-      {/* 헤더 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
-        <div className='px-4 py-4'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <h1 className='text-xl font-bold text-gray-900'>회원 관리</h1>
-              <p className='text-sm text-gray-500'>
-                {filteredUsers.length}명의 회원
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* 검색 및 필터 - 고정 */}
-      <div className='sticky top-[73px] z-10 bg-gray-50 px-4 py-4 space-y-4 border-b border-gray-100'>
+      <div className='sticky top-0 z-10 bg-gray-50 px-4 py-4 space-y-4 border-b border-gray-100'>
         {/* 검색 */}
         <div className='relative'>
           <Search className='absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2' />

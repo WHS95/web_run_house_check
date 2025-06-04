@@ -24,8 +24,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     <header
       className={`relative flex items-center justify-center  py-4 ${borderClass}`}
     >
-      <Link href={backLink} className='absolute left-0 px-3'>
-        <FiChevronLeft size={24} color={iconColor} />
+      <Link
+        href={backLink}
+        className='absolute left-0 px-3 py-2 transition-all duration-150 ease-in-out rounded-lg hover:bg-black/5 active:bg-black/10 active:scale-95'
+      >
+        <FiChevronLeft
+          size={24}
+          color={iconColor}
+          className='transition-transform duration-150 ease-in-out'
+        />
       </Link>
       <h1 className={`text-base font-semibold ${textColor}`}>{title}</h1>
       {rightAction && (

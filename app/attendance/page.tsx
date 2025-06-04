@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import AttendanceTemplate from "@/components/templates/AttendanceTemplate";
+import EnhancedAttendanceTemplate from "@/components/templates/EnhancedAttendanceTemplate";
 import { type User } from "@supabase/supabase-js";
 
 // 서버용 Supabase 클라이언트 (lib/supabase/server.ts로 분리 권장)
@@ -201,7 +201,7 @@ export default async function AttendancePage() {
   }
 
   return (
-    <AttendanceTemplate
+    <EnhancedAttendanceTemplate
       currentUser={pageData.currentUser}
       crewInfo={pageData.crewInfo}
       fetchedLocationOptions={pageData.fetchedLocationOptions}

@@ -1,6 +1,6 @@
 import "./styles/globals.css";
 import { ReactNode } from "react";
-import { StagewiseToolbar } from "@stagewise/toolbar-next";
+// import { StagewiseToolbar } from "@stagewise/toolbar-next";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -157,11 +157,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel='shortcut icon' href='/favicon.ico' />
       </head>
       <body>
-        <StagewiseToolbar
+        {/* <StagewiseToolbar
           config={{
             plugins: [], // 필요한 경우 여기에 사용자 정의 플러그인을 추가할 수 있습니다.
           }}
-        />
+        /> */}
         <div className='h-screen overflow-hidden'>{children}</div>
       </body>
     </html>

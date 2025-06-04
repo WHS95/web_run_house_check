@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '../organisms/Header';
 import Hero from '../organisms/Hero';
@@ -65,14 +65,21 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
         hapticFeedback: true,
     });
 
+    // ref를 모두 동일한 element에 연결하는 콜백
+    const setRefs = useCallback((element: HTMLDivElement | null) => {
+        // containerRef에 할당 (타입 체크 추가)
+        if (containerRef && 'current' in containerRef) {
+            (containerRef as any).current = element;
+        }
+        // swipeRef에 할당 (타입 체크 추가) 
+        if (swipeRef && 'current' in swipeRef) {
+            (swipeRef as any).current = element;
+        }
+    }, [containerRef, swipeRef]);
+
     return (
         <div 
-            ref={(el) => {
-                if (el) {
-                    containerRef.current = el;
-                    swipeRef.current = el;
-                }
-            }}
+            ref={setRefs}
             className="relative min-h-screen bg-basic-black overflow-hidden native-scroll"
         >
             {/* 풀 투 리프레시 인디케이터 */}

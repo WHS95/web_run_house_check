@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import AttendanceForm from '@/components/organisms/attendance/AttendanceForm';
@@ -154,6 +154,18 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
     threshold: 80,
     hapticFeedback: true,
   });
+
+  // ref를 모두 동일한 element에 연결하는 콜백
+  const setRefs = useCallback((element: HTMLDivElement | null) => {
+    // containerRef에 할당 (타입 체크 추가)
+    if (containerRef && 'current' in containerRef) {
+      (containerRef as any).current = element;
+    }
+    // swipeRef에 할당 (타입 체크 추가) 
+    if (swipeRef && 'current' in swipeRef) {
+      (swipeRef as any).current = element;
+    }
+  }, [containerRef, swipeRef]);
   
   const handleAttendanceSubmit = async (formData: any) => {
     console.log('출석 정보 제출 시도:', formData);
@@ -234,12 +246,7 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
 
   return (
     <div 
-      ref={(el) => {
-        if (el) {
-          containerRef.current = el;
-          swipeRef.current = el;
-        }
-      }}
+      ref={setRefs}
       className="min-h-screen bg-white flex flex-col native-scroll relative"
     >
       {/* 제출 로딩 오버레이 */}

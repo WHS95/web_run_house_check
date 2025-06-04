@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import RankingInfo from '@/components/organisms/ranking/RankingInfo';
@@ -147,19 +147,31 @@ const EnhancedRankingTemplate: React.FC<EnhancedRankingTemplateProps> = ({
   } = usePullToRefresh({
     onRefresh: handleRefresh,
     threshold: 100,
-    disabled: isMonthChanging || isDataLoading,
+    disabled: isDataLoading || isMonthChanging,
   });
 
   // 스와이프 제스처 기능
   const swipeRef = useSwipeGesture({
     onSwipeRight: handleSwipeToHome,
     onSwipeLeft: () => {
-      // 왼쪽 스와이프 - 추후 다른 페이지 추가 시 사용
+      // 추후 다른 기능 추가 시 사용
       haptic.light();
     },
     threshold: 80,
     hapticFeedback: true,
   });
+
+  // ref를 모두 동일한 element에 연결하는 콜백
+  const setRefs = useCallback((element: HTMLDivElement | null) => {
+    // containerRef에 할당 (타입 체크 추가)
+    if (containerRef && 'current' in containerRef) {
+      (containerRef as any).current = element;
+    }
+    // swipeRef에 할당 (타입 체크 추가) 
+    if (swipeRef && 'current' in swipeRef) {
+      (swipeRef as any).current = element;
+    }
+  }, [containerRef, swipeRef]);
 
   const handlePrevMonth = async () => {
     if (isMonthChanging || isDataLoading) return;
@@ -229,12 +241,7 @@ const EnhancedRankingTemplate: React.FC<EnhancedRankingTemplateProps> = ({
 
   return (
     <div 
-      ref={(el) => {
-        if (el) {
-          containerRef.current = el;
-          swipeRef.current = el;
-        }
-      }}
+      ref={setRefs}
       className="min-h-screen bg-[#223150] text-white flex flex-col native-scroll relative"
     >
       {/* 풀 투 리프레시 인디케이터 */}

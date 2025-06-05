@@ -33,14 +33,14 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     }, [router]);
 
     return (
-        <div className="flex flex-col h-full bg-basic-black">
-            {/* 🔒 헤더 - 상단 고정 */}
-            <div className="flex-shrink-0 pt-safe bg-basic-black z-50">
+        <div className="relative min-h-screen bg-basic-black overflow-hidden">
+            {/* 🔒 헤더 - 상단 완전 고정 */}
+            <div className="fixed top-0 left-0 right-0 z-50 pt-safe bg-basic-black">
                 <Header title={"RUN HOUSE"} />
             </div>
 
-            {/* 📱 중간 영역 - Hero + 공지사항 (스크롤 없음) */}
-            <div className="flex-1 relative overflow-hidden">
+            {/* 📱 중간 영역 - Hero + 공지사항 */}
+            <div className="pt-[80px] pb-[220px] h-screen overflow-hidden">
                 {/* Hero 배경 */}
                 <div className="relative h-full">
                     {username && (
@@ -49,15 +49,15 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                     
                     {/* 공지사항 - Hero 위에 오버레이 */}
                     {noticeText && (
-                        <div className="absolute top-4 left-0 right-0 z-10 px-4 ">
+                        <div className="absolute top-4 left-0 right-0 z-10 px-4">
                             <NoticeBar noticeText={noticeText} />
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* 🔒 하단 카드 섹션 - 하단 고정 */}
-            <div className="flex-shrink-0 pb-safe px-safe bg-basic-black z-40">
+            {/* 🔒 하단 카드 섹션 - 하단 완전 고정 */}
+            <div className="fixed bottom-0 left-0 right-0 z-40 pb-safe px-safe bg-basic-black">
                 {/* 카드 스택 컨테이너 */}
                 <div className="relative h-[200px]">
                     {/* 출석 체크 카드 - 상단에 위치 */}

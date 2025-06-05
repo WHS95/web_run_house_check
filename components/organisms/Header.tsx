@@ -18,11 +18,14 @@ const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
           </h1>
         </div>
         <div className='flex items-center gap-3 text-white'>
-          <div className='relative w-6 h-6 cursor-pointer'>
-            <Link href={mypageLink}>
+          <Link
+            href={mypageLink}
+            className='p-2 transition-colors rounded-lg cursor-pointer hover:bg-white/10'
+          >
+            <div className='relative w-6 h-6'>
               <FaRegUserCircle size={24} />
-            </Link>
-          </div>
+            </div>
+          </Link>
         </div>
       </div>
     </header>

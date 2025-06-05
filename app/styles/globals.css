@@ -134,6 +134,28 @@
     height: 100%;
     overflow-x: hidden;
     background-color: #1a1a1a; /* 검은색 배경으로 변경 */
+    
+    /* 성능 최적화 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeSpeed;
+    image-rendering: crisp-edges;
+  }
+  
+  /* 성능 최적화를 위한 하드웨어 가속 */
+  .hw-accelerated {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+  }
+  
+  /* 빠른 트랜지션을 위한 GPU 가속 */
+  .fast-transition {
+    will-change: transform, opacity;
+    transform: translateZ(0);
   }
 }
 
@@ -151,6 +173,66 @@
   /* iOS 스타일 입력 필드 */
   .ios-input {
     @apply rounded-xl border border-gray-200 px-4 py-3 bg-white;
+  }
+  
+  /* iOS에서 날짜/시간 입력 필드 커스텀 스타일 */
+  .ios-date-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #374151;
+    font-size: 1rem;
+    line-height: 1.5;
+    width: 100%;
+    height: 3rem;
+    outline: none;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  .ios-date-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* iOS Safari에서 날짜 picker 아이콘 숨기기 */
+  .ios-date-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    z-index: 1;
+  }
+  
+  /* iOS에서 select 요소 커스텀 스타일 */
+  .ios-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: white;
+    background-image: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    padding-right: 2.5rem;
+    color: #374151;
+    font-size: 1rem;
+    line-height: 1.5;
+    width: 100%;
+    height: 3rem;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  
+  .ios-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
   }
   
   /* 네이티브 앱 스타일 컴포넌트 추가 */

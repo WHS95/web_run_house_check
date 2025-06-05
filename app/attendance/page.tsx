@@ -1,9 +1,52 @@
-import React from "react";
-import UltraFastAttendanceTemplate from "@/components/templates/UltraFastAttendanceTemplate";
+import React, { Suspense } from "react";
+import nextDynamic from "next/dynamic";
+
+// 동적 로딩으로 번들 크기 최적화
+const UltraFastAttendanceTemplate = nextDynamic(
+  () => import("@/components/templates/UltraFastAttendanceTemplate"),
+  {
+    loading: () => (
+      <div className='flex items-center justify-center min-h-screen bg-white'>
+        <div className='w-8 h-8 border-2 border-blue-500 rounded-full animate-spin border-t-transparent'></div>
+      </div>
+    ),
+    ssr: false, // 클라이언트 사이드에서만 렌더링
+  }
+);
 
 // 동적 렌더링 강제 (클라이언트 렌더링)
 export const dynamic = "force-dynamic";
 
+// 페이지 메타데이터 최적화
+export const metadata = {
+  title: "출석 체크",
+  description: "RUNHOUSE 출석 체크 페이지",
+};
+
+// 로딩 폴백 컴포넌트
+const AttendancePageFallback = () => (
+  <div className='min-h-screen bg-white'>
+    <div className='pt-safe'>
+      <div className='flex items-center justify-between w-full px-4 py-4 border-b border-[#EAEAF3]'>
+        <div className='w-20 h-6 bg-gray-200 rounded animate-pulse'></div>
+        <div className='w-6 h-6 bg-gray-200 rounded animate-pulse'></div>
+      </div>
+    </div>
+    <div className='px-4 pt-6 space-y-6'>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div key={index} className='animate-pulse'>
+          <div className='w-24 h-4 mb-3 bg-gray-200 rounded'></div>
+          <div className='h-12 bg-gray-100 rounded-xl'></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 export default function AttendancePage() {
-  return <UltraFastAttendanceTemplate />;
+  return (
+    <Suspense fallback={<AttendancePageFallback />}>
+      <UltraFastAttendanceTemplate />
+    </Suspense>
+  );
 }

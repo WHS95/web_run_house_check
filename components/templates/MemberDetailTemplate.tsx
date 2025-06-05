@@ -83,7 +83,7 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
     }), [displayName, userProfile.joinDate, userProfile.rankName]);
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-screen bg-white">
             <div className="sticky top-0 z-10">
                 <PageHeader 
                     title="내 정보" 

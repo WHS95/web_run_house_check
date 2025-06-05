@@ -7,10 +7,6 @@ import Hero from '../organisms/Hero';
 import NoticeBar from '../molecules/NoticeBar';
 import RankingCard from '../molecules/RankingCard';
 import AttendanceCard from '../molecules/AttendanceCard';
-import PullToRefresh from '../molecules/PullToRefresh';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { useSwipeGesture } from '@/hooks/useSwipeGesture';
-import { haptic } from '@/lib/haptic';
 
 interface EnhancedHomeTemplateProps {
     username: string | null;
@@ -27,113 +23,58 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
 }) => {
     const router = useRouter();
 
-    // 새로고침 함수
-    const handleRefresh = async () => {
-        // 1초 정도 딜레이를 주어 새로고침 효과를 보여줌
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        // 페이지 새로고침
-        window.location.reload();
-    };
-
-    // 랭킹 페이지로 이동
-    const handleSwipeToRanking = () => {
-        haptic.medium();
+    // 랭킹 페이지로 이동 - 최적화
+    const handleSwipeToRanking = useCallback(() => {
+        // haptic 피드백을 비동기로 처리하여 UI 블로킹 방지
+        if ('vibrate' in navigator) {
+            navigator.vibrate(50);
+        }
         router.push('/ranking');
-    };
-
-    // 풀 투 리프레시 기능
-    const {
-        containerRef,
-        isRefreshing,
-        pullDistance,
-        isTriggered,
-        refreshIndicatorStyle,
-    } = usePullToRefresh({
-        onRefresh: handleRefresh,
-        threshold: 100,
-        disabled: false,
-    });
-
-    // 스와이프 제스처 기능
-    const swipeRef = useSwipeGesture({
-        onSwipeLeft: handleSwipeToRanking,
-        onSwipeRight: () => {
-            // 오른쪽 스와이프 - 추후 다른 페이지 추가 시 사용
-            haptic.light();
-        },
-        threshold: 80,
-        hapticFeedback: true,
-    });
-
-    // ref를 모두 동일한 element에 연결하는 콜백
-    const setRefs = useCallback((element: HTMLDivElement | null) => {
-        // containerRef에 할당 (타입 체크 추가)
-        if (containerRef && 'current' in containerRef) {
-            (containerRef as any).current = element;
-        }
-        // swipeRef에 할당 (타입 체크 추가) 
-        if (swipeRef && 'current' in swipeRef) {
-            (swipeRef as any).current = element;
-        }
-    }, [containerRef, swipeRef]);
+    }, [router]);
 
     return (
-        <div 
-            ref={setRefs}
-            className="relative min-h-screen bg-basic-black overflow-hidden native-scroll"
-        >
-            {/* 풀 투 리프레시 인디케이터 */}
-            <PullToRefresh
-                isRefreshing={isRefreshing}
-                pullDistance={pullDistance}
-                isTriggered={isTriggered}
-                style={refreshIndicatorStyle}
-            />
-
-            {/* Hero 섹션이 화면 전체를 채움 */}
-            <div className="absolute inset-0 z-0">
-                {username && (
-                    <Hero username={username} />
-                )}
-            </div>
-
-            {/* 헤더 - 안전 영역 고려 */}
-            <div className="relative z-50 pt-safe">
+        <div className="flex flex-col h-full bg-basic-black">
+            {/* 🔒 헤더 - 상단 고정 */}
+            <div className="flex-shrink-0 pt-safe bg-basic-black z-50">
                 <Header title={"RUN HOUSE"} />
             </div>
 
-            {/* 공지사항 */}
-            {noticeText && (
-                <div className="absolute top-[120px] left-0 right-0 z-40 px-4">
-                    <div className="mx-auto">
-                        <NoticeBar noticeText={noticeText} />
-                    </div>
-                </div>
-            )}
-
-            {/* 카드 섹션 - 화면 하단에 고정, 안전 영역 고려 */}
-            <div className="absolute left-0 right-0 bottom-0 z-10 pb-safe">
-                <div className="mx-auto">
-                    {/* 카드 스택 컨테이너 */}
-                    <div className="relative h-[400px] bg-transparent">
-                        {/* 파란색 랭킹 카드 - 하단에 위치 */}
-                        <div className="absolute bottom-0 left-0 right-0 z-40">
-                            <div className="native-card">
-                                <RankingCard />
-                            </div>
+            {/* 📱 중간 영역 - Hero + 공지사항 (스크롤 없음) */}
+            <div className="flex-1 relative overflow-hidden">
+                {/* Hero 배경 */}
+                <div className="relative h-full">
+                    {username && (
+                        <Hero username={username} />
+                    )}
+                    
+                    {/* 공지사항 - Hero 위에 오버레이 */}
+                    {noticeText && (
+                        <div className="absolute top-4 left-0 right-0 z-10 px-4 ">
+                            <NoticeBar noticeText={noticeText} />
                         </div>
+                    )}
+                </div>
+            </div>
 
-                        {/* 보라색 출석 체크 카드 - 상단에 위치하며 파란색 카드 위로 겹침 */}
-                        <div className="absolute bottom-[90px] left-0 right-0 z-20">
-                            <div className="native-card">
-                                <AttendanceCard />
-                            </div>
+            {/* 🔒 하단 카드 섹션 - 하단 고정 */}
+            <div className="flex-shrink-0 pb-safe px-safe bg-basic-black z-40">
+                {/* 카드 스택 컨테이너 */}
+                <div className="relative h-[200px]">
+                    {/* 출석 체크 카드 - 상단에 위치 */}
+                    <div className="absolute bottom-[80px] left-0 right-0 z-20">
+                        <div className="native-card">
+                            <AttendanceCard />
+                        </div>
+                    </div>
+
+                    {/* 랭킹 카드 - 가장 하단에 위치 */}
+                    <div className="absolute bottom-0 left-0 right-0 z-40">
+                        <div className="native-card">
+                            <RankingCard />
                         </div>
                     </div>
                 </div>
             </div>
-
-
         </div>
     );
 };

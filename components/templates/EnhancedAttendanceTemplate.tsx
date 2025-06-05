@@ -1,13 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import AttendanceForm from '@/components/organisms/attendance/AttendanceForm';
-import AttendanceButton from '@/components/atoms/AttendanceButton';
 import PopupNotification, { NotificationType } from '@/components/molecules/common/PopupNotification';
-import PullToRefresh from '@/components/molecules/PullToRefresh';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { haptic } from '@/lib/haptic';
 
@@ -24,15 +21,16 @@ interface EnhancedAttendanceTemplateProps {
   fetchedExerciseOptions: Array<{ value: string; label: string }>;
 }
 
-// 로딩 스피너 컴포넌트
-const LoadingSpinner: React.FC = () => (
+// 로딩 스피너 컴포넌트 - 메모이제이션
+const LoadingSpinner = React.memo(() => (
   <div className="flex items-center justify-center">
     <div className="animate-spin rounded-full h-6 w-6 border-2 border-basic-blue border-t-transparent"></div>
   </div>
-);
+));
+LoadingSpinner.displayName = 'LoadingSpinner';
 
-// 제출 로딩 오버레이 컴포넌트
-const SubmissionLoadingOverlay: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
+// 제출 로딩 오버레이 컴포넌트 - 메모이제이션
+const SubmissionLoadingOverlay = React.memo<{ isVisible: boolean }>(({ isVisible }) => {
   if (!isVisible) return null;
 
   return (
@@ -43,7 +41,8 @@ const SubmissionLoadingOverlay: React.FC<{ isVisible: boolean }> = ({ isVisible 
       </div>
     </div>
   );
-};
+});
+SubmissionLoadingOverlay.displayName = 'SubmissionLoadingOverlay';
 
 const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
   currentUser,
@@ -59,7 +58,7 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // currentUser나 crewInfo가 없으면 로딩 또는 에러 처리
+  // currentUser나 crewInfo가 없으면 로딩 처리
   if (!currentUser || !crewInfo) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center native-scroll">
@@ -76,8 +75,8 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
     );
   }
   
-  // 현재 시간을 10분 단위로 가장 가까운 시간으로 설정
-  const getCurrentTime = () => {
+  // 현재 시간 계산 - 메모이제이션
+  const getCurrentTime = useCallback(() => {
     const now = new Date();
     const currentMinutes = now.getMinutes();
     const currentSeconds = now.getSeconds();
@@ -99,75 +98,56 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
     }
     
     return `${adjustedHours.toString().padStart(2, '0')}:${adjustedMinutes.toString().padStart(2, '0')}`;
-  };
+  }, []);
   
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
-  const day = today.getDate().toString().padStart(2, '0');
-  const todayKST_YYYYMMDD = `${year}-${month}-${day}`;
+  // 초기 출석 데이터 - 메모이제이션
+  const initialAttendanceData = useMemo(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    const todayKST_YYYYMMDD = `${year}-${month}-${day}`;
 
-  const initialAttendanceData = {
-    name: currentUser.name || "사용자",
-    date: todayKST_YYYYMMDD,
-    time: getCurrentTime(),
-    location: fetchedLocationOptions.length > 0 ? fetchedLocationOptions[0].value : "",
-    exerciseType: fetchedExerciseOptions.length > 0 ? fetchedExerciseOptions[0].value : "",
-    isHost: "아니오",
-  };
+    return {
+      name: currentUser.name || "사용자",
+      date: todayKST_YYYYMMDD,
+      time: getCurrentTime(),
+      location: fetchedLocationOptions.length > 0 ? fetchedLocationOptions[0].value : "",
+      exerciseType: fetchedExerciseOptions.length > 0 ? fetchedExerciseOptions[0].value : "",
+      isHost: "아니오",
+    };
+  }, [currentUser.name, fetchedLocationOptions, fetchedExerciseOptions, getCurrentTime]);
 
-  // 새로고침 함수
-  const handleRefresh = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    window.location.reload();
-  };
-
-  // 홈으로 이동
-  const handleSwipeToHome = () => {
+  // 내비게이션 핸들러들 - 메모이제이션
+  const handleSwipeToHome = useCallback(() => {
     haptic.medium();
     router.push('/');
-  };
+  }, [router]);
 
-  // 랭킹으로 이동
-  const handleSwipeToRanking = () => {
+  const handleSwipeToRanking = useCallback(() => {
     haptic.medium();
     router.push('/ranking');
-  };
+  }, [router]);
 
-  // 풀 투 리프레시 기능
-  const {
-    containerRef,
-    isRefreshing,
-    pullDistance,
-    isTriggered,
-    refreshIndicatorStyle,
-  } = usePullToRefresh({
-    onRefresh: handleRefresh,
-    threshold: 100,
-    disabled: isSubmitting,
-  });
-
-  // 스와이프 제스처 기능
-  const swipeRef = useSwipeGesture({
+  // 스와이프 제스처 설정 - 메모이제이션
+  const swipeOptions = useMemo(() => ({
     onSwipeRight: handleSwipeToHome,
     onSwipeLeft: handleSwipeToRanking,
     threshold: 80,
     hapticFeedback: true,
-  });
+  }), [handleSwipeToHome, handleSwipeToRanking]);
 
-  // ref를 모두 동일한 element에 연결하는 콜백
+  const swipeRef = useSwipeGesture(swipeOptions);
+
+  // ref 설정 - 메모이제이션
   const setRefs = useCallback((element: HTMLDivElement | null) => {
-    // containerRef에 할당 (타입 체크 추가)
-    if (containerRef && 'current' in containerRef) {
-      (containerRef as any).current = element;
-    }
-    // swipeRef에 할당 (타입 체크 추가) 
     if (swipeRef && 'current' in swipeRef) {
       (swipeRef as any).current = element;
     }
-  }, [containerRef, swipeRef]);
+  }, [swipeRef]);
   
-  const handleAttendanceSubmit = async (formData: any) => {
+  // 출석 제출 핸들러 - 메모이제이션
+  const handleAttendanceSubmit = useCallback(async (formData: any) => {
     console.log('출석 정보 제출 시도:', formData);
     
     if (!currentUser.id || !crewInfo?.id) {
@@ -231,9 +211,10 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
     }
     
     setShowNotification(true);
-  };
+  }, [currentUser.id, crewInfo?.id]);
 
-  const handleAttendanceButtonClick = () => {
+  // 출석 버튼 클릭 핸들러 - 메모이제이션
+  const handleAttendanceButtonClick = useCallback(() => {
     if (isSubmitting) return;
     
     haptic.light(); // 버튼 클릭 햅틱
@@ -242,7 +223,18 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
     if (form) {
       form.requestSubmit();
     }
-  };
+  }, [isSubmitting]);
+
+  // 알림 닫기 핸들러 - 메모이제이션
+  const handleNotificationClose = useCallback(() => {
+    setShowNotification(false);
+    if (notificationType === "success") {
+      // 성공 시 랭킹 페이지로 이동
+      setTimeout(() => {
+        router.push("/ranking");
+      }, 100);
+    }
+  }, [notificationType, router]);
 
   return (
     <div 
@@ -252,14 +244,6 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
       {/* 제출 로딩 오버레이 */}
       <SubmissionLoadingOverlay isVisible={isSubmitting} />
 
-      {/* 풀 투 리프레시 인디케이터 */}
-      <PullToRefresh
-        isRefreshing={isRefreshing}
-        pullDistance={pullDistance}
-        isTriggered={isTriggered}
-        style={refreshIndicatorStyle}
-      />
-      
       {/* 헤더 - 안전 영역 고려 */}
       <div className="flex-shrink-0 pt-safe">
         <div className="mb-4">
@@ -279,7 +263,7 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
       </div>
       
       {/* 하단 고정 버튼 - 안전 영역 고려 */}
-      <div className="fixed bottom-0 left-0 right-0 p-4  border-t border-[#EAEAF3] bg-white shadow-lg z-40 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 p-4 border-t border-[#EAEAF3] bg-white shadow-lg z-40 pb-safe">
         <div className="native-card mx-2">
           <button
             onClick={handleAttendanceButtonClick}
@@ -324,15 +308,7 @@ const EnhancedAttendanceTemplate: React.FC<EnhancedAttendanceTemplateProps> = ({
           message={notificationMessage}
           type={notificationType}
           duration={1500}
-          onClose={() => {
-            setShowNotification(false);
-            if (notificationType === "success") {
-              // 성공 시 랭킹 페이지로 이동
-              setTimeout(() => {
-                router.push("/ranking");
-              }, 100);
-            }
-          }}
+          onClose={handleNotificationClose}
         />
       )}
     </div>

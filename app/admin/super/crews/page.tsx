@@ -3,6 +3,9 @@ import { getAllCrews } from "@/lib/supabase/admin";
 import { Plus, Edit, Users } from "lucide-react";
 import CrewCreateButton from "@/components/admin/crew/CrewCreateButton";
 
+// 동적 렌더링 강제
+export const dynamic = "force-dynamic";
+
 interface CrewData {
   id: string;
   name: string;

@@ -74,139 +74,126 @@ const createSupabaseServerClient = async () => {
   );
 };
 
-async function getHomePageData(supabaseClient: any, user: User) {
-  let userName: string | null = null;
-  let crewName: string | null = null;
-  let rankName: string | null = null;
-  let noticeText: string | null = null;
+// 병렬 처리를 위한 최적화된 데이터 페칭 함수
+async function getHomePageDataOptimized(supabaseClient: any, user: User) {
+  try {
+    // 1. 사용자 기본 정보 조회 (가장 중요한 쿼리)
+    const { data: userData, error: userError } = await supabaseClient
+      .schema("attendance")
+      .from("users")
+      .select("first_name, verified_crew_id, is_crew_verified")
+      .eq("id", user.id)
+      .single();
 
-  const { data: userData, error: userError } = await supabaseClient
-    .schema("attendance")
-    .from("users")
-    .select("first_name, verified_crew_id, is_crew_verified")
-    .eq("id", user.id)
-    .single();
-
-  if (userError || !userData) {
-    console.error("Error fetching user data for homepage:", userError);
-    if (!userData?.is_crew_verified || !userData?.verified_crew_id) {
-      // 회원가입/크루인증 미완료 사용자는 signup 또는 verify-crew로
-      // 미들웨어에서 /auth/verify-crew로 보내므로, 여기서는 signup으로 유도 가능
-      redirect("/auth/signup");
+    if (userError || !userData) {
+      console.error("Error fetching user data:", userError);
+      return {
+        userName: user.user_metadata?.full_name || user.email || "사용자",
+        crewName: null,
+        rankName: "Beginer",
+        noticeText: null,
+      };
     }
-    // 오류 발생 또는 데이터 없음 (그러나 리다이렉트되지 않은 경우)
+
+    if (!userData.is_crew_verified || !userData.verified_crew_id) {
+      redirect("/auth/verify-crew");
+    }
+
+    const currentCrewId = userData.verified_crew_id;
+
+    // 2. 병렬로 나머지 데이터 조회 - Promise.all 사용
+    const [crewResult, userCrewResult, noticeResult] = await Promise.allSettled(
+      [
+        // 크루 정보
+        supabaseClient
+          .schema("attendance")
+          .from("crews")
+          .select("name")
+          .eq("id", currentCrewId)
+          .single(),
+
+        // 사용자 크루 등급 정보 (조인 쿼리로 한번에)
+        supabaseClient
+          .schema("attendance")
+          .from("user_crews")
+          .select(
+            `
+          crew_grade_id,
+          crew_grades!inner(
+            name_override,
+            grade_id,
+            grades!inner(name)
+          )
+        `
+          )
+          .eq("user_id", user.id)
+          .eq("crew_id", currentCrewId)
+          .maybeSingle(),
+
+        // 공지사항
+        supabaseClient
+          .schema("attendance")
+          .from("notices")
+          .select("content")
+          .eq("is_active", true)
+          .or(`crew_id.eq.${currentCrewId},crew_id.is.null`)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]
+    );
+
+    // 결과 처리
+    const crewName =
+      crewResult.status === "fulfilled" && crewResult.value.data
+        ? crewResult.value.data.name
+        : null;
+
+    let rankName = "Beginer";
+    if (
+      userCrewResult.status === "fulfilled" &&
+      userCrewResult.value.data?.crew_grades
+    ) {
+      const gradeData = userCrewResult.value.data.crew_grades;
+      rankName = gradeData.name_override || gradeData.grades?.name || "Beginer";
+    }
+
+    const noticeText =
+      noticeResult.status === "fulfilled" && noticeResult.value.data
+        ? noticeResult.value.data.content
+        : null;
+
     return {
-      userName: user.user_metadata?.full_name || user.email || "사용자",
+      userName: userData.first_name,
       crewName,
       rankName,
       noticeText,
     };
+  } catch (error) {
+    console.error("Error in getHomePageDataOptimized:", error);
+    return {
+      userName: user.user_metadata?.full_name || user.email || "사용자",
+      crewName: null,
+      rankName: "Beginer",
+      noticeText: null,
+    };
   }
-
-  userName = userData.first_name;
-
-  if (!userData.is_crew_verified || !userData.verified_crew_id) {
-    redirect("/auth/verify-crew");
-  }
-
-  const currentCrewId = userData.verified_crew_id;
-
-  if (currentCrewId) {
-    const { data: crewData, error: crewError } = await supabaseClient
-      .schema("attendance")
-      .from("crews")
-      .select("name")
-      .eq("id", currentCrewId)
-      .single();
-
-    if (crewError) console.error("Error fetching crew name:", crewError);
-    else crewName = crewData?.name || null;
-
-    const { data: userCrewData, error: userCrewError } = await supabaseClient
-      .schema("attendance")
-      .from("user_crews")
-      .select(
-        "crew_grade_id, crew_grades(name_override, grade_id, grades(name))"
-      )
-      .eq("user_id", user.id)
-      .eq("crew_id", currentCrewId)
-      .single();
-
-    if (userCrewError) {
-      console.error("Error fetching user_crew data:", userCrewError);
-      // user_crews 정보가 없더라도 기본 등급 부여
-      const { data: defaultGrade } = await supabaseClient
-        .schema("attendance")
-        .from("grades")
-        .select("name")
-        .eq("name", "Beginer")
-        .single();
-      rankName = defaultGrade?.name || "Beginer";
-    } else if (userCrewData?.crew_grades) {
-      rankName =
-        userCrewData.crew_grades.name_override ||
-        userCrewData.crew_grades.grades?.name ||
-        "Beginer";
-    } else {
-      // crew_grade_id가 null이거나, join된 crew_grades가 없는 경우
-      const { data: defaultGrade } = await supabaseClient
-        .schema("attendance")
-        .from("grades")
-        .select("name")
-        .eq("name", "Beginer")
-        .single();
-      rankName = defaultGrade?.name || "Beginer";
-    }
-  } else {
-    // verified_crew_id가 없는 경우, 기본 등급
-    rankName = "Beginer";
-  }
-
-  // 공지사항 (해당 크루 우선, 없으면 전체 공지)
-  const noticeQuery = supabaseClient
-    .schema("attendance")
-    .from("notices")
-    .select("content")
-    .eq("is_active", true)
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  if (currentCrewId) {
-    noticeQuery.or("crew_id.eq." + currentCrewId + ",crew_id.is.null");
-  } else {
-    noticeQuery.is("crew_id", null);
-  }
-
-  const { data: noticeData, error: noticeError } =
-    await noticeQuery.maybeSingle();
-  if (noticeError) console.error("Error fetching notice:", noticeError);
-  else noticeText = noticeData?.content || null;
-
-  return { userName, crewName, rankName, noticeText };
 }
 
 export default async function HomePage() {
-  const supabase = await createSupabaseServerClient(); // 여기서 클라이언트 생성
+  const supabase = await createSupabaseServerClient();
 
   const {
     data: { session },
     error: sessionError,
   } = await supabase.auth.getSession();
 
-  if (sessionError || !session) {
-    // session?.user 대신 session으로 확인
+  if (sessionError || !session?.user) {
     console.log("No active session, redirecting to login.");
     redirect("/auth/login");
   }
 
-  const { user } = session;
-  if (!user) {
-    // 한번 더 명시적으로 user 객체 확인
-    console.log("Session exists, but no user object. Redirecting to login.");
-    redirect("/auth/login");
-  }
-
-  const pageData = await getHomePageData(supabase, user);
+  const pageData = await getHomePageDataOptimized(supabase, session.user);
 
   return (
     <EnhancedHomeTemplate

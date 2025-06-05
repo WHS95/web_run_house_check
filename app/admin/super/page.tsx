@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Users, Tag, User, Clock, Calendar } from "lucide-react";
 
+// 동적 렌더링 강제
+export const dynamic = "force-dynamic";
+
 // 대시보드 카드 컴포넌트
 function DashboardCard({
   title,

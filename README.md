@@ -13,8 +13,8 @@
 1. 환경 변수 설정
    - `.env.local` 파일을 프로젝트 루트에 생성하고 아래 내용 추가:
    ```
-   SUPABASE_URL=supabase_url
-   SUPABASE_ANON_KEY=supabase_anon_key
+   NEXT_PUBLIC_SUPABASE_URL=NEXT_PUBLIC_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=supabase_anon_key
    ```
 
 2. 의존성 설치

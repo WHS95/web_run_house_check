@@ -104,10 +104,9 @@
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior: none;
     
-    /* 안전 영역 패딩 */
-    padding-top: var(--safe-area-inset-top);
-    padding-left: var(--safe-area-inset-left);
-    padding-right: var(--safe-area-inset-right);
+    /* Safe Area 패딩 제거 - 각 컴포넌트에서 개별 처리 */
+    padding: 0;
+    margin: 0;
   }
   
   /* 웹킷 기반 브라우저에서 스크롤바 숨김 */
@@ -131,10 +130,10 @@
     -webkit-text-size-adjust: none;
     -webkit-touch-callout: none;
     
-    /* 네이티브 앱 스타일 */
+    /* 네이티브 앱 스타일 - 배경색을 검은색으로 변경 */
     height: 100%;
     overflow-x: hidden;
-    background-color: #f8f9fa;
+    background-color: #1a1a1a; /* 검은색 배경으로 변경 */
   }
 }
 
@@ -235,12 +234,35 @@
     padding-right: var(--safe-area-inset-right);
   }
   
+  .px-safe {
+    padding-left: var(--safe-area-inset-left);
+    padding-right: var(--safe-area-inset-right);
+  }
+  
+  .py-safe {
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+  
   .mb-safe {
     margin-bottom: var(--safe-area-inset-bottom);
   }
   
   .mt-safe {
     margin-top: var(--safe-area-inset-top);
+  }
+  
+  /* 모든 Safe Area를 적용하는 클래스 */
+  .safe-area-all {
+    padding-top: var(--safe-area-inset-top);
+    padding-right: var(--safe-area-inset-right);
+    padding-bottom: var(--safe-area-inset-bottom);
+    padding-left: var(--safe-area-inset-left);
+  }
+  
+  /* 네이티브 앱 스타일의 높이 설정 */
+  .h-screen-safe {
+    height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
   }
 }
 

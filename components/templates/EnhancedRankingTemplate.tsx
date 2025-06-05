@@ -7,9 +7,7 @@ import RankingInfo from '@/components/organisms/ranking/RankingInfo';
 import RankingTabs, { type TabItem } from '@/components/organisms/ranking/RankingTabs';
 import RankingListHeader from '@/components/organisms/ranking/RankingListHeader';
 import RankingListItem from '@/components/organisms/ranking/RankingListItem';
-import PullToRefresh from '@/components/molecules/PullToRefresh';
 import PopupNotification, { NotificationType } from '@/components/molecules/common/PopupNotification';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { haptic } from '@/lib/haptic';
 import { IoMdArrowDropleft, IoMdArrowDropright} from 'react-icons/io';
@@ -97,18 +95,6 @@ const EnhancedRankingTemplate: React.FC<EnhancedRankingTemplateProps> = ({
     { id: 'hosting', label: '개설' },
   ];
 
-  // 새로고침 함수
-  const handleRefresh = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    window.location.reload();
-  };
-
-  // 홈으로 이동
-  const handleSwipeToHome = () => {
-    haptic.medium();
-    router.push('/');
-  };
-
   // 월 데이터 페칭 함수
   const fetchMonthData = useCallback(async (year: number, month: number) => {
     setIsDataLoading(true);
@@ -137,18 +123,11 @@ const EnhancedRankingTemplate: React.FC<EnhancedRankingTemplateProps> = ({
     }
   }, []);
 
-  // 풀 투 리프레시 기능
-  const {
-    containerRef,
-    isRefreshing,
-    pullDistance,
-    isTriggered,
-    refreshIndicatorStyle,
-  } = usePullToRefresh({
-    onRefresh: handleRefresh,
-    threshold: 100,
-    disabled: isDataLoading || isMonthChanging,
-  });
+  // 홈으로 이동
+  const handleSwipeToHome = () => {
+    haptic.medium();
+    router.push('/');
+  };
 
   // 스와이프 제스처 기능
   const swipeRef = useSwipeGesture({
@@ -161,17 +140,13 @@ const EnhancedRankingTemplate: React.FC<EnhancedRankingTemplateProps> = ({
     hapticFeedback: true,
   });
 
-  // ref를 모두 동일한 element에 연결하는 콜백
+  // ref를 스와이프 제스처에만 연결하는 콜백
   const setRefs = useCallback((element: HTMLDivElement | null) => {
-    // containerRef에 할당 (타입 체크 추가)
-    if (containerRef && 'current' in containerRef) {
-      (containerRef as any).current = element;
-    }
     // swipeRef에 할당 (타입 체크 추가) 
     if (swipeRef && 'current' in swipeRef) {
       (swipeRef as any).current = element;
     }
-  }, [containerRef, swipeRef]);
+  }, [swipeRef]);
 
   const handlePrevMonth = async () => {
     if (isMonthChanging || isDataLoading) return;
@@ -244,14 +219,6 @@ const EnhancedRankingTemplate: React.FC<EnhancedRankingTemplateProps> = ({
       ref={setRefs}
       className="min-h-screen bg-[#223150] text-white flex flex-col native-scroll relative"
     >
-      {/* 풀 투 리프레시 인디케이터 */}
-      <PullToRefresh
-        isRefreshing={isRefreshing}
-        pullDistance={pullDistance}
-        isTriggered={isTriggered}
-        style={refreshIndicatorStyle}
-      />
-
       {/* 상단 고정 영역 - 안전 영역 고려 */}
       <div className="flex-shrink-0 pt-safe">
         <div className="mb-4 bg-white">

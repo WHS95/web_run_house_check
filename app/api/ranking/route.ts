@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { type User } from "@supabase/supabase-js";
 
+// 동적 렌더링 강제
+export const dynamic = "force-dynamic";
+
 // 서버용 Supabase 클라이언트
 const createSupabaseServerClient = async () => {
   const cookieStore = await cookies();

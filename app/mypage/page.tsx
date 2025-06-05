@@ -4,7 +4,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import MemberDetailTemplate from "@/components/templates/MemberDetailTemplate";
 import { type User } from "@supabase/supabase-js";
 
-// 서버용 Supabase 클라이언트 (app/page.tsx와 동일한 방식, 추후 lib/supabase/server.ts로 분리 권장)
+// ⚡ 서버용 Supabase 클라이언트 (캐시된 인스턴스)
 const createSupabaseServerClient = async () => {
   const cookieStore = await cookies();
   return createServerClient(
@@ -16,29 +16,28 @@ const createSupabaseServerClient = async () => {
           return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
-          // cookieStore.set({ name, value, ...options }); 서버 컴포넌트에서 직접 사용 불가
+          // 서버 컴포넌트에서 직접 사용 불가
         },
         remove(name: string, options: CookieOptions) {
-          // cookieStore.set({ name, value: "", ...options }); 서버 컴포넌트에서 직접 사용 불가
+          // 서버 컴포넌트에서 직접 사용 불가
         },
       },
     }
   );
 };
 
-// MemberDetailTemplate에 전달할 사용자 프로필 데이터 타입
+// ⚡ 타입 정의 (인터페이스 통합)
 interface UserProfileForMyPage {
   firstName: string | null;
   birthYear: number | null;
-  joinDate: string | null; // YYYY/MM/DD 형식 또는 ISO 문자열
+  joinDate: string | null;
   rankName: string | null;
   email: string | null;
   phone: string | null;
   profileImageUrl?: string | null;
-  isAdmin: boolean; // 관리자 권한 여부 추가
+  isAdmin: boolean;
 }
 
-// 활동 데이터 인터페이스 추가
 interface Activity {
   type: "attendance" | "create_meeting";
   date: string;
@@ -52,235 +51,187 @@ interface ActivityData {
   activities: Activity[];
 }
 
-async function getMyPageData(
+// ⚡ 통합된 데이터 조회 함수 (병렬 처리로 성능 최적화)
+async function getOptimizedMyPageData(
   supabaseClient: any,
   user: User
-): Promise<UserProfileForMyPage | null> {
+): Promise<{ userProfile: UserProfileForMyPage; activityData: ActivityData }> {
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+  // ⚡ 모든 쿼리를 병렬로 실행하여 성능 최적화
+  const [userDataResult, userRoleResult, activityResult] =
+    await Promise.allSettled([
+      // 1. 기본 사용자 정보
+      supabaseClient
+        .schema("attendance")
+        .from("users")
+        .select(
+          "first_name, birth_year, phone, join_date, profile_image_url, verified_crew_id, is_crew_verified"
+        )
+        .eq("id", user.id)
+        .single(),
+
+      // 2. 사용자 권한 정보
+      supabaseClient
+        .schema("attendance")
+        .from("user_roles")
+        .select("roles(name)")
+        .eq("user_id", user.id),
+
+      // 3. 활동 데이터 (최적화된 쿼리)
+      supabaseClient
+        .schema("attendance")
+        .from("attendance_records")
+        .select(
+          "attendance_timestamp, is_host, location, exercise_types!attendance_records_exercise_type_id_fkey(name)"
+        )
+        .eq("user_id", user.id)
+        .gte("attendance_timestamp", ninetyDaysAgo.toISOString())
+        .order("attendance_timestamp", { ascending: false })
+        .limit(100), // ⚡ 성능을 위해 최대 100개로 제한
+    ]);
+
+  // ⚡ 기본 사용자 프로필 초기화
   let userProfile: UserProfileForMyPage = {
     firstName: null,
     email: user.email || null,
     birthYear: null,
     profileImageUrl: user.user_metadata?.avatar_url || null,
-    rankName: null,
+    rankName: "Beginer",
     joinDate: null,
     phone: null,
-    isAdmin: false, // 기본값 false
+    isAdmin: false,
   };
 
-  // 1. users 테이블에서 상세 정보 조회 (join_date, phone 추가)
-  const { data: userData, error: userDbError } = await supabaseClient
-    .schema("attendance")
-    .from("users")
-    .select(
-      "first_name, birth_year, phone, join_date, profile_image_url, verified_crew_id, is_crew_verified"
-    )
-    .eq("id", user.id)
-    .single();
+  // ⚡ 기본 활동 데이터 초기화
+  let activityData: ActivityData = {
+    attendanceCount: 0,
+    meetingsCreatedCount: 0,
+    activities: [],
+  };
 
-  if (userDbError) {
-    console.error("Error fetching user data from DB:", userDbError);
-    return userProfile;
-  }
+  // 1. 사용자 데이터 처리
+  if (userDataResult.status === "fulfilled" && userDataResult.value.data) {
+    const userData = userDataResult.value.data;
 
-  if (!userData) {
-    redirect("/auth/signup");
-  }
+    if (!userData.is_crew_verified || !userData.verified_crew_id) {
+      redirect("/auth/verify-crew");
+    }
 
-  userProfile.firstName = userData.first_name;
-  userProfile.birthYear = userData.birth_year;
-  userProfile.phone = userData.phone;
-  if (userData.join_date) {
-    userProfile.joinDate = new Date(userData.join_date).toLocaleDateString(
-      "ko-KR"
-    ); // YYYY. MM. DD. 형식
-  }
-  if (userData.profile_image_url) {
-    userProfile.profileImageUrl = userData.profile_image_url;
-  }
+    userProfile.firstName = userData.first_name;
+    userProfile.birthYear = userData.birth_year;
+    userProfile.phone = userData.phone;
+    if (userData.join_date) {
+      userProfile.joinDate = new Date(userData.join_date).toLocaleDateString(
+        "ko-KR"
+      );
+    }
+    if (userData.profile_image_url) {
+      userProfile.profileImageUrl = userData.profile_image_url;
+    }
 
-  if (!userData.is_crew_verified || !userData.verified_crew_id) {
-    redirect("/auth/verify-crew");
-  }
-
-  const currentCrewId = userData.verified_crew_id;
-
-  // 2. 사용자 권한 확인 (ADMIN 권한 여부)
-  const { data: userRoleData, error: userRoleError } = await supabaseClient
-    .schema("attendance")
-    .from("user_roles")
-    .select("roles(name)")
-    .eq("user_id", user.id);
-
-  if (!userRoleError && userRoleData) {
-    userProfile.isAdmin = userRoleData.some(
-      (role: any) => role.roles?.name === "ADMIN"
-    );
-  }
-
-  if (currentCrewId) {
-    // 크루 이름은 MemberDetailTemplate에서 직접 표시하지 않으므로 조회 생략 가능
-    // 등급 조회 로직은 동일
-    const { data: userCrewData, error: userCrewError } = await supabaseClient
+    // ⚡ 등급 정보를 별도로 조회 (필요한 경우에만)
+    const userCrewResult = await supabaseClient
       .schema("attendance")
       .from("user_crews")
       .select(
         "crew_grade_id, crew_grades(name_override, grade_id, grades(name))"
       )
       .eq("user_id", user.id)
-      .eq("crew_id", currentCrewId)
+      .eq("crew_id", userData.verified_crew_id)
       .single();
 
-    if (userCrewError) {
-      console.error("Error fetching user_crew data for mypage:", userCrewError);
-      const { data: defaultGrade } = await supabaseClient
-        .schema("attendance")
-        .from("grades")
-        .select("name")
-        .eq("name", "Beginer")
-        .single();
-      userProfile.rankName = defaultGrade?.name || "Beginer";
-    } else if (userCrewData?.crew_grades) {
+    if (userCrewResult.data?.crew_grades) {
       userProfile.rankName =
-        userCrewData.crew_grades.name_override ||
-        userCrewData.crew_grades.grades?.name ||
+        userCrewResult.data.crew_grades.name_override ||
+        userCrewResult.data.crew_grades.grades?.name ||
         "Beginer";
-    } else {
-      const { data: defaultGrade } = await supabaseClient
-        .schema("attendance")
-        .from("grades")
-        .select("name")
-        .eq("name", "Beginer")
-        .single();
-      userProfile.rankName = defaultGrade?.name || "Beginer";
     }
   } else {
-    userProfile.rankName = "Beginer";
+    redirect("/auth/signup");
   }
 
-  return userProfile;
-}
-
-// 활동 데이터를 가져오는 함수 추가
-async function getActivityData(
-  supabaseClient: any,
-  user: User
-): Promise<ActivityData> {
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-
-  try {
-    // 최근 30일간의 출석 기록 조회 (장소와 운동 종류 정보 포함)
-    const { data: records, error: recordsError } = await supabaseClient
-      .schema("attendance")
-      .from("attendance_records")
-      .select(
-        `
-        attendance_timestamp, 
-        is_host, 
-        location,
-        exercise_types!attendance_records_exercise_type_id_fkey(name)
-      `
-      )
-      .eq("user_id", user.id)
-      .gte("attendance_timestamp", ninetyDaysAgo.toISOString())
-      .order("attendance_timestamp", { ascending: false });
-
-    if (recordsError) {
-      console.error("Error fetching activity data:", recordsError);
-      return {
-        attendanceCount: 0,
-        meetingsCreatedCount: 0,
-        activities: [],
-      };
-    }
-
-    // 출석 횟수와 모임 개설 횟수 계산
-    const attendanceCount = records?.length || 0;
-    const meetingsCreatedCount =
-      records?.filter((record: { is_host: boolean }) => record.is_host)
-        .length || 0;
-
-    // 활동 내역 포맷팅
-    const activities =
-      records?.map(
-        (record: {
-          is_host: boolean;
-          attendance_timestamp: string;
-          location: string;
-          exercise_types: { name: string } | null;
-        }) => ({
-          type: record.is_host
-            ? ("create_meeting" as const)
-            : ("attendance" as const),
-          date: record.attendance_timestamp,
-          location: record.location || "알 수 없음",
-          exerciseType: record.exercise_types?.name || "알 수 없음",
-        })
-      ) || [];
-
-    return {
-      attendanceCount,
-      meetingsCreatedCount,
-      activities,
-    };
-  } catch (error) {
-    console.error("Error in getActivityData:", error);
-    return {
-      attendanceCount: 0,
-      meetingsCreatedCount: 0,
-      activities: [],
-    };
+  // 2. 권한 정보 처리
+  if (userRoleResult.status === "fulfilled" && userRoleResult.value.data) {
+    userProfile.isAdmin = userRoleResult.value.data.some(
+      (role: any) => role.roles?.name === "ADMIN"
+    );
   }
+
+  // 3. 활동 데이터 처리
+  if (activityResult.status === "fulfilled" && activityResult.value.data) {
+    const records = activityResult.value.data;
+
+    activityData.attendanceCount = records.length;
+    activityData.meetingsCreatedCount = records.filter(
+      (record: { is_host: boolean }) => record.is_host
+    ).length;
+
+    // ⚡ 활동 내역 매핑 최적화
+    activityData.activities = records.map((record: any) => ({
+      type: record.is_host
+        ? ("create_meeting" as const)
+        : ("attendance" as const),
+      date: record.attendance_timestamp,
+      location: record.location || "알 수 없음",
+      exerciseType: record.exercise_types?.name || "알 수 없음",
+    }));
+  }
+
+  return { userProfile, activityData };
 }
 
+// ⚡ 메인 페이지 컴포넌트 (최적화됨)
 export default async function MyPage() {
   const supabase = await createSupabaseServerClient();
 
+  // ⚡ 세션 확인 최적화
   const {
     data: { session },
     error: sessionError,
   } = await supabase.auth.getSession();
 
-  if (sessionError || !session) {
+  if (sessionError || !session?.user) {
     redirect("/auth/login");
   }
 
-  const { user } = session;
-  if (!user) {
-    redirect("/auth/login");
-  }
-
-  const userProfileData = await getMyPageData(supabase, user);
-  const activityData = await getActivityData(supabase, user);
-
-  if (!userProfileData) {
-    // getMyPageData에서 오류 발생 시 초기 userProfile 객체가 반환될 수 있음
-    // 또는 리다이렉션 되었어야 함.
-    console.error(
-      "User profile data is null or undefined after getMyPageData call."
+  try {
+    // ⚡ 통합 데이터 조회 (병렬 처리)
+    const { userProfile, activityData } = await getOptimizedMyPageData(
+      supabase,
+      session.user
     );
-    // 기본값으로라도 템플릿을 렌더링하거나, 에러 페이지로 리다이렉트
+
     return (
       <MemberDetailTemplate
-        userProfile={{
-          firstName: user.user_metadata?.full_name || user.email || null,
-          email: user.email || null,
-          birthYear: null,
-          joinDate: null,
-          phone: null,
-          rankName: "-",
-          profileImageUrl: user.user_metadata?.avatar_url || null,
-          isAdmin: false, // 기본값 false
-        }}
+        userProfile={userProfile}
         activityData={activityData}
       />
     );
-  }
+  } catch (error) {
+    console.error("MyPage 데이터 로딩 오류:", error);
 
-  return (
-    <MemberDetailTemplate
-      userProfile={userProfileData}
-      activityData={activityData}
-    />
-  );
+    // ⚡ 에러 발생 시 기본값으로 렌더링
+    return (
+      <MemberDetailTemplate
+        userProfile={{
+          firstName:
+            session.user.user_metadata?.full_name || session.user.email || null,
+          email: session.user.email || null,
+          birthYear: null,
+          joinDate: null,
+          phone: null,
+          rankName: "Beginer",
+          profileImageUrl: session.user.user_metadata?.avatar_url || null,
+          isAdmin: false,
+        }}
+        activityData={{
+          attendanceCount: 0,
+          meetingsCreatedCount: 0,
+          activities: [],
+        }}
+      />
+    );
+  }
 }

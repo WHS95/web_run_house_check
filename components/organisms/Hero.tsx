@@ -7,7 +7,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ username }) => {
   return (
-    <div className='relative w-full h-screen '>
+    <div className='relative w-full min-h-screen '>
       {/* 텍스트 콘텐츠 - 중앙 배치 */}
       <div className='absolute inset-0 z-30 flex flex-col items-center justify-center'>
         <div className='max-w-md mx-auto text-center '>

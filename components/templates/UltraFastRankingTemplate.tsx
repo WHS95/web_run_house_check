@@ -5,11 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import RankingInfo from '@/components/organisms/ranking/RankingInfo';
-import RankingTabs, { type TabItem } from '@/components/organisms/ranking/RankingTabs';
+import RankingTabs, { TabItem } from '@/components/organisms/ranking/RankingTabs';
 import RankingListHeader from '@/components/organisms/ranking/RankingListHeader';
 import RankingListItem from '@/components/organisms/ranking/RankingListItem';
 import PopupNotification, { NotificationType } from '@/components/molecules/common/PopupNotification';
-import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { haptic } from '@/lib/haptic';
 import { IoMdArrowDropleft, IoMdArrowDropright } from 'react-icons/io';
 
@@ -31,20 +30,20 @@ export interface RankingData {
   crewName?: string | null;
 }
 
-// ⚡ 로딩 스피너 컴포넌트
-const LoadingSpinner = React.memo(() => (
-  <div className="flex items-center justify-center">
-    <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-  </div>
-));
-LoadingSpinner.displayName = 'LoadingSpinner';
-
-// ⚡ 심플한 랭킹 리스트 로딩 스피너
+// ⚡ 랭킹 리스트 로딩 스켈레톤
 const RankingListSkeleton = React.memo(() => (
-  <div className="flex-1 flex items-center justify-center">
-    <div className="flex flex-col items-center space-y-3 py-12">
-      <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-500"></div>
-      <p className="text-gray-500 text-sm">랭킹 데이터 로딩 중...</p>
+  <div className="flex-1 overflow-y-auto native-scroll">
+    <div className="pb-safe space-y-2">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <div key={index} className="flex items-center p-4 animate-pulse">
+          <div className="w-8 h-6 bg-gray-200 rounded mr-4"></div>
+          <div className="w-10 h-10 bg-gray-200 rounded-full mr-4"></div>
+          <div className="flex-1">
+            <div className="h-4 bg-gray-200 rounded w-20 mb-1"></div>
+          </div>
+          <div className="w-12 h-4 bg-gray-200 rounded"></div>
+        </div>
+      ))}
     </div>
   </div>
 ));
@@ -79,49 +78,23 @@ UltraFastRankingList.displayName = 'UltraFastRankingList';
 const UltraFastRankingTemplate = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // ⚡ 현재 날짜 즉시 계산
-  const currentDate = useMemo(() => {
-    const now = new Date();
-    const urlYear = searchParams.get('year');
-    const urlMonth = searchParams.get('month');
-    
-    let year = now.getFullYear();
-    let month = now.getMonth() + 1;
-    
-    if (urlYear) {
-      const parsedYear = parseInt(urlYear, 10);
-      if (!isNaN(parsedYear) && parsedYear >= 1900 && parsedYear <= 2200) {
-        year = parsedYear;
-      }
-    }
-    
-    if (urlMonth) {
-      const parsedMonth = parseInt(urlMonth, 10);
-      if (!isNaN(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12) {
-        month = parsedMonth;
-      }
-    }
-    
-    return { year, month };
-  }, [searchParams]);
-
-  // ⚡ 상태 - 초기에는 빈 데이터로 시작
+  
+  // ⚡ 상태 최적화 - 필요한 것만 분리
   const [currentData, setCurrentData] = useState<RankingData>({
-    selectedYear: currentDate.year,
-    selectedMonth: currentDate.month,
+    selectedYear: new Date().getFullYear(),
+    selectedMonth: new Date().getMonth() + 1,
     attendanceRanking: [],
     hostingRanking: [],
-    crewName: null,
+    crewName: null
   });
-  const [activeTab, setActiveTab] = useState<string>('attendance');
-  const [isMonthChanging, setIsMonthChanging] = useState(false);
-  const [isDataLoading, setIsDataLoading] = useState(true); // 초기에는 로딩 중
+  
+  const [activeTab, setActiveTab] = useState('attendance');
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationType, setNotificationType] = useState<NotificationType | null>(null);
   const [notificationMessage, setNotificationMessage] = useState('');
 
-  // ⚡ Supabase 클라이언트 (지연 생성)
+  // ⚡ Supabase 클라이언트 (한 번만 생성)
   const supabase = useMemo(() => createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -129,11 +102,11 @@ const UltraFastRankingTemplate = () => {
 
   // ⚡ 탭 설정
   const tabs: TabItem[] = useMemo(() => [
-    { id: 'attendance', label: '출석' },
-    { id: 'hosting', label: '개설' },
+    { id: 'attendance', label: '출석 랭킹' },
+    { id: 'hosting', label: '개설 랭킹' }
   ], []);
 
-  // ⚡ 데이터 로딩 함수
+  // ⚡ 메모화된 데이터 로딩 함수 - 통합 함수 사용으로 대폭 간소화
   const fetchRankingData = useCallback(async (year: number, month: number) => {
     try {
       // 1. 세션 확인
@@ -143,16 +116,40 @@ const UltraFastRankingTemplate = () => {
         return;
       }
 
-      // 2. 실제 랭킹 데이터 로딩
-      const response = await fetch(`/api/ranking?year=${year}&month=${month}`);
-      if (!response.ok) {
-        throw new Error('데이터를 불러오는데 실패했습니다.');
+      // 2. 통합 랭킹 데이터 조회 (5번 통신 → 1번 통신)
+      const { data: result, error } = await supabase.schema('attendance').rpc('get_ranking_data_unified', {
+        p_user_id: session.user.id,
+        target_year: year,
+        target_month: month
+      });
+
+      if (error) {
+        console.error('랭킹 데이터 조회 오류:', error);
+        throw new Error(error.message);
       }
-      
-      const data = await response.json();
-      setCurrentData(data);
-      
-      return data;
+
+      // 3. 결과 처리
+      if (!result.success) {
+        if (result.error === 'user_not_found') {
+          router.push('/auth/login');
+          return;
+        }
+        if (result.error === 'crew_not_verified') {
+          router.push('/auth/verify-crew');
+          return;
+        }
+        throw new Error(result.message || '알 수 없는 오류가 발생했습니다.');
+      }
+
+      // 4. 상태 업데이트 (기존과 동일한 형태)
+      setCurrentData({
+        selectedYear: result.data.selectedYear,
+        selectedMonth: result.data.selectedMonth,
+        attendanceRanking: result.data.attendanceRanking || [],
+        hostingRanking: result.data.hostingRanking || [],
+        crewName: result.data.crewName
+      });
+
     } catch (error) {
       console.error('랭킹 데이터 로딩 오류:', error);
       throw error;
@@ -163,7 +160,10 @@ const UltraFastRankingTemplate = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        await fetchRankingData(currentDate.year, currentDate.month);
+        const year = parseInt(searchParams.get('year') || '') || new Date().getFullYear();
+        const month = parseInt(searchParams.get('month') || '') || new Date().getMonth() + 1;
+        
+        await fetchRankingData(year, month);
       } catch (error) {
         haptic.error();
         setNotificationType("error");
@@ -175,15 +175,14 @@ const UltraFastRankingTemplate = () => {
     };
 
     loadInitialData();
-  }, [fetchRankingData, currentDate.year, currentDate.month]);
+  }, [searchParams, fetchRankingData]);
 
-  // ⚡ 월 변경 핸들러
+  // ⚡ 월 변경 핸들러들 - URL 업데이트 제거로 간소화
   const handlePrevMonth = useCallback(async () => {
-    if (isMonthChanging || isDataLoading) return;
+    if (isDataLoading) return;
     
     haptic.light();
-    setIsMonthChanging(true);
-    setIsDataLoading(true); // 즉시 로딩 상태 표시
+    setIsDataLoading(true);
 
     let newYear = currentData.selectedYear;
     let newMonth = currentData.selectedMonth - 1;
@@ -193,10 +192,7 @@ const UltraFastRankingTemplate = () => {
       newYear -= 1;
     }
 
-    // URL 즉시 업데이트 (사용자 피드백)
-    router.push(`/ranking?year=${newYear}&month=${newMonth}`, { scroll: false });
-    
-    // 데이터 로딩
+    // 데이터 로딩만 수행 (URL 업데이트 제거)
     try {
       await fetchRankingData(newYear, newMonth);
     } catch (error) {
@@ -206,16 +202,14 @@ const UltraFastRankingTemplate = () => {
       setShowNotification(true);
     } finally {
       setIsDataLoading(false);
-      setIsMonthChanging(false);
     }
-  }, [isMonthChanging, isDataLoading, currentData.selectedYear, currentData.selectedMonth, router, fetchRankingData]);
+  }, [isDataLoading, currentData.selectedYear, currentData.selectedMonth, fetchRankingData]);
 
   const handleNextMonth = useCallback(async () => {
-    if (isMonthChanging || isDataLoading) return;
+    if (isDataLoading) return;
     
     haptic.light();
-    setIsMonthChanging(true);
-    setIsDataLoading(true); // 즉시 로딩 상태 표시
+    setIsDataLoading(true);
 
     let newYear = currentData.selectedYear;
     let newMonth = currentData.selectedMonth + 1;
@@ -225,10 +219,7 @@ const UltraFastRankingTemplate = () => {
       newYear += 1;
     }
 
-    // URL 즉시 업데이트 (사용자 피드백)
-    router.push(`/ranking?year=${newYear}&month=${newMonth}`, { scroll: false });
-    
-    // 데이터 로딩
+    // 데이터 로딩만 수행 (URL 업데이트 제거)
     try {
       await fetchRankingData(newYear, newMonth);
     } catch (error) {
@@ -238,25 +229,14 @@ const UltraFastRankingTemplate = () => {
       setShowNotification(true);
     } finally {
       setIsDataLoading(false);
-      setIsMonthChanging(false);
     }
-  }, [isMonthChanging, isDataLoading, currentData.selectedYear, currentData.selectedMonth, router, fetchRankingData]);
+  }, [isDataLoading, currentData.selectedYear, currentData.selectedMonth, fetchRankingData]);
 
   // ⚡ 탭 변경 핸들러
   const handleTabChange = useCallback((tabId: string) => {
     haptic.light();
     setActiveTab(tabId);
   }, []);
-
-  // ⚡ 스와이프 제스처
-  const swipeOptions = useMemo(() => ({
-    onSwipeRight: () => { haptic.medium(); router.push('/'); },
-    onSwipeLeft: () => { haptic.medium(); router.push('/attendance'); },
-    threshold: 80,
-    hapticFeedback: true,
-  }), [router]);
-
-  const swipeRef = useSwipeGesture(swipeOptions);
 
   // ⚡ 현재 표시할 데이터 계산
   const currentRankingData = useMemo(() => 
@@ -280,10 +260,7 @@ const UltraFastRankingTemplate = () => {
   );
 
   return (
-    <div 
-      ref={swipeRef as any}
-      className="h-screen bg-[#223150] text-white flex flex-col overflow-hidden relative"
-    >
+    <div className="h-screen bg-[#223150] text-white flex flex-col overflow-hidden relative">
       {/* ⚡ 헤더 - 상단 고정 */}
       <div className="fixed top-0 left-0 right-0 bg-white z-30 pt-safe shadow-sm">
         <PageHeader title="랭킹" iconColor="black" />
@@ -296,15 +273,15 @@ const UltraFastRankingTemplate = () => {
             <button 
               onClick={handlePrevMonth} 
               className={`p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
-                isMonthChanging || isDataLoading 
+                isDataLoading 
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-white/10'
               }`}
               aria-label="이전 달"
-              disabled={isMonthChanging || isDataLoading}
+              disabled={isDataLoading}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              {isMonthChanging ? <LoadingSpinner /> : <IoMdArrowDropleft className="h-6 w-6" />}
+              <IoMdArrowDropleft className="h-6 w-6" />
             </button>
             
             <RankingInfo 
@@ -316,15 +293,15 @@ const UltraFastRankingTemplate = () => {
             <button 
               onClick={handleNextMonth} 
               className={`p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
-                isMonthChanging || isDataLoading 
+                isDataLoading 
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-white/10'
               }`}
               aria-label="다음 달"
-              disabled={isMonthChanging || isDataLoading}
+              disabled={isDataLoading}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              {isMonthChanging ? <LoadingSpinner /> : <IoMdArrowDropright className="h-6 w-6" />}
+              <IoMdArrowDropright className="h-6 w-6" />
             </button>
           </div>
           
@@ -372,20 +349,6 @@ const UltraFastRankingTemplate = () => {
               </div>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* 스와이프 힌트 - 하단 고정 */}
-      <div className="fixed bottom-4 left-4 right-4 z-50 opacity-50 pb-safe">
-        <div className="flex justify-between text-white text-xs">
-          <div className="flex items-center space-x-1">
-            <span>←</span>
-            <span>홈</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <span>출석</span>
-            <span>→</span>
-          </div>
         </div>
       </div>
 

@@ -33,7 +33,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     }, [router]);
 
     return (
-        <div className="relative min-h-screen bg-basic-black overflow-hidden">
+        <div className="relative min-h-screen bg-basic-black overflow-hidden page-transition initial-load">
             {/* 🔒 헤더 - 상단 완전 고정 */}
             <div className="fixed top-0 left-0 right-0 z-50 pt-safe bg-basic-black">
                 <Header title={"RUN HOUSE"} />
@@ -62,14 +62,14 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                 <div className="relative h-[200px]">
                     {/* 출석 체크 카드 - 상단에 위치 */}
                     <div className="absolute bottom-[80px] left-0 right-0 z-20">
-                        <div className="native-card">
+                        <div className="native-card hw-accelerated">
                             <AttendanceCard />
                         </div>
                     </div>
 
                     {/* 랭킹 카드 - 가장 하단에 위치 */}
                     <div className="absolute bottom-0 left-0 right-0 z-40">
-                        <div className="native-card">
+                        <div className="native-card hw-accelerated">
                             <RankingCard />
                         </div>
                     </div>

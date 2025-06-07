@@ -115,6 +115,7 @@ const HomePage = () => {
 
         // 5. 성공적으로 데이터를 가져온 경우
         const finalData = functionResult.data;
+        // console.log("finalData", finalData);
         setPageData(finalData);
         setCachedData(session.user.id, finalData);
       } catch (error) {

@@ -192,6 +192,12 @@
     outline: none;
     transition: all 0.2s ease;
     position: relative;
+    text-align: left;
+    color-scheme: light;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .ios-date-input:focus {
@@ -199,15 +205,69 @@
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
   }
   
-  /* iOS Safari에서 날짜 picker 아이콘 숨기기 */
+  .ios-date-input:active {
+    transform: scale(0.995);
+  }
+  
+  /* iOS Safari에서 날짜 picker 아이콘 및 텍스트 정렬 개선 */
   .ios-date-input::-webkit-calendar-picker-indicator {
     opacity: 0;
     position: absolute;
-    right: 1rem;
-    width: 1.25rem;
-    height: 1.25rem;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
     cursor: pointer;
-    z-index: 1;
+    z-index: 2;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Safari에서 날짜 입력 필드 내부 요소들 정렬 */
+  .ios-date-input::-webkit-datetime-edit {
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+  
+  .ios-date-input::-webkit-datetime-edit-fields-wrapper {
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .ios-date-input::-webkit-datetime-edit-text {
+    text-align: left;
+    padding: 0 2px;
+    color: #6b7280;
+  }
+  
+  .ios-date-input::-webkit-datetime-edit-month-field,
+  .ios-date-input::-webkit-datetime-edit-day-field,
+  .ios-date-input::-webkit-datetime-edit-year-field {
+    text-align: left;
+    padding: 0 1px;
+    color: #374151;
+    font-weight: 500;
+  }
+  
+  .ios-date-input::-webkit-inner-spin-button,
+  .ios-date-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    display: none;
+  }
+  
+  /* 빈 날짜 필드일 때 플레이스홀더 스타일 */
+  .ios-date-input:invalid {
+    color: #9ca3af;
   }
   
   /* iOS에서 select 요소 커스텀 스타일 */

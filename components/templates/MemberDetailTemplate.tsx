@@ -61,26 +61,26 @@ const AdminButton = memo(() => (
 AdminButton.displayName = 'AdminButton';
 
 const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, activityData }) => {
-    if (!userProfile) {
-        return <ErrorState />;
-    }
-
     const displayName = useMemo(() => {
-        if (!userProfile.firstName) return '사용자';
+        if (!userProfile?.firstName) return '사용자';
         return userProfile.birthYear 
             ? `${userProfile.firstName} (${String(userProfile.birthYear)})`
             : userProfile.firstName;
-    }, [userProfile.firstName, userProfile.birthYear]);
+    }, [userProfile?.firstName, userProfile?.birthYear]);
 
     const adminButton = useMemo(() => {
-        return userProfile.isAdmin ? <AdminButton /> : null;
-    }, [userProfile.isAdmin]);
+        return userProfile?.isAdmin ? <AdminButton /> : null;
+    }, [userProfile?.isAdmin]);
 
     const profileProps = useMemo(() => ({
         name: displayName,
-        joinDate: userProfile.joinDate || '-',
-        grade: userProfile.rankName || '-'
-    }), [displayName, userProfile.joinDate, userProfile.rankName]);
+        joinDate: userProfile?.joinDate || '-',
+        grade: userProfile?.rankName || '-'
+    }), [displayName, userProfile?.joinDate, userProfile?.rankName]);
+
+    if (!userProfile) {
+        return <ErrorState />;
+    }
 
     return (
         <div className="flex flex-col h-screen bg-white">

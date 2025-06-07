@@ -260,14 +260,14 @@ const UltraFastRankingTemplate = () => {
   );
 
   return (
-    <div className="h-screen bg-[#223150] text-white flex flex-col overflow-hidden relative">
+    <div className="h-screen bg-white text-white flex flex-col overflow-hidden relative">
       {/* ⚡ 헤더 - 상단 고정 */}
       <div className="fixed top-0 left-0 right-0 bg-white z-30 pt-safe shadow-sm">
         <PageHeader title="랭킹" iconColor="black" />
       </div>
 
-      {/* ⚡ 상단 컨트롤 영역 - 고정 */}
-      <div className="fixed top-[80px] left-0 right-0 bg-[#223150] z-20 pt-safe">
+      {/* ⚡ RankingInfo- 고정 */}
+      <div className="fixed top-[55px] left-0 right-0 bg-basic-black z-20">
         <div className="px-2 pb-4">
           <div className="mb-6 mt-6 flex items-center justify-between">
             <button 
@@ -311,12 +311,9 @@ const UltraFastRankingTemplate = () => {
             onTabChange={handleTabChange}
           />
         </div>
-      </div>
-      
-      {/* ⚡ 스크롤 가능한 랭킹 리스트 영역 */}
-      <div className="flex-1 bg-white rounded-t-3xl text-black flex flex-col mt-[240px] native-card hw-accelerated">
-        {/* 고정 헤더 */}
-        <div className="flex-shrink-0 sticky top-0 bg-white z-10">
+        
+        {/* ⚡ 고정된 랭킹 리스트 헤더 */}
+        <div className="bg-white border-t border-gray-200">
           <RankingListHeader 
             headers={[
               '등수', 
@@ -326,7 +323,10 @@ const UltraFastRankingTemplate = () => {
             ]} 
           />
         </div>
-        
+      </div>
+      
+      {/* ⚡ 스크롤 가능한 랭킹 리스트 영역 */}
+      <div className="flex-1 bg-white text-black flex flex-col mt-[300px]  hw-accelerated">
         {/* ⚡ 데이터 또는 로딩 스피너 표시 */}
         <div className="flex-1 overflow-y-auto native-scroll">
           {isDataLoading ? (

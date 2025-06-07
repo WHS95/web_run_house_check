@@ -6,6 +6,8 @@ import { createBrowserClient } from '@supabase/ssr';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import PopupNotification, { NotificationType } from '@/components/molecules/common/PopupNotification';
 import { haptic } from '@/lib/haptic';
+import { AiOutlineCalendar } from "react-icons/ai";
+import { IoChevronDown } from "react-icons/io5";
 
 // ⚡ 심플한 폼 로딩 스켈레톤
 const FormSkeleton = React.memo(() => (
@@ -90,9 +92,7 @@ const UltraFastForm = React.memo<{
               className="ios-date-input"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
-              </svg>
+              <AiOutlineCalendar className="w-5 h-5 text-gray-400" />
             </div>
           </div>
           <div className="relative">
@@ -106,9 +106,7 @@ const UltraFastForm = React.memo<{
               ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <IoChevronDown className="w-5 h-5 text-gray-400" />
             </div>
           </div>
         </div>
@@ -128,9 +126,7 @@ const UltraFastForm = React.memo<{
             ))}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <IoChevronDown className="w-5 h-5 text-gray-400" />
           </div>
         </div>
       </div>
@@ -149,9 +145,7 @@ const UltraFastForm = React.memo<{
             ))}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <IoChevronDown className="w-5 h-5 text-gray-400" />
           </div>
         </div>
       </div>
@@ -349,7 +343,6 @@ const UltraFastAttendanceTemplate = () => {
 
       {/* ⚡ 메인 콘텐츠 - 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto native-scroll pt-[80px] pb-[100px] px-4">
-        <div className="pt-6">
           {isDataLoading ? (
             <FormSkeleton />
           ) : (
@@ -360,7 +353,6 @@ const UltraFastAttendanceTemplate = () => {
               exerciseOptions={exerciseOptions}
             />
           )}
-        </div>
       </div>
 
       {/* ⚡ 하단 버튼 - 하단 고정 */}

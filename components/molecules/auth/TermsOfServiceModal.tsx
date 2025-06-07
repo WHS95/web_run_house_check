@@ -14,7 +14,7 @@ export default function TermsOfServiceModal({
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-basic-black bg-opacity-50'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 bg-basic-black'>
       <div className='bg-white rounded-lg max-w-md w-full mx-4 max-h-[80vh] overflow-hidden'>
         {/* 헤더 */}
         <div className='flex items-center justify-between p-4 border-b border-gray-200'>
@@ -33,18 +33,19 @@ export default function TermsOfServiceModal({
         <div className='p-4 overflow-y-auto max-h-[60vh]'>
           <div className='space-y-4 text-sm text-gray-700'>
             <p className='font-medium text-gray-900'>
-              본 약관은 러닝 크루 연결 플랫폼 '런하우스(RunHouse)'(이하
-              "서비스")의 이용과 관련하여 이용자(이하 "회원")와 운영자(이하
-              "운영자") 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을
-              목적으로 합니다.
+              본 약관은 러닝 크루 연결 플랫폼
+              &apos;런하우스(RunHouse)&apos;(이하 &quot;서비스&quot;)의 이용과
+              관련하여 이용자(이하 &quot;회원&quot;)와 운영자(이하
+              &quot;운영자&quot;) 간의 권리, 의무 및 책임사항, 기타 필요한
+              사항을 규정함을 목적으로 합니다.
             </p>
 
             <div>
               <h3 className='mb-2 font-semibold text-gray-900'>제1조 (정의)</h3>
               <ul className='ml-2 space-y-1 text-xs list-disc list-inside'>
                 <li>
-                  <strong>서비스:</strong> '런하우스' 웹사이트 및 관련 도메인,
-                  모바일 환경에서 제공되는 모든 기능과 정보
+                  <strong>서비스:</strong> &apos;런하우스&apos; 웹사이트 및 관련
+                  도메인, 모바일 환경에서 제공되는 모든 기능과 정보
                 </li>
                 <li>
                   <strong>회원:</strong> 본 약관에 따라 서비스에 접속하여 소셜

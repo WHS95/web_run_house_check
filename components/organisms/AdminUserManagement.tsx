@@ -50,6 +50,8 @@ export default function AdminUserManagement({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserForAdmin | null>(null);
 
+  console.log("users", users);
+
   // 정렬 함수
   const sortUsers = (users: UserForAdmin[]) => {
     return [...users].sort((a, b) => {
@@ -237,7 +239,7 @@ export default function AdminUserManagement({
   return (
     <div className='flex flex-col h-screen bg-gray-50'>
       {/* 검색 및 필터 - 고정 */}
-      <div className='sticky top-0 z-10 bg-gray-50 px-4 py-4 space-y-4 border-b border-gray-100'>
+      <div className='sticky top-0 z-10 px-4 py-4 space-y-4 border-b border-gray-100 bg-gray-50'>
         {/* 검색 */}
         <div className='relative'>
           <Search className='absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2' />

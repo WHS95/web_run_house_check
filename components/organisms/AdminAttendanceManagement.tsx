@@ -27,10 +27,7 @@ import {
 import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import AttendanceEditModal from "@/components/molecules/AttendanceEditModal";
 import NoticeModal from "@/components/molecules/NoticeModal";
-import {
-  deleteAttendanceRecord,
-  updateAttendanceRecord,
-} from "@/lib/supabase/admin";
+// API 라우트를 통해 출석 기록 관리
 import type {
   AttendanceRecord,
   AttendanceSummary,
@@ -280,21 +277,64 @@ export default function AdminAttendanceManagement({
     }
   };
 
-  // 출석 기록 삭제 핸들러 (서버 연동)
+  // 출석 기록 삭제 핸들러 (API 라우트 사용)
   const handleCancelAttendance = async (recordId: string) => {
     if (isDeletingRecord) return; // 이미 삭제 중인 경우 중복 실행 방지
 
     setIsDeletingRecord(recordId);
 
-    try {
-      const { success, error } = await deleteAttendanceRecord(recordId);
+    // 삭제할 기록의 날짜 정보 미리 저장
+    const recordToDelete = selectedDateDetails.find(
+      (record) => record.id === recordId
+    );
+    const deletedRecordDate = recordToDelete
+      ? recordToDelete.checkInTime.split("T")[0]
+      : null;
 
-      if (success) {
+    try {
+      const response = await fetch(
+        `/api/admin/attendance/delete?recordId=${recordId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         // 성공 시 로컬 상태에서 해당 기록 제거
         const updatedDetails = selectedDateDetails.filter(
           (record) => record.id !== recordId
         );
         setSelectedDateDetails(updatedDetails);
+
+        // 달력 출석 요약 업데이트 (해당 날짜의 카운트 -1)
+        if (deletedRecordDate) {
+          setAttendanceSummary(
+            (prevSummary) =>
+              prevSummary
+                .map((summary) => {
+                  if (summary.date === deletedRecordDate) {
+                    const newCount = summary.count - 1;
+                    // 카운트가 0이 되면 해당 항목 제거
+                    return newCount > 0
+                      ? { ...summary, count: newCount }
+                      : null;
+                  }
+                  return summary;
+                })
+                .filter(Boolean) as AttendanceSummary[]
+          );
+
+          // 캐시된 상세 데이터도 업데이트
+          setAttendanceDetailData((prev) => ({
+            ...prev,
+            [deletedRecordDate]: updatedDetails,
+          }));
+        }
 
         setNoticeModal({
           isOpen: true,
@@ -302,11 +342,13 @@ export default function AdminAttendanceManagement({
           content: "출석 기록이 성공적으로 삭제되었습니다.",
         });
       } else {
-        console.error("출석 기록 삭제 실패:", error);
+        console.error("출석 기록 삭제 실패:", result.error);
         setNoticeModal({
           isOpen: true,
           title: "삭제 실패",
-          content: "출석 기록 삭제에 실패했습니다.\n다시 시도해주세요.",
+          content:
+            result.error ||
+            "출석 기록 삭제에 실패했습니다.\n다시 시도해주세요.",
         });
       }
     } catch (error) {
@@ -314,7 +356,8 @@ export default function AdminAttendanceManagement({
       setNoticeModal({
         isOpen: true,
         title: "오류 발생",
-        content: "출석 기록 삭제 중 오류가 발생했습니다.\n다시 시도해주세요.",
+        content:
+          "출석 기록 삭제 중 네트워크 오류가 발생했습니다.\n다시 시도해주세요.",
       });
     } finally {
       setIsDeletingRecord(null);
@@ -327,7 +370,7 @@ export default function AdminAttendanceManagement({
     setEditModalOpen(true);
   };
 
-  // 출석 정보 저장 핸들러
+  // 출석 정보 저장 핸들러 (API 라우트 사용)
   const handleSaveAttendanceInfo = async (attendanceData: {
     checkInTime: string;
     location: string;
@@ -336,34 +379,117 @@ export default function AdminAttendanceManagement({
     if (!selectedAttendance) return;
 
     try {
-      const { success, error } = await updateAttendanceRecord(
-        selectedAttendance.id,
-        attendanceData
-      );
+      const response = await fetch("/api/admin/attendance/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recordId: selectedAttendance.id,
+          updates: attendanceData,
+        }),
+      });
 
-      if (!success) {
-        console.error("출석 정보 업데이트 실패:", error);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        console.error("출석 정보 업데이트 실패:", result.error);
         setNoticeModal({
           isOpen: true,
           title: "수정 실패",
-          content: "출석 정보 수정에 실패했습니다.\n다시 시도해주세요.",
+          content:
+            result.error ||
+            "출석 정보 수정에 실패했습니다.\n다시 시도해주세요.",
         });
         return;
       }
 
+      // 원래 날짜와 새로운 날짜 확인
+      const originalDate = selectedAttendance.checkInTime.split("T")[0];
+      const newDate = attendanceData.checkInTime.split("T")[0];
+      const isDateChanged = originalDate !== newDate;
+
       // 로컬 상태 업데이트
-      setSelectedDateDetails((prevDetails) =>
-        prevDetails.map((record) =>
-          record.id === selectedAttendance.id
-            ? {
-                ...record,
-                checkInTime: attendanceData.checkInTime,
-                location: attendanceData.location,
-                isHost: attendanceData.isHost,
-              }
-            : record
-        )
-      );
+      if (isDateChanged) {
+        // 날짜가 변경된 경우: 현재 목록에서 제거
+        const updatedDetails = selectedDateDetails.filter(
+          (record) => record.id !== selectedAttendance.id
+        );
+        setSelectedDateDetails(updatedDetails);
+
+        // 달력 출석 요약 업데이트
+        setAttendanceSummary((prevSummary) => {
+          const updatedSummary = [...prevSummary];
+
+          // 원래 날짜의 카운트 -1
+          const originalSummaryIndex = updatedSummary.findIndex(
+            (s) => s.date === originalDate
+          );
+          if (originalSummaryIndex !== -1) {
+            const newCount = updatedSummary[originalSummaryIndex].count - 1;
+            if (newCount > 0) {
+              updatedSummary[originalSummaryIndex] = {
+                ...updatedSummary[originalSummaryIndex],
+                count: newCount,
+              };
+            } else {
+              updatedSummary.splice(originalSummaryIndex, 1);
+            }
+          }
+
+          // 새로운 날짜의 카운트 +1
+          const newSummaryIndex = updatedSummary.findIndex(
+            (s) => s.date === newDate
+          );
+          if (newSummaryIndex !== -1) {
+            updatedSummary[newSummaryIndex] = {
+              ...updatedSummary[newSummaryIndex],
+              count: updatedSummary[newSummaryIndex].count + 1,
+            };
+          } else {
+            updatedSummary.push({ date: newDate, count: 1 });
+          }
+
+          return updatedSummary;
+        });
+
+        // 캐시된 상세 데이터 업데이트
+        setAttendanceDetailData((prev) => ({
+          ...prev,
+          [originalDate]: updatedDetails,
+        }));
+      } else {
+        // 같은 날짜 내에서 수정: 기존 로직 유지
+        setSelectedDateDetails((prevDetails) =>
+          prevDetails.map((record) =>
+            record.id === selectedAttendance.id
+              ? {
+                  ...record,
+                  checkInTime: attendanceData.checkInTime,
+                  location: attendanceData.location,
+                  isHost: attendanceData.isHost,
+                }
+              : record
+          )
+        );
+
+        // 캐시된 상세 데이터도 업데이트
+        if (selectedDate) {
+          setAttendanceDetailData((prev) => ({
+            ...prev,
+            [selectedDate]: selectedDateDetails.map((record) =>
+              record.id === selectedAttendance.id
+                ? {
+                    ...record,
+                    checkInTime: attendanceData.checkInTime,
+                    location: attendanceData.location,
+                    isHost: attendanceData.isHost,
+                  }
+                : record
+            ),
+          }));
+        }
+      }
 
       setEditModalOpen(false);
       setSelectedAttendance(null);
@@ -371,14 +497,17 @@ export default function AdminAttendanceManagement({
       setNoticeModal({
         isOpen: true,
         title: "수정 완료",
-        content: "출석 정보가 성공적으로 수정되었습니다.",
+        content: isDateChanged
+          ? "출석 정보가 성공적으로 수정되었습니다.\n날짜가 변경되어 해당 출석 기록이 새로운 날짜로 이동되었습니다."
+          : "출석 정보가 성공적으로 수정되었습니다.",
       });
     } catch (error) {
       console.error("출석 정보 업데이트 오류:", error);
       setNoticeModal({
         isOpen: true,
         title: "오류 발생",
-        content: "출석 정보 수정 중 오류가 발생했습니다.\n다시 시도해주세요.",
+        content:
+          "출석 정보 수정 중 네트워크 오류가 발생했습니다.\n다시 시도해주세요.",
       });
     }
   };

@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CircleCheck, CircleSlash } from "lucide-react";
+import { CircleCheck, CircleSlash, CircleEllipsis } from "lucide-react";
 
 export type NotificationType = "success" | "error" | "loading";
 
@@ -36,10 +36,8 @@ const PopupNotification = memo<PopupNotificationProps>(
           return { color: "text-red-500", Component: CircleSlash };
         case "loading":
           return {
-            color: "text-blue-500",
-            Component: () => (
-              <div className='animate-spin rounded-full h-[95px] w-[95px] border-4 border-blue-200 border-t-blue-500'></div>
-            ),
+            color: "text-yellow-500",
+            Component: CircleEllipsis,
           };
         default:
           return { color: "text-red-500", Component: CircleSlash };

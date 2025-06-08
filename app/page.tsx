@@ -46,6 +46,7 @@ const HomePage = () => {
     crewName: null,
     noticeText: null,
   });
+  console.log("pageData", pageData);
 
   // ⚡ Supabase 클라이언트 (한 번만 생성)
   const supabase = useMemo(
@@ -115,7 +116,7 @@ const HomePage = () => {
 
         // 5. 성공적으로 데이터를 가져온 경우
         const finalData = functionResult.data;
-        // console.log("finalData", finalData);
+        console.log("finalData", finalData);
         setPageData(finalData);
         setCachedData(session.user.id, finalData);
       } catch (error) {

@@ -21,6 +21,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     crewName,
     noticeText,
 }) => {
+    console.log("EnhancedHomeTemplate noticeText:", noticeText);
     const router = useRouter();
 
     // 랭킹 페이지로 이동 - 최적화
@@ -42,20 +43,20 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
             </div>
 
             {/* 📱 중간 영역 - Hero + 공지사항 */}
-            <div className="pt-[140px] pb-[220px] h-screen ">
-                {/* Hero 배경 */}
-                <div className="relative h-full">
+            <div className="relative h-screen">
+                {/* Hero 배경 - 가운데 정렬 */}
+                <div className="h-full flex items-center justify-center">
                     {username && (
                         <Hero username={username} />
                     )}
-                    
-                    {/* 공지사항 - Hero 위에 오버레이 */}
-                    {noticeText && (
-                        <div className="absolute top-4 left-0 right-0 z-10 px-4">
-                            <NoticeBar noticeText={noticeText} />
-                        </div>
-                    )}
                 </div>
+                
+                {/* 공지사항 - 상단 고정 오버레이 */}
+                {noticeText && (
+                    <div className="absolute top-24 left-0 right-0 z-40 px-4">
+                        <NoticeBar noticeText={noticeText} />
+                    </div>
+                )}
             </div>
 
             {/* 🔒 하단 카드 섹션 - 하단 완전 고정 */}

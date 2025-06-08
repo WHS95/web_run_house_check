@@ -9,10 +9,7 @@ const Hero: React.FC<HeroProps> = ({ username }) => {
   return (
     <div className='relative w-full min-h-screen '>
       {/* 텍스트 콘텐츠 - 헤더와 출석카드 사이 중앙 배치 */}
-      <div
-        className='absolute inset-0 z-30 flex flex-col items-center justify-center'
-        style={{ marginTop: "40px", marginBottom: "140px" }}
-      >
+      <div className='absolute inset-0 z-30 flex flex-col items-center justify-center'>
         <div className='max-w-md mx-auto text-center '>
           <p className='text-2xl font-light leading-[1.3] text-left text-white'>
             안녕하세요 👋🏻

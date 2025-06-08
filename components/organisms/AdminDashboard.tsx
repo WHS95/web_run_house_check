@@ -10,7 +10,27 @@ import {
   TrendingDown,
 } from "lucide-react";
 import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
-import { AdminStats } from "@/lib/admin-stats";
+// AdminStats 타입 정의
+interface AdminStats {
+  totalMembers: number;
+  todayAttendance: number;
+  todayMeetingCount: number;
+  newMembersThisMonth: number;
+  newMembersThisMonthChange: number | null;
+  lastMonthNewMembers: number;
+  monthlyMeetingCount: number;
+  monthlyMeetingCountChange: number | null;
+  lastMonthMeetingCount: number;
+  monthlyParticipationCount: number;
+  monthlyParticipationCountChange: number | null;
+  lastMonthParticipationCount: number;
+  monthlyParticipantCount: number;
+  monthlyParticipantCountChange: number | null;
+  lastMonthParticipantCount: number;
+  monthlyHostCount: number;
+  monthlyHostCountChange: number | null;
+  lastMonthHostCount: number;
+}
 
 interface AdminDashboardProps {
   stats: AdminStats;
@@ -125,7 +145,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 모임 건수 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-center justify-between'>
+                  <div className='flex items-start justify-between'>
                     <div>
                       <p className='text-sm text-gray-600'>모임 건수</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -135,7 +155,12 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
                         </span>
                       </p>
                     </div>
-                    {renderChangeIndicator(stats.monthlyMeetingCountChange)}
+                    <div className='flex flex-col items-end space-y-1'>
+                      {renderChangeIndicator(stats.monthlyMeetingCountChange)}
+                      <p className='text-xs text-gray-400'>
+                        지난달: {stats.lastMonthMeetingCount}건
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -143,7 +168,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 모임 참여 횟수 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-center justify-between'>
+                  <div className='flex items-start justify-between'>
                     <div>
                       <p className='text-sm text-gray-600'>출석 횟수</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -153,9 +178,14 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
                         </span>
                       </p>
                     </div>
-                    {renderChangeIndicator(
-                      stats.monthlyParticipationCountChange
-                    )}
+                    <div className='flex flex-col items-end space-y-1'>
+                      {renderChangeIndicator(
+                        stats.monthlyParticipationCountChange
+                      )}
+                      <p className='text-xs text-gray-400'>
+                        지난달: {stats.lastMonthParticipationCount}건
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -163,7 +193,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 참여 크루원 수 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-center justify-between'>
+                  <div className='flex items-start justify-between'>
                     <div>
                       <p className='text-sm text-gray-600'>참여 크루원 수</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -173,7 +203,14 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
                         </span>
                       </p>
                     </div>
-                    {renderChangeIndicator(stats.monthlyParticipantCountChange)}
+                    <div className='flex flex-col items-end space-y-1'>
+                      {renderChangeIndicator(
+                        stats.monthlyParticipantCountChange
+                      )}
+                      <p className='text-xs text-gray-400'>
+                        지난달: {stats.lastMonthParticipantCount}명
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -181,7 +218,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 모임개설 크루원 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-center justify-between'>
+                  <div className='flex items-start justify-between'>
                     <div>
                       <p className='text-sm text-gray-600'>모임개설 크루원</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -191,7 +228,12 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
                         </span>
                       </p>
                     </div>
-                    {renderChangeIndicator(stats.monthlyHostCountChange)}
+                    <div className='flex flex-col items-end space-y-1'>
+                      {renderChangeIndicator(stats.monthlyHostCountChange)}
+                      <p className='text-xs text-gray-400'>
+                        지난달: {stats.lastMonthHostCount}명
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -199,7 +241,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 신규 가입 인원 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-center justify-between'>
+                  <div className='flex items-start justify-between'>
                     <div>
                       <p className='text-sm text-gray-600'>신규 가입 인원</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -209,7 +251,12 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
                         </span>
                       </p>
                     </div>
-                    {renderChangeIndicator(stats.newMembersThisMonthChange)}
+                    <div className='flex flex-col items-end space-y-1'>
+                      {renderChangeIndicator(stats.newMembersThisMonthChange)}
+                      <p className='text-xs text-gray-400'>
+                        지난달: {stats.lastMonthNewMembers}명
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

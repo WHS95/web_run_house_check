@@ -283,14 +283,6 @@ export default function AdminAttendanceManagement({
 
     setIsDeletingRecord(recordId);
 
-    // 삭제할 기록의 날짜 정보 미리 저장
-    const recordToDelete = selectedDateDetails.find(
-      (record) => record.id === recordId
-    );
-    const deletedRecordDate = recordToDelete
-      ? recordToDelete.checkInTime.split("T")[0]
-      : null;
-
     try {
       const response = await fetch(
         `/api/admin/attendance/delete?recordId=${recordId}`,
@@ -310,31 +302,6 @@ export default function AdminAttendanceManagement({
           (record) => record.id !== recordId
         );
         setSelectedDateDetails(updatedDetails);
-
-        // 달력 출석 요약 업데이트 (해당 날짜의 카운트 -1)
-        if (deletedRecordDate) {
-          setAttendanceSummary(
-            (prevSummary) =>
-              prevSummary
-                .map((summary) => {
-                  if (summary.date === deletedRecordDate) {
-                    const newCount = summary.count - 1;
-                    // 카운트가 0이 되면 해당 항목 제거
-                    return newCount > 0
-                      ? { ...summary, count: newCount }
-                      : null;
-                  }
-                  return summary;
-                })
-                .filter(Boolean) as AttendanceSummary[]
-          );
-
-          // 캐시된 상세 데이터도 업데이트
-          setAttendanceDetailData((prev) => ({
-            ...prev,
-            [deletedRecordDate]: updatedDetails,
-          }));
-        }
 
         setNoticeModal({
           isOpen: true,

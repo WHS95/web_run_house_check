@@ -77,7 +77,10 @@ export default function AdminPage() {
     async function fetchStats() {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/admin/stats?crewId=${crewId}`);
+        // 통합 API 사용: /api/admin/attendance?type=stats
+        const response = await fetch(
+          `/api/admin/attendance?crewId=${crewId}&type=stats`
+        );
 
         if (!response.ok) {
           throw new Error("통계 데이터를 가져오는데 실패했습니다.");

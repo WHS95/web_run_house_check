@@ -632,9 +632,13 @@ export async function getUsersByCrewId(
         .from("attendance_records")
         .select("attendance_timestamp")
         .eq("user_id", user.id)
+        .eq("crew_id", crewId) // 크루 ID 조건 추가
         .is("deleted_at", null) // 삭제되지 않은 기록만
         .order("attendance_timestamp", { ascending: false })
         .limit(1);
+      // console.log("--------------------------------");
+      // console.log("user.id", user.id);
+      // console.log("attendanceData", attendanceData);
 
       const userWithAttendance: UserForAdmin = {
         ...user,

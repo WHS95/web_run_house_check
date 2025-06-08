@@ -29,13 +29,19 @@ const getDaysAgo = (dateString: string | null): string => {
   if (!dateString) return "출석 기록 없음";
 
   const today = new Date();
+  today.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+
   const targetDate = new Date(dateString);
+  targetDate.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+
   const diffTime = today.getTime() - targetDate.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) return "오늘";
   if (diffDays === 1) return "1일 전";
-  return `${diffDays}일 전`;
+  if (diffDays > 1) return `${diffDays}일 전`;
+  if (diffDays === -1) return "1일 후";
+  return `${Math.abs(diffDays)}일 후`;
 };
 
 export default function AdminUserManagement({

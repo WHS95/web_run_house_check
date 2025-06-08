@@ -52,6 +52,20 @@ export async function POST(request: Request) {
       attendanceTimestamp,
     } = parsedData.data;
 
+    // 현재 시간보다 이후 시간인지 검증 (미래 시간 차단)
+    const currentTime = new Date();
+    const attendanceTime = new Date(attendanceTimestamp);
+
+    if (attendanceTime > currentTime) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "현재 시간보다 이후 시간으로는 출석할 수 없습니다.",
+        },
+        { status: 400 }
+      );
+    }
+
     // 병렬로 locationId 검증과 출석 기록 삽입 준비
     const [locationValidation] = await Promise.allSettled([
       supabase

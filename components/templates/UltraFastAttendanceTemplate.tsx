@@ -54,6 +54,28 @@ const getTodayString = () => {
   return today.toISOString().split('T')[0];
 };
 
+// ⚡ 현재 시간보다 이후인지 확인하는 함수 (미래 시간인지)
+const isFutureDateTime = (date: string, time: string) => {
+  const selectedDateTime = new Date(`${date}T${time}:00`);
+  const now = new Date();
+  console.log("selectedDateTime", selectedDateTime);  
+  console.log("now", now);
+  return selectedDateTime > now;
+};
+
+// ⚡ 오늘 날짜에서 선택 가능한 시간 옵션 필터링 (현재 시간 이전만 허용)
+const getAvailableTimeOptions = (selectedDate: string) => {
+  const today = getTodayString();
+  if (selectedDate !== today) {
+    return TIME_OPTIONS; // 오늘이 아니면 모든 시간 선택 가능
+  }
+  
+  const now = new Date();
+  const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  
+  return TIME_OPTIONS.filter(option => option.value <= currentTime);
+};
+
 // ⚡ 시간 옵션 미리 계산 (컴포넌트 외부에서)
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) => 
   ['00', '10', '20', '30', '40', '50'].map(m => ({
@@ -69,6 +91,9 @@ const UltraFastForm = React.memo<{
   locationOptions: any[];
   exerciseOptions: any[];
 }>(({ formData, onFormChange, locationOptions, exerciseOptions }) => {
+  
+  // 현재 날짜에 따른 시간 옵션 계산
+  const availableTimeOptions = useMemo(() => getAvailableTimeOptions(formData.date), [formData.date]);
   
   return (
     <div className="space-y-6">
@@ -101,7 +126,7 @@ const UltraFastForm = React.memo<{
               onChange={(e) => onFormChange('time', e.target.value)}
               className="ios-select"
             >
-              {TIME_OPTIONS.map(option => (
+              {availableTimeOptions.map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -208,15 +233,45 @@ const UltraFastAttendanceTemplate = () => {
 
   // ⚡ 메모화된 폼 변경 핸들러
   const handleFormChange = useCallback((field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'date') {
+      setFormData(prev => {
+        const newData = { ...prev, [field]: value };
+        
+        // 오늘 날짜로 변경된 경우, 현재 시간 이후면 현재 시간으로 조정
+        if (value === getTodayString()) {
+          const availableOptions = getAvailableTimeOptions(value);
+          if (availableOptions.length > 0 && !availableOptions.find(opt => opt.value === prev.time)) {
+            newData.time = availableOptions[availableOptions.length - 1].value; // 현재 시간에 가장 가까운 시간
+          }
+        }
+        
+        return newData;
+      });
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
   }, []);
 
   // ⚡ 메모화된 제출 핸들러
   const handleSubmit = useCallback(async () => {
     if (isSubmitting || !currentUser || !crewInfo) return;
 
+    // 현재 시간보다 이후인지 검증 (미래 시간 차단)
+    if (isFutureDateTime(formData.date, formData.time)) {
+      haptic.error();
+      setNotificationType('error');
+      setNotificationMessage('현재 시간보다 이후 시간으로는 출석할 수 없습니다.');
+      setShowNotification(true);
+      return;
+    }
+
     setIsSubmitting(true);
     haptic.medium();
+
+    // 로딩 알림 표시
+    setNotificationType('loading');
+    setNotificationMessage('출석 처리 중...');
+    setShowNotification(true);
 
     try {
       const attendanceDateTime = new Date(`${formData.date}T${formData.time}:00`);
@@ -326,16 +381,6 @@ const UltraFastAttendanceTemplate = () => {
 
   return (
     <div className="h-screen bg-white flex flex-col overflow-hidden relative">
-      {/* 제출 로딩 오버레이 */}
-      {isSubmitting && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-6 flex flex-col items-center space-y-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-basic-blue border-t-transparent"></div>
-            <p className="text-gray-700 text-sm font-medium">출석 처리 중...</p>
-          </div>
-        </div>
-      )}
-
       {/* ⚡ 헤더 - 상단 고정 */}
       <div className="fixed top-0 left-0 right-0 bg-white z-30 pt-safe border-b border-[#EAEAF3] shadow-sm">
         <PageHeader title="출석 체크" iconColor="black" borderColor="border-transparent" />
@@ -388,7 +433,7 @@ const UltraFastAttendanceTemplate = () => {
           isVisible={showNotification} 
           message={notificationMessage}
           type={notificationType}
-          duration={1500}
+          duration={notificationType === 'loading' ? 0 : 1500}
           onClose={() => {
             setShowNotification(false);
             if (notificationType === 'success') {

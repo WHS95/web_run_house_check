@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CircleCheck, CircleSlash } from "lucide-react";
 
-export type NotificationType = "success" | "error";
+export type NotificationType = "success" | "error" | "loading";
 
 interface PopupNotificationProps {
   isVisible: boolean;
@@ -28,10 +28,23 @@ const PopupNotification = memo<PopupNotificationProps>(
     }, [isVisible, duration, handleAutoClose]);
 
     // ⚡ 아이콘 설정을 상수로 메모이제이션
-    const iconConfig =
-      type === "success"
-        ? { color: "text-blue-500", Component: CircleCheck }
-        : { color: "text-red-500", Component: CircleSlash };
+    const iconConfig = (() => {
+      switch (type) {
+        case "success":
+          return { color: "text-blue-500", Component: CircleCheck };
+        case "error":
+          return { color: "text-red-500", Component: CircleSlash };
+        case "loading":
+          return {
+            color: "text-blue-500",
+            Component: () => (
+              <div className='animate-spin rounded-full h-[95px] w-[95px] border-4 border-blue-200 border-t-blue-500'></div>
+            ),
+          };
+        default:
+          return { color: "text-red-500", Component: CircleSlash };
+      }
+    })();
 
     return (
       <AnimatePresence>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,6 +36,7 @@ import type {
   AttendanceSummary,
   AttendanceDetailData,
 } from "@/lib/supabase/admin";
+import { useAdminContext } from "@/app/admin/AdminContextProvider";
 
 // 모임 그룹 타입 정의
 interface MeetingGroup {
@@ -52,9 +53,10 @@ interface AdminAttendanceManagementProps {
 }
 
 export default function AdminAttendanceManagement({
-  attendanceSummary,
-  attendanceDetailData,
+  attendanceSummary: initialSummary,
+  attendanceDetailData: initialDetailData,
 }: AdminAttendanceManagementProps) {
+  const { crewId } = useAdminContext();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateDetails, setSelectedDateDetails] = useState<
@@ -72,6 +74,11 @@ export default function AdminAttendanceManagement({
     title: "",
     content: "",
   });
+
+  // 상태로 관리되는 데이터
+  const [attendanceSummary, setAttendanceSummary] = useState(initialSummary);
+  const [attendanceDetailData, setAttendanceDetailData] =
+    useState(initialDetailData);
 
   // 현재 월의 첫 번째 날과 마지막 날 계산
   const firstDayOfMonth = new Date(
@@ -117,9 +124,12 @@ export default function AdminAttendanceManagement({
     calendarDays.push({ date, isCurrentMonth: false });
   }
 
-  // 날짜를 YYYY-MM-DD 형식으로 변환
+  // 날짜를 YYYY-MM-DD 형식으로 변환 (한국 시간 기준)
   const formatDate = (date: Date) => {
-    return date.toISOString().split("T")[0];
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   // 해당 날짜에 출석 기록이 있는지 확인 및 카운트 반환
@@ -177,8 +187,35 @@ export default function AdminAttendanceManagement({
   // 그룹화된 모임 데이터
   const groupedMeetings = groupMeetingsByLocationAndTime(filteredRecords);
 
+  // 월별 데이터 불러오기
+  const fetchMonthlyData = async (year: number, month: number) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `/api/admin/attendance?crewId=${crewId}&year=${year}&month=${month}`
+      );
+
+      if (!response.ok) {
+        throw new Error("출석 데이터를 가져오는데 실패했습니다.");
+      }
+
+      const data = await response.json();
+      setAttendanceSummary(data.summary || []);
+      setAttendanceDetailData(data.detailData || {});
+    } catch (error) {
+      console.error("월별 데이터 조회 오류:", error);
+      setNoticeModal({
+        isOpen: true,
+        title: "오류 발생",
+        content: "출석 데이터를 불러오는데 실패했습니다.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // 월 변경
-  const changeMonth = (direction: "prev" | "next") => {
+  const changeMonth = async (direction: "prev" | "next") => {
     const newDate = new Date(currentDate);
     if (direction === "prev") {
       newDate.setMonth(newDate.getMonth() - 1);
@@ -188,6 +225,9 @@ export default function AdminAttendanceManagement({
     setCurrentDate(newDate);
     setSelectedDate(null);
     setSelectedDateDetails([]);
+
+    // 새로운 월의 데이터 불러오기
+    await fetchMonthlyData(newDate.getFullYear(), newDate.getMonth() + 1);
   };
 
   // 날짜 클릭 핸들러
@@ -201,11 +241,42 @@ export default function AdminAttendanceManagement({
       setIsLoading(true);
       setSelectedDate(dateStr);
 
-      setTimeout(() => {
-        const detailData = attendanceDetailData[dateStr] || [];
-        setSelectedDateDetails(detailData);
+      // 캐시된 데이터가 있으면 사용, 없으면 API 호출
+      const cachedData = attendanceDetailData[dateStr];
+      if (cachedData) {
+        setSelectedDateDetails(cachedData);
         setIsLoading(false);
-      }, 500);
+      } else {
+        try {
+          // 실시간으로 해당 날짜의 상세 데이터 조회
+          const response = await fetch(
+            `/api/admin/attendance/daily?crewId=${crewId}&date=${dateStr}`
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            setSelectedDateDetails(data.records || []);
+
+            // 캐시에 저장
+            setAttendanceDetailData((prev) => ({
+              ...prev,
+              [dateStr]: data.records || [],
+            }));
+          } else {
+            throw new Error("상세 데이터 조회 실패");
+          }
+        } catch (error) {
+          console.error("날짜별 상세 데이터 조회 오류:", error);
+          setSelectedDateDetails([]);
+          setNoticeModal({
+            isOpen: true,
+            title: "오류 발생",
+            content: "해당 날짜의 상세 정보를 불러오는데 실패했습니다.",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }
     }
   };
 

@@ -701,25 +701,21 @@ export async function getMonthlyAttendanceSummary(
   try {
     const supabase = await createClient();
 
-    // 해당 월의 시작일과 종료일 계산
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0);
-
-    const startDateStr = startDate.toISOString().split("T")[0];
-    const endDateStr = endDate.toISOString().split("T")[0];
+    // 한국 시간대 기준으로 월의 시작과 끝 계산
+    const startDateStr = `${year}-${month.toString().padStart(2, "0")}-01`;
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
+    const endDateStr = `${year}-${month
+      .toString()
+      .padStart(2, "0")}-${lastDayOfMonth.toString().padStart(2, "0")}`;
 
     const { data, error } = await supabase
       .schema("attendance")
       .from("attendance_records")
-      .select(
-        `
-        attendance_timestamp
-      `
-      )
+      .select("attendance_timestamp")
       .eq("crew_id", crewId)
-      .is("deleted_at", null) // 삭제되지 않은 기록만
-      .gte("attendance_timestamp", startDateStr)
-      .lte("attendance_timestamp", endDateStr + "T23:59:59.999Z")
+      .is("deleted_at", null)
+      .gte("attendance_timestamp", startDateStr + "T00:00:00Z")
+      .lte("attendance_timestamp", endDateStr + "T23:59:59Z")
       .order("attendance_timestamp");
 
     if (error) {
@@ -727,14 +723,19 @@ export async function getMonthlyAttendanceSummary(
       return { data: null, error: new Error(error.message) };
     }
 
-    // 날짜별로 그룹화하여 카운트
+    // 한국 시간 기준으로 날짜별 그룹화 - 더 정확한 방법 사용
     const summaryMap: { [key: string]: number } = {};
 
-    data.forEach((record) => {
-      const date = new Date(record.attendance_timestamp)
-        .toISOString()
-        .split("T")[0];
-      summaryMap[date] = (summaryMap[date] || 0) + 1;
+    data.forEach((record: any) => {
+      const utcDate = new Date(record.attendance_timestamp);
+      // UTC 시간에서 9시간을 더해서 한국 시간으로 변환
+      const koreanDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+      const year = koreanDate.getUTCFullYear();
+      const month = (koreanDate.getUTCMonth() + 1).toString().padStart(2, "0");
+      const day = koreanDate.getUTCDate().toString().padStart(2, "0");
+      const dateStr = `${year}-${month}-${day}`;
+
+      summaryMap[dateStr] = (summaryMap[dateStr] || 0) + 1;
     });
 
     const summary: AttendanceSummary[] = Object.entries(summaryMap).map(
@@ -764,6 +765,12 @@ export async function getDailyAttendanceDetails(
   try {
     const supabase = await createClient();
 
+    // 한국 시간 기준 날짜를 UTC 범위로 변환
+    // 예: 2025-06-05 한국 시간 = 2025-06-04 15:00:00 UTC ~ 2025-06-05 14:59:59 UTC
+    const targetDate = new Date(date);
+    const startUTC = new Date(targetDate.getTime() - 9 * 60 * 60 * 1000); // UTC-9시간
+    const endUTC = new Date(startUTC.getTime() + 24 * 60 * 60 * 1000 - 1); // +24시간 -1ms
+
     const { data, error } = await supabase
       .schema("attendance")
       .from("attendance_records")
@@ -785,8 +792,8 @@ export async function getDailyAttendanceDetails(
       )
       .eq("crew_id", crewId)
       .is("deleted_at", null) // 삭제되지 않은 기록만
-      .gte("attendance_timestamp", date + "T00:00:00.000Z")
-      .lte("attendance_timestamp", date + "T23:59:59.999Z")
+      .gte("attendance_timestamp", startUTC.toISOString())
+      .lte("attendance_timestamp", endUTC.toISOString())
       .order("attendance_timestamp");
 
     if (error) {
@@ -794,18 +801,40 @@ export async function getDailyAttendanceDetails(
       return { data: null, error: new Error(error.message) };
     }
 
+    // JavaScript에서 한국 시간 기준으로 정확히 필터링
+    const filteredData = data.filter((record: any) => {
+      const utcDate = new Date(record.attendance_timestamp);
+      // UTC 시간에서 9시간을 더해서 한국 시간으로 변환
+      const koreanDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+      const year = koreanDate.getUTCFullYear();
+      const month = (koreanDate.getUTCMonth() + 1).toString().padStart(2, "0");
+      const day = koreanDate.getUTCDate().toString().padStart(2, "0");
+      const koreanDateStr = `${year}-${month}-${day}`;
+      return koreanDateStr === date;
+    });
+
+    // Debug: 조회 결과 로그 (개발 환경에서만)
+    if (process.env.NODE_ENV === "development") {
+      console.log(`날짜 ${date} 조회 결과:`, {
+        totalRecords: data.length,
+        filteredRecords: filteredData.length,
+      });
+    }
+
     // 데이터 변환
-    const attendanceRecords: AttendanceRecord[] = data.map((record: any) => ({
-      id: record.id,
-      userId: record.user_id,
-      userName: record.users?.first_name || "알 수 없음",
-      checkInTime: record.attendance_timestamp,
-      location: record.location || "위치 정보 없음",
-      exerciseType: record.exercise_types?.name || "기타",
-      status: "present" as const, // 출석 기록이 있으면 출석으로 간주
-      isHost: record.is_host,
-      deletedAt: record.deleted_at,
-    }));
+    const attendanceRecords: AttendanceRecord[] = filteredData.map(
+      (record: any) => ({
+        id: record.id,
+        userId: record.user_id,
+        userName: record.users?.first_name || "알 수 없음",
+        checkInTime: record.attendance_timestamp,
+        location: record.location || "위치 정보 없음",
+        exerciseType: record.exercise_types?.name || "기타",
+        status: "present" as const, // 출석 기록이 있으면 출석으로 간주
+        isHost: record.is_host,
+        deletedAt: record.deleted_at,
+      })
+    );
 
     return { data: attendanceRecords, error: null };
   } catch (error: any) {

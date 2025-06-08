@@ -54,17 +54,17 @@ export async function getTodayAttendance(crewId: string): Promise<number> {
   return count || 0;
 }
 
-// 오늘 모임 건수 조회 (해당 crew의 호스트 기준)
+// 오늘 모임 건수 조회 (해당 crew의 장소+시간 기준 그룹핑)
 export async function getTodayMeetingCount(crewId: string): Promise<number> {
   const supabase = await createClient();
   const today = new Date().toISOString().split("T")[0];
 
-  const { count, error } = await supabase
+  // 장소와 시간(10분 단위)으로 그룹핑하여 실제 모임 건수 계산
+  const { data, error } = await supabase
     .schema("attendance")
     .from("attendance_records")
-    .select("*", { count: "exact", head: true })
+    .select("location, attendance_timestamp")
     .eq("crew_id", crewId)
-    .eq("is_host", true)
     .gte("attendance_timestamp", `${today}T00:00:00.000Z`)
     .lt("attendance_timestamp", `${today}T23:59:59.999Z`);
 
@@ -73,7 +73,26 @@ export async function getTodayMeetingCount(crewId: string): Promise<number> {
     return 0;
   }
 
-  return count || 0;
+  if (!data || data.length === 0) {
+    return 0;
+  }
+
+  // 장소 + 시간(10분 단위)으로 그룹핑
+  const meetings = new Set();
+  data.forEach((record) => {
+    const timestamp = new Date(record.attendance_timestamp);
+    // 10분 단위로 반올림
+    const roundedMinutes = Math.floor(timestamp.getMinutes() / 10) * 10;
+    const roundedTime = new Date(timestamp);
+    roundedTime.setMinutes(roundedMinutes);
+    roundedTime.setSeconds(0);
+    roundedTime.setMilliseconds(0);
+
+    const meetingKey = `${record.location}_${roundedTime.toISOString()}`;
+    meetings.add(meetingKey);
+  });
+
+  return meetings.size;
 }
 
 // 이달 신규 가입자 수 조회 (해당 crew 기준)
@@ -126,19 +145,19 @@ export async function getNewMembersLastMonth(crewId: string): Promise<number> {
   return count || 0;
 }
 
-// 이달 모임 건수 조회 (해당 crew 기준)
+// 이달 모임 건수 조회 (해당 crew의 장소+시간 기준 그룹핑)
 export async function getMonthlyMeetingCount(crewId: string): Promise<number> {
   const supabase = await createClient();
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-  const { count, error } = await supabase
+  // 장소와 시간(10분 단위)으로 그룹핑하여 실제 모임 건수 계산
+  const { data, error } = await supabase
     .schema("attendance")
     .from("attendance_records")
-    .select("*", { count: "exact", head: true })
+    .select("location, attendance_timestamp")
     .eq("crew_id", crewId)
-    .eq("is_host", true)
     .gte("attendance_timestamp", firstDayOfMonth.toISOString())
     .lte("attendance_timestamp", lastDayOfMonth.toISOString());
 
@@ -147,10 +166,29 @@ export async function getMonthlyMeetingCount(crewId: string): Promise<number> {
     return 0;
   }
 
-  return count || 0;
+  if (!data || data.length === 0) {
+    return 0;
+  }
+
+  // 장소 + 시간(10분 단위)으로 그룹핑
+  const meetings = new Set();
+  data.forEach((record) => {
+    const timestamp = new Date(record.attendance_timestamp);
+    // 10분 단위로 반올림
+    const roundedMinutes = Math.floor(timestamp.getMinutes() / 10) * 10;
+    const roundedTime = new Date(timestamp);
+    roundedTime.setMinutes(roundedMinutes);
+    roundedTime.setSeconds(0);
+    roundedTime.setMilliseconds(0);
+
+    const meetingKey = `${record.location}_${roundedTime.toISOString()}`;
+    meetings.add(meetingKey);
+  });
+
+  return meetings.size;
 }
 
-// 지난달 모임 건수 조회 (해당 crew 기준)
+// 지난달 모임 건수 조회 (해당 crew의 장소+시간 기준 그룹핑)
 export async function getLastMonthMeetingCount(
   crewId: string
 ): Promise<number> {
@@ -163,12 +201,12 @@ export async function getLastMonthMeetingCount(
   );
   const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-  const { count, error } = await supabase
+  // 장소와 시간(10분 단위)으로 그룹핑하여 실제 모임 건수 계산
+  const { data, error } = await supabase
     .schema("attendance")
     .from("attendance_records")
-    .select("*", { count: "exact", head: true })
+    .select("location, attendance_timestamp")
     .eq("crew_id", crewId)
-    .eq("is_host", true)
     .gte("attendance_timestamp", firstDayOfLastMonth.toISOString())
     .lte("attendance_timestamp", lastDayOfLastMonth.toISOString());
 
@@ -177,7 +215,26 @@ export async function getLastMonthMeetingCount(
     return 0;
   }
 
-  return count || 0;
+  if (!data || data.length === 0) {
+    return 0;
+  }
+
+  // 장소 + 시간(10분 단위)으로 그룹핑
+  const meetings = new Set();
+  data.forEach((record) => {
+    const timestamp = new Date(record.attendance_timestamp);
+    // 10분 단위로 반올림
+    const roundedMinutes = Math.floor(timestamp.getMinutes() / 10) * 10;
+    const roundedTime = new Date(timestamp);
+    roundedTime.setMinutes(roundedMinutes);
+    roundedTime.setSeconds(0);
+    roundedTime.setMilliseconds(0);
+
+    const meetingKey = `${record.location}_${roundedTime.toISOString()}`;
+    meetings.add(meetingKey);
+  });
+
+  return meetings.size;
 }
 
 // 이달 모임 참여 횟수 조회 (해당 crew 기준)

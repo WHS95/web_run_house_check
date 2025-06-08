@@ -103,11 +103,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className='bg-basic-black'>
-        <StagewiseToolbar
-          config={{
-            plugins: [], // Add your custom plugins here
-          }}
-        />
+        {process.env.NODE_ENV === "development" && (
+          <StagewiseToolbar
+            config={{
+              plugins: [], // Add your custom plugins here
+            }}
+          />
+        )}
         <div className='h-screen overflow-hidden bg-basic-black'>
           {children}
         </div>

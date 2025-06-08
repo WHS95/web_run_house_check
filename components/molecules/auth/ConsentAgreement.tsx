@@ -118,7 +118,7 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
                 type='checkbox'
                 checked={allAgreed}
                 onChange={handleAllAgreementClick}
-                className='w-5 h-5 bg-gray-100 border-gray-300 rounded text-primary-blue focus:ring-primary-blue focus:ring-2'
+                className='w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2'
               />
               <span className='ml-3 text-base font-semibold text-gray-900'>
                 전체동의
@@ -135,10 +135,10 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
                   type='checkbox'
                   checked={termsOfService}
                   onChange={handleTermsOfServiceChange}
-                  className='w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-blue focus:ring-primary-blue focus:ring-2'
+                  className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2'
                 />
                 <div className='ml-3'>
-                  <span className='text-sm font-medium text-primary-blue'>
+                  <span className='text-sm font-medium text-blue-600'>
                     필수
                   </span>
                   <span className='ml-2 text-sm text-gray-900'>
@@ -162,10 +162,10 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
                   type='checkbox'
                   checked={privacyConsent}
                   onChange={handlePrivacyConsentChange}
-                  className='w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-blue focus:ring-primary-blue focus:ring-2'
+                  className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2'
                 />
                 <div className='ml-3'>
-                  <span className='text-sm font-medium text-primary-blue'>
+                  <span className='text-sm font-medium text-blue-600'>
                     필수
                   </span>
                   <span className='ml-2 text-sm text-gray-900'>

@@ -10,17 +10,54 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host"); // 로드 밸런서 이전의 원래 호스트
-      const isLocalEnv = process.env.NODE_ENV === "development";
-      if (isLocalEnv) {
-        // 로컬 환경에서는 로드 밸런서가 없으므로 X-Forwarded-Host를 확인할 필요 없음
-        return NextResponse.redirect(`${origin}${next}`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error && data.session) {
+      try {
+        // 사용자가 DB에 등록되어 있는지 확인
+        const { data: userData, error: userError } = await supabase
+          .schema("attendance")
+          .from("users")
+          .select("id, name, crew_id")
+          .eq("id", data.session.user.id)
+          .single();
+
+        const forwardedHost = request.headers.get("x-forwarded-host");
+        const isLocalEnv = process.env.NODE_ENV === "development";
+
+        // 리다이렉트 URL 결정
+        const getRedirectUrl = (path: string) => {
+          if (isLocalEnv) {
+            return `${origin}${path}`;
+          } else if (forwardedHost) {
+            return `https://${forwardedHost}${path}`;
+          } else {
+            return `${origin}${path}`;
+          }
+        };
+
+        // 사용자가 DB에 없거나 오류가 발생한 경우 (신규 회원)
+        if (userError || !userData) {
+          console.log("신규 회원 감지, 회원가입 페이지로 리다이렉트");
+          return NextResponse.redirect(getRedirectUrl("/auth/signup"));
+        }
+
+        // 기존 회원인 경우 원래 페이지로 리다이렉트
+        console.log("기존 회원 로그인 성공");
+        return NextResponse.redirect(getRedirectUrl(next));
+      } catch (dbError) {
+        console.error("DB 조회 중 오류:", dbError);
+        // DB 오류 시에도 회원가입 페이지로 리다이렉트
+        const forwardedHost = request.headers.get("x-forwarded-host");
+        const isLocalEnv = process.env.NODE_ENV === "development";
+
+        if (isLocalEnv) {
+          return NextResponse.redirect(`${origin}/auth/signup`);
+        } else if (forwardedHost) {
+          return NextResponse.redirect(`https://${forwardedHost}/auth/signup`);
+        } else {
+          return NextResponse.redirect(`${origin}/auth/signup`);
+        }
       }
     }
   }

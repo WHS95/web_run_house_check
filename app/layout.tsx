@@ -63,6 +63,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           href='https://fonts.googleapis.com'
           crossOrigin=''
         />
+        <link
+          rel='preconnect'
+          href='https://fonts.gstatic.com'
+          crossOrigin=''
+        />
+
+        {/* Black Han Sans 폰트 추가 */}
+        <link
+          href='https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap'
+          rel='stylesheet'
+        />
 
         {/* 필수 링크만 유지 */}
         <link rel='apple-touch-icon' href='/apple-touch-icon.png' />

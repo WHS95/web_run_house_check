@@ -119,7 +119,11 @@ const CrewCodeVerification = memo<CrewCodeVerificationProps>(
         <div className='flex items-center space-x-2'>
           <input
             type='text'
-            {...register("crewCode", { onChange: onCrewCodeChange })}
+            {...register("crewCode")}
+            onChange={(e) => {
+              register("crewCode").onChange(e);
+              onCrewCodeChange();
+            }}
             placeholder='크루 코드를 입력하세요'
             disabled={isCrewCodeVerifying || crewCodeVerified}
             className={inputClassName}
@@ -246,15 +250,10 @@ export default function SignupPage() {
     },
   });
 
-  // ⚡ Watch 값들 메모이제이션
-  const watchedValues = useMemo(
-    () => ({
-      crewCode: watch("crewCode"),
-      privacyConsent: watch("privacyConsent"),
-      termsOfService: watch("termsOfService"),
-    }),
-    [watch]
-  );
+  // ⚡ Watch 값들 - useMemo 제거하여 실시간 반응성 개선
+  const crewCodeValue = watch("crewCode");
+  const privacyConsentValue = watch("privacyConsent");
+  const termsOfServiceValue = watch("termsOfService");
 
   const [isCrewCodeVerifying, setIsCrewCodeVerifying] = useState(false);
   const [crewCodeVerified, setCrewCodeVerified] = useState(false);
@@ -485,7 +484,7 @@ export default function SignupPage() {
             {/* ⚡ 크루 코드 검증 */}
             <CrewCodeVerification
               register={register}
-              crewCodeInputValue={watchedValues.crewCode}
+              crewCodeInputValue={crewCodeValue}
               isCrewCodeVerifying={isCrewCodeVerifying}
               crewCodeVerified={crewCodeVerified}
               crewCodeError={crewCodeError}
@@ -499,8 +498,8 @@ export default function SignupPage() {
 
             {/* ⚡ 동의 항목들 */}
             <ConsentAgreement
-              termsOfService={watchedValues.termsOfService}
-              privacyConsent={watchedValues.privacyConsent}
+              termsOfService={termsOfServiceValue}
+              privacyConsent={privacyConsentValue}
               onTermsOfServiceChange={handleTermsOfServiceChange}
               onPrivacyConsentChange={handlePrivacyConsentChange}
               errors={{
@@ -520,8 +519,8 @@ export default function SignupPage() {
         isSubmitting={isSubmitting}
         isCrewCodeVerifying={isCrewCodeVerifying}
         crewCodeVerified={crewCodeVerified}
-        privacyConsentValue={watchedValues.privacyConsent}
-        termsOfServiceValue={watchedValues.termsOfService}
+        privacyConsentValue={privacyConsentValue}
+        termsOfServiceValue={termsOfServiceValue}
         onSubmit={handleFormSubmit}
       />
     </div>

@@ -10,10 +10,10 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
   const mypageLink = "/mypage";
   return (
-    <header className='flex items-center justify-between w-full px-3 py-4'>
+    <header className='flex items-center justify-between w-full px-3 py-4 bg-basic-black relative z-10'>
       <div className='flex items-center justify-between w-full mx-auto'>
         <div>
-          <h1 className='text-2xl font-bold tracking-wider text-white'>
+          <h1 className='text-2xl font-bold tracking-wider text-white black-han-sans-regular'>
             {title}
           </h1>
         </div>

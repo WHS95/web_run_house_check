@@ -33,14 +33,16 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     }, [router]);
 
     return (
-        <div className="relative min-h-screen bg-basic-black overflow-hidden page-transition initial-load">
+        <div className="relative min-h-screen bg-basic-black page-transition initial-load">
             {/* 🔒 헤더 - 상단 완전 고정 */}
-            <div className="fixed top-0 left-0 right-0 z-50 pt-safe bg-basic-black">
-                <Header title={"RUN HOUSE"} />
+            <div className="fixed top-0 left-0 right-0 z-50 bg-basic-black border-b border-gray-800/20">
+                <div className="pt-safe">
+                    <Header title={"RUN HOUSE"} />
+                </div>
             </div>
 
             {/* 📱 중간 영역 - Hero + 공지사항 */}
-            <div className="pt-[80px] pb-[220px] h-screen overflow-hidden">
+            <div className="pt-[140px] pb-[220px] h-screen ">
                 {/* Hero 배경 */}
                 <div className="relative h-full">
                     {username && (
@@ -57,20 +59,22 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
             </div>
 
             {/* 🔒 하단 카드 섹션 - 하단 완전 고정 */}
-            <div className="fixed bottom-0 left-0 right-0 z-40 pb-safe px-safe bg-basic-black">
-                {/* 카드 스택 컨테이너 */}
-                <div className="relative h-[200px]">
-                    {/* 출석 체크 카드 - 상단에 위치 */}
-                    <div className="absolute bottom-[80px] left-0 right-0 z-20">
-                        <div className="native-card hw-accelerated">
-                            <AttendanceCard />
+            <div className="fixed bottom-0 left-0 right-0 z-40 bg-basic-gray">
+                <div className="pb-safe">
+                    {/* 카드 스택 컨테이너 */}
+                    <div className="relative h-[160px]">
+                        {/* 출석 체크 카드 - 상단에 위치 */}
+                        <div className="absolute bottom-[80px] left-0 right-0 z-20">
+                            <div className="native-card hw-accelerated">
+                                <AttendanceCard />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* 랭킹 카드 - 가장 하단에 위치 */}
-                    <div className="absolute bottom-0 left-0 right-0 z-40">
-                        <div className="native-card hw-accelerated">
-                            <RankingCard />
+                        {/* 랭킹 카드 - 가장 하단에 위치 */}
+                        <div className="absolute bottom-0 left-0 right-0 z-40">
+                            <div className="native-card hw-accelerated">
+                                <RankingCard />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -30,7 +30,7 @@ const HomeTemplate: React.FC<HomeTemplateProps> = ({
         {username && ( // username이 있을 때만 Hero 렌더링 (예시)
           <Hero
             username={username}
-            // score prop 제거
+            crewName={crewName}
           />
         )}
       </div>

@@ -12,9 +12,7 @@ const Card: React.FC<CardProps> = ({
   bgColor = "bg-white",
 }) => {
   return (
-    <div
-      className={`${bgColor} rounded-t-lg shadow-md p-4 border border-opacity-10 border-white ${className}`}
-    >
+    <div className={`${bgColor} rounded-t-lg  p-4   ${className}`}>
       {children}
     </div>
   );

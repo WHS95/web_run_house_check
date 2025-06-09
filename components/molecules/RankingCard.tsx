@@ -8,10 +8,7 @@ import { ChevronRight } from "lucide-react";
 const RankingCard: React.FC = () => {
   return (
     <Link href='/ranking'>
-      <Card
-        bgColor='bg-basic-gray'
-        className='rounded-card-top min-h-[100px] cursor-pointer shadow-lg'
-      >
+      <Card bgColor='bg-basic-gray' className='min-h-[100px] cursor-pointer '>
         <div className='flex items-center justify-between h-full py-5'>
           <div className='flex items-center'>
             <h3 className='font-bold text-white text-20'>나의 랭킹 확인하기</h3>

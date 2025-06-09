@@ -110,9 +110,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }}
           />
         )}
-        <div className='h-screen overflow-hidden bg-basic-black'>
-          {children}
-        </div>
+        <div className='min-h-screen bg-basic-black'>{children}</div>
         <Analytics />
       </body>
     </html>

@@ -34,29 +34,48 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     }, [router]);
 
     return (
-        <div className="relative min-h-screen bg-basic-black page-transition initial-load">
-            {/* 🔒 헤더 - 상단 완전 고정 */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-basic-black border-b border-gray-800/20">
-                <div className="pt-safe">
-                    <Header title={"RUN HOUSE"} />
-                </div>
-            </div>
+        <div >
+            {/* 🔒 헤더 - Header 컴포넌트에서 fixed 처리됨 */}
+            <Header title={"RUN HOUSE"} />
 
-            {/* 📱 중간 영역 - Hero + 공지사항 */}
-            <div className="relative h-screen">
+            {/* 📢 공지사항 - 헤더 바로 아래 고정 */}
+            {noticeText && (
+                <div className="fixed top-20 left-0 right-0 z-40 px-4 pt-safe">
+                    <NoticeBar noticeText={noticeText} />
+                </div>
+            )}
+
+            {/* 📱 Hero 영역 - 공지사항 아래에 위치 */}
+            <div className="relative min-h-screen">
                 {/* Hero 배경 - 가운데 정렬 */}
-                <div className="h-full flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center">
                     {username && (
-                        <Hero username={username} crewName={crewName} />
+                        <div className="relative w-full">
+                            {/* Hero 전체 화면 높이로 설정 */}
+                            <div className="relative w-full flex items-center justify-center">
+                                <div className="max-w-md mx-auto text-center px-4">
+                                    <p className="text-2xl font-light leading-[1.3] text-left text-white">
+                                        안녕하세요 👋🏻
+                                        <br />
+                                        {crewName && (
+                                            <span className="text-2xl font-bold text-[#95bdf4]">
+                                                {crewName}
+                                            </span>
+                                        )}
+                                        <br />
+                                        <span className="text-2xl font-bold text-white">
+                                            {username} 님,
+                                        </span>
+                                        <br />
+                                        오늘도 즐거운
+                                        <br />
+                                        러닝 하세요!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
-                
-                {/* 공지사항 - 상단 고정 오버레이 */}
-                {noticeText && (
-                    <div className="absolute top-24 left-0 right-0 z-40 px-4">
-                        <NoticeBar noticeText={noticeText} />
-                    </div>
-                )}
             </div>
 
             {/* 🔒 하단 카드 섹션 - 하단 완전 고정 */}

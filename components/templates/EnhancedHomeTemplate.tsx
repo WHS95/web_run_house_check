@@ -47,7 +47,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                 {/* Hero 배경 - 가운데 정렬 */}
                 <div className="h-full flex items-center justify-center">
                     {username && (
-                        <Hero username={username} />
+                        <Hero username={username} crewName={crewName} />
                     )}
                 </div>
                 

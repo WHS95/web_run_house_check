@@ -863,6 +863,7 @@ export default function AdminAttendanceManagement({
           }}
           attendance={selectedAttendance}
           onSave={handleSaveAttendanceInfo}
+          crewId={crewId}
         />
       )}
 

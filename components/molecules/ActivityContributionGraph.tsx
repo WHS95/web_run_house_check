@@ -200,59 +200,39 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
     }, [weeks, activityMap, today, getActivityColor, getTooltipMessage]);
 
     return (
-      <div className='mt-6 overflow-hidden bg-white border border-gray-200 rounded-lg'>
-        {/* ⚡ 헤더 (최적화됨) */}
-        <div className='px-4 py-3 border-b border-gray-200 bg-gray-50'>
-          <div className='flex items-center justify-between'>
-            <h3 className='text-base font-semibold text-gray-900'>활동 기록</h3>
-            <Legend />
-          </div>
-        </div>
-
-        {/* ⚡ 그래프 (최적화됨) */}
-        <div className='p-3'>
-          <div className='relative'>
-            {/* ⚡ 월 라벨 */}
-            <div className='flex mb-1'>
-              {monthLabels.map((monthLabel, index) => {
-                const nextLabelIndex =
-                  index < monthLabels.length - 1
-                    ? monthLabels[index + 1].index
-                    : weeks.length;
-                const width = (nextLabelIndex - monthLabel.index) * 16;
-
-                return (
-                  <div
-                    key={monthLabel.index}
-                    className='text-xs text-gray-500'
-                    style={{
-                      marginLeft: monthLabel.index === 0 ? "20px" : "0",
-                      width: `${Math.max(width, 32)}px`,
-                    }}
-                  >
-                    {monthLabel.label}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* ⚡ 요일 라벨과 그리드 */}
-            <div className='flex'>
-              {/* 요일 라벨 */}
-              <div className='flex flex-col mr-2 text-xs text-gray-500 space-y-1'>
-                <div className='h-3 flex items-center'>일</div>
-                <div className='h-3'></div>
-                <div className='h-3 flex items-center'>화</div>
-                <div className='h-3'></div>
-                <div className='h-3 flex items-center'>목</div>
-                <div className='h-3'></div>
-                <div className='h-3 flex items-center'>토</div>
+      <div className='p-2 mt-6 rounded-lg bg-basic-black-gray'>
+        {/* 상단 월 라벨 */}
+        <div className='flex mb-1 ml-8'>
+          {monthLabels.map((monthLabel, index) => {
+            const nextLabelIndex =
+              index < monthLabels.length - 1
+                ? monthLabels[index + 1].index
+                : weeks.length;
+            const width = (nextLabelIndex - monthLabel.index) * 16;
+            return (
+              <div
+                key={monthLabel.index}
+                className='text-xs text-center text-gray-300'
+                style={{ width: `${Math.max(width, 32)}px` }}
+              >
+                {monthLabel.label}
               </div>
-
-              {/* ⚡ 활동 그리드 (최적화됨) */}
-              <div className='flex space-x-1 overflow-x-auto'>{gridCells}</div>
-            </div>
+            );
+          })}
+        </div>
+        <div className='flex mb-3'>
+          {/* 좌측 요일 라벨 */}
+          <div className='flex flex-col items-end w-6 mr-2 space-y-1 text-xs text-gray-300'>
+            <div className='flex items-center h-3'>일</div>
+            <div className='flex items-center h-3'>월</div>
+            <div className='flex items-center h-3'>화</div>
+            <div className='flex items-center h-3'>수</div>
+            <div className='flex items-center h-3'>목</div>
+            <div className='flex items-center h-3'>금</div>
+            <div className='flex items-center h-3'>토</div>
           </div>
+          {/* 활동 그리드 */}
+          <div className='flex space-x-1 overflow-x-auto'>{gridCells}</div>
         </div>
       </div>
     );

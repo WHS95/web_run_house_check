@@ -27,7 +27,7 @@ const MemberProfileInfo = memo<MemberProfileInfoProps>(
       </div> */}
         <div className='flex-1'>
           <div className='flex items-center mb-1'>
-            <h2 className='mr-2 text-xl font-medium'>{name}</h2>
+            <h2 className='mr-2 text-xl font-bold text-white'>{name}</h2>
             {/* <Image
             src='/assets/star-icon-yellow.svg'
             alt='등급'
@@ -35,7 +35,7 @@ const MemberProfileInfo = memo<MemberProfileInfoProps>(
             height={16}
           /> */}
           </div>
-          <div className='flex space-x-4 text-sm text-gray-600'>
+          <div className='flex space-x-4 text-sm text-white'>
             <span>가입일 {joinDate}</span>
             {/* <span>등급 {grade}</span> */}
           </div>

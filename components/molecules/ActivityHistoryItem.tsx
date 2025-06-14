@@ -68,59 +68,32 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
   const relativeTime = getRelativeTime(date);
 
   return (
-    <div className='relative flex items-start space-x-3 pb-4'>
+    <div className='relative flex items-start pb-2 space-x-3'>
       {/* 타임라인 */}
       <div className='relative flex flex-col items-center'>
         {/* 아이콘 */}
         <div
           className={`
             flex items-center justify-center w-6 h-6 rounded-full text-white
-            ${config.color} ring-4 ring-white shadow-sm
+            ${config.color} shadow-sm
           `}
         >
           {config.icon}
         </div>
 
         {/* 연결선 (마지막 아이템이 아닌 경우) */}
-        {!isLast && <div className='w-0.5 h-8 bg-gray-200 mt-1'></div>}
+        {!isLast && <div className='w-0.5 h-4 bg-gray-600 mt-1'></div>}
       </div>
 
       {/* 콘텐츠 */}
       <div className='flex-1 min-w-0'>
-        {/* 메인 메시지 */}
-        <div className='flex items-center justify-between'>
-          <div className='flex-1'>
-            <p className='text-sm font-medium text-gray-900 leading-5'>
-              {config.message}
-            </p>
-
-            {/* 메타 정보 */}
-            <div className='flex items-center space-x-3 mt-1'>
-              <span
-                className={`
-                  inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                  ${config.textColor} ${config.bgColor}
-                `}
-              >
-                {config.label}
-              </span>
-
-              <div className='flex items-center space-x-1 text-xs text-gray-500'>
-                <Clock className='w-3 h-3' />
-                <span>{relativeTime}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 상세 정보 (호버 시 표시되는 추가 정보) */}
-        <div className='mt-2 text-xs text-gray-500 space-y-1'>
-          <div className='flex items-center space-x-1'>
-            <MapPin className='w-3 h-3' />
-            <span>{location}</span>
-            <span className='text-gray-300'>•</span>
-            <span>{exerciseType}</span>
-          </div>
+        {/* 간소화된 정보 */}
+        <div className='flex items-center space-x-2 text-sm text-gray-300'>
+          <span className='font-medium'>{location}</span>
+          <span className='text-gray-500'>•</span>
+          <span>{exerciseType}</span>
+          <span className='text-gray-500'>•</span>
+          <span className='text-xs'>{relativeTime}</span>
         </div>
       </div>
     </div>

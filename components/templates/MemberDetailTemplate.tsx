@@ -40,7 +40,7 @@ interface MemberDetailTemplateProps {
 const ErrorState = memo(() => (
     <div className="h-screen bg-basic-black flex flex-col">
         <div className="flex-shrink-0">
-            <PageHeader title="내 정보" iconColor="black" backLink="/" borderColor="gray-300" backgroundColor="bg-basic-black-gray" />
+            <PageHeader title="내 정보" iconColor="white" borderColor="gray-300" backgroundColor="bg-basic-black-gray" />
         </div>
         <div className="flex-1 flex items-center justify-center">
             <p className="text-gray-600">사용자 정보를 불러올 수 없습니다.</p>
@@ -83,18 +83,17 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
     }
 
     return (
-        <div className="flex flex-col h-screen bg-white">
-            <div className="sticky top-0 z-10">
+        <div className="flex flex-col h-screen bg-basic-black">
+            <div className="fixed top-0 left-0 right-0 z-10 bg-basic-black-gray">
                 <PageHeader 
                     title="내 정보" 
-                    iconColor="black" 
-                    backLink="/" 
+                    iconColor="white" 
                     borderColor="gray-300"
                     rightAction={adminButton}
                 />
             </div>
             
-            <div className="flex-1 overflow-y-auto px-4 py-4">
+            <div className="flex-1 overflow-y-auto px-4 py-4 pt-[80px]">
                 <MemberProfileInfo {...profileProps} />
                 <ActivityContributionGraph 
                     activities={activityData.activities}

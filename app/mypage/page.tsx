@@ -32,24 +32,24 @@ interface ActivityData {
 
 // ⚡ 로딩 스켈레톤 컴포넌트
 const MyPageSkeleton = React.memo(() => (
-  <div className='flex flex-col h-screen bg-white'>
-    <div className='flex-shrink-0 h-[80px] bg-white border-b border-gray-200 animate-pulse'>
+  <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex-shrink-0 h-[80px] bg-basic-black-gray border-b border-gray-200 animate-pulse'>
       <div className='flex items-center justify-center h-full'>
-        <div className='w-20 h-6 bg-gray-200 rounded'></div>
+        <div className='w-20 h-6 rounded bg-basic-black-gray'></div>
       </div>
     </div>
     <div className='flex-1 p-4 space-y-6 animate-pulse'>
       {/* 프로필 영역 */}
       <div className='flex items-center space-x-4'>
-        <div className='w-16 h-16 bg-gray-200 rounded-full'></div>
+        <div className='w-16 h-16 rounded-full bg-basic-black-gray'></div>
         <div className='flex-1 space-y-2'>
-          <div className='w-32 h-6 bg-gray-200 rounded'></div>
-          <div className='w-24 h-4 bg-gray-200 rounded'></div>
+          <div className='w-32 h-6 rounded bg-basic-black-gray'></div>
+          <div className='w-24 h-4 rounded bg-basic-black-gray'></div>
         </div>
       </div>
 
       {/* 활동 그래프 영역 */}
-      <div className='h-32 bg-gray-200 rounded-lg'></div>
+      <div className='h-32 rounded-lg bg-basic-black-gray'></div>
 
       {/* 활동 내역 영역 */}
       <div className='space-y-3'>

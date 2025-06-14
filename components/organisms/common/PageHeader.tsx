@@ -19,7 +19,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   borderColor,
   rightAction,
 }) => {
-  const textColor = iconColor === "white" ? "text-white" : "text-black";
+  const textColor = iconColor === "white" ? "text-white" : "text-basic-black";
 
   return (
     <header

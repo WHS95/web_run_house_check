@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 // import StagewiseWrapper from "@/components/StagewiseWrapper";
 import { StagewiseToolbar } from "@stagewise/toolbar-next";
 import { Analytics } from "@vercel/analytics/react";
+import BottomNavigation from "@/components/organisms/BottomNavigation";
 
 import type { Metadata, Viewport } from "next";
 
@@ -110,7 +111,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }}
           />
         )}
-        <div className='min-h-screen bg-basic-black'>{children}</div>
+        <div className='min-h-screen bg-basic-black pb-20'>{children}</div>
+        <BottomNavigation />
         <Analytics />
       </body>
     </html>

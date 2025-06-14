@@ -38,9 +38,9 @@ interface MemberDetailTemplateProps {
 }
 
 const ErrorState = memo(() => (
-    <div className="h-screen bg-white flex flex-col">
+    <div className="h-screen bg-basic-black flex flex-col">
         <div className="flex-shrink-0">
-            <PageHeader title="내 정보" iconColor="black" backLink="/" borderColor="gray-300" />
+            <PageHeader title="내 정보" iconColor="black" backLink="/" borderColor="gray-300" backgroundColor="bg-basic-black-gray" />
         </div>
         <div className="flex-1 flex items-center justify-center">
             <p className="text-gray-600">사용자 정보를 불러올 수 없습니다.</p>

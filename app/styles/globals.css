@@ -180,8 +180,6 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-color: white;
-    border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
     color: #374151;
@@ -275,9 +273,7 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-color: white;
     background-image: none;
-    border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
     padding-right: 2.5rem;
@@ -523,4 +519,14 @@ html, body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.ios-date-input,
+.ios-date-input::-webkit-datetime-edit,
+.ios-date-input::-webkit-datetime-edit-fields-wrapper,
+.ios-date-input::-webkit-datetime-edit-text,
+.ios-date-input::-webkit-datetime-edit-month-field,
+.ios-date-input::-webkit-datetime-edit-day-field,
+.ios-date-input::-webkit-datetime-edit-year-field {
+    color: #fff !important;
 } 

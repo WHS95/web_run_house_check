@@ -77,28 +77,6 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                     )}
                 </div>
             </div>
-
-            {/* 🔒 하단 카드 섹션 - 하단 완전 고정 */}
-            <div className="fixed bottom-0 left-0 right-0 z-40 bg-basic-gray">
-                <div className="pb-safe">
-                    {/* 카드 스택 컨테이너 */}
-                    <div className="relative h-[160px]">
-                        {/* 출석 체크 카드 - 상단에 위치 */}
-                        <div className="absolute bottom-[80px] left-0 right-0 z-20">
-                            <div className="native-card hw-accelerated">
-                                <AttendanceCard />
-                            </div>
-                        </div>
-
-                        {/* 랭킹 카드 - 가장 하단에 위치 */}
-                        <div className="absolute bottom-0 left-0 right-0 z-40">
-                            <div className="native-card hw-accelerated">
-                                <RankingCard />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };

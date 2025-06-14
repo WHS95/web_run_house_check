@@ -6,7 +6,7 @@ const UltraFastAttendanceTemplate = nextDynamic(
   () => import("@/components/templates/UltraFastAttendanceTemplate"),
   {
     loading: () => (
-      <div className='flex items-center justify-center min-h-screen bg-white'>
+      <div className='flex items-center justify-center min-h-screen bg-basic-black'>
         <div className='w-8 h-8 border-2 border-blue-500 rounded-full animate-spin border-t-transparent'></div>
       </div>
     ),
@@ -25,18 +25,18 @@ export const metadata = {
 
 // 로딩 폴백 컴포넌트
 const AttendancePageFallback = () => (
-  <div className='min-h-screen bg-white'>
+  <div className='min-h-screen bg-basic-black'>
     <div className='pt-safe'>
       <div className='flex items-center justify-between w-full px-4 py-4 border-b border-[#EAEAF3]'>
-        <div className='w-20 h-6 bg-gray-200 rounded animate-pulse'></div>
-        <div className='w-6 h-6 bg-gray-200 rounded animate-pulse'></div>
+        <div className='w-20 h-6 rounded bg-basic-black animate-pulse'></div>
+        <div className='w-6 h-6 rounded bg-basic-black animate-pulse'></div>
       </div>
     </div>
     <div className='px-4 pt-6 space-y-6'>
       {Array.from({ length: 5 }).map((_, index) => (
         <div key={index} className='animate-pulse'>
-          <div className='w-24 h-4 mb-3 bg-gray-200 rounded'></div>
-          <div className='h-12 bg-gray-100 rounded-xl'></div>
+          <div className='w-24 h-4 mb-3 rounded bg-basic-black'></div>
+          <div className='h-12 bg-basic-black rounded-xl'></div>
         </div>
       ))}
     </div>

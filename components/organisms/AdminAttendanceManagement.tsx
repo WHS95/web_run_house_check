@@ -534,7 +534,7 @@ export default function AdminAttendanceManagement({
   const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
+    <div className='flex flex-col h-screen bg-basic-black'>
       {/* 메인 컨텐츠 - 스크롤 가능, 하단 바텀에 가려지지 않게 pb-24 적용 */}
       <div className='flex-1 px-4 py-6 pb-24 overflow-y-auto'>
         <div className='space-y-6'>

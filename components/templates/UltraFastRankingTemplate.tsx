@@ -260,10 +260,10 @@ const UltraFastRankingTemplate = () => {
   );
 
   return (
-    <div className="h-screen bg-white text-white flex flex-col overflow-hidden relative">
+    <div className="h-screen bg-basic-black text-white flex flex-col overflow-hidden relative">
       {/* ⚡ 헤더 - 상단 고정 */}
-      <div className="fixed top-0 left-0 right-0 bg-white z-30 pt-safe shadow-sm">
-        <PageHeader title="랭킹" iconColor="black" />
+      <div className="fixed top-0 left-0 right-0 bg-basic-black-gray z-30 pt-safe shadow-sm">
+        <PageHeader title="랭킹" iconColor="black" backgroundColor="bg-basic-black-gray" />
       </div>
 
       {/* ⚡ RankingInfo- 고정 */}

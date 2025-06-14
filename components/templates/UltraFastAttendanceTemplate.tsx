@@ -99,22 +99,22 @@ const UltraFastForm = React.memo<{
     <div className="space-y-6">
       {/* 이름 */}
       <div>
-        <label className="block mb-3 text-sm font-semibold text-gray-800">이름</label>
-        <div className="h-12 bg-gray-100 rounded-xl flex items-center px-4">
-          <span className="text-gray-700 font-medium">{formData.name}</span>
+        <label className="block mb-3 text-sm font-bold text-white">이름</label>
+        <div className="h-12 bg-basic-black-gray rounded-xl flex items-center px-4">
+          <span className="text-white font-medium">{formData.name}</span>
         </div>
       </div>
 
       {/* 참여일시 */}
       <div>
-        <label className="block mb-3 text-sm font-semibold text-gray-800">참여일시</label>
+        <label className="block mb-3 text-sm font-bold text-white">참여일시</label>
         <div className="space-y-3">
           <div className="relative">
             <input
               type="date"
               value={formData.date}
               onChange={(e) => onFormChange('date', e.target.value)}
-              className="ios-date-input"
+              className="ios-date-input bg-basic-black-gray text-white"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <AiOutlineCalendar className="w-5 h-5 text-gray-400" />
@@ -124,7 +124,7 @@ const UltraFastForm = React.memo<{
             <select
               value={formData.time}
               onChange={(e) => onFormChange('time', e.target.value)}
-              className="ios-select"
+              className="ios-select bg-basic-black-gray text-white"
             >
               {availableTimeOptions.map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
@@ -139,12 +139,12 @@ const UltraFastForm = React.memo<{
 
       {/* 장소 */}
       <div>
-        <label className="block mb-3 text-sm font-semibold text-gray-800">참여 장소</label>
+        <label className="block mb-3 text-sm font-bold text-white">참여 장소</label>
         <div className="relative">
           <select
             value={formData.location}
             onChange={(e) => onFormChange('location', e.target.value)}
-            className="ios-select"
+            className="ios-select bg-basic-black-gray text-white"
           >
             {locationOptions.map(option => (
               <option key={option.value} value={option.value}>{option.label}</option>
@@ -158,12 +158,12 @@ const UltraFastForm = React.memo<{
 
       {/* 운동 종류 */}
       <div>
-        <label className="block mb-3 text-sm font-semibold text-gray-800">운동 종류</label>
+        <label className="block mb-3 text-sm font-bold text-white">운동 종류</label>
         <div className="relative">
           <select
             value={formData.exerciseType}
             onChange={(e) => onFormChange('exerciseType', e.target.value)}
-            className="ios-select"
+            className="ios-select bg-basic-black-gray text-white"
           >
             {exerciseOptions.map(option => (
               <option key={option.value} value={option.value}>{option.label}</option>
@@ -177,7 +177,7 @@ const UltraFastForm = React.memo<{
 
       {/* 개설자 여부 */}
       <div>
-        <label className="block mb-3 text-sm font-semibold text-gray-800">개설자 여부</label>
+        <label className="block mb-3 text-sm font-bold text-white">개설자 여부</label>
         <div className="flex space-x-4">
           {HOST_OPTIONS.map(option => (
             <label key={option.value} className="flex items-center cursor-pointer">
@@ -189,7 +189,7 @@ const UltraFastForm = React.memo<{
                 onChange={(e) => onFormChange('isHost', e.target.value)}
                 className="mr-2 text-blue-500 focus:ring-blue-500"
               />
-              <span className="text-gray-700">{option.label}</span>
+              <span className="text-white">{option.label}</span>
             </label>
           ))}
         </div>
@@ -380,14 +380,14 @@ const UltraFastAttendanceTemplate = () => {
   }, [supabase, router]);
 
   return (
-    <div className="h-screen bg-white flex flex-col overflow-hidden relative">
+    <div className="h-screen bg-basic-black flex flex-col overflow-hidden relative">
       {/* ⚡ 헤더 - 상단 고정 */}
-      <div className="fixed top-0 left-0 right-0 bg-white z-30 pt-safe border-b border-[#EAEAF3] shadow-sm">
-        <PageHeader title="출석 체크" iconColor="black" borderColor="border-transparent" />
+      <div className="fixed top-0 left-0 right-0">
+        <PageHeader title="출석 체크" iconColor="white" borderColor="gray-500" />
       </div>
 
       {/* ⚡ 메인 콘텐츠 - 스크롤 영역 */}
-      <div className="flex-1 overflow-y-auto native-scroll pt-[80px] pb-[100px] px-4">
+      <div className="flex-1 overflow-y-auto native-scroll pt-[80px] pb-[180px] px-4">
           {isDataLoading ? (
             <FormSkeleton />
           ) : (
@@ -398,34 +398,35 @@ const UltraFastAttendanceTemplate = () => {
               exerciseOptions={exerciseOptions}
             />
           )}
+          <button  
+          onClick={handleSubmit}
+          disabled={isSubmitting || isDataLoading || !currentUser}
+          className={`mt-4 p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-14 font-bold text-white ${
+            isSubmitting || isDataLoading || !currentUser
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-basic-blue hover:bg-blue-600'
+          }`}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          {isSubmitting ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+              <span>처리 중...</span>
+            </div>
+          ) : isDataLoading ? (
+            "데이터 로딩 중..."
+          ) : (
+            "출석 체크"
+          )}
+        </button>
       </div>
 
       {/* ⚡ 하단 버튼 - 하단 고정 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#EAEAF3] shadow-lg z-30 pb-safe">
-        <div className="p-4">
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || isDataLoading || !currentUser}
-            className={`p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-14 font-semibold text-white ${
-              isSubmitting || isDataLoading || !currentUser
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-basic-blue hover:bg-blue-600'
-            }`}
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            {isSubmitting ? (
-              <div className="flex items-center justify-center space-x-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-                <span>처리 중...</span>
-              </div>
-            ) : isDataLoading ? (
-              "데이터 로딩 중..."
-            ) : (
-              "출석 체크"
-            )}
-          </button>
-        </div>
-      </div>
+
+      
+
+
+
 
       {/* 알림 팝업 */}
       {notificationType && (

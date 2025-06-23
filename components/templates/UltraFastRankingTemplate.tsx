@@ -263,7 +263,7 @@ const UltraFastRankingTemplate = () => {
     <div className="h-screen bg-basic-black text-white flex flex-col overflow-hidden relative">
       {/* ⚡ 헤더 - 상단 고정 */}
       <div className="fixed top-0 left-0 right-0 bg-basic-black-gray z-30 pt-safe shadow-sm">
-        <PageHeader title="랭킹" iconColor="black" backgroundColor="bg-basic-black-gray" />
+        <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-basic-black-gray" />
       </div>
 
       {/* ⚡ RankingInfo- 고정 */}
@@ -313,7 +313,7 @@ const UltraFastRankingTemplate = () => {
         </div>
         
         {/* ⚡ 고정된 랭킹 리스트 헤더 */}
-        <div className="bg-white border-t border-gray-200">
+        <div className="border-gray-200">
           <RankingListHeader 
             headers={[
               '등수', 
@@ -326,7 +326,7 @@ const UltraFastRankingTemplate = () => {
       </div>
       
       {/* ⚡ 스크롤 가능한 랭킹 리스트 영역 */}
-      <div className="flex-1 bg-white text-black flex flex-col mt-[300px]  hw-accelerated">
+      <div className="flex-1 bg-basic-black text-black flex flex-col mt-[300px]  hw-accelerated">
         {/* ⚡ 데이터 또는 로딩 스피너 표시 */}
         <div className="flex-1 overflow-y-auto native-scroll">
           {isDataLoading ? (

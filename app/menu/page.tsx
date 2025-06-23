@@ -80,10 +80,10 @@ export default function MenuPage() {
               <button
                 key={index}
                 onClick={() => handleItemClick(item)}
-                className='flex items-center justify-between w-full px-4 py-4 transition-colors border-b border-gray-100 last:border-b-0 hover:bg-gray-50'
+                className='flex justify-between items-center px-4 py-4 w-full border-b border-gray-100 transition-colors last:border-b-0 hover:bg-gray-50'
               >
-                <div className='flex items-center gap-3'>
-                  <div className='flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full'>
+                <div className='flex gap-3 items-center'>
+                  <div className='flex justify-center items-center w-10 h-10 bg-gray-100 rounded-full'>
                     <IconComponent
                       size={20}
                       className={`${
@@ -119,8 +119,8 @@ export default function MenuPage() {
       <div className='px-4 mt-8'>
         <div className='p-4 bg-white rounded-lg'>
           <div className='text-center'>
-            <h3 className='mb-1 font-semibold text-gray-900'>RunHouse</h3>
-            <p className='text-sm text-gray-500'>버전 1.0.0</p>
+            <h3 className='mb-1 font-semibold text-gray-900'>RunHouseCheck</h3>
+            <p className='text-sm text-gray-500'>버전 0.0.2</p>
           </div>
         </div>
       </div>

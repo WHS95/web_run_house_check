@@ -6,7 +6,7 @@ interface RankingListHeaderProps {
 
 const RankingListHeader: React.FC<RankingListHeaderProps> = ({ headers }) => {
   return (
-    <div className='sticky top-0 z-20 flex justify-between px-4 py-3 text-sm bg-white border-b border-gray-200 shadow-sm text-black/60'>
+    <div className='flex sticky top-0 z-20 justify-between px-4 py-3 text-sm text-white shadow-sm bg-basic-black-gray'>
       <span className='w-1/6 font-medium text-center'>
         {headers[0] || "순위"}
       </span>

@@ -149,9 +149,9 @@ export default function PaceCalculatorPage() {
 
   return (
     <FormLayout title='페이스 계산기'>
-      <div className='max-w-md mx-auto space-y-6'>
+      <div className='px-4 mx-auto space-y-6'>
         {/* 모드 선택 탭 */}
-        <div className='flex p-1 space-x-1 border rounded-lg'>
+        <div className='flex p-1 space-x-1 rounded-lg border'>
           {[
             { id: "pace", label: "페이스" },
             { id: "distance", label: "거리" },
@@ -166,8 +166,8 @@ export default function PaceCalculatorPage() {
               className={cn(
                 "flex-1 px-3 py-2 text-sm rounded-md transition-colors",
                 mode === tab.id
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted"
+                  ? "bg-basic-blue text-white"
+                  : "hover:bg-muted text-white"
               )}
             >
               {tab.label}
@@ -176,9 +176,9 @@ export default function PaceCalculatorPage() {
         </div>
 
         {/* 입력 폼 */}
-        <div className='space-y-4'>
+        <div className='space-y-4 text-white'>
           {mode !== "distance" && (
-            <div>
+            <div className='text-white'>
               <label className='block mb-2 text-sm font-medium'>
                 거리 (km)
               </label>
@@ -194,9 +194,9 @@ export default function PaceCalculatorPage() {
           )}
 
           {mode !== "time" && (
-            <div>
+            <div className='text-white'>
               <label className='block mb-2 text-sm font-medium'>시간</label>
-              <div className='relative flex items-center gap-1'>
+              <div className='flex relative gap-1 items-center'>
                 <div className='flex-1'>
                   <Input
                     type='number'
@@ -249,7 +249,7 @@ export default function PaceCalculatorPage() {
               <label className='block mb-2 text-sm font-medium'>
                 목표 페이스 (km당)
               </label>
-              <div className='relative flex items-center gap-1'>
+              <div className='flex relative gap-1 items-center'>
                 <div className='flex-1'>
                   <Input
                     type='number'
@@ -282,16 +282,19 @@ export default function PaceCalculatorPage() {
             </div>
           )}
 
-          <Button onClick={handleCalculate} className='w-full'>
+          <Button
+            onClick={handleCalculate}
+            className='w-full text-white bg-basic-blue'
+          >
             계산하기
           </Button>
         </div>
 
         {/* 결과 */}
         {results && (
-          <div className='mt-6'>
+          <div className='mt-6 text-white'>
             <h2 className='mb-4 text-lg font-medium'>결과</h2>
-            <div className='overflow-hidden border rounded-lg'>
+            <div className='overflow-hidden rounded-lg border'>
               <table className='w-full'>
                 <tbody className='divide-y'>
                   {results.pace && (

@@ -58,9 +58,9 @@ export default function SplitTimeCalculatorPage() {
     <FormLayout title='스플릿 타임 계산기'>
       <div className='space-y-6'>
         {/* 입력 폼 */}
-        <div className='space-y-4'>
+        <div className='space-y-4 text-white'>
           <div>
-            <label className='block mb-2 text-sm font-medium'>
+            <label className='block mb-2 text-sm font-bold'>
               목표 거리 (km)
             </label>
             <Input
@@ -73,8 +73,8 @@ export default function SplitTimeCalculatorPage() {
             />
           </div>
 
-          <div>
-            <label className='block mb-2 text-sm font-medium'>목표 시간</label>
+          <div className='text-white'>
+            <label className='block mb-2 text-sm font-bold'>목표 시간</label>
             <div className='flex relative gap-1 items-center'>
               <div className='flex-1'>
                 <Input
@@ -122,18 +122,21 @@ export default function SplitTimeCalculatorPage() {
             </div>
           </div>
 
-          <Button onClick={handleCalculate} className='w-full'>
+          <Button
+            onClick={handleCalculate}
+            className='w-full text-white bg-basic-blue'
+          >
             계산하기
           </Button>
         </div>
 
         {/* 결과 테이블 */}
         {results.length > 0 && (
-          <div className='mt-6'>
+          <div className='mt-6 text-white'>
             {/* <h2 className='mb-4 text-lg font-medium'>예상 구간 기록</h2> */}
             <div className='overflow-hidden rounded-lg border'>
               <table className='w-full'>
-                <thead className='bg-muted'>
+                <thead className='text-black bg-muted'>
                   <tr>
                     <th className='px-2 py-2 text-left'>거리</th>
                     <th className='px-2 py-2 text-left'>예상 시간</th>

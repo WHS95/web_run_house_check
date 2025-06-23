@@ -77,16 +77,16 @@ export default function PredictionCalculatorPage() {
       <div className='space-y-6'>
         {/* 설명 */}
         <div className='p-4 text-sm rounded-lg bg-accent/50'>
-          <p className='text-muted-foreground'>
+          <p className='text-white text-muted-foreground'>
             이전에 달린 기록을 바탕으로 다른 거리의 예상 완주 시간을 계산합니다.
             <br />
-            예를 들어, 10km를 60분에 달렸다면 하프마라톤(21.1km)은 얼마나 걸릴지
-            예측할 수 있습니다.
+            ex) 10km를 60분에 달렸다면 하프마라톤(21.1km)은 얼마나 걸릴지 예측할
+            수 있습니다.
           </p>
         </div>
 
         {/* 입력 폼 */}
-        <div className='space-y-4'>
+        <div className='space-y-4 text-white'>
           {/* 기록한 거리 선택 */}
           <div>
             <label className='block mb-2 text-sm font-medium'>
@@ -96,7 +96,7 @@ export default function PredictionCalculatorPage() {
               value={recordedDistance}
               onValueChange={setRecordedDistance}
             >
-              <SelectTrigger>
+              <SelectTrigger className='text-black'>
                 <SelectValue placeholder='거리 선택' />
               </SelectTrigger>
               <SelectContent>
@@ -115,7 +115,7 @@ export default function PredictionCalculatorPage() {
           {/* 기록 시간 입력 */}
           <div>
             <label className='block mb-2 text-sm font-medium'>기록 시간</label>
-            <div className='relative flex items-center gap-1'>
+            <div className='flex relative gap-1 items-center'>
               <div className='flex-1'>
                 <Input
                   type='number'
@@ -164,11 +164,11 @@ export default function PredictionCalculatorPage() {
 
           {/* 목표 거리 선택 */}
           <div>
-            <label className='block mb-2 text-sm font-medium'>
+            <label className='block mb-2 text-sm font-medium text-white'>
               목표 거리 (km)
             </label>
             <Select value={targetDistance} onValueChange={setTargetDistance}>
-              <SelectTrigger>
+              <SelectTrigger className='text-black'>
                 <SelectValue placeholder='거리 선택' />
               </SelectTrigger>
               <SelectContent>
@@ -184,15 +184,18 @@ export default function PredictionCalculatorPage() {
             </Select>
           </div>
 
-          <Button onClick={handleCalculate} className='w-full'>
+          <Button
+            onClick={handleCalculate}
+            className='w-full text-white bg-basic-blue'
+          >
             계산하기
           </Button>
         </div>
 
         {/* 결과 */}
         {result && (
-          <div className='mt-6'>
-            <div className='flex items-center gap-2 mb-4'>
+          <div className='mt-6 text-white'>
+            <div className='flex gap-2 items-center mb-4'>
               <h2 className='text-lg font-medium'>
                 {COMMON_DISTANCES.find(
                   (d) => d.value.toString() === targetDistance
@@ -214,15 +217,19 @@ export default function PredictionCalculatorPage() {
                 </div>
               </div>
             </div>
-            <div className='overflow-hidden border rounded-lg'>
+            <div className='overflow-hidden rounded-lg border'>
               <table className='w-full'>
                 <tbody className='divide-y'>
                   <tr>
-                    <td className='px-4 py-3 font-medium'>예상 시간</td>
+                    <td className='px-4 py-3 font-medium text-white'>
+                      예상 시간
+                    </td>
                     <td className='px-4 py-3'>{result.time}</td>
                   </tr>
                   <tr>
-                    <td className='px-4 py-3 font-medium'>평균 페이스</td>
+                    <td className='px-4 py-3 font-medium text-white'>
+                      평균 페이스
+                    </td>
                     <td className='px-4 py-3'>{result.pace}</td>
                   </tr>
                 </tbody>

@@ -3,125 +3,140 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import {
-  Settings,
-  HelpCircle,
-  Shield,
-  LogOut,
-  Bell,
-  User,
+  Calculator,
+  Timer,
+  Target,
+  Heart,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
+import { createBrowserClient } from "@supabase/ssr";
+import PageHeader from "@/components/organisms/common/PageHeader";
 
 const menuItems = [
   {
-    icon: User,
-    title: "프로필 설정",
-    description: "개인 정보 수정",
-    href: "/mypage",
+    icon: Calculator,
+    title: "페이스 계산기",
+    description: "거리, 시간, 페이스 계산",
+    href: "/calculator/pace",
   },
   {
-    icon: Bell,
-    title: "알림 설정",
-    description: "푸시 알림 관리",
-    href: "/settings/notifications",
+    icon: Target,
+    title: "완주 시간 예측기",
+    description: "기록 기반 완주 시간 예측",
+    href: "/calculator/prediction",
   },
   {
-    icon: Settings,
-    title: "앱 설정",
-    description: "언어, 테마 등",
-    href: "/settings",
+    icon: Timer,
+    title: "스플릿 타임 계산기",
+    description: "구간별 예상 기록 계산",
+    href: "/calculator/split-time",
   },
   {
-    icon: Shield,
-    title: "개인정보 처리방침",
-    description: "개인정보 보호 정책",
-    href: "/privacy",
-  },
-  {
-    icon: HelpCircle,
-    title: "고객센터",
-    description: "문의 및 도움말",
-    href: "/support",
-  },
-  {
-    icon: LogOut,
-    title: "로그아웃",
-    description: "계정에서 로그아웃",
-    action: "logout",
+    icon: Heart,
+    title: "심박수 존 계산기",
+    description: "나이별 트레이닝 존 계산",
+    href: "/calculator/heart-rate",
   },
 ];
 
 export default function MenuPage() {
   const router = useRouter();
 
+  // Supabase 클라이언트 생성
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const handleItemClick = (item: (typeof menuItems)[0]) => {
-    if (item.action === "logout") {
-      // 로그아웃 로직
-      console.log("로그아웃 처리");
+    // 햅틱 피드백
+    if (typeof window !== "undefined" && window.navigator.vibrate) {
+      window.navigator.vibrate(50);
+    }
+    router.push(item.href);
+  };
+
+  const handleLogout = async () => {
+    try {
+      // 햅틱 피드백
+      if (typeof window !== "undefined" && window.navigator.vibrate) {
+        window.navigator.vibrate([50, 100, 50]);
+      }
+
+      // Supabase 세션 종료
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error("로그아웃 중 오류:", error);
+        alert("로그아웃 중 오류가 발생했습니다.");
+        return;
+      }
+
+      // 로그인 페이지로 리다이렉트
       router.push("/auth/login");
-    } else if (item.href) {
-      router.push(item.href);
+    } catch (error) {
+      console.error("로그아웃 처리 중 예외:", error);
+      alert("로그아웃 처리 중 문제가 발생했습니다.");
     }
   };
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      {/* 헤더 */}
-      <div className='px-4 py-4 bg-white border-b border-gray-200'>
-        <h1 className='text-xl font-bold text-gray-900'>메뉴</h1>
+    <div className='flex flex-col h-screen bg-basic-black'>
+      <div className='fixed top-0 right-0 left-0 z-10 bg-basic-black-gray'>
+        <PageHeader
+          title='러닝 계산기'
+          iconColor='white'
+          borderColor='gray-300'
+        />
       </div>
 
       {/* 메뉴 리스트 */}
-      <div className='mt-4'>
-        <div className='bg-white'>
+      <div className='flex-1 overflow-y-auto px-2 py-2 pt-[80px]'>
+        <div className='bg-basic-black'>
+          {/* 계산기 메뉴들 */}
           {menuItems.map((item, index) => {
             const IconComponent = item.icon;
             return (
               <button
                 key={index}
                 onClick={() => handleItemClick(item)}
-                className='flex justify-between items-center px-4 py-4 w-full border-b border-gray-100 transition-colors last:border-b-0 hover:bg-gray-50'
+                className='flex justify-between items-center px-2 py-6 w-full transition-colors hover:bg-basic-black-gray'
               >
                 <div className='flex gap-3 items-center'>
-                  <div className='flex justify-center items-center w-10 h-10 bg-gray-100 rounded-full'>
-                    <IconComponent
-                      size={20}
-                      className={`${
-                        item.action === "logout"
-                          ? "text-red-500"
-                          : "text-gray-600"
-                      }`}
-                    />
+                  <div className='flex justify-center items-center w-10 h-10 rounded-full bg-basic-black-gray'>
+                    <IconComponent size={20} className='text-white' />
                   </div>
                   <div className='text-left'>
-                    <div
-                      className={`font-medium ${
-                        item.action === "logout"
-                          ? "text-red-500"
-                          : "text-gray-900"
-                      }`}
-                    >
+                    <div className='font-extrabold text-basic-blue'>
                       {item.title}
                     </div>
-                    <div className='text-sm text-gray-500'>
-                      {item.description}
-                    </div>
+                    <div className='text-sm text-white'>{item.description}</div>
                   </div>
                 </div>
                 <ChevronRight size={20} className='text-gray-400' />
               </button>
             );
           })}
-        </div>
-      </div>
 
-      {/* 앱 정보 */}
-      <div className='px-4 mt-8'>
-        <div className='p-4 bg-white rounded-lg'>
-          <div className='text-center'>
-            <h3 className='mb-1 font-semibold text-gray-900'>RunHouseCheck</h3>
-            <p className='text-sm text-gray-500'>버전 0.0.2</p>
-          </div>
+          {/* 구분선 */}
+          <div className='my-4 border-t border-gray-600'></div>
+
+          {/* 로그아웃 버튼 */}
+          <button
+            onClick={handleLogout}
+            className='flex justify-between items-center px-2 py-6 w-full transition-colors hover:bg-red-900/20'
+          >
+            <div className='flex gap-3 items-center'>
+              <div className='flex justify-center items-center w-10 h-10 bg-red-600 rounded-full'>
+                <LogOut size={20} className='text-white' />
+              </div>
+              <div className='text-left'>
+                <div className='font-extrabold text-red-500'>로그아웃</div>
+                <div className='text-sm text-gray-400'>계정에서 로그아웃</div>
+              </div>
+            </div>
+          </button>
         </div>
       </div>
     </div>

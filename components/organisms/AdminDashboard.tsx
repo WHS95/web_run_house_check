@@ -55,8 +55,8 @@ const renderChangeIndicator = (change: number | null) => {
         isPositive ? "bg-green-100" : isNegative ? "bg-red-100" : "bg-gray-100"
       }`}
     >
-      {isPositive && <TrendingUp className='w-3 h-3 mr-1 text-green-600' />}
-      {isNegative && <TrendingDown className='w-3 h-3 mr-1 text-red-600' />}
+      {isPositive && <TrendingUp className='mr-1 w-3 h-3 text-green-600' />}
+      {isNegative && <TrendingDown className='mr-1 w-3 h-3 text-red-600' />}
       <span
         className={`font-medium ${
           isPositive
@@ -75,8 +75,8 @@ const renderChangeIndicator = (change: number | null) => {
 export default function AdminDashboard({ stats }: AdminDashboardProps) {
   return (
     <div className='flex flex-col h-screen'>
-      <div className='flex-1 pb-24 overflow-y-auto bg-gray-50'>
-        <div className='max-w-md px-4 py-6 mx-auto'>
+      <div className='overflow-y-auto flex-1 pb-24 bg-gray-50'>
+        <div className='px-4 py-6 mx-auto max-w-md'>
           {/* 기본 통계 섹션 */}
           <div className='space-y-4'>
             <div className='grid grid-cols-3 gap-3'>
@@ -145,7 +145,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 모임 건수 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-start justify-between'>
+                  <div className='flex justify-between items-start'>
                     <div>
                       <p className='text-sm text-gray-600'>모임 건수</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -168,7 +168,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 모임 참여 횟수 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-start justify-between'>
+                  <div className='flex justify-between items-start'>
                     <div>
                       <p className='text-sm text-gray-600'>출석 횟수</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -193,7 +193,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 참여 크루원 수 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-start justify-between'>
+                  <div className='flex justify-between items-start'>
                     <div>
                       <p className='text-sm text-gray-600'>참여 크루원 수</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -218,7 +218,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 모임개설 크루원 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-start justify-between'>
+                  <div className='flex justify-between items-start'>
                     <div>
                       <p className='text-sm text-gray-600'>모임개설 크루원</p>
                       <p className='text-xl font-bold text-gray-900'>
@@ -241,7 +241,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
               {/* 신규 가입 인원 */}
               <Card className='ios-card'>
                 <CardContent className='p-3'>
-                  <div className='flex items-start justify-between'>
+                  <div className='flex justify-between items-start'>
                     <div>
                       <p className='text-sm text-gray-600'>신규 가입 인원</p>
                       <p className='text-xl font-bold text-gray-900'>

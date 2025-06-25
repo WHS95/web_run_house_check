@@ -28,9 +28,9 @@ const navigationItems = [
   },
   {
     name: "통계",
-    href: "/admin/analytics",
+    href: "/admin/analyze",
     icon: BarChart3,
-    isComingSoon: true,
+    isComingSoon: false,
   },
   {
     name: "설정",

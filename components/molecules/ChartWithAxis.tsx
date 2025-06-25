@@ -1,97 +1,45 @@
 import React from "react";
 import LineChart from "@/components/atoms/LineChart";
 import { DataPoint } from "@/lib/dashboard-data";
+import DayParticipationItem from "./AxisBar";
+
+interface DayParticipationData {
+  dayName: string;
+  dayIndex: number;
+  participationRate: number;
+  totalMembers: number;
+  color: string;
+}
 
 interface ChartWithAxisProps {
-  data: DataPoint[];
-  color: string;
-  height?: number;
-  yAxisLabel?: string;
-  title?: string;
-  gradientId?: string;
+  title: string;
+  data: DayParticipationData[];
+  year: number;
+  month: number;
 }
 
 export default function ChartWithAxis({
-  data,
-  color,
-  height = 200,
-  yAxisLabel = "",
   title,
-  gradientId = "chartGradient",
+  data,
+  year,
+  month,
 }: ChartWithAxisProps) {
-  // 그래프 최대 값 계산 (스케일링을 위해)
-  const maxValue = Math.max(...data.map((item) => item.value));
-
-  // Y축 값 자동 생성 (0부터 최대값까지 균등하게 나눔)
-  const yAxisValues = Array.from({ length: 6 }, (_, i) =>
-    Math.round((maxValue * (5 - i)) / 5)
-  );
-  yAxisValues.push(0);
-
-  // 차트 크기
-  const chartHeight = height;
-  const chartWidth = 400;
-
   return (
-    <div className='relative'>
-      {title && (
-        <h2 className='text-lg font-medium mb-3 text-white'>{title}</h2>
-      )}
-      <div
-        className='relative'
-        style={{ height: `${height + 30}px`, width: "100%" }}
-      >
-        {/* 그리드 라인 */}
-        <div className='absolute inset-0 grid grid-cols-6 grid-rows-5'>
-          {Array.from({ length: 6 }).map((_, colIndex) => (
-            <div
-              key={`col-${colIndex}`}
-              className='border-l h-full border-gray-700'
-            ></div>
-          ))}
-          {Array.from({ length: 6 }).map((_, rowIndex) => (
-            <div
-              key={`row-${rowIndex}`}
-              className='border-b w-full border-gray-700'
-            ></div>
-          ))}
-        </div>
+    <div className='p-6 bg-white rounded-lg border border-gray-200 shadow-sm'>
+      <div className='mb-6'>
+        <h3 className='mb-1 text-lg font-semibold text-gray-900'>{title}</h3>
+      </div>
 
-        {/* Y축 값 및 라벨 */}
-        <div className='absolute left-[-10px] inset-y-0 w-10 flex flex-col justify-between text-xs text-gray-400'>
-          {yAxisValues.map((value, index) => (
-            <span key={index}>{value}</span>
-          ))}
-        </div>
-
-        {yAxisLabel && (
-          <div className='absolute left-[-30px] top-1/2 transform -rotate-90 text-xs text-gray-400'>
-            {yAxisLabel}
+      <div className='space-y-1'>
+        {data.length > 0 ? (
+          data.map((item, index) => (
+            <DayParticipationItem key={item.dayIndex} item={item} />
+          ))
+        ) : (
+          <div className='py-8 text-center text-gray-500'>
+            <p>해당 기간의 데이터가 없습니다.</p>
           </div>
         )}
-
-        {/* X축 값 */}
-        <div className='absolute bottom-[-20px] inset-x-0 flex justify-between px-8 text-xs text-gray-400'>
-          {data.map((item, index) => (
-            <span key={index}>{item.month}</span>
-          ))}
-        </div>
-
-        {/* 그래프 SVG */}
-        <svg
-          className='absolute inset-0 w-full h-full px-12 pt-4'
-          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-          preserveAspectRatio='none'
-        >
-          <LineChart
-            data={data}
-            color={color}
-            gradientId={gradientId}
-            maxValue={maxValue}
-            chartWidth={chartWidth}
-            chartHeight={chartHeight}
-          />
-        </svg>
       </div>
     </div>
   );

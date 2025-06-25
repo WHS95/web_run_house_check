@@ -76,7 +76,7 @@ export default function HeartRateCalculatorPage() {
 
           <Button
             onClick={handleCalculate}
-            className='w-full text-white bg-blue-600 hover:bg-blue-700'
+            className='w-full text-white bg-basic-blue hover:bg-basic-blue/80'
           >
             계산하기
           </Button>

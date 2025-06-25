@@ -186,7 +186,7 @@ export default function PredictionCalculatorPage() {
 
           <Button
             onClick={handleCalculate}
-            className='w-full text-white bg-basic-blue'
+            className='w-full text-white bg-basic-blue hover:bg-basic-blue/80'
           >
             계산하기
           </Button>

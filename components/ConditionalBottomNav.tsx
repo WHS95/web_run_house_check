@@ -12,6 +12,7 @@ export default function ConditionalBottomNav() {
     "/auth/signup",
     "/auth/callback",
     "/auth/verify-crew",
+    "/admin",
   ];
 
   // 현재 경로가 숨김 목록에 있는지 확인

@@ -149,8 +149,6 @@ export default function AdminPage() {
       <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
         <div className='px-4 py-3'>
           <div className='flex justify-between items-center'>
-            <h1 className='text-xl font-bold text-gray-900'>Admin 대시보드</h1>
-
             {/* 년도/월 선택 드롭다운 */}
             <div className='flex items-center space-x-2'>
               <select

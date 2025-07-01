@@ -536,13 +536,13 @@ export default function AdminAttendanceManagement({
   return (
     <div className='flex flex-col h-screen bg-basic-black'>
       {/* 메인 컨텐츠 - 스크롤 가능, 하단 바텀에 가려지지 않게 pb-24 적용 */}
-      <div className='flex-1 px-4 py-6 pb-24 overflow-y-auto'>
+      <div className='overflow-y-auto flex-1 px-4 py-6 pb-24'>
         <div className='space-y-6'>
           {/* 월별 달력 - 높이를 80%로 조정 */}
           <Card className='ios-card'>
             <CardContent className='p-4'>
               {/* 달력 헤더 */}
-              <div className='flex items-center justify-between mb-4'>
+              <div className='flex justify-between items-center mb-4'>
                 <Button
                   variant='ghost'
                   size='icon'
@@ -629,7 +629,7 @@ export default function AdminAttendanceManagement({
               </div>
 
               {/* 범례 */}
-              <div className='flex items-center justify-center mt-4 text-xs text-gray-500'>
+              <div className='flex justify-center items-center mt-4 text-xs text-gray-500'>
                 <div className='flex items-center space-x-1'>
                   <div className='w-1.5 h-1.5 bg-blue-500 rounded-full'></div>
                   <span>출석 기록 (숫자: 출석자 수)</span>
@@ -643,7 +643,7 @@ export default function AdminAttendanceManagement({
             <Card className='ios-card'>
               <CardContent className='p-4'>
                 <div className='text-center'>
-                  <div className='w-8 h-8 mx-auto mb-2 border-b-2 border-blue-600 rounded-full animate-spin'></div>
+                  <div className='mx-auto mb-2 w-8 h-8 rounded-full border-b-2 border-blue-600 animate-spin'></div>
                   <p className='text-sm text-gray-500'>
                     출석 정보를 불러오는 중...
                   </p>
@@ -688,19 +688,19 @@ export default function AdminAttendanceManagement({
 
               {/* 검색 */}
               <div className='relative'>
-                <Search className='absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2' />
+                <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
                 <Input
                   placeholder='이름 또는 장소로 검색'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className='pl-10 bg-white border-gray-200 rounded-lg'
+                  className='pl-10 bg-white rounded-lg border-gray-200'
                 />
               </div>
 
               {/* 모임별 그룹화된 출석 기록 목록 */}
               <div className='space-y-3'>
-                <div className='flex items-center justify-between'>
-                  <h3 className='text-lg font-semibold text-gray-900'>
+                <div className='flex justify-between items-center'>
+                  <h3 className='text-lg font-semibold text-white'>
                     모임별 출석 목록
                   </h3>
                   <Button
@@ -712,7 +712,7 @@ export default function AdminAttendanceManagement({
                       setSearchTerm("");
                       setStatusFilter("all");
                     }}
-                    className='text-gray-500'
+                    className='text-white'
                   >
                     닫기
                   </Button>
@@ -745,9 +745,9 @@ export default function AdminAttendanceManagement({
                         {meeting.records.map((record) => (
                           <div
                             key={record.id}
-                            className='flex items-center justify-between'
+                            className='flex justify-between items-center'
                           >
-                            <div className='flex items-center flex-1 space-x-3'>
+                            <div className='flex flex-1 items-center space-x-3'>
                               <div className='flex-1 min-w-0'>
                                 <div className='flex items-center mb-1 space-x-2'>
                                   <h4 className='font-medium text-gray-900'>
@@ -778,7 +778,7 @@ export default function AdminAttendanceManagement({
                                   disabled={isDeletingRecord === record.id}
                                 >
                                   {isDeletingRecord === record.id ? (
-                                    <div className='w-4 h-4 border-2 border-gray-300 rounded-full border-t-gray-600 animate-spin'></div>
+                                    <div className='w-4 h-4 rounded-full border-2 border-gray-300 animate-spin border-t-gray-600'></div>
                                   ) : (
                                     <MoreVertical className='w-4 h-4' />
                                   )}
@@ -789,7 +789,7 @@ export default function AdminAttendanceManagement({
                                   onClick={() => handleEditAttendance(record)}
                                   disabled={isDeletingRecord === record.id}
                                 >
-                                  <Edit className='w-4 h-4 mr-2' />
+                                  <Edit className='mr-2 w-4 h-4' />
                                   정보 수정
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -801,12 +801,12 @@ export default function AdminAttendanceManagement({
                                 >
                                   {isDeletingRecord === record.id ? (
                                     <>
-                                      <div className='w-4 h-4 mr-2 border-2 border-red-300 rounded-full border-t-red-600 animate-spin'></div>
+                                      <div className='mr-2 w-4 h-4 rounded-full border-2 border-red-300 animate-spin border-t-red-600'></div>
                                       삭제 중...
                                     </>
                                   ) : (
                                     <>
-                                      <X className='w-4 h-4 mr-2' />
+                                      <X className='mr-2 w-4 h-4' />
                                       출석 취소
                                     </>
                                   )}
@@ -834,7 +834,7 @@ export default function AdminAttendanceManagement({
             <Card className='bg-white border-gray-200'>
               <CardContent className='p-4'>
                 <div className='text-center text-gray-500'>
-                  <Calendar className='w-8 h-8 mx-auto mb-2 text-gray-400' />
+                  <Calendar className='mx-auto mb-2 w-8 h-8 text-gray-400' />
                   <p className='text-sm'>
                     달력에서 파란색 점과 숫자가 있는 날짜를 클릭하면
                   </p>

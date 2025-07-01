@@ -138,7 +138,9 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
             {/* 섹션 헤더 */}
             <div className='flex items-center p-2 space-x-2'>
               <TrendingUp className='w-5 h-5 text-green-600' />
-              <h2 className='text-lg font-semibold text-gray-900'>이달 현황</h2>
+              <h2 className='text-lg font-semibold text-gray-900'>
+                이번 달 현황
+              </h2>
             </div>
 
             <div className='space-y-3'>

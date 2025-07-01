@@ -103,7 +103,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
       </head>
-      <body className='bg-basic-black'>
+      <body>
         {process.env.NODE_ENV === "development" && (
           <StagewiseToolbar
             config={{
@@ -111,7 +111,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }}
           />
         )}
-        <div className='pb-20 min-h-screen bg-basic-black'>{children}</div>
+        <div>{children}</div>
         <ConditionalBottomNav />
         <Analytics />
       </body>

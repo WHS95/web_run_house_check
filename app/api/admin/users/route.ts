@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUsersByCrewId } from "@/lib/supabase/admin";
+import { getUsersByCrewIdOptimized } from "@/lib/supabase/admin";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
@@ -9,15 +9,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const crewId = searchParams.get("crewId");
 
-    if (!crewId) {
-      return NextResponse.json(
-        { error: "crewId가 필요합니다." },
-        { status: 400 }
-      );
-    }
+    let users, error;
 
-    // 해당 크루의 사용자 목록 데이터 가져오기
-    const { data: users, error } = await getUsersByCrewId(crewId);
+    if (crewId) {
+      // 특정 크루의 사용자 목록 조회 (최적화됨)
+      const result = await getUsersByCrewIdOptimized(crewId);
+      users = result.data;
+      error = result.error;
+    }
 
     if (error) {
       console.error("사용자 데이터 조회 실패:", error);
@@ -29,6 +28,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       users: users || [],
+      optimized: true, // 최적화된 버전임을 표시
     });
   } catch (error) {
     console.error("Users API 오류:", error);

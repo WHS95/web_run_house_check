@@ -11,7 +11,6 @@ export async function middleware(req: NextRequest) {
     "/auth/auth-code-error",
     "/_next",
     "/favicon.ico",
-    "/api/auth",
   ];
 
   const isPublicRoute = PUBLIC_ROUTES.some(

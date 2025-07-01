@@ -34,7 +34,7 @@ interface ActivityData {
 const MyPageSkeleton = React.memo(() => (
   <div className='flex flex-col h-screen bg-basic-black'>
     <div className='flex-shrink-0 h-[80px] bg-basic-black-gray border-b border-gray-200 animate-pulse'>
-      <div className='flex items-center justify-center h-full'>
+      <div className='flex justify-center items-center h-full'>
         <div className='w-20 h-6 rounded bg-basic-black-gray'></div>
       </div>
     </div>
@@ -139,6 +139,7 @@ export default function MyPage() {
         };
 
         setUserProfile(formattedProfile);
+        console.log("1231231", activityInfo);
         setActivityData(activityInfo);
       } catch (error) {
         console.error("마이페이지 데이터 로딩 오류:", error);

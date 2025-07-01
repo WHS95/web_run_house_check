@@ -243,9 +243,9 @@ export default function AdminUserManagement({
   };
 
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
+    <div className='flex overflow-hidden relative flex-col h-screen bg-gray-50'>
       {/* 검색 및 필터 - 고정 */}
-      <div className='sticky top-0 z-10 px-4 py-4 space-y-4 bg-gray-50 border-b border-gray-100'>
+      <div className='fixed top-0 right-0 left-0 z-50 px-4 py-4 space-y-4 bg-gray-50 border-b border-gray-100'>
         {/* 검색 */}
         <div className='relative'>
           <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
@@ -305,7 +305,7 @@ export default function AdminUserManagement({
       </div>
 
       {/* 메인 컨텐츠 - 스크롤 가능  하단 바텀에 가려지지지 않게 pb-24 반영*/}
-      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
+      <div className='overflow-y-auto flex-1 px-4 pt-32 pb-24'>
         {/* 사용자 목록 */}
         <div className='space-y-3'>
           {filteredUsers.map((user) => (

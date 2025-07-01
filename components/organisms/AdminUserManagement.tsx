@@ -19,6 +19,7 @@ import {
   updateUserStatus,
   updateUserInfo,
 } from "@/lib/supabase/admin";
+import { useAdminContext } from "@/app/admin/AdminContextProvider";
 
 interface AdminUserManagementProps {
   initialUsers: UserForAdmin[];
@@ -47,6 +48,7 @@ const getDaysAgo = (dateString: string | null): string => {
 export default function AdminUserManagement({
   initialUsers,
 }: AdminUserManagementProps) {
+  const { crewId } = useAdminContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("전체");
   const [sortBy, setSortBy] = useState("lastAttendance"); // 기본값: 최근 참석일
@@ -55,8 +57,6 @@ export default function AdminUserManagement({
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserForAdmin | null>(null);
-
-  console.log("users", users);
 
   // 정렬 함수
   const sortUsers = (users: UserForAdmin[]) => {
@@ -103,7 +103,7 @@ export default function AdminUserManagement({
         userPhone.includes(searchTerm) ||
         userEmail.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const isActive = user.status === "active" || user.status === null;
+      const isActive = user.status === "ACTIVE" || user.status === null;
       const matchesStatus =
         statusFilter === "전체" ||
         (statusFilter === "활성" && isActive) ||
@@ -121,9 +121,9 @@ export default function AdminUserManagement({
       if (!currentUser) return;
 
       const isCurrentlyActive =
-        currentUser.status === "active" || currentUser.status === null;
+        currentUser.status === "ACTIVE" || currentUser.status === null;
       const newStatus = !isCurrentlyActive;
-      const { error } = await updateUserStatus(userId, newStatus);
+      const { error } = await updateUserStatus(userId, crewId, newStatus);
 
       if (error) {
         console.error("사용자 상태 업데이트 실패:", error);
@@ -135,7 +135,7 @@ export default function AdminUserManagement({
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === userId
-            ? { ...user, status: newStatus ? "active" : "suspended" }
+            ? { ...user, status: newStatus ? "ACTIVE" : "SUSPENDED" }
             : user
         )
       );
@@ -193,8 +193,8 @@ export default function AdminUserManagement({
   };
 
   const getStatusBadge = (status: string | null) => {
-    // status가 'active' 또는 null이면 활성, 'suspended'면 비활성
-    const isActive = status === "active" || status === null;
+    // status가 'ACTIVE' 또는 null이면 활성, 'SUSPENDED'면 비활성
+    const isActive = status === "ACTIVE" || status === null;
 
     if (isActive) {
       return (
@@ -245,20 +245,20 @@ export default function AdminUserManagement({
   return (
     <div className='flex flex-col h-screen bg-gray-50'>
       {/* 검색 및 필터 - 고정 */}
-      <div className='sticky top-0 z-10 px-4 py-4 space-y-4 border-b border-gray-100 bg-gray-50'>
+      <div className='sticky top-0 z-10 px-4 py-4 space-y-4 bg-gray-50 border-b border-gray-100'>
         {/* 검색 */}
         <div className='relative'>
-          <Search className='absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2' />
+          <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
           <Input
             placeholder='이름, 전화번호 또는 이메일로 검색'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='pl-10 bg-white border-gray-200 rounded-lg'
+            className='pl-10 bg-white rounded-lg border-gray-200'
           />
         </div>
 
         {/* 상태 필터 탭과 정렬 */}
-        <div className='flex items-center justify-between'>
+        <div className='flex justify-between items-center'>
           <div className='flex space-x-2'>
             {["전체", "활성", "비활성"].map((status) => (
               <Button
@@ -285,7 +285,7 @@ export default function AdminUserManagement({
                 size='sm'
                 className='bg-white rounded-full'
               >
-                <ArrowUpDown className='w-4 h-4 mr-1' />
+                <ArrowUpDown className='mr-1 w-4 h-4' />
                 {getSortLabel()}
               </Button>
             </DropdownMenuTrigger>
@@ -305,15 +305,15 @@ export default function AdminUserManagement({
       </div>
 
       {/* 메인 컨텐츠 - 스크롤 가능  하단 바텀에 가려지지지 않게 pb-24 반영*/}
-      <div className='flex-1 px-4 py-4 pb-24 overflow-y-auto'>
+      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
         {/* 사용자 목록 */}
         <div className='space-y-3'>
           {filteredUsers.map((user) => (
             <Card key={user.id} className='bg-white border-gray-200'>
               <CardContent className='p-4'>
-                <div className='flex items-center justify-between'>
+                <div className='flex justify-between items-center'>
                   <div className='flex-1'>
-                    <div className='flex items-center justify-between mb-2'>
+                    <div className='flex justify-between items-center mb-2'>
                       <div className='flex items-center space-x-3'>
                         <div className='flex items-center space-x-2'>
                           <h3 className='font-semibold text-gray-900'>
@@ -342,7 +342,7 @@ export default function AdminUserManagement({
                           <DropdownMenuItem
                             onClick={() => handleEditUser(user)}
                           >
-                            <Edit className='w-4 h-4 mr-2' />
+                            <Edit className='mr-2 w-4 h-4' />
                             정보 수정
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -351,7 +351,7 @@ export default function AdminUserManagement({
                           >
                             {isUpdating === user.id
                               ? "처리 중..."
-                              : user.status === "active" || user.status === null
+                              : user.status === "ACTIVE" || user.status === null
                               ? "비활성화"
                               : "활성화"}
                           </DropdownMenuItem>

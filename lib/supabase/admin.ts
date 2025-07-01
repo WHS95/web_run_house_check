@@ -517,26 +517,35 @@ export async function getAllUsers(): Promise<GetAllUsersReturn> {
 /**
  * 사용자 상태를 업데이트합니다 (활성/비활성)
  */
-export async function updateUserStatus(userId: string, isActive: boolean) {
+export async function updateUserStatus(
+  userId: string,
+  crewId: string,
+  isActive: boolean,
+  suspensionReason?: string
+) {
   try {
     const supabase = await createClient();
 
     const updateData: any = {
-      status: isActive ? "active" : "suspended",
-      updated_at: new Date().toISOString(),
+      status: isActive ? "ACTIVE" : "SUSPENDED",
     };
 
     if (!isActive) {
       updateData.suspended_at = new Date().toISOString();
+      if (suspensionReason) {
+        updateData.suspension_reason = suspensionReason;
+      }
     } else {
       updateData.suspended_at = null;
+      updateData.suspension_reason = null;
     }
 
     const { data, error } = await supabase
       .schema("attendance")
-      .from("users")
+      .from("user_crews")
       .update(updateData)
-      .eq("id", userId)
+      .eq("user_id", userId)
+      .eq("crew_id", crewId)
       .select()
       .single();
 
@@ -544,7 +553,7 @@ export async function updateUserStatus(userId: string, isActive: boolean) {
 
     return { data, error: null };
   } catch (error) {
-    console.error("사용자 상태 업데이트 오류:", error);
+    console.error("사용자 크루 상태 업데이트 오류:", error);
     return { data: null, error };
   }
 }
@@ -586,71 +595,39 @@ export async function updateUserInfo(
 }
 
 /**
- * 특정 크루의 사용자 목록을 가져옵니다.
+ * ⚡ 최적화된 크루별 사용자 목록 조회 함수 (PostgreSQL 함수 사용)
+ * N+1 쿼리 문제를 해결하여 성능을 크게 향상시킵니다.
  */
-export async function getUsersByCrewId(
+export async function getUsersByCrewIdOptimized(
   crewId: string
 ): Promise<GetAllUsersReturn> {
   try {
     const supabase = await createClient();
 
-    const { data, error } = await supabase
+    // PostgreSQL 함수 호출 (특정 crew_id)
+    const { data: functionResult, error } = await supabase
       .schema("attendance")
-      .from("users")
-      .select(
-        `
-        id,
-        email,
-        first_name,
-        birth_year,
-        phone,
-        profile_image_url,
-        is_crew_verified,
-        verified_crew_id,
-        created_at,
-        join_date,
-        status
-      `
-      )
-      .eq("verified_crew_id", crewId)
-      .order("created_at", { ascending: false });
+      .rpc("get_admin_users_unified", { p_crew_id: crewId });
 
     if (error) {
-      console.error("크루별 사용자 목록 조회 오류 (Supabase):", error);
+      console.error(
+        "최적화된 크루별 사용자 목록 조회 오류 (PostgreSQL Function):",
+        error
+      );
       return { data: null, error: new Error(error.message) };
     }
 
-    if (!data) return { data: [], error: null };
-
-    // 각 사용자의 최근 출석 정보를 별도로 조회 (삭제되지 않은 기록만)
-    const usersWithAttendance: UserForAdmin[] = [];
-
-    for (const user of data) {
-      // 최근 출석 정보 조회 (soft delete 적용)
-      const { data: attendanceData } = await supabase
-        .schema("attendance")
-        .from("attendance_records")
-        .select("attendance_timestamp")
-        .eq("user_id", user.id)
-        .eq("crew_id", crewId) // 크루 ID 조건 추가
-        .is("deleted_at", null) // 삭제되지 않은 기록만
-        .order("attendance_timestamp", { ascending: false })
-        .limit(1);
-      // console.log("--------------------------------");
-      // console.log("user.id", user.id);
-      // console.log("attendanceData", attendanceData);
-
-      const userWithAttendance: UserForAdmin = {
-        ...user,
-        last_attendance_date: attendanceData?.[0]?.attendance_timestamp || null,
+    if (!functionResult?.success) {
+      return {
+        data: null,
+        error: new Error(functionResult?.error || "Unknown error"),
       };
-
-      usersWithAttendance.push(userWithAttendance);
     }
 
-    return { data: usersWithAttendance, error: null };
+    const users = functionResult.data as UserForAdmin[];
+    return { data: users || [], error: null };
   } catch (error: any) {
-    console.error("크루별 사용자 목록 조회 오류 (Catch):", error);
+    console.error("최적화된 크루별 사용자 목록 조회 오류 (Catch):", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),

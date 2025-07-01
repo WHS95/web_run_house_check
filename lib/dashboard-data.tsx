@@ -1,4 +1,4 @@
-import { Users, Calendar, DollarSign } from "lucide-react";
+import { Users, Calendar } from "lucide-react";
 import React from "react";
 
 export interface DataPoint {

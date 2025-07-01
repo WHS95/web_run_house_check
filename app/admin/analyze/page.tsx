@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAdminContext } from "../AdminContextProvider";
 import ChartWithAxis from "@/components/molecules/ChartWithAxis";
 import LocationChart from "@/components/molecules/LocationChart";
@@ -114,41 +114,44 @@ export default function AnalyzePage() {
   // 월 옵션 생성
   const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
 
-  const fetchAnalyzeData = async (year: number, month: number) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const fetchAnalyzeData = useCallback(
+    async (year: number, month: number) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const response = await fetch(
-        `/api/admin/analyze?crewId=${crewId}&year=${year}&month=${month}`
-      );
+        const response = await fetch(
+          `/api/admin/analyze?crewId=${crewId}&year=${year}&month=${month}`
+        );
 
-      if (!response.ok) {
-        throw new Error("통계 데이터를 가져오는데 실패했습니다.");
+        if (!response.ok) {
+          throw new Error("통계 데이터를 가져오는데 실패했습니다.");
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          setAnalyzeData(result.data);
+        } else {
+          throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
+        }
+      } catch (err) {
+        console.error("분석 데이터 조회 오류:", err);
+        setError(
+          err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+        );
+      } finally {
+        setIsLoading(false);
       }
-
-      const result = await response.json();
-
-      if (result.success) {
-        setAnalyzeData(result.data);
-      } else {
-        throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
-      }
-    } catch (err) {
-      console.error("분석 데이터 조회 오류:", err);
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [crewId]
+  );
 
   useEffect(() => {
     if (crewId) {
       fetchAnalyzeData(selectedYear, selectedMonth);
     }
-  }, [crewId, selectedYear, selectedMonth]);
+  }, [crewId, selectedYear, selectedMonth, fetchAnalyzeData]);
 
   if (isLoading) {
     return <AnalyzeLoadingSkeleton />;

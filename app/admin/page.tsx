@@ -11,17 +11,17 @@ function AdminDashboardSkeleton() {
       {/* 헤더 스켈레톤 */}
       <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
         <div className='px-4 py-3'>
-          <div className='flex items-center justify-between'>
+          <div className='flex justify-between items-center'>
             <div>
               <div className='w-20 h-8 bg-gray-200 rounded animate-pulse'></div>
-              <div className='w-16 h-4 mt-1 bg-gray-200 rounded animate-pulse'></div>
+              <div className='mt-1 w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className='flex-1 pb-24 overflow-y-auto bg-gray-50'>
-        <div className='max-w-md px-4 py-3 mx-auto'>
+      <div className='overflow-y-auto flex-1 pb-24 bg-gray-50'>
+        <div className='px-4 py-3 mx-auto max-w-md'>
           {/* 기본 통계 스켈레톤 */}
           <div className='space-y-4'>
             <div className='grid grid-cols-3 gap-3'>
@@ -31,7 +31,7 @@ function AdminDashboardSkeleton() {
                     <div className='w-8 h-8 bg-gray-200 rounded-xl animate-pulse'></div>
                     <div>
                       <div className='w-12 h-3 bg-gray-200 rounded animate-pulse'></div>
-                      <div className='w-16 h-6 mt-1 bg-gray-200 rounded animate-pulse'></div>
+                      <div className='mt-1 w-16 h-6 bg-gray-200 rounded animate-pulse'></div>
                     </div>
                   </div>
                 </div>
@@ -49,10 +49,10 @@ function AdminDashboardSkeleton() {
             <div className='space-y-3'>
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className='p-3 bg-white rounded-lg shadow-sm'>
-                  <div className='flex items-center justify-between'>
+                  <div className='flex justify-between items-center'>
                     <div>
                       <div className='w-20 h-4 bg-gray-200 rounded animate-pulse'></div>
-                      <div className='w-16 h-6 mt-1 bg-gray-200 rounded animate-pulse'></div>
+                      <div className='mt-1 w-16 h-6 bg-gray-200 rounded animate-pulse'></div>
                     </div>
                     <div className='w-12 h-6 bg-gray-200 rounded animate-pulse'></div>
                   </div>
@@ -73,14 +73,26 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 년도/월 상태 관리 (기본값: 현재 년월)
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(
+    currentDate.getMonth() + 1
+  );
+
   useEffect(() => {
     async function fetchStats() {
       try {
         setIsLoading(true);
-        // 통합 API 사용: /api/admin/attendance?type=stats
-        const response = await fetch(
-          `/api/admin/attendance?crewId=${crewId}&type=stats`
-        );
+        // 년도/월 파라미터 추가하여 API 호출
+        const params = new URLSearchParams({
+          crewId,
+          type: "stats",
+          year: selectedYear.toString(),
+          month: selectedMonth.toString(),
+        });
+
+        const response = await fetch(`/api/admin/attendance?${params}`);
 
         if (!response.ok) {
           throw new Error("통계 데이터를 가져오는데 실패했습니다.");
@@ -101,7 +113,7 @@ export default function AdminPage() {
     if (crewId) {
       fetchStats();
     }
-  }, [crewId]);
+  }, [crewId, selectedYear, selectedMonth]);
 
   if (isLoading) {
     return <AdminDashboardSkeleton />;
@@ -109,8 +121,8 @@ export default function AdminPage() {
 
   if (error) {
     return (
-      <div className='flex items-center justify-center min-h-screen bg-gray-50'>
-        <div className='p-6 text-center bg-white border border-red-200 rounded-lg shadow-sm'>
+      <div className='flex justify-center items-center min-h-screen bg-gray-50'>
+        <div className='p-6 text-center bg-white rounded-lg border border-red-200 shadow-sm'>
           <h3 className='mb-2 text-lg font-semibold text-gray-900'>
             오류 발생
           </h3>
@@ -124,5 +136,55 @@ export default function AdminPage() {
     return <AdminDashboardSkeleton />;
   }
 
-  return <AdminDashboard stats={stats} />;
+  // 년도 옵션 생성 (현재년도 기준 ±2년)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+
+  // 월 옵션 생성
+  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  return (
+    <div className='flex flex-col h-screen'>
+      {/* 년도/월 선택 헤더 */}
+      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
+        <div className='px-4 py-3'>
+          <div className='flex justify-between items-center'>
+            <h1 className='text-xl font-bold text-gray-900'>Admin 대시보드</h1>
+
+            {/* 년도/월 선택 드롭다운 */}
+            <div className='flex items-center space-x-2'>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                className='px-3 py-1 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500'
+              >
+                {yearOptions.map((year) => (
+                  <option key={year} value={year}>
+                    {year}년
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                className='px-3 py-1 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500'
+              >
+                {monthOptions.map((month) => (
+                  <option key={month} value={month}>
+                    {month}월
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AdminDashboard 컴포넌트 */}
+      <div className='overflow-hidden flex-1'>
+        <AdminDashboard stats={stats} />
+      </div>
+    </div>
+  );
 }

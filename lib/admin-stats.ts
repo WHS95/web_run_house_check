@@ -754,3 +754,77 @@ export async function getAdminStats(crewId: string): Promise<AdminStats> {
     };
   }
 }
+
+// PostgreSQL 함수를 사용한 최적화된 Admin 통계 조회
+export async function getAdminStatsOptimized(
+  crewId: string,
+  targetYear?: number,
+  targetMonth?: number
+): Promise<AdminStats> {
+  const supabase = await createClient();
+
+  try {
+    // PostgreSQL 함수 호출
+    const { data, error } = await supabase
+      .schema("attendance")
+      .rpc("get_admin_stats", {
+        p_crew_id: crewId,
+        p_year: targetYear || null,
+        p_month: targetMonth || null,
+      });
+
+    if (error) {
+      console.error("Error calling get_admin_stats function:", error);
+      // fallback to existing function
+      return getAdminStats(crewId);
+    }
+
+    if (!data || !data.success) {
+      console.error("get_admin_stats function returned error:", data?.error);
+      // fallback to existing function
+      return getAdminStats(crewId);
+    }
+
+    const statsData = data.data;
+
+    return {
+      totalMembers: statsData.totalMembers,
+      todayAttendance: statsData.todayAttendance,
+      todayMeetingCount: statsData.todayMeetingCount,
+      newMembersThisMonth: statsData.newMembersThisMonth,
+      newMembersThisMonthChange: calculateChangePercentage(
+        statsData.newMembersThisMonth,
+        statsData.lastMonthNewMembers
+      ),
+      lastMonthNewMembers: statsData.lastMonthNewMembers,
+      monthlyMeetingCount: statsData.monthlyMeetingCount,
+      monthlyMeetingCountChange: calculateChangePercentage(
+        statsData.monthlyMeetingCount,
+        statsData.lastMonthMeetingCount
+      ),
+      lastMonthMeetingCount: statsData.lastMonthMeetingCount,
+      monthlyParticipationCount: statsData.monthlyParticipationCount,
+      monthlyParticipationCountChange: calculateChangePercentage(
+        statsData.monthlyParticipationCount,
+        statsData.lastMonthParticipationCount
+      ),
+      lastMonthParticipationCount: statsData.lastMonthParticipationCount,
+      monthlyParticipantCount: statsData.monthlyParticipantCount,
+      monthlyParticipantCountChange: calculateChangePercentage(
+        statsData.monthlyParticipantCount,
+        statsData.lastMonthParticipantCount
+      ),
+      lastMonthParticipantCount: statsData.lastMonthParticipantCount,
+      monthlyHostCount: statsData.monthlyHostCount,
+      monthlyHostCountChange: calculateChangePercentage(
+        statsData.monthlyHostCount,
+        statsData.lastMonthHostCount
+      ),
+      lastMonthHostCount: statsData.lastMonthHostCount,
+    };
+  } catch (error) {
+    console.error("Error in optimized admin stats:", error);
+    // fallback to existing function
+    return getAdminStats(crewId);
+  }
+}

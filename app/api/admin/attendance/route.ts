@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMonthlyAttendanceData } from "@/lib/supabase/admin";
-import { getAdminStats } from "@/lib/admin-stats";
+import { getAdminStatsOptimized } from "@/lib/admin-stats";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
@@ -34,7 +34,15 @@ export async function GET(request: NextRequest) {
     // 통계 데이터 요청 (대시보드용)
     if (type === "stats") {
       try {
-        const stats = await getAdminStats(crewId);
+        // 년도/월 파라미터 처리 (선택사항)
+        const targetYear = year ? parseInt(year) : undefined;
+        const targetMonth = month ? parseInt(month) : undefined;
+
+        const stats = await getAdminStatsOptimized(
+          crewId,
+          targetYear,
+          targetMonth
+        );
         return NextResponse.json(stats);
       } catch (error) {
         console.error("통계 데이터 조회 오류:", error);

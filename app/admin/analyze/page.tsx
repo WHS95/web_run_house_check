@@ -6,6 +6,14 @@ import ChartWithAxis from "@/components/molecules/ChartWithAxis";
 import LocationChart from "@/components/molecules/LocationChart";
 import MemberAttendanceStatusChart from "@/components/molecules/MemberAttendanceStatusChart";
 import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 interface DayParticipationData {
   dayName: string;
@@ -91,43 +99,56 @@ export default function AnalyzePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchAnalyzeData() {
-      try {
-        setIsLoading(true);
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;
+  // 년도/월 선택 상태 추가
+  const now = new Date();
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
 
-        const response = await fetch(
-          `/api/admin/analyze?crewId=${"5a9315f4-7e2d-45fb-b22a-2510426e6055"}&year=${currentYear}&month=${currentMonth}`
-        );
+  // 년도 옵션 생성 (현재 실제 년도 기준 ±2년)
+  const currentYear = now.getFullYear();
+  const yearOptions = [];
+  for (let i = currentYear - 2; i <= currentYear + 2; i++) {
+    yearOptions.push(i);
+  }
 
-        if (!response.ok) {
-          throw new Error("통계 데이터를 가져오는데 실패했습니다.");
-        }
+  // 월 옵션 생성
+  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
 
-        const result = await response.json();
+  const fetchAnalyzeData = async (year: number, month: number) => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        if (result.success) {
-          setAnalyzeData(result.data);
-        } else {
-          throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
-        }
-      } catch (err) {
-        console.error("분석 데이터 조회 오류:", err);
-        setError(
-          err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-        );
-      } finally {
-        setIsLoading(false);
+      const response = await fetch(
+        `/api/admin/analyze?crewId=${crewId}&year=${year}&month=${month}`
+      );
+
+      if (!response.ok) {
+        throw new Error("통계 데이터를 가져오는데 실패했습니다.");
       }
-    }
 
-    if (crewId) {
-      fetchAnalyzeData();
+      const result = await response.json();
+
+      if (result.success) {
+        setAnalyzeData(result.data);
+      } else {
+        throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
+      }
+    } catch (err) {
+      console.error("분석 데이터 조회 오류:", err);
+      setError(
+        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+      );
+    } finally {
+      setIsLoading(false);
     }
-  }, [crewId]);
+  };
+
+  useEffect(() => {
+    if (crewId) {
+      fetchAnalyzeData(selectedYear, selectedMonth);
+    }
+  }, [crewId, selectedYear, selectedMonth]);
 
   if (isLoading) {
     return <AnalyzeLoadingSkeleton />;
@@ -166,8 +187,60 @@ export default function AnalyzePage() {
         <div className='px-4 py-4'>
           <div className='flex justify-between items-center'>
             <div>
-              <h1 className='text-xl font-bold text-gray-900'>통계 분석</h1>
-              <p className='text-sm text-gray-500'>크루 활동 패턴 분석</p>
+              <h1 className='text-xl font-bold text-gray-900'>통계</h1>
+            </div>
+
+            {/* 년도/월 선택 드롭다운 */}
+            <div className='flex space-x-2'>
+              {/* 년도 선택 */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='bg-white min-w-20'
+                  >
+                    {selectedYear}년
+                    <ChevronDown className='ml-1 w-4 h-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  {yearOptions.map((year) => (
+                    <DropdownMenuItem
+                      key={year}
+                      onClick={() => setSelectedYear(year)}
+                      className={selectedYear === year ? "bg-blue-50" : ""}
+                    >
+                      {year}년
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* 월 선택 */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='bg-white min-w-16'
+                  >
+                    {selectedMonth}월
+                    <ChevronDown className='ml-1 w-4 h-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  {monthOptions.map((month) => (
+                    <DropdownMenuItem
+                      key={month}
+                      onClick={() => setSelectedMonth(month)}
+                      className={selectedMonth === month ? "bg-blue-50" : ""}
+                    >
+                      {month}월
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

@@ -5,7 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MoreVertical, ArrowUpDown, Edit, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  Search,
+  MoreVertical,
+  ArrowUpDown,
+  Edit,
+  ChevronDown,
+  ChevronRight,
+  CircleCheck,
+  CircleX,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -93,24 +102,48 @@ export default function AdminUserManagement({
     });
   };
 
+  // 검색어만 적용된 사용자 목록 (카운트 계산용)
+  const searchFilteredUsers = users.filter((user) => {
+    const userName = user.first_name || "";
+    const userPhone = user.phone || "";
+    const userEmail = user.email || "";
+
+    return (
+      userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      userPhone.includes(searchTerm) ||
+      userEmail.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  // 각 상태별 카운트 계산
+  const getStatusCounts = () => {
+    const total = searchFilteredUsers.length;
+    const active = searchFilteredUsers.filter(
+      (user) => user.status === "ACTIVE" || user.status === null
+    ).length;
+    const inactive = searchFilteredUsers.filter(
+      (user) => user.status === "SUSPENDED"
+    ).length;
+
+    return {
+      전체: total,
+      활성: active,
+      비활성: inactive,
+    };
+  };
+
+  const statusCounts = getStatusCounts();
+
+  // 최종 필터링 및 정렬된 사용자 목록
   const filteredUsers = sortUsers(
-    users.filter((user) => {
-      const userName = user.first_name || "";
-      const userPhone = user.phone || "";
-      const userEmail = user.email || "";
-
-      const matchesSearch =
-        userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        userPhone.includes(searchTerm) ||
-        userEmail.toLowerCase().includes(searchTerm.toLowerCase());
-
+    searchFilteredUsers.filter((user) => {
       const isActive = user.status === "ACTIVE" || user.status === null;
       const matchesStatus =
         statusFilter === "전체" ||
         (statusFilter === "활성" && isActive) ||
         (statusFilter === "비활성" && !isActive);
 
-      return matchesSearch && matchesStatus;
+      return matchesStatus;
     })
   );
 
@@ -194,7 +227,7 @@ export default function AdminUserManagement({
   };
 
   const toggleUserExpansion = (userId: string) => {
-    setExpandedUsers(prev => {
+    setExpandedUsers((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(userId)) {
         newSet.delete(userId);
@@ -205,30 +238,14 @@ export default function AdminUserManagement({
     });
   };
 
-  const toggleAllUsers = () => {
-    if (expandedUsers.size === filteredUsers.length) {
-      setExpandedUsers(new Set());
-    } else {
-      setExpandedUsers(new Set(filteredUsers.map(user => user.id)));
-    }
-  };
-
   const getStatusBadge = (status: string | null) => {
     // status가 'ACTIVE' 또는 null이면 활성, 'SUSPENDED'면 비활성
     const isActive = status === "ACTIVE" || status === null;
 
     if (isActive) {
-      return (
-        <Badge className='text-green-800 bg-green-100 hover:bg-green-100'>
-          활성
-        </Badge>
-      );
+      return <CircleCheck color='green' className='w-4 h-4  mr-1.5' />;
     } else {
-      return (
-        <Badge className='text-gray-800 bg-gray-100 hover:bg-gray-100'>
-          비활성
-        </Badge>
-      );
+      return <CircleX color='red' className='w-4 h-4  mr-1.5' />;
     }
   };
 
@@ -245,9 +262,9 @@ export default function AdminUserManagement({
   const getSortLabel = () => {
     switch (sortBy) {
       case "lastAttendance":
-        return `최근 참석일 ${sortOrder === "desc" ? "↓" : "↑"}`;
+        return `참석 ${sortOrder === "desc" ? "↓" : "↑"}`;
       case "joinDate":
-        return `가입일 ${sortOrder === "desc" ? "↓" : "↑"}`;
+        return `가입 ${sortOrder === "desc" ? "↓" : "↑"}`;
       case "name":
         return `이름 ${sortOrder === "desc" ? "↓" : "↑"}`;
       default:
@@ -281,46 +298,43 @@ export default function AdminUserManagement({
         {/* 상태 필터 탭과 정렬 */}
         <div className='flex justify-between items-center'>
           <div className='flex space-x-2'>
-            {["전체", "활성", "비활성"].map((status) => (
-              <Button
-                key={status}
-                variant={statusFilter === status ? "default" : "outline"}
-                size='sm'
-                onClick={() => setStatusFilter(status)}
-                className={`rounded-full ${
-                  statusFilter === status
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-600 border-gray-200"
-                }`}
-              >
-                {status}
-              </Button>
-            ))}
+            {/* 상태 필터 드롭다운 */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='bg-white rounded-full'
+                >
+                  <ChevronDown className='mr-1 w-4 h-4' />
+                  {statusFilter}
+                  <span className='ml-2 text-gray-500'>
+                    {statusCounts[statusFilter as keyof typeof statusCounts]}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='start'>
+                {["전체", "활성", "비활성"].map((status) => (
+                  <DropdownMenuItem
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={
+                      statusFilter === status ? "bg-blue-50  font-medium" : ""
+                    }
+                  >
+                    <div className='flex justify-between items-center w-full'>
+                      <span>{status}</span>
+                      <span className='ml-2 text-gray-500'>
+                        {statusCounts[status as keyof typeof statusCounts]}
+                      </span>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className='flex space-x-2'>
-            {/* 전체 펼치기/접기 버튼 */}
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={toggleAllUsers}
-              className='bg-white rounded-full'
-            >
-              {expandedUsers.size === filteredUsers.length ? (
-                <>
-                  <ChevronRight className='mr-1 w-4 h-4' />
-                  <span className='hidden sm:inline'>전체 접기</span>
-                  <span className='sm:hidden'>접기</span>
-                </>
-              ) : (
-                <>
-                  <ChevronDown className='mr-1 w-4 h-4' />
-                  <span className='hidden sm:inline'>전체 펼치기</span>
-                  <span className='sm:hidden'>펼치기</span>
-                </>
-              )}
-            </Button>
-
             {/* 정렬 드롭다운 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -335,13 +349,13 @@ export default function AdminUserManagement({
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
                 <DropdownMenuItem onClick={() => handleSort("lastAttendance")}>
-                  최근 참석일순
+                  참석
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleSort("joinDate")}>
-                  가입일순
+                  가입
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleSort("name")}>
-                  이름순
+                  이름
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -355,35 +369,23 @@ export default function AdminUserManagement({
         <div className='space-y-3'>
           {filteredUsers.map((user) => {
             const isExpanded = expandedUsers.has(user.id);
-            
+
             return (
               <Card key={user.id} className='bg-white border-gray-200'>
-                <CardContent className='p-4'>
+                <CardContent className='px-3 py-2'>
                   {/* 메인 사용자 정보 */}
                   <div className='flex justify-between items-center'>
                     <div className='flex-1'>
                       <div className='flex justify-between items-center'>
                         <div className='flex items-center space-x-2 sm:space-x-3'>
                           <div className='flex items-center space-x-2'>
-                            <h3 className='font-semibold text-gray-900 text-base sm:text-lg'>
+                            <h3 className='text-base font-semibold text-gray-900 sm:text-lg'>
                               {getUserDisplayName(user)}
                             </h3>
                             {getStatusBadge(user.status)}
                           </div>
-                          
-                          {/* 아코디언 토글 버튼 */}
-                          <Button
-                            variant='ghost'
-                            size='sm'
-                            onClick={() => toggleUserExpansion(user.id)}
-                            className='p-1 h-8 w-8 sm:h-6 sm:w-6 transition-transform duration-200'
-                          >
-                            <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${
-                              isExpanded ? 'rotate-90' : 'rotate-0'
-                            }`} />
-                          </Button>
                         </div>
-                        
+
                         <div className='flex items-center space-x-2'>
                           {/* 최근 참석일 (항상 표시) */}
                           <span
@@ -403,7 +405,20 @@ export default function AdminUserManagement({
                           >
                             {getDaysAgo(user.last_attendance_date)}
                           </span>
-                          
+
+                          {/* 아코디언 토글 버튼 */}
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => toggleUserExpansion(user.id)}
+                            className='p-1 w-8 h-8 transition-transform duration-200 sm:h-6 sm:w-6'
+                          >
+                            <ChevronRight
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                isExpanded ? "rotate-90" : "rotate-0"
+                              }`}
+                            />
+                          </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -428,7 +443,8 @@ export default function AdminUserManagement({
                               >
                                 {isUpdating === user.id
                                   ? "처리 중..."
-                                  : user.status === "ACTIVE" || user.status === null
+                                  : user.status === "ACTIVE" ||
+                                    user.status === null
                                   ? "비활성화"
                                   : "활성화"}
                               </DropdownMenuItem>
@@ -440,14 +456,18 @@ export default function AdminUserManagement({
                   </div>
 
                   {/* 펼쳐진 상세 정보 */}
-                  <div className={`overflow-hidden transition-all duration-300 ${
-                    isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                  }`}>
-                    <div className='mt-3 pt-3 border-t border-gray-100'>
-                      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600'>
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ${
+                      isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className='pt-3 mt-3 border-t border-gray-100'>
+                      <div className='grid grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-2'>
                         <div className='flex justify-between'>
                           <span className='font-medium'>연락처</span>
-                          <span className='text-right break-all'>{getUserContactInfo(user)}</span>
+                          <span className='text-right break-all'>
+                            {getUserContactInfo(user)}
+                          </span>
                         </div>
                         <div className='flex justify-between'>
                           <span className='font-medium'>가입일</span>
@@ -458,13 +478,17 @@ export default function AdminUserManagement({
                         {user.birth_year && (
                           <div className='flex justify-between'>
                             <span className='font-medium'>출생연도</span>
-                            <span className='text-right'>{user.birth_year}년생</span>
+                            <span className='text-right'>
+                              {user.birth_year}
+                            </span>
                           </div>
                         )}
                         <div className='flex justify-between'>
                           <span className='font-medium'>최근 참석일</span>
                           <span className='text-right'>
-                            {user.last_attendance_date ? formatDate(user.last_attendance_date) : "출석 기록 없음"}
+                            {user.last_attendance_date
+                              ? formatDate(user.last_attendance_date)
+                              : "출석 기록 없음"}
                           </span>
                         </div>
                       </div>

@@ -6,8 +6,8 @@ const UltraFastAttendanceTemplate = nextDynamic(
   () => import("@/components/templates/UltraFastAttendanceTemplate"),
   {
     loading: () => (
-      <div className='flex items-center justify-center min-h-screen bg-basic-black'>
-        <div className='w-8 h-8 border-2 border-blue-500 rounded-full animate-spin border-t-transparent'></div>
+      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
+        <div className='w-8 h-8 rounded-full border-2 border-blue-500 animate-spin border-t-transparent'></div>
       </div>
     ),
     ssr: false, // 클라이언트 사이드에서만 렌더링
@@ -28,15 +28,15 @@ const AttendancePageFallback = () => (
   <div className='min-h-screen bg-basic-black'>
     <div className='pt-safe'>
       <div className='flex items-center justify-between w-full px-4 py-4 border-b border-[#EAEAF3]'>
-        <div className='w-20 h-6 rounded bg-basic-black animate-pulse'></div>
-        <div className='w-6 h-6 rounded bg-basic-black animate-pulse'></div>
+        <div className='w-20 h-6 rounded animate-pulse bg-basic-black'></div>
+        <div className='w-6 h-6 rounded animate-pulse bg-basic-black'></div>
       </div>
     </div>
     <div className='px-4 pt-6 space-y-6'>
       {Array.from({ length: 5 }).map((_, index) => (
         <div key={index} className='animate-pulse'>
-          <div className='w-24 h-4 mb-3 rounded bg-basic-black'></div>
-          <div className='h-12 bg-basic-black rounded-xl'></div>
+          <div className='mb-3 w-24 h-4 rounded bg-basic-black'></div>
+          <div className='h-12 rounded-xl bg-basic-black'></div>
         </div>
       ))}
     </div>

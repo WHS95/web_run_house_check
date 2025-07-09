@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MoreVertical, ArrowUpDown, Edit } from "lucide-react";
+import { Search, MoreVertical, ArrowUpDown, Edit, ChevronDown, ChevronRight } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,6 +57,7 @@ export default function AdminUserManagement({
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserForAdmin | null>(null);
+  const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
 
   // 정렬 함수
   const sortUsers = (users: UserForAdmin[]) => {
@@ -192,6 +193,26 @@ export default function AdminUserManagement({
     }
   };
 
+  const toggleUserExpansion = (userId: string) => {
+    setExpandedUsers(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(userId)) {
+        newSet.delete(userId);
+      } else {
+        newSet.add(userId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleAllUsers = () => {
+    if (expandedUsers.size === filteredUsers.length) {
+      setExpandedUsers(new Set());
+    } else {
+      setExpandedUsers(new Set(filteredUsers.map(user => user.id)));
+    }
+  };
+
   const getStatusBadge = (status: string | null) => {
     // status가 'ACTIVE' 또는 null이면 활성, 'SUSPENDED'면 비활성
     const isActive = status === "ACTIVE" || status === null;
@@ -277,30 +298,54 @@ export default function AdminUserManagement({
             ))}
           </div>
 
-          {/* 정렬 드롭다운 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant='outline'
-                size='sm'
-                className='bg-white rounded-full'
-              >
-                <ArrowUpDown className='mr-1 w-4 h-4' />
-                {getSortLabel()}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem onClick={() => handleSort("lastAttendance")}>
-                최근 참석일순
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleSort("joinDate")}>
-                가입일순
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleSort("name")}>
-                이름순
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className='flex space-x-2'>
+            {/* 전체 펼치기/접기 버튼 */}
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={toggleAllUsers}
+              className='bg-white rounded-full'
+            >
+              {expandedUsers.size === filteredUsers.length ? (
+                <>
+                  <ChevronRight className='mr-1 w-4 h-4' />
+                  <span className='hidden sm:inline'>전체 접기</span>
+                  <span className='sm:hidden'>접기</span>
+                </>
+              ) : (
+                <>
+                  <ChevronDown className='mr-1 w-4 h-4' />
+                  <span className='hidden sm:inline'>전체 펼치기</span>
+                  <span className='sm:hidden'>펼치기</span>
+                </>
+              )}
+            </Button>
+
+            {/* 정렬 드롭다운 */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='bg-white rounded-full'
+                >
+                  <ArrowUpDown className='mr-1 w-4 h-4' />
+                  {getSortLabel()}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end'>
+                <DropdownMenuItem onClick={() => handleSort("lastAttendance")}>
+                  최근 참석일순
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSort("joinDate")}>
+                  가입일순
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSort("name")}>
+                  이름순
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
@@ -308,94 +353,127 @@ export default function AdminUserManagement({
       <div className='overflow-y-auto flex-1 px-4 pt-32 pb-24'>
         {/* 사용자 목록 */}
         <div className='space-y-3'>
-          {filteredUsers.map((user) => (
-            <Card key={user.id} className='bg-white border-gray-200'>
-              <CardContent className='p-4'>
-                <div className='flex justify-between items-center'>
-                  <div className='flex-1'>
-                    <div className='flex justify-between items-center mb-2'>
-                      <div className='flex items-center space-x-3'>
-                        <div className='flex items-center space-x-2'>
-                          <h3 className='font-semibold text-gray-900'>
-                            {getUserDisplayName(user)}
-                          </h3>
-                          {user.birth_year && (
-                            <span className='text-sm text-gray-500'>
-                              ({user.birth_year}년생)
-                            </span>
-                          )}
-                        </div>
-                        {getStatusBadge(user.status)}
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+          {filteredUsers.map((user) => {
+            const isExpanded = expandedUsers.has(user.id);
+            
+            return (
+              <Card key={user.id} className='bg-white border-gray-200'>
+                <CardContent className='p-4'>
+                  {/* 메인 사용자 정보 */}
+                  <div className='flex justify-between items-center'>
+                    <div className='flex-1'>
+                      <div className='flex justify-between items-center'>
+                        <div className='flex items-center space-x-2 sm:space-x-3'>
+                          <div className='flex items-center space-x-2'>
+                            <h3 className='font-semibold text-gray-900 text-base sm:text-lg'>
+                              {getUserDisplayName(user)}
+                            </h3>
+                            {getStatusBadge(user.status)}
+                          </div>
+                          
+                          {/* 아코디언 토글 버튼 */}
                           <Button
                             variant='ghost'
-                            size='icon'
-                            className='w-8 h-8'
-                            disabled={isUpdating === user.id}
+                            size='sm'
+                            onClick={() => toggleUserExpansion(user.id)}
+                            className='p-1 h-8 w-8 sm:h-6 sm:w-6 transition-transform duration-200'
                           >
-                            <MoreVertical className='w-4 h-4' />
+                            <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${
+                              isExpanded ? 'rotate-90' : 'rotate-0'
+                            }`} />
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                          <DropdownMenuItem
-                            onClick={() => handleEditUser(user)}
+                        </div>
+                        
+                        <div className='flex items-center space-x-2'>
+                          {/* 최근 참석일 (항상 표시) */}
+                          <span
+                            className={`text-xs sm:text-sm font-medium ${
+                              user.last_attendance_date &&
+                              new Date(user.last_attendance_date) >
+                                new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                                ? "text-green-600"
+                                : user.last_attendance_date &&
+                                  new Date(user.last_attendance_date) >
+                                    new Date(
+                                      Date.now() - 30 * 24 * 60 * 60 * 1000
+                                    )
+                                ? "text-yellow-600"
+                                : "text-red-600"
+                            }`}
                           >
-                            <Edit className='mr-2 w-4 h-4' />
-                            정보 수정
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleToggleUserStatus(user.id)}
-                            disabled={isUpdating === user.id}
-                          >
-                            {isUpdating === user.id
-                              ? "처리 중..."
-                              : user.status === "ACTIVE" || user.status === null
-                              ? "비활성화"
-                              : "활성화"}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-
-                    <div className='space-y-1 text-sm text-gray-600'>
-                      <div className='flex justify-between'>
-                        <span>연락처</span>
-                        <span>{getUserContactInfo(user)}</span>
-                      </div>
-                      <div className='flex justify-between'>
-                        <span>가입일</span>
-                        <span>
-                          {formatDate(user.join_date || user.created_at)}
-                        </span>
-                      </div>
-                      <div className='flex justify-between'>
-                        <span>최근 참석일</span>
-                        <span
-                          className={`font-medium ${
-                            user.last_attendance_date &&
-                            new Date(user.last_attendance_date) >
-                              new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-                              ? "text-green-600"
-                              : user.last_attendance_date &&
-                                new Date(user.last_attendance_date) >
-                                  new Date(
-                                    Date.now() - 30 * 24 * 60 * 60 * 1000
-                                  )
-                              ? "text-yellow-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {getDaysAgo(user.last_attendance_date)}
-                        </span>
+                            {getDaysAgo(user.last_attendance_date)}
+                          </span>
+                          
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                className='w-8 h-8 sm:w-8 sm:h-8'
+                                disabled={isUpdating === user.id}
+                              >
+                                <MoreVertical className='w-4 h-4' />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align='end'>
+                              <DropdownMenuItem
+                                onClick={() => handleEditUser(user)}
+                              >
+                                <Edit className='mr-2 w-4 h-4' />
+                                정보 수정
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleToggleUserStatus(user.id)}
+                                disabled={isUpdating === user.id}
+                              >
+                                {isUpdating === user.id
+                                  ? "처리 중..."
+                                  : user.status === "ACTIVE" || user.status === null
+                                  ? "비활성화"
+                                  : "활성화"}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                  {/* 펼쳐진 상세 정보 */}
+                  <div className={`overflow-hidden transition-all duration-300 ${
+                    isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}>
+                    <div className='mt-3 pt-3 border-t border-gray-100'>
+                      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600'>
+                        <div className='flex justify-between'>
+                          <span className='font-medium'>연락처</span>
+                          <span className='text-right break-all'>{getUserContactInfo(user)}</span>
+                        </div>
+                        <div className='flex justify-between'>
+                          <span className='font-medium'>가입일</span>
+                          <span className='text-right'>
+                            {formatDate(user.join_date || user.created_at)}
+                          </span>
+                        </div>
+                        {user.birth_year && (
+                          <div className='flex justify-between'>
+                            <span className='font-medium'>출생연도</span>
+                            <span className='text-right'>{user.birth_year}년생</span>
+                          </div>
+                        )}
+                        <div className='flex justify-between'>
+                          <span className='font-medium'>최근 참석일</span>
+                          <span className='text-right'>
+                            {user.last_attendance_date ? formatDate(user.last_attendance_date) : "출석 기록 없음"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {filteredUsers.length === 0 && (

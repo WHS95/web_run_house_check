@@ -14,6 +14,328 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+
+// 요일별 참여율 분석 데이터 조회
+async function getDayParticipationAnalysis(
+  supabase: any,
+  crewId: string,
+  year: number,
+  month: number
+): Promise<DayParticipationData[]> {
+  // 한국 시간 기준으로 해당 월의 첫째 날과 마지막 날 계산
+  const startDateStr = `${year}-${month.toString().padStart(2, "0")}-01`;
+  const lastDayOfMonth = new Date(year, month, 0).getDate();
+  const endDateStr = `${year}-${month
+    .toString()
+    .padStart(2, "0")}-${lastDayOfMonth.toString().padStart(2, "0")}`;
+
+  // 한국 시간 기준으로 UTC 범위 계산
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+
+  // 한국 시간 00:00:00을 UTC로 변환 (UTC-9시간)
+  const startUTC = new Date(startDate.getTime() - 9 * 60 * 60 * 1000);
+  // 한국 시간 23:59:59를 UTC로 변환 (UTC-9시간, +24시간-1ms)
+  const endUTC = new Date(
+    endDate.getTime() + 24 * 60 * 60 * 1000 - 1 - 9 * 60 * 60 * 1000
+  );
+
+  // 1단계: 크루의 활성 멤버들의 user_id 조회
+  const { data: activeMembers, error: memberError } = await supabase
+    .schema("attendance")
+    .from("user_crews")
+    .select("user_id")
+    .eq("crew_id", crewId)
+    .eq("status", "ACTIVE");
+
+  if (memberError) {
+    throw new Error("활성 멤버 조회에 실패했습니다.");
+  }
+
+  if (!activeMembers || activeMembers.length === 0) {
+    const dayInfo = [
+      { name: "일요일", color: "bg-basic-black-gray" },
+      { name: "월요일", color: "bg-basic-black-gray" },
+      { name: "화요일", color: "bg-basic-black-gray" },
+      { name: "수요일", color: "bg-basic-black-gray" },
+      { name: "목요일", color: "bg-basic-black-gray" },
+      { name: "금요일", color: "bg-basic-black-gray" },
+      { name: "토요일", color: "bg-basic-black-gray" },
+    ];
+
+    return Array.from({ length: 7 }, (_, index) => ({
+      dayName: dayInfo[index].name,
+      dayIndex: index,
+      participationRate: 0,
+      participantCount: 0,
+      totalMembers: 0,
+      color: dayInfo[index].color,
+    }));
+  }
+
+  const activeMemberIds = activeMembers.map((member: any) => member.user_id);
+
+  // 2단계: 활성 멤버들의 출석 기록 조회
+  const { data: attendanceData, error: attendanceError } = await supabase
+    .schema("attendance")
+    .from("attendance_records")
+    .select("user_id, attendance_timestamp")
+    .eq("crew_id", crewId)
+    .in("user_id", activeMemberIds)
+    .is("deleted_at", null)
+    .gte("attendance_timestamp", startUTC.toISOString())
+    .lte("attendance_timestamp", endUTC.toISOString());
+
+  if (attendanceError) {
+    throw new Error("출석 데이터 조회에 실패했습니다.");
+  }
+
+  // 요일별 출석 횟수 집계
+  const dayAttendanceCounts: { [key: number]: number } = {
+    0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0,
+  };
+
+  let totalAttendanceCount = 0;
+
+  attendanceData?.forEach((record: any) => {
+    const utcDate = new Date(record.attendance_timestamp);
+    const koreanDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+    const koreanYear = koreanDate.getUTCFullYear();
+    const koreanMonth = koreanDate.getUTCMonth() + 1;
+
+    if (koreanYear === year && koreanMonth === month) {
+      const dayOfWeek = koreanDate.getUTCDay();
+      dayAttendanceCounts[dayOfWeek]++;
+      totalAttendanceCount++;
+    }
+  });
+
+  const dayInfo = [
+    { name: "일요일", color: "bg-basic-blue" },
+    { name: "월요일", color: "bg-basic-blue" },
+    { name: "화요일", color: "bg-basic-blue" },
+    { name: "수요일", color: "bg-basic-blue" },
+    { name: "목요일", color: "bg-basic-blue" },
+    { name: "금요일", color: "bg-basic-blue" },
+    { name: "토요일", color: "bg-basic-blue" },
+  ];
+
+  const result: DayParticipationData[] = Array.from(
+    { length: 7 },
+    (_, index) => {
+      const dayAttendanceCount = dayAttendanceCounts[index];
+      const participationRate =
+        totalAttendanceCount > 0
+          ? Math.round((dayAttendanceCount / totalAttendanceCount) * 100)
+          : 0;
+
+      return {
+        dayName: dayInfo[index].name,
+        dayIndex: index,
+        participationRate,
+        participantCount: dayAttendanceCount,
+        totalMembers: totalAttendanceCount,
+        color: dayInfo[index].color,
+      };
+    }
+  );
+
+  return result.sort((a, b) => b.participationRate - a.participationRate);
+}
+
+// 장소별 참여율 분석 데이터 조회
+async function getLocationParticipationAnalysis(
+  supabase: any,
+  crewId: string,
+  year: number,
+  month: number
+): Promise<LocationParticipationData[]> {
+  const startDateStr = `${year}-${month.toString().padStart(2, "0")}-01`;
+  const lastDayOfMonth = new Date(year, month, 0).getDate();
+  const endDateStr = `${year}-${month
+    .toString()
+    .padStart(2, "0")}-${lastDayOfMonth.toString().padStart(2, "0")}`;
+
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+
+  const startUTC = new Date(startDate.getTime() - 9 * 60 * 60 * 1000);
+  const endUTC = new Date(
+    endDate.getTime() + 24 * 60 * 60 * 1000 - 1 - 9 * 60 * 60 * 1000
+  );
+
+  const { data: activeMembers, error: memberError } = await supabase
+    .schema("attendance")
+    .from("user_crews")
+    .select("user_id")
+    .eq("crew_id", crewId)
+    .eq("status", "ACTIVE");
+
+  if (memberError) {
+    throw new Error("활성 멤버 조회에 실패했습니다.");
+  }
+
+  if (!activeMembers || activeMembers.length === 0) {
+    return [];
+  }
+
+  const activeMemberIds = activeMembers.map((member: any) => member.user_id);
+
+  const { data: attendanceData, error: attendanceError } = await supabase
+    .schema("attendance")
+    .from("attendance_records")
+    .select("location, attendance_timestamp")
+    .eq("crew_id", crewId)
+    .in("user_id", activeMemberIds)
+    .is("deleted_at", null)
+    .gte("attendance_timestamp", startUTC.toISOString())
+    .lte("attendance_timestamp", endUTC.toISOString());
+
+  if (attendanceError) {
+    throw new Error("출석 데이터 조회에 실패했습니다.");
+  }
+
+  const locationCounts: { [key: string]: number } = {};
+  let totalAttendanceCount = 0;
+
+  attendanceData?.forEach((record: any) => {
+    const utcDate = new Date(record.attendance_timestamp);
+    const koreanDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+    const koreanYear = koreanDate.getUTCFullYear();
+    const koreanMonth = koreanDate.getUTCMonth() + 1;
+
+    if (koreanYear === year && koreanMonth === month) {
+      const location = record.location || "기타";
+      locationCounts[location] = (locationCounts[location] || 0) + 1;
+      totalAttendanceCount++;
+    }
+  });
+
+  const generateColor = (locationName: string, index: number) => {
+    const colors = [
+      "bg-basic-blue",
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-yellow-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-red-500",
+      "bg-teal-500",
+      "bg-orange-500",
+    ];
+    return colors[index % colors.length];
+  };
+
+  const result: LocationParticipationData[] = Object.entries(locationCounts)
+    .map(([locationName, attendanceCount], index) => {
+      const participationRate =
+        totalAttendanceCount > 0
+          ? Math.round((attendanceCount / totalAttendanceCount) * 100)
+          : 0;
+
+      return {
+        locationName,
+        participationRate,
+        attendanceCount,
+        totalAttendance: totalAttendanceCount,
+        color: generateColor(locationName, index),
+      };
+    })
+    .sort((a, b) => b.participationRate - a.participationRate);
+
+  return result;
+}
+
+// 전체 인원 대비 출석 현황 분석
+async function getMemberAttendanceStatus(
+  supabase: any,
+  crewId: string,
+  year: number,
+  month: number
+): Promise<MemberAttendanceStatusData> {
+  const startDateStr = `${year}-${month.toString().padStart(2, "0")}-01`;
+  const lastDayOfMonth = new Date(year, month, 0).getDate();
+  const endDateStr = `${year}-${month
+    .toString()
+    .padStart(2, "0")}-${lastDayOfMonth.toString().padStart(2, "0")}`;
+
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+
+  const startUTC = new Date(startDate.getTime() - 9 * 60 * 60 * 1000);
+  const endUTC = new Date(
+    endDate.getTime() + 24 * 60 * 60 * 1000 - 1 - 9 * 60 * 60 * 1000
+  );
+
+  const { data: activeMembers, error: memberError } = await supabase
+    .schema("attendance")
+    .from("user_crews")
+    .select("user_id")
+    .eq("crew_id", crewId)
+    .eq("status", "ACTIVE");
+
+  if (memberError) {
+    throw new Error("활성 멤버 조회에 실패했습니다.");
+  }
+
+  const totalActiveMembers = activeMembers?.length || 0;
+
+  if (totalActiveMembers === 0) {
+    return {
+      totalActiveMembers: 0,
+      attendedMembers: 0,
+      attendanceRate: 0,
+      absentMembers: 0,
+      absentRate: 0,
+    };
+  }
+
+  const activeMemberIds = activeMembers.map((member: any) => member.user_id);
+
+  const { data: attendanceData, error: attendanceError } = await supabase
+    .schema("attendance")
+    .from("attendance_records")
+    .select("user_id, attendance_timestamp")
+    .eq("crew_id", crewId)
+    .in("user_id", activeMemberIds)
+    .is("deleted_at", null)
+    .gte("attendance_timestamp", startUTC.toISOString())
+    .lte("attendance_timestamp", endUTC.toISOString());
+
+  if (attendanceError) {
+    throw new Error("출석 데이터 조회에 실패했습니다.");
+  }
+
+  const attendedMemberIds = new Set<string>();
+
+  attendanceData?.forEach((record: any) => {
+    const utcDate = new Date(record.attendance_timestamp);
+    const koreanDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+    const koreanYear = koreanDate.getUTCFullYear();
+    const koreanMonth = koreanDate.getUTCMonth() + 1;
+
+    if (koreanYear === year && koreanMonth === month) {
+      attendedMemberIds.add(record.user_id);
+    }
+  });
+
+  const attendedMembers = attendedMemberIds.size;
+  const absentMembers = totalActiveMembers - attendedMembers;
+  const attendanceRate = Math.round(
+    (attendedMembers / totalActiveMembers) * 100
+  );
+  const absentRate = Math.round((absentMembers / totalActiveMembers) * 100);
+
+  return {
+    totalActiveMembers,
+    attendedMembers,
+    attendanceRate,
+    absentMembers,
+    absentRate,
+  };
+}
 
 interface DayParticipationData {
   dayName: string;
@@ -120,21 +442,26 @@ export default function AnalyzePage() {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch(
-          `/api/admin/analyze?crewId=${crewId}&year=${year}&month=${month}`
-        );
+        const supabase = createClient();
+        
+        // 직접 Supabase 함수 호출
+        const [
+          dayParticipationData,
+          locationParticipationData,
+          memberAttendanceStatus,
+        ] = await Promise.all([
+          getDayParticipationAnalysis(supabase, crewId, year, month),
+          getLocationParticipationAnalysis(supabase, crewId, year, month),
+          getMemberAttendanceStatus(supabase, crewId, year, month),
+        ]);
 
-        if (!response.ok) {
-          throw new Error("통계 데이터를 가져오는데 실패했습니다.");
-        }
-
-        const result = await response.json();
-
-        if (result.success) {
-          setAnalyzeData(result.data);
-        } else {
-          throw new Error(result.error || "알 수 없는 오류가 발생했습니다.");
-        }
+        setAnalyzeData({
+          dayParticipation: dayParticipationData,
+          locationParticipation: locationParticipationData,
+          memberAttendanceStatus: memberAttendanceStatus,
+          year: year,
+          month: month,
+        });
       } catch (err) {
         console.error("분석 데이터 조회 오류:", err);
         setError(

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAdminContext } from "../AdminContextProvider";
 import AdminSettingsManagement from "@/components/organisms/AdminSettingsManagement";
+import { getCrewLocations, getCrewById } from "@/lib/supabase/admin";
 
 // 로딩 스켈레톤 컴포넌트
 function SettingsLoadingSkeleton() {
@@ -69,14 +70,28 @@ export default function AdminSettingsPage() {
     async function fetchSettingsData() {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/admin/settings?crewId=${crewId}`);
+        
+        // 직접 Supabase 함수 호출
+        const [
+          { data: crewData, error: crewError },
+          { data: locations, error: locationsError }
+        ] = await Promise.all([
+          getCrewById(crewId),
+          getCrewLocations(crewId)
+        ]);
 
-        if (!response.ok) {
-          throw new Error("설정 데이터를 가져오는데 실패했습니다.");
+        if (crewError) {
+          throw crewError;
+        }
+        
+        if (locationsError) {
+          throw locationsError;
         }
 
-        const data = await response.json();
-        setSettingsData(data);
+        setSettingsData({
+          crewData,
+          locations: locations || [],
+        });
       } catch (err) {
         console.error("설정 데이터 조회 오류:", err);
         setError(

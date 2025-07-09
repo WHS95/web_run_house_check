@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAdminContext } from "../AdminContextProvider";
 import AdminUserManagement from "@/components/organisms/AdminUserManagement";
+import { getUsersByCrewIdOptimized } from "@/lib/supabase/admin";
 
 // 로딩 컴포넌트
 function AdminUserManagementSkeleton() {
@@ -79,14 +80,15 @@ export default function AdminUserPage() {
     async function fetchUsers() {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/admin/users?crewId=${crewId}`);
-
-        if (!response.ok) {
-          throw new Error("사용자 데이터를 가져오는데 실패했습니다.");
+        
+        // 직접 Supabase 함수 호출
+        const { data: users, error } = await getUsersByCrewIdOptimized(crewId);
+        
+        if (error) {
+          throw error;
         }
-
-        const data = await response.json();
-        setUsers(data.users || []);
+        
+        setUsers(users || []);
       } catch (err) {
         console.error("사용자 데이터 조회 오류:", err);
         setError(

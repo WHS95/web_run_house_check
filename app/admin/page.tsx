@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import AdminDashboard from "@/components/organisms/AdminDashboard";
 import { useAdminContext } from "./AdminContextProvider";
+import { getAdminStatsOptimized } from "@/lib/admin-stats";
 
 // 로딩 컴포넌트
 function AdminDashboardSkeleton() {
@@ -84,21 +85,13 @@ export default function AdminPage() {
     async function fetchStats() {
       try {
         setIsLoading(true);
-        // 년도/월 파라미터 추가하여 API 호출
-        const params = new URLSearchParams({
+        
+        // 직접 Supabase 함수 호출
+        const data = await getAdminStatsOptimized(
           crewId,
-          type: "stats",
-          year: selectedYear.toString(),
-          month: selectedMonth.toString(),
-        });
-
-        const response = await fetch(`/api/admin/attendance?${params}`);
-
-        if (!response.ok) {
-          throw new Error("통계 데이터를 가져오는데 실패했습니다.");
-        }
-
-        const data = await response.json();
+          selectedYear,
+          selectedMonth
+        );
         setStats(data);
       } catch (err) {
         console.error("통계 데이터 조회 오류:", err);

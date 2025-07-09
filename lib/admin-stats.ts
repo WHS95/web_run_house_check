@@ -1,4 +1,4 @@
-import { createClient } from "./supabase-admin";
+import { createClient } from "./supabase/client";
 
 export interface AdminStats {
   totalMembers: number;
@@ -23,7 +23,7 @@ export interface AdminStats {
 
 // 총 회원 수 조회 (해당 crew에 속한 회원)
 export async function getTotalMembers(crewId: string): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { count, error } = await supabase
     .schema("attendance")
     .from("user_crews")
@@ -45,7 +45,7 @@ interface TodayStats {
 }
 
 export async function getTodayStats(crewId: string): Promise<TodayStats> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 오늘 날짜 계산 (daily API 방식과 동일)
   const koreanNow = new Date();
@@ -135,7 +135,7 @@ export async function getTodayMeetingCount(crewId: string): Promise<number> {
 
 // 이달 신규 가입자 수 조회 (해당 crew 기준)
 export async function getNewMembersThisMonth(crewId: string): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -158,7 +158,7 @@ export async function getNewMembersThisMonth(crewId: string): Promise<number> {
 
 // 지난달 신규 가입자 수 조회 (해당 crew 기준, 증감률 계산용)
 export async function getNewMembersLastMonth(crewId: string): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
   const now = new Date();
   const firstDayOfLastMonth = new Date(
     now.getFullYear(),
@@ -185,7 +185,7 @@ export async function getNewMembersLastMonth(crewId: string): Promise<number> {
 
 // 이달 모임 건수 조회 (daily API 방식 적용)
 export async function getMonthlyMeetingCount(crewId: string): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 이달 계산
   const koreanNow = new Date();
@@ -245,7 +245,7 @@ export async function getMonthlyMeetingCount(crewId: string): Promise<number> {
 export async function getLastMonthMeetingCount(
   crewId: string
 ): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 지난달 계산
   const koreanNow = new Date();
@@ -316,7 +316,7 @@ export async function getLastMonthMeetingCount(
 export async function getMonthlyParticipationCount(
   crewId: string
 ): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 이달 계산
   const koreanNow = new Date();
@@ -353,7 +353,7 @@ export async function getMonthlyParticipationCount(
 export async function getLastMonthParticipationCount(
   crewId: string
 ): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 지난달 계산
   const koreanNow = new Date();
@@ -401,7 +401,7 @@ export async function getLastMonthParticipationCount(
 export async function getMonthlyParticipantCount(
   crewId: string
 ): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 이달 계산
   const koreanNow = new Date();
@@ -460,7 +460,7 @@ export async function getMonthlyParticipantCount(
 export async function getLastMonthParticipantCount(
   crewId: string
 ): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 지난달 계산
   const koreanNow = new Date();
@@ -528,7 +528,7 @@ export async function getLastMonthParticipantCount(
 
 // 이달 모임개설 크루원 수 조회 (서브쿼리 방식)
 export async function getMonthlyHostCount(crewId: string): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 이달 계산
   const koreanNow = new Date();
@@ -586,7 +586,7 @@ export async function getMonthlyHostCount(crewId: string): Promise<number> {
 
 // 지난달 모임개설 크루원 수 조회 (서브쿼리 방식)
 export async function getLastMonthHostCount(crewId: string): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // 한국 시간 기준으로 지난달 계산
   const koreanNow = new Date();
@@ -761,7 +761,7 @@ export async function getAdminStatsOptimized(
   targetYear?: number,
   targetMonth?: number
 ): Promise<AdminStats> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   try {
     // PostgreSQL 함수 호출

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAdminContext } from "../AdminContextProvider";
 import AdminAttendanceManagement from "@/components/organisms/AdminAttendanceManagement";
+import { getMonthlyAttendanceData } from "@/lib/supabase/admin";
 
 // 로딩 스켈레톤 컴포넌트
 function AttendanceLoadingSkeleton() {
@@ -83,16 +84,21 @@ export default function AttendancePage() {
         const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;
 
-        const response = await fetch(
-          `/api/admin/attendance?crewId=${crewId}&year=${currentYear}&month=${currentMonth}`
-        );
+        // 직접 Supabase 함수 호출
+        const {
+          summary,
+          detailData,
+          error: attendanceError,
+        } = await getMonthlyAttendanceData(crewId, currentYear, currentMonth);
 
-        if (!response.ok) {
-          throw new Error("출석 데이터를 가져오는데 실패했습니다.");
+        if (attendanceError) {
+          throw attendanceError;
         }
 
-        const data = await response.json();
-        setAttendanceData(data);
+        setAttendanceData({
+          summary: summary || [],
+          detailData: detailData || {},
+        });
       } catch (err) {
         console.error("출석 데이터 조회 오류:", err);
         setError(

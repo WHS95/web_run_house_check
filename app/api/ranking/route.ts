@@ -202,17 +202,16 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    if (!session?.user) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: "인증이 필요합니다." },
         { status: 401 }
       );
     }
-
-    const { user } = session;
     const { searchParams } = new URL(request.url);
 
     // URL 파라미터에서 년도와 월 추출

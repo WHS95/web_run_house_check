@@ -92,11 +92,12 @@ export default function MyPage() {
   useEffect(() => {
     const loadMyPageData = async () => {
       try {
-        // 1. 세션 확인
+        // 1. 사용자 인증 확인
         const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session?.user) {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+        if (authError || !user) {
           router.push("/auth/login");
           return;
         }
@@ -105,7 +106,7 @@ export default function MyPage() {
         const { data: result, error } = await supabase
           .schema("attendance")
           .rpc("get_mypage_data_unified", {
-            p_user_id: session.user.id,
+            p_user_id: user.id,
           });
 
         if (error) {

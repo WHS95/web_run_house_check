@@ -62,17 +62,18 @@ const HomePage = () => {
   useEffect(() => {
     const loadHomeData = async () => {
       try {
-        // 1. 세션 확인
+        // 1. 사용자 인증 확인
         const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session?.user) {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+        if (authError || !user) {
           router.push("/auth/login");
           return;
         }
 
         // 2. 캐시된 데이터 확인
-        const cachedData = getCachedData(session.user.id);
+        const cachedData = getCachedData(user.id);
         if (cachedData) {
           setPageData(cachedData);
           setIsLoading(false);
@@ -83,7 +84,7 @@ const HomePage = () => {
         const { data: functionResult, error: functionError } = await supabase
           .schema("attendance")
           .rpc("get_home_page_data", {
-            p_user_id: session.user.id,
+            p_user_id: user.id,
           });
 
         if (functionError) {
@@ -101,15 +102,15 @@ const HomePage = () => {
           // 오류가 있어도 기본 데이터는 표시
           const fallbackData = functionResult.data || {
             userName:
-              session.user.user_metadata?.full_name ||
-              session.user.email ||
+              user.user_metadata?.full_name ||
+              user.email ||
               "사용자",
             crewName: null,
             noticeText: null,
           };
 
           setPageData(fallbackData);
-          setCachedData(session.user.id, fallbackData);
+          setCachedData(user.id, fallbackData);
           setIsLoading(false);
           return;
         }
@@ -118,7 +119,7 @@ const HomePage = () => {
         const finalData = functionResult.data;
         console.log("finalData", finalData);
         setPageData(finalData);
-        setCachedData(session.user.id, finalData);
+        setCachedData(user.id, finalData);
       } catch (error) {
         console.error("홈 데이터 로딩 오류:", error);
         haptic.error();

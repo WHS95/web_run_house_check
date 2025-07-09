@@ -109,16 +109,16 @@ const UltraFastRankingTemplate = () => {
   // ⚡ 메모화된 데이터 로딩 함수 - 통합 함수 사용으로 대폭 간소화
   const fetchRankingData = useCallback(async (year: number, month: number) => {
     try {
-      // 1. 세션 확인
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
+      // 1. 사용자 인증 확인
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
         router.push('/auth/login');
         return;
       }
 
       // 2. 통합 랭킹 데이터 조회 (5번 통신 → 1번 통신)
       const { data: result, error } = await supabase.schema('attendance').rpc('get_ranking_data_unified', {
-        p_user_id: session.user.id,
+        p_user_id: user.id,
         target_year: year,
         target_month: month
       });

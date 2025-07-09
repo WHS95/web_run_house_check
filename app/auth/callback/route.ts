@@ -14,12 +14,20 @@ export async function GET(request: Request) {
 
     if (!error && data.session) {
       try {
+        // 사용자 인증 확인
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          console.log("사용자 인증 실패, 로그인 페이지로 리다이렉트");
+          return NextResponse.redirect(`${origin}/auth/login?error=인증 실패`);
+        }
+
         // 사용자가 DB에 등록되어 있는지 확인
         const { data: userData, error: userError } = await supabase
           .schema("attendance")
           .from("users")
           .select("verified_crew_id")
-          .eq("id", data.session.user.id)
+          .eq("id", user.id)
           .single();
 
         const forwardedHost = request.headers.get("x-forwarded-host");

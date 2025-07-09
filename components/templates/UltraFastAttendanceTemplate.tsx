@@ -316,16 +316,16 @@ const UltraFastAttendanceTemplate = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // 1. 세션 확인
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) {
+        // 1. 사용자 인증 확인
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
           router.push('/auth/login');
           return;
         }
 
         // 2. 통합 폼 데이터 조회 (5번 통신 → 1번 통신)
         const { data: result, error } = await supabase.schema('attendance').rpc('get_attendance_form_data', {
-          p_user_id: session.user.id
+          p_user_id: user.id
         });
 
         if (error) {
@@ -350,7 +350,7 @@ const UltraFastAttendanceTemplate = () => {
         const { userName, crewInfo, locationOptions, exerciseOptions } = result.data;
         
         setCurrentUser({
-          id: session.user.id,
+          id: user.id,
           name: userName
         });
         setCrewInfo(crewInfo);

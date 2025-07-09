@@ -70,11 +70,12 @@ export async function middleware(req: NextRequest) {
 
   // 인증 상태 확인
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
   // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
-  if (!session) {
+  if (authError || !user) {
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = "/auth/login";
     redirectUrl.searchParams.set("from", req.nextUrl.pathname);
@@ -87,7 +88,7 @@ export async function middleware(req: NextRequest) {
       .schema("attendance")
       .from("users")
       .select("is_crew_verified")
-      .eq("id", session.user.id)
+      .eq("id", user.id)
       .single();
 
     // 크루 인증이 필요한 사용자를 크루 인증 페이지로 리다이렉트

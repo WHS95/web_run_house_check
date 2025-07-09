@@ -270,15 +270,16 @@ export default function SignupPage() {
     const fetchUserSession = async () => {
       try {
         const {
-          data: { session },
-        } = await supabase.auth.getSession();
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
 
         if (!isMounted) return;
 
-        if (session?.user) {
-          setValue("email", session.user.email || "", { shouldValidate: true });
-          if (session.user.user_metadata) {
-            const meta = session.user.user_metadata;
+        if (user && !authError) {
+          setValue("email", user.email || "", { shouldValidate: true });
+          if (user.user_metadata) {
+            const meta = user.user_metadata;
             setValue("firstName", meta.full_name || meta.name || "", {
               shouldValidate: true,
             });

@@ -17,9 +17,9 @@ interface MemberActivityHistoryProps {
 
 // ⚡ 빈 상태 컴포넌트 (메모이제이션)
 const EmptyState = memo(() => (
-  <div className='py-8 text-center'>
-    <GitCommit className='w-8 h-8 mx-auto mb-2 text-gray-500' />
-    <p className='text-sm font-medium text-gray-400'>
+  <div className='py-[4vh] text-center'>
+    <GitCommit className='w-[2rem] h-[2rem] mx-auto mb-[1vh] text-gray-500' />
+    <p className='text-[0.875rem] font-medium text-gray-400'>
       최근 활동 내역이 없습니다
     </p>
   </div>
@@ -57,7 +57,7 @@ const MemberActivityHistory = memo<MemberActivityHistoryProps>(
     }, [recentActivities]);
 
     return (
-      <div className='mt-6 bg-basic-black-gray rounded-lg p-4'>
+      <div className='mt-[3vh] bg-basic-black-gray rounded-lg p-[2vw]'>
         {/* ⚡ 활동 목록만 표시 (헤더 제거) */}
         <div>{activityItems}</div>
       </div>

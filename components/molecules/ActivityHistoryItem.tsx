@@ -43,7 +43,7 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
   const getActivityConfig = () => {
     if (type === "create_meeting") {
       return {
-        icon: <Users className='w-3 h-3' />,
+        icon: <Users className='w-[0.75rem] h-[0.75rem]' />,
         color: "bg-purple-500",
         borderColor: "border-purple-200",
         textColor: "text-purple-700",
@@ -53,7 +53,7 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
       };
     } else {
       return {
-        icon: <CheckCircle className='w-3 h-3' />,
+        icon: <CheckCircle className='w-[0.75rem] h-[0.75rem]' />,
         color: "bg-green-500",
         borderColor: "border-green-200",
         textColor: "text-green-700",
@@ -68,13 +68,13 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
   const relativeTime = getRelativeTime(date);
 
   return (
-    <div className='relative flex items-start pb-2 space-x-3'>
+    <div className='relative flex items-start pb-[1vh] space-x-[1.5vw]'>
       {/* 타임라인 */}
       <div className='relative flex flex-col items-center'>
         {/* 아이콘 */}
         <div
           className={`
-            flex items-center justify-center w-6 h-6 rounded-full text-white
+            flex items-center justify-center w-[1.5rem] h-[1.5rem] rounded-full text-white
             ${config.color} shadow-sm
           `}
         >
@@ -82,18 +82,18 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
         </div>
 
         {/* 연결선 (마지막 아이템이 아닌 경우) */}
-        {!isLast && <div className='w-0.5 h-4 bg-gray-600 mt-1'></div>}
+        {!isLast && <div className='w-[0.125rem] h-[2vh] bg-gray-600 mt-[0.25vh]'></div>}
       </div>
 
       {/* 콘텐츠 */}
       <div className='flex-1 min-w-0'>
         {/* 간소화된 정보 */}
-        <div className='flex items-center space-x-2 text-sm text-gray-300'>
+        <div className='flex items-center space-x-[1vw] text-[0.875rem] text-gray-300'>
           <span className='font-medium'>{location}</span>
           <span className='text-gray-500'>•</span>
           <span>{exerciseType}</span>
           <span className='text-gray-500'>•</span>
-          <span className='text-xs'>{relativeTime}</span>
+          <span className='text-[0.75rem]'>{relativeTime}</span>
         </div>
       </div>
     </div>

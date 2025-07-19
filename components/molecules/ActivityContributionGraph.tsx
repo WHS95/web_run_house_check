@@ -15,13 +15,13 @@ interface ActivityContributionGraphProps {
 
 // ⚡ 범례 컴포넌트 (메모이제이션)
 const Legend = memo(() => (
-  <div className='flex items-center space-x-2 text-xs text-gray-500'>
+  <div className='flex items-center space-x-[1vw] text-[0.75rem] text-gray-500'>
     <span>적음</span>
     <div className='flex space-x-1'>
-      <div className='w-2.5 h-2.5 bg-gray-100 rounded-sm'></div>
-      <div className='w-2.5 h-2.5 bg-blue-200 rounded-sm'></div>
-      <div className='w-2.5 h-2.5 bg-blue-400 rounded-sm'></div>
-      <div className='w-2.5 h-2.5 bg-basic-blue rounded-sm'></div>
+      <div className='w-[0.625rem] h-[0.625rem] bg-gray-100 rounded-sm'></div>
+      <div className='w-[0.625rem] h-[0.625rem] bg-blue-200 rounded-sm'></div>
+      <div className='w-[0.625rem] h-[0.625rem] bg-blue-400 rounded-sm'></div>
+      <div className='w-[0.625rem] h-[0.625rem] bg-basic-blue rounded-sm'></div>
     </div>
     <span>많음</span>
   </div>
@@ -200,9 +200,9 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
     }, [weeks, activityMap, today, getActivityColor, getTooltipMessage]);
 
     return (
-      <div className='p-2 mt-6 rounded-lg bg-basic-black-gray'>
+      <div className='p-[2vw] mt-[3vh] rounded-lg bg-basic-black-gray'>
         {/* 상단 월 라벨 */}
-        <div className='flex mb-1 ml-8'>
+        <div className='flex mb-[0.5vh] ml-[4vw]'>
           {monthLabels.map((monthLabel, index) => {
             const nextLabelIndex =
               index < monthLabels.length - 1
@@ -212,7 +212,7 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
             return (
               <div
                 key={monthLabel.index}
-                className='text-xs text-center text-gray-300'
+                className='text-[0.75rem] text-center text-gray-300'
                 style={{ width: `${Math.max(width, 32)}px` }}
               >
                 {monthLabel.label}
@@ -220,16 +220,16 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
             );
           })}
         </div>
-        <div className='flex mb-3'>
+        <div className='flex mb-[1.5vh]'>
           {/* 좌측 요일 라벨 */}
-          <div className='flex flex-col items-end w-6 mr-2 space-y-1 text-xs text-gray-300'>
-            <div className='flex items-center h-3'>일</div>
-            <div className='flex items-center h-3'>월</div>
-            <div className='flex items-center h-3'>화</div>
-            <div className='flex items-center h-3'>수</div>
-            <div className='flex items-center h-3'>목</div>
-            <div className='flex items-center h-3'>금</div>
-            <div className='flex items-center h-3'>토</div>
+          <div className='flex flex-col items-end w-[1.5rem] mr-[1vw] space-y-[0.25vh] text-[0.75rem] text-gray-300'>
+            <div className='flex items-center h-[0.75rem]'>일</div>
+            <div className='flex items-center h-[0.75rem]'>월</div>
+            <div className='flex items-center h-[0.75rem]'>화</div>
+            <div className='flex items-center h-[0.75rem]'>수</div>
+            <div className='flex items-center h-[0.75rem]'>목</div>
+            <div className='flex items-center h-[0.75rem]'>금</div>
+            <div className='flex items-center h-[0.75rem]'>토</div>
           </div>
           {/* 활동 그리드 */}
           <div className='flex space-x-1 overflow-x-auto'>{gridCells}</div>

@@ -52,7 +52,7 @@ ErrorState.displayName = 'ErrorState';
 const AdminButton = memo(() => (
     <Link 
         href="/admin" 
-        className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+        className="flex items-center justify-center w-[2rem] h-[2rem] rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
         title="크루관리"
     >
         <FiSettings size={18} color="black" />
@@ -93,7 +93,7 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                 />
             </div>
             
-            <div className="flex-1 overflow-y-auto px-4 py-4 pt-[80px]">
+            <div className="flex-1 overflow-y-auto px-[4vw] py-[2vh] pt-[10vh]">
                 <MemberProfileInfo {...profileProps} />
                 <ActivityContributionGraph 
                     activities={activityData.activities}

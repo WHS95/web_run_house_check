@@ -23,7 +23,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 
   return (
     <header
-      className={`relative flex items-center py-4 ${backgroundColor} border-b border-gray-500 shadow-sm `}
+      className={`flex relative z-50 items-center py-4 border-b border-gray-500 shadow-sm ${backgroundColor}`}
     >
       <div className='flex-1 px-4'>
         {/* 

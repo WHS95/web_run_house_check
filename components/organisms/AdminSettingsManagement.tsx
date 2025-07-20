@@ -189,11 +189,11 @@ export default function AdminSettingsManagement({
   return (
     <div className='flex flex-col h-screen bg-gray-50'>
       {/* 메인 컨텐츠 */}
-      <div className='flex-1 px-4 py-6 pb-24 space-y-6 overflow-y-auto'>
+      <div className='overflow-y-auto flex-1 px-4 py-6 pb-24 space-y-6'>
         {/* 활동장소 관리 */}
         <Card>
           <CardHeader>
-            <CardTitle className='flex items-center justify-between'>
+            <CardTitle className='flex justify-between items-center'>
               <div className='flex items-center space-x-2'>
                 <MapPin className='w-5 h-5 text-green-600' />
                 <span>활동장소 관리</span>
@@ -207,15 +207,14 @@ export default function AdminSettingsManagement({
                 className='bg-green-600 hover:bg-green-700'
                 disabled={isCreatingLocation}
               >
-                <Plus className='w-4 h-4 mr-1' />
-                장소 추가
+                <Plus className='mr-1 w-4 h-4' />
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
             {/* 장소 추가 폼 */}
             {isCreatingLocation && (
-              <Card className='border-green-200 bg-green-50'>
+              <Card className='bg-green-50 border-green-200'>
                 <CardContent className='p-4 space-y-3'>
                   <div>
                     <label
@@ -246,9 +245,9 @@ export default function AdminSettingsManagement({
                       disabled={loadingStates.create || !newLocationName.trim()}
                     >
                       {loadingStates.create ? (
-                        <Loader2 className='w-4 h-4 mr-1 animate-spin' />
+                        <Loader2 className='mr-1 w-4 h-4 animate-spin' />
                       ) : (
-                        <Save className='w-4 h-4 mr-1' />
+                        <Save className='mr-1 w-4 h-4' />
                       )}
                       추가
                     </Button>
@@ -261,7 +260,7 @@ export default function AdminSettingsManagement({
                       size='sm'
                       disabled={loadingStates.create}
                     >
-                      <X className='w-4 h-4 mr-1' />
+                      <X className='mr-1 w-4 h-4' />
                       취소
                     </Button>
                   </div>
@@ -271,7 +270,7 @@ export default function AdminSettingsManagement({
 
             {/* 검색 */}
             <div className='relative'>
-              <Search className='absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2' />
+              <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
               <Input
                 placeholder='장소명으로 검색'
                 value={searchTerm}
@@ -281,10 +280,10 @@ export default function AdminSettingsManagement({
             </div>
 
             {/* 테이블 */}
-            <div className='overflow-hidden bg-white border border-gray-200 rounded-lg'>
+            <div className='overflow-hidden bg-white rounded-lg border border-gray-200'>
               <div className='overflow-x-auto'>
                 <table className='w-full'>
-                  <thead className='border-b border-gray-200 bg-gray-50'>
+                  <thead className='bg-gray-50 border-b border-gray-200'>
                     <tr>
                       <th className='px-4 py-3 text-sm font-medium text-left text-gray-700'>
                         장소명
@@ -322,7 +321,7 @@ export default function AdminSettingsManagement({
                         </td>
                         <td className='px-4 py-3'>
                           {editingLocation === location.id ? (
-                            <div className='flex items-center justify-center space-x-1'>
+                            <div className='flex justify-center items-center space-x-1'>
                               <Button
                                 size='sm'
                                 onClick={handleSaveEdit}
@@ -368,7 +367,7 @@ export default function AdminSettingsManagement({
                                   <DropdownMenuItem
                                     onClick={() => handleStartEdit(location)}
                                   >
-                                    <Edit className='w-4 h-4 mr-2' />
+                                    <Edit className='mr-2 w-4 h-4' />
                                     수정
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
@@ -377,7 +376,7 @@ export default function AdminSettingsManagement({
                                     }
                                     className='text-red-600'
                                   >
-                                    <Trash2 className='w-4 h-4 mr-2' />
+                                    <Trash2 className='mr-2 w-4 h-4' />
                                     삭제
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -405,7 +404,7 @@ export default function AdminSettingsManagement({
                       size='sm'
                       className='mt-2 bg-green-600 hover:bg-green-700'
                     >
-                      <Plus className='w-4 h-4 mr-1' />첫 번째 장소 추가하기
+                      <Plus className='mr-1 w-4 h-4' />첫 번째 장소 추가하기
                     </Button>
                   )}
                 </div>

@@ -464,27 +464,27 @@ export default function AdminUserManagement({
                     <div className='pt-3 mt-3 border-t border-gray-100'>
                       <div className='grid grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-2'>
                         <div className='flex justify-between'>
-                          <span className='font-medium'>연락처</span>
+                          <span className='font-bold'>연락처</span>
                           <span className='text-right break-all'>
                             {getUserContactInfo(user)}
                           </span>
                         </div>
                         <div className='flex justify-between'>
-                          <span className='font-medium'>가입일</span>
+                          <span className='font-bold'>가입일</span>
                           <span className='text-right'>
                             {formatDate(user.join_date || user.created_at)}
                           </span>
                         </div>
                         {user.birth_year && (
                           <div className='flex justify-between'>
-                            <span className='font-medium'>출생연도</span>
+                            <span className='font-bold'>출생연도</span>
                             <span className='text-right'>
                               {user.birth_year}
                             </span>
                           </div>
                         )}
                         <div className='flex justify-between'>
-                          <span className='font-medium'>최근 참석일</span>
+                          <span className='font-bold'>최근 참석일</span>
                           <span className='text-right'>
                             {user.last_attendance_date
                               ? formatDate(user.last_attendance_date)

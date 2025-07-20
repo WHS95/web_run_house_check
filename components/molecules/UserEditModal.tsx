@@ -48,15 +48,15 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center'>
+    <div className='flex fixed inset-0 z-50 justify-center items-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 bg-basic-black/50 backdrop-blur-sm'
+        className='absolute inset-0 backdrop-blur-sm bg-basic-black/50'
         onClick={onClose}
       />
 
       {/* 모달 컨텐츠 */}
-      <div className='relative w-full max-w-md p-8 mx-4 bg-white shadow-2xl rounded-3xl'>
+      <div className='relative p-8 mx-4 w-full max-w-md bg-white rounded-3xl shadow-2xl'>
         <div className='text-center'>
           {/* 제목 */}
           <h2 className='mb-6 text-xl font-bold text-gray-900'>
@@ -76,7 +76,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, first_name: e.target.value })
                 }
-                className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
                 placeholder='이름을 입력하세요'
               />
             </div>
@@ -92,7 +92,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
                 placeholder='010-0000-0000'
               />
             </div>
@@ -111,7 +111,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                     birth_year: parseInt(e.target.value),
                   })
                 }
-                className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
                 placeholder='1990'
                 min='1950'
                 max={new Date().getFullYear()}
@@ -127,7 +127,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                 type='text'
                 value={new Date(user.created_at).toLocaleDateString("ko-KR")}
                 disabled
-                className='w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-500'
+                className='p-3 w-full text-gray-500 bg-gray-100 rounded-lg border border-gray-300'
               />
             </div>
           </div>

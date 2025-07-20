@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { haptic } from "@/lib/haptic";
+import PopupNotification, { NotificationType } from "@/components/molecules/common/PopupNotification";
 
 interface CrewMember {
   id: string;
@@ -51,6 +52,27 @@ export default function AdminCrewMembersManagement({
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
 
+  // 알림 상태
+  const [notification, setNotification] = useState({
+    isVisible: false,
+    message: "",
+    type: "success" as NotificationType,
+  });
+
+  // 알림 표시 함수
+  const showNotification = useCallback((message: string, type: NotificationType) => {
+    setNotification({
+      isVisible: true,
+      message,
+      type,
+    });
+  }, []);
+
+  // 알림 닫기
+  const closeNotification = useCallback(() => {
+    setNotification(prev => ({ ...prev, isVisible: false }));
+  }, []);
+
   // 멤버 목록 조회
   const fetchMembers = useCallback(async () => {
     try {
@@ -63,14 +85,16 @@ export default function AdminCrewMembersManagement({
       } else {
         console.error("멤버 조회 오류:", result.error);
         haptic.error();
+        showNotification("멤버 조회에 실패했습니다.", "error");
       }
     } catch (error) {
       console.error("멤버 조회 실패:", error);
       haptic.error();
+      showNotification("멤버 조회 중 오류가 발생했습니다.", "error");
     } finally {
       setIsLoading(false);
     }
-  }, [crewId]);
+  }, [crewId, showNotification]);
 
   // 운영진 권한 토글
   const handleToggleAdmin = useCallback(
@@ -93,20 +117,21 @@ export default function AdminCrewMembersManagement({
         if (response.ok && result.success) {
           haptic.success();
           await fetchMembers(); // 목록 새로고침
+          showNotification(result.message || "권한이 성공적으로 변경되었습니다.", "success");
         } else {
           haptic.error();
-          alert(result.error || "권한 변경에 실패했습니다.");
+          showNotification(result.error || "권한 변경에 실패했습니다.", "error");
         }
       } catch (error) {
         console.error("권한 변경 실패:", error);
         haptic.error();
-        alert("권한 변경 중 오류가 발생했습니다.");
+        showNotification("권한 변경 중 오류가 발생했습니다.", "error");
       } finally {
         setActionLoading(false);
         setIsUpdating(null);
       }
     },
-    [crewId, fetchMembers, actionLoading]
+    [crewId, fetchMembers, actionLoading, showNotification]
   );
 
   // 정렬 함수
@@ -490,6 +515,15 @@ export default function AdminCrewMembersManagement({
           </div>
         )}
       </div>
+
+      {/* 알림 팝업 */}
+      <PopupNotification
+        isVisible={notification.isVisible}
+        message={notification.message}
+        type={notification.type}
+        duration={2000}
+        onClose={closeNotification}
+      />
     </div>
   );
 }

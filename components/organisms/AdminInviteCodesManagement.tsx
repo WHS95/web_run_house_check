@@ -4,15 +4,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Plus,
-  Copy,
-  Ticket,
-  Calendar,
-  Edit,
-  Shuffle,
-} from "lucide-react";
+import { Plus, Copy, Ticket, Calendar, Edit, Shuffle } from "lucide-react";
 import { haptic } from "@/lib/haptic";
+import PopupNotification, {
+  NotificationType,
+} from "@/components/molecules/common/PopupNotification";
+import ConfirmModal from "@/components/molecules/ConfirmModal";
 
 interface InviteCode {
   id: number;
@@ -40,6 +37,52 @@ export default function AdminInviteCodesManagement({
     description: "",
   });
 
+  // 알림 상태
+  const [notification, setNotification] = useState({
+    isVisible: false,
+    message: "",
+    type: "success" as NotificationType,
+  });
+
+  // 확인 모달 상태
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    onConfirm: () => {},
+  });
+
+  // 알림 표시 함수
+  const showNotification = useCallback(
+    (message: string, type: NotificationType) => {
+      setNotification({
+        isVisible: true,
+        message,
+        type,
+      });
+    },
+    []
+  );
+
+  // 알림 닫기
+  const closeNotification = useCallback(() => {
+    setNotification((prev) => ({ ...prev, isVisible: false }));
+  }, []);
+
+  // 확인 모달 표시
+  const showConfirmModal = useCallback((onConfirm: () => void) => {
+    setConfirmModal({
+      isOpen: true,
+      onConfirm,
+    });
+  }, []);
+
+  // 확인 모달 닫기
+  const closeConfirmModal = useCallback(() => {
+    setConfirmModal({
+      isOpen: false,
+      onConfirm: () => {},
+    });
+  }, []);
+
   // 초대코드 조회
   const fetchInviteCode = useCallback(async () => {
     try {
@@ -52,14 +95,16 @@ export default function AdminInviteCodesManagement({
       } else {
         console.error("초대코드 조회 오류:", result.error);
         haptic.error();
+        showNotification("초대코드 조회에 실패했습니다.", "error");
       }
     } catch (error) {
       console.error("초대코드 조회 실패:", error);
       haptic.error();
+      showNotification("초대코드 조회 중 오류가 발생했습니다.", "error");
     } finally {
       setIsLoading(false);
     }
-  }, [crewId]);
+  }, [crewId, showNotification]);
 
   // 초대코드 생성 또는 재생성
   const handleCreateInviteCode = useCallback(async () => {
@@ -90,70 +135,80 @@ export default function AdminInviteCodesManagement({
         setIsEditing(false);
         setEditData({ inviteCode: "", description: "" });
         await fetchInviteCode();
+        showNotification(
+          result.message || "초대코드가 성공적으로 생성되었습니다.",
+          "success"
+        );
       } else {
         haptic.error();
-        alert(result.error || "초대코드 생성에 실패했습니다.");
+        showNotification(
+          result.error || "초대코드 생성에 실패했습니다.",
+          "error"
+        );
       }
     } catch (error) {
       console.error("초대코드 생성 실패:", error);
       haptic.error();
-      alert("초대코드 생성 중 오류가 발생했습니다.");
+      showNotification("초대코드 생성 중 오류가 발생했습니다.", "error");
     } finally {
       setActionLoading(false);
     }
-  }, [crewId, editData, fetchInviteCode, actionLoading]);
+  }, [crewId, editData, fetchInviteCode, actionLoading, showNotification]);
 
   // 초대코드 재생성
-  const handleRegenerateInviteCode = useCallback(async () => {
+  const handleRegenerateInviteCode = useCallback(() => {
     if (actionLoading || !inviteCode) return;
 
-    const confirmed = window.confirm(
-      "기존 초대코드가 무효화되고 새로운 코드가 생성됩니다. 계속하시겠습니까?"
-    );
-    if (!confirmed) return;
+    showConfirmModal(async () => {
+      try {
+        setActionLoading(true);
+        haptic.medium();
 
-    try {
-      setActionLoading(true);
-      haptic.medium();
+        const response = await fetch(
+          `/api/admin/invite-codes?codeId=${inviteCode.id}`,
+          {
+            method: "DELETE",
+          }
+        );
 
-      const response = await fetch(
-        `/api/admin/invite-codes?codeId=${inviteCode.id}`,
-        {
-          method: "DELETE",
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          haptic.success();
+          // 즉시 새 코드 생성
+          await handleCreateInviteCode();
+        } else {
+          haptic.error();
+          showNotification(
+            result.error || "초대코드 재생성에 실패했습니다.",
+            "error"
+          );
         }
-      );
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        haptic.success();
-        // 즉시 새 코드 생성
-        await handleCreateInviteCode();
-      } else {
+      } catch (error) {
+        console.error("초대코드 재생성 실패:", error);
         haptic.error();
-        alert(result.error || "초대코드 재생성에 실패했습니다.");
+        showNotification("초대코드 재생성 중 오류가 발생했습니다.", "error");
+      } finally {
+        setActionLoading(false);
       }
-    } catch (error) {
-      console.error("초대코드 재생성 실패:", error);
-      haptic.error();
-      alert("초대코드 재생성 중 오류가 발생했습니다.");
-    } finally {
-      setActionLoading(false);
-    }
-  }, [inviteCode, actionLoading, handleCreateInviteCode]);
+    });
+  }, [inviteCode, actionLoading, handleCreateInviteCode, showNotification, showConfirmModal]);
 
   // 초대코드 복사
-  const handleCopyCode = useCallback(async (code: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      haptic.success();
-      alert("초대코드가 클립보드에 복사되었습니다.");
-    } catch (error) {
-      console.error("복사 실패:", error);
-      haptic.error();
-      alert("복사에 실패했습니다.");
-    }
-  }, []);
+  const handleCopyCode = useCallback(
+    async (code: string) => {
+      try {
+        await navigator.clipboard.writeText(code);
+        haptic.success();
+        showNotification("초대코드가 클립보드에 복사되었습니다.", "success");
+      } catch (error) {
+        console.error("복사 실패:", error);
+        haptic.error();
+        showNotification("복사에 실패했습니다.", "error");
+      }
+    },
+    [showNotification]
+  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -162,7 +217,6 @@ export default function AdminInviteCodesManagement({
       "0"
     )}.${String(date.getDate()).padStart(2, "0")}`;
   };
-
 
   // 랜덤 코드 생성
   const generateRandomCode = useCallback(() => {
@@ -263,12 +317,14 @@ export default function AdminInviteCodesManagement({
                   placeholder='예: CREW123 (7자리 영문+숫자)'
                   value={editData.inviteCode}
                   onChange={(e) => {
-                    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    const value = e.target.value
+                      .toUpperCase()
+                      .replace(/[^A-Z0-9]/g, "");
                     if (value.length <= 7) {
                       setEditData({ ...editData, inviteCode: value });
                     }
                   }}
-                  className='bg-white font-mono'
+                  className='font-mono bg-white'
                   maxLength={7}
                 />
                 <Button
@@ -303,7 +359,11 @@ export default function AdminInviteCodesManagement({
             <div className='flex space-x-[2vw]'>
               <Button
                 onClick={handleCreateInviteCode}
-                disabled={actionLoading || !editData.inviteCode.trim() || editData.inviteCode.length !== 7}
+                disabled={
+                  actionLoading ||
+                  !editData.inviteCode.trim() ||
+                  editData.inviteCode.length !== 7
+                }
                 className='bg-purple-600 hover:bg-purple-700'
               >
                 {actionLoading ? "처리 중..." : inviteCode ? "수정" : "생성"}
@@ -325,19 +385,19 @@ export default function AdminInviteCodesManagement({
             <CardContent className='px-4 py-4'>
               <div className='flex justify-between items-start'>
                 <div className='flex-1'>
-                  <div className='flex items-center space-x-3 mb-3'>
-                    <code className='text-xl font-mono font-bold text-purple-600 bg-purple-50 px-3 py-2 rounded-lg'>
+                  <div className='flex items-center mb-3 space-x-3'>
+                    <code className='px-3 py-2 font-mono text-xl font-bold text-purple-600 bg-purple-50 rounded-lg'>
                       {inviteCode.invite_code}
                     </code>
                   </div>
-                  
+
                   {inviteCode.description && (
-                    <p className='text-sm text-gray-600 mb-3'>
+                    <p className='mb-3 text-sm text-gray-600'>
                       {inviteCode.description}
                     </p>
                   )}
 
-                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600'>
+                  <div className='grid grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-2'>
                     <div className='flex items-center space-x-2'>
                       <Calendar className='w-4 h-4' />
                       <span>생성: {formatDate(inviteCode.created_at)}</span>
@@ -387,7 +447,7 @@ export default function AdminInviteCodesManagement({
             <p className='mb-2 text-lg font-medium text-gray-500'>
               등록된 초대코드가 없습니다
             </p>
-            <p className='text-gray-400 mb-4'>
+            <p className='mb-4 text-gray-400'>
               크루 초대를 위한 코드를 생성해보세요
             </p>
             <Button
@@ -397,12 +457,32 @@ export default function AdminInviteCodesManagement({
               }}
               className='bg-purple-600 hover:bg-purple-700'
             >
-              <Plus className='w-4 h-4 mr-2' />
-              첫 번째 초대코드 생성하기
+              <Plus className='mr-2 w-4 h-4' />첫 번째 초대코드 생성하기
             </Button>
           </div>
         )}
       </div>
+
+      {/* 알림 팝업 */}
+      <PopupNotification
+        isVisible={notification.isVisible}
+        message={notification.message}
+        type={notification.type}
+        duration={2000}
+        onClose={closeNotification}
+      />
+
+      {/* 확인 모달 */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+        title="초대코드 재생성"
+        content="기존 초대코드가 무효화되고 새로운 코드가 생성됩니다. 계속하시겠습니까?"
+        confirmText="재생성"
+        cancelText="취소"
+        variant="destructive"
+      />
     </div>
   );
 }

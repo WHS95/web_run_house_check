@@ -51,14 +51,14 @@ const PopupNotification = memo<PopupNotificationProps>(
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-basic-black bg-opacity-30'
+            className='flex fixed inset-0 z-50 justify-center items-center p-4 bg-opacity-30 bg-basic-black'
           >
             <motion.div
               initial={{ scale: 0.5, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.5, opacity: 0, y: 50 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className='flex flex-col items-center justify-center bg-white shadow-2xl rounded-xl w-72 h-72 md:w-80 md:h-80'
+              className='flex flex-col justify-center items-center w-72 h-72 bg-white rounded-xl shadow-2xl md:w-80 md:h-80'
             >
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}

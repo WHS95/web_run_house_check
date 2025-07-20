@@ -16,6 +16,7 @@ import {
 import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import AdminCrewMembersManagement from "@/components/organisms/AdminCrewMembersManagement";
 import AdminInviteCodesManagement from "@/components/organisms/AdminInviteCodesManagement";
+import PopupNotification, { NotificationType } from "@/components/molecules/common/PopupNotification";
 import {
   CrewLocation,
   createCrewLocation,
@@ -55,6 +56,17 @@ export default function AdminSettingsManagementNew({
     [key: string]: boolean;
   }>({});
 
+  // 알림 상태
+  const [notification, setNotification] = useState<{
+    isVisible: boolean;
+    message: string;
+    type: NotificationType;
+  }>({
+    isVisible: false,
+    message: "",
+    type: "success",
+  });
+
   // 검색된 장소 목록
   const filteredLocations = locations.filter((location) =>
     location.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -63,6 +75,20 @@ export default function AdminSettingsManagementNew({
   // 로딩 상태 설정 헬퍼
   const setLoading = (key: string, loading: boolean) => {
     setLoadingStates((prev) => ({ ...prev, [key]: loading }));
+  };
+
+  // 알림 표시 헬퍼
+  const showNotification = (message: string, type: NotificationType) => {
+    setNotification({
+      isVisible: true,
+      message,
+      type,
+    });
+  };
+
+  // 알림 닫기 헬퍼
+  const closeNotification = () => {
+    setNotification((prev) => ({ ...prev, isVisible: false }));
   };
 
   // 활동장소 추가
@@ -80,7 +106,7 @@ export default function AdminSettingsManagementNew({
       if (error) {
         console.error("장소 추가 오류:", error);
         haptic.error();
-        alert("장소 추가 중 오류가 발생했습니다.");
+        showNotification("장소 추가 중 오류가 발생했습니다.", "error");
         return;
       }
 
@@ -97,7 +123,7 @@ export default function AdminSettingsManagementNew({
     } catch (error) {
       console.error("장소 추가 오류:", error);
       haptic.error();
-      alert("장소 추가 중 오류가 발생했습니다.");
+      showNotification("장소 추가 중 오류가 발생했습니다.", "error");
     } finally {
       setLoading("create", false);
     }
@@ -125,7 +151,7 @@ export default function AdminSettingsManagementNew({
       if (error) {
         console.error("장소 수정 오류:", error);
         haptic.error();
-        alert("장소 수정 중 오류가 발생했습니다.");
+        showNotification("장소 수정 중 오류가 발생했습니다.", "error");
         return;
       }
 
@@ -146,7 +172,7 @@ export default function AdminSettingsManagementNew({
     } catch (error) {
       console.error("장소 수정 오류:", error);
       haptic.error();
-      alert("장소 수정 중 오류가 발생했습니다.");
+      showNotification("장소 수정 중 오류가 발생했습니다.", "error");
     } finally {
       setLoading(`edit-${editingLocation}`, false);
     }
@@ -175,7 +201,7 @@ export default function AdminSettingsManagementNew({
       if (error) {
         console.error("장소 삭제 오류:", error);
         haptic.error();
-        alert("장소 삭제 중 오류가 발생했습니다.");
+        showNotification("장소 삭제 중 오류가 발생했습니다.", "error");
         return;
       }
 
@@ -192,7 +218,7 @@ export default function AdminSettingsManagementNew({
     } catch (error) {
       console.error("장소 삭제 오류:", error);
       haptic.error();
-      alert("장소 삭제 중 오류가 발생했습니다.");
+      showNotification("장소 삭제 중 오류가 발생했습니다.", "error");
     } finally {
       setLoading(`delete-${locationId}`, false);
     }
@@ -464,6 +490,15 @@ export default function AdminSettingsManagementNew({
 
       {/* 하단 네비게이션 */}
       <AdminBottomNavigation />
+
+      {/* 팝업 알림 */}
+      <PopupNotification
+        isVisible={notification.isVisible}
+        message={notification.message}
+        type={notification.type}
+        duration={2000}
+        onClose={closeNotification}
+      />
     </div>
   );
 }

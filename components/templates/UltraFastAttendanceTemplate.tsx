@@ -11,11 +11,11 @@ import { IoChevronDown } from "react-icons/io5";
 
 // ⚡ 심플한 폼 로딩 스켈레톤
 const FormSkeleton = React.memo(() => (
-  <div className="space-y-6 animate-pulse">
+  <div className="space-y-[3vh] animate-pulse">
     {Array.from({ length: 5 }).map((_, index) => (
       <div key={index}>
-        <div className="h-4 bg-gray-200 rounded w-24 mb-3"></div>
-        <div className="h-12 bg-gray-100 rounded-xl"></div>
+        <div className="h-[1rem] bg-gray-200 rounded w-[24vw] mb-[1.5vh]"></div>
+        <div className="h-[6vh] bg-gray-100 rounded-xl"></div>
       </div>
     ))}
   </div>
@@ -96,19 +96,19 @@ const UltraFastForm = React.memo<{
   const availableTimeOptions = useMemo(() => getAvailableTimeOptions(formData.date), [formData.date]);
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-[3vh]">
       {/* 이름 */}
       <div>
-        <label className="block mb-3 text-sm font-bold text-white">이름</label>
-        <div className="h-12 bg-basic-black-gray rounded-xl flex items-center px-4">
+        <label className="block mb-[1.5vh] text-[0.875rem] font-bold text-white">이름</label>
+        <div className="h-[6vh] bg-basic-black-gray rounded-xl flex items-center px-[2vw]">
           <span className="text-white font-medium">{formData.name}</span>
         </div>
       </div>
 
       {/* 참여일시 */}
       <div>
-        <label className="block mb-3 text-sm font-bold text-white">참여일시</label>
-        <div className="space-y-3">
+        <label className="block mb-[1.5vh] text-[0.875rem] font-bold text-white">참여일시</label>
+        <div className="space-y-[1.5vh]">
           <div className="relative">
             <input
               type="date"
@@ -116,8 +116,8 @@ const UltraFastForm = React.memo<{
               onChange={(e) => onFormChange('date', e.target.value)}
               className="ios-date-input bg-basic-black-gray text-white"
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <AiOutlineCalendar className="w-5 h-5 text-gray-400" />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none">
+              <AiOutlineCalendar className="w-[1.25rem] h-[1.25rem] text-gray-400" />
             </div>
           </div>
           <div className="relative">
@@ -130,8 +130,8 @@ const UltraFastForm = React.memo<{
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <IoChevronDown className="w-5 h-5 text-gray-400" />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none">
+              <IoChevronDown className="w-[1.25rem] h-[1.25rem] text-gray-400" />
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@ const UltraFastForm = React.memo<{
 
       {/* 장소 */}
       <div>
-        <label className="block mb-3 text-sm font-bold text-white">참여 장소</label>
+        <label className="block mb-[1.5vh] text-[0.875rem] font-bold text-white">참여 장소</label>
         <div className="relative">
           <select
             value={formData.location}
@@ -158,7 +158,7 @@ const UltraFastForm = React.memo<{
 
       {/* 운동 종류 */}
       <div>
-        <label className="block mb-3 text-sm font-bold text-white">운동 종류</label>
+        <label className="block mb-[1.5vh] text-[0.875rem] font-bold text-white">운동 종류</label>
         <div className="relative">
           <select
             value={formData.exerciseType}
@@ -177,8 +177,8 @@ const UltraFastForm = React.memo<{
 
       {/* 개설자 여부 */}
       <div>
-        <label className="block mb-3 text-sm font-bold text-white">개설자 여부</label>
-        <div className="flex space-x-4">
+        <label className="block mb-[1.5vh] text-[0.875rem] font-bold text-white">개설자 여부</label>
+        <div className="flex space-x-[2vw]">
           {HOST_OPTIONS.map(option => (
             <label key={option.value} className="flex items-center cursor-pointer">
               <input
@@ -187,7 +187,7 @@ const UltraFastForm = React.memo<{
                 value={option.value}
                 checked={formData.isHost === option.value}
                 onChange={(e) => onFormChange('isHost', e.target.value)}
-                className="mr-2 text-blue-500 focus:ring-blue-500"
+                className="mr-[1vw] text-blue-500 focus:ring-blue-500"
               />
               <span className="text-white">{option.label}</span>
             </label>
@@ -387,7 +387,7 @@ const UltraFastAttendanceTemplate = () => {
       </div>
 
       {/* ⚡ 메인 콘텐츠 - 스크롤 영역 */}
-      <div className="flex-1 overflow-y-auto native-scroll pt-[80px] pb-[180px] px-4">
+      <div className="flex-1 overflow-y-auto native-scroll pt-[10vh] pb-[20vh] px-[4vw]">
           {isDataLoading ? (
             <FormSkeleton />
           ) : (
@@ -401,7 +401,7 @@ const UltraFastAttendanceTemplate = () => {
           <button  
           onClick={handleSubmit}
           disabled={isSubmitting || isDataLoading || !currentUser}
-          className={`mt-4 p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-14 font-bold text-white ${
+          className={`mt-[2vh] p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-[7vh] font-bold text-white ${
             isSubmitting || isDataLoading || !currentUser
               ? 'bg-gray-400 cursor-not-allowed' 
               : 'bg-basic-blue hover:bg-blue-600'
@@ -409,8 +409,8 @@ const UltraFastAttendanceTemplate = () => {
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
           {isSubmitting ? (
-            <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+            <div className="flex items-center justify-center space-x-[1vw]">
+              <div className="animate-spin rounded-full h-[1.5rem] w-[1.5rem] border-2 border-white border-t-transparent"></div>
               <span>처리 중...</span>
             </div>
           ) : isDataLoading ? (

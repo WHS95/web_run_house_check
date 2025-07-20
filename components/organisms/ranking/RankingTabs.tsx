@@ -27,12 +27,12 @@ const RankingTabs: React.FC<RankingTabsProps> = ({
   }
 
   return (
-    <div className='flex p-1 mb-6 rounded-lg bg-basic-black-gray'>
+    <div className='flex p-[0.25rem] mb-[3vh] rounded-lg bg-basic-black-gray'>
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => handleTabClick(tab.id)}
-          className={`flex-1 py-2 rounded-md text-sm font-medium transition-all duration-200 
+          className={`flex-1 py-[1vh] rounded-md text-[0.875rem] font-medium transition-all duration-200 
             ${
               activeTabId === tab.id
                 ? "bg-white text-basic-black-gray shadow-lg font-semibold transform scale-[1.02]"

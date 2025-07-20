@@ -267,12 +267,12 @@ const UltraFastRankingTemplate = () => {
       </div>
 
       {/* ⚡ RankingInfo- 고정 */}
-      <div className="fixed top-[55px] left-0 right-0 bg-basic-black z-20">
-        <div className="px-2 pb-4">
-          <div className="mb-6 mt-6 flex items-center justify-between">
+      <div className="fixed top-[7vh] left-0 right-0 bg-basic-black z-20">
+        <div className="px-[2vw] pb-[2vh]">
+          <div className="mb-[3vh] mt-[3vh] flex items-center justify-between">
             <button 
               onClick={handlePrevMonth} 
-              className={`p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
+              className={`p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
                 isDataLoading 
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-white/10'
@@ -281,7 +281,7 @@ const UltraFastRankingTemplate = () => {
               disabled={isDataLoading}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <IoMdArrowDropleft className="h-6 w-6" />
+              <IoMdArrowDropleft className="h-[1.5rem] w-[1.5rem]" />
             </button>
             
             <RankingInfo 
@@ -292,7 +292,7 @@ const UltraFastRankingTemplate = () => {
             
             <button 
               onClick={handleNextMonth} 
-              className={`p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
+              className={`p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
                 isDataLoading 
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-white/10'
@@ -301,7 +301,7 @@ const UltraFastRankingTemplate = () => {
               disabled={isDataLoading}
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              <IoMdArrowDropright className="h-6 w-6" />
+              <IoMdArrowDropright className="h-[1.5rem] w-[1.5rem]" />
             </button>
           </div>
           
@@ -326,7 +326,7 @@ const UltraFastRankingTemplate = () => {
       </div>
       
       {/* ⚡ 스크롤 가능한 랭킹 리스트 영역 */}
-      <div className="flex-1 bg-basic-black text-black flex flex-col mt-[300px]  hw-accelerated">
+      <div className="flex-1 bg-basic-black text-black flex flex-col mt-[35vh] hw-accelerated">
         {/* ⚡ 데이터 또는 로딩 스피너 표시 */}
         <div className="flex-1 overflow-y-auto native-scroll">
           {isDataLoading ? (
@@ -337,15 +337,15 @@ const UltraFastRankingTemplate = () => {
               activeTab={activeTab}
             />
           ) : (
-            <div className="flex-1 flex items-center justify-center pb-safe min-h-[400px]">
+            <div className="flex-1 flex items-center justify-center pb-safe min-h-[50vh]">
               <div className="text-center">
-                <div className="mb-4 text-gray-400">
-                  <svg className="w-16 h-16 mx-auto opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                <div className="mb-[2vh] text-gray-400">
+                  <svg className="w-[4rem] h-[4rem] mx-auto opacity-50" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <p className="text-gray-500 text-lg font-medium">해당 월의 랭킹 데이터가 없습니다</p>
-                <p className="text-gray-400 text-sm mt-2">다른 월을 확인해보세요</p>
+                <p className="text-gray-500 text-[1.125rem] font-medium">해당 월의 랭킹 데이터가 없습니다</p>
+                <p className="text-gray-400 text-[0.875rem] mt-[1vh]">다른 월을 확인해보세요</p>
               </div>
             </div>
           )}

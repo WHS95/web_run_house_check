@@ -53,19 +53,19 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
   };
 
   return (
-    <div className='flex overflow-y-auto justify-between items-center px-4 py-3 border-b border-white'>
+    <div className='flex overflow-y-auto justify-between items-center px-[4vw] py-[1.5vh] border-b border-white'>
       <span
-        className={`w-1/6 text-center ${rank <= 3 ? "text-2xl" : "text-sm"}`}
+        className={`w-1/6 text-center ${rank <= 3 ? "text-[1.5rem]" : "text-[0.875rem]"}`}
       >
         {getRankDisplay()}
       </span>
       <div className='flex justify-center items-center w-3/6'>
         {/* <ProfileIcon /> */}
-        <span className='text-sm font-normal text-center text-white'>
+        <span className='text-[0.875rem] font-normal text-center text-white'>
           {name}
         </span>
       </div>
-      <span className='w-2/6 text-sm font-normal text-center text-white'>
+      <span className='w-2/6 text-[0.875rem] font-normal text-center text-white'>
         {score}
       </span>
     </div>

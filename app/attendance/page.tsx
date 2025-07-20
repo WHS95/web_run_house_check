@@ -7,7 +7,7 @@ const UltraFastAttendanceTemplate = nextDynamic(
   {
     loading: () => (
       <div className='flex justify-center items-center min-h-screen bg-basic-black'>
-        <div className='w-8 h-8 rounded-full border-2 border-blue-500 animate-spin border-t-transparent'></div>
+        <div className='w-[2rem] h-[2rem] rounded-full border-2 border-blue-500 animate-spin border-t-transparent'></div>
       </div>
     ),
     ssr: false, // 클라이언트 사이드에서만 렌더링
@@ -27,16 +27,16 @@ export const metadata = {
 const AttendancePageFallback = () => (
   <div className='min-h-screen bg-basic-black'>
     <div className='pt-safe'>
-      <div className='flex items-center justify-between w-full px-4 py-4 border-b border-[#EAEAF3]'>
-        <div className='w-20 h-6 rounded animate-pulse bg-basic-black'></div>
-        <div className='w-6 h-6 rounded animate-pulse bg-basic-black'></div>
+      <div className='flex items-center justify-between w-full px-[4vw] py-[2vh] border-b border-[#EAEAF3]'>
+        <div className='w-[20vw] h-[1.5rem] rounded animate-pulse bg-basic-black'></div>
+        <div className='w-[1.5rem] h-[1.5rem] rounded animate-pulse bg-basic-black'></div>
       </div>
     </div>
-    <div className='px-4 pt-6 space-y-6'>
+    <div className='px-[4vw] pt-[3vh] space-y-[3vh]'>
       {Array.from({ length: 5 }).map((_, index) => (
         <div key={index} className='animate-pulse'>
-          <div className='mb-3 w-24 h-4 rounded bg-basic-black'></div>
-          <div className='h-12 rounded-xl bg-basic-black'></div>
+          <div className='mb-[1.5vh] w-[24vw] h-[1rem] rounded bg-basic-black'></div>
+          <div className='h-[6vh] rounded-xl bg-basic-black'></div>
         </div>
       ))}
     </div>

@@ -1463,3 +1463,131 @@ export async function updateAttendanceRecord(
     };
   }
 }
+
+// ==================== 사용자 활동 통계 관련 함수들 ====================
+
+export interface UserActivityStatistics {
+  period_label: string;
+  attendance_count: number;
+  meetings_created_count: number;
+  total_participants: number;
+  user_rank: number;
+}
+
+export interface CurrentMonthStats {
+  attendance_count: number;
+  meetings_created_count: number;
+  user_rank: number;
+  total_participants: number;
+  current_month: string;
+}
+
+interface GetUserActivityStatisticsReturn {
+  data: UserActivityStatistics[] | null;
+  error: Error | null;
+}
+
+interface GetCurrentMonthStatsReturn {
+  data: CurrentMonthStats | null;
+  error: Error | null;
+}
+
+/**
+ * 사용자의 주별, 월별, 년별 활동 통계를 가져옵니다.
+ */
+export async function getUserActivityStatistics(
+  userId: string,
+  timePeriod: 'week' | 'month' | 'year' = 'week'
+): Promise<GetUserActivityStatisticsReturn> {
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .schema("attendance")
+      .rpc("get_user_activity_statistics", {
+        p_user_id: userId,
+        p_time_period: timePeriod
+      });
+
+    if (error) {
+      console.error("사용자 활동 통계 조회 오류:", error);
+      return { data: null, error: new Error(error.message) };
+    }
+
+    return { data: data || [], error: null };
+  } catch (error: any) {
+    console.error("사용자 활동 통계 조회 오류:", error);
+    return {
+      data: null,
+      error: new Error(error.message || "알 수 없는 오류 발생"),
+    };
+  }
+}
+
+/**
+ * 사용자의 이번 달 활동 통계를 가져옵니다.
+ */
+export async function getCurrentMonthStats(
+  userId: string
+): Promise<GetCurrentMonthStatsReturn> {
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .schema("attendance")
+      .rpc("get_current_month_stats", {
+        p_user_id: userId
+      });
+
+    if (error) {
+      console.error("이번 달 통계 조회 오류:", error);
+      return { data: null, error: new Error(error.message) };
+    }
+
+    // 첫 번째 결과만 반환 (UNION ALL로 인해 배열 형태로 반환됨)
+    const result = data?.[0] || null;
+    return { data: result, error: null };
+  } catch (error: any) {
+    console.error("이번 달 통계 조회 오류:", error);
+    return {
+      data: null,
+      error: new Error(error.message || "알 수 없는 오류 발생"),
+    };
+  }
+}
+
+/**
+ * 사용자의 특정 년월 활동 통계를 가져옵니다.
+ */
+export async function getSpecificMonthStats(
+  userId: string,
+  year: number,
+  month: number
+): Promise<GetCurrentMonthStatsReturn> {
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .schema("attendance")
+      .rpc("get_specific_month_stats", {
+        p_user_id: userId,
+        p_year: year,
+        p_month: month
+      });
+
+    if (error) {
+      console.error("특정 월 통계 조회 오류:", error);
+      return { data: null, error: new Error(error.message) };
+    }
+
+    // 첫 번째 결과만 반환 (UNION ALL로 인해 배열 형태로 반환됨)
+    const result = data?.[0] || null;
+    return { data: result, error: null };
+  } catch (error: any) {
+    console.error("특정 월 통계 조회 오류:", error);
+    return {
+      data: null,
+      error: new Error(error.message || "알 수 없는 오류 발생"),
+    };
+  }
+}

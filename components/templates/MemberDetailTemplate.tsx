@@ -1,12 +1,13 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { FiSettings } from 'react-icons/fi';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import MemberProfileInfo from '@/components/organisms/manager/memberDetail/MemberProfileInfo';
 import MemberActivityHistory from '@/components/organisms/manager/memberDetail/MemberActivityHistory';
-import ActivityContributionGraph from '@/components/molecules/ActivityContributionGraph';
+// import ActivityContributionGraph from '@/components/molecules/ActivityContributionGraph';
+import ActivitySummaryCard from '@/components/molecules/ActivitySummaryCard';
 
 interface Activity {
     type: 'attendance' | 'create_meeting';
@@ -35,6 +36,7 @@ interface ActivityData {
 interface MemberDetailTemplateProps {
     userProfile: UserProfileForMyPage | null;
     activityData: ActivityData;
+    userId?: string;
 }
 
 const ErrorState = memo(() => (
@@ -60,7 +62,7 @@ const AdminButton = memo(() => (
 ));
 AdminButton.displayName = 'AdminButton';
 
-const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, activityData }) => {
+const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, activityData, userId }) => {
     const displayName = useMemo(() => {
         if (!userProfile?.firstName) return '사용자';
         return userProfile.birthYear 
@@ -95,12 +97,21 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
             
             <div className="flex-1 overflow-y-auto px-[4vw] py-[2vh] pt-[10vh]">
                 <MemberProfileInfo {...profileProps} />
-                <ActivityContributionGraph 
-                    activities={activityData.activities}
-                />
-                <MemberActivityHistory 
-                    activities={activityData.activities}
-                />
+                
+                {/* NRC 스타일 이번 달 요약 카드 */}
+                {userId && (
+                    <ActivitySummaryCard 
+                        userId={userId}
+                        className="bg-basic-black-gray rounded-[1rem] p-[6vw] mb-[4vh]"
+                    />
+                )}
+                
+                {/* 활동 내역 */}
+                <div className="bg-basic-black-gray rounded-[1rem] p-[3vw] mb-[2vh]">
+                    <MemberActivityHistory 
+                        activities={activityData.activities}
+                    />
+                </div>
             </div>
         </div>
     );

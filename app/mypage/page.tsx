@@ -77,6 +77,7 @@ export default function MyPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // ⚡ Supabase 클라이언트 (메모화)
   const supabase = useMemo(
@@ -101,6 +102,9 @@ export default function MyPage() {
           router.push("/auth/login");
           return;
         }
+
+        // 사용자 ID 저장
+        setUserId(user.id);
 
         // 2. 통합 마이페이지 데이터 조회 (4-5번 통신 → 1번 통신)
         const { data: result, error } = await supabase
@@ -189,6 +193,7 @@ export default function MyPage() {
     <MemberDetailTemplate
       userProfile={userProfile}
       activityData={activityData}
+      userId={userId || undefined}
     />
   );
 }

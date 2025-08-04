@@ -57,7 +57,7 @@ const MemberActivityHistory = memo<MemberActivityHistoryProps>(
     }, [recentActivities]);
 
     return (
-      <div className='mt-[3vh] bg-basic-black-gray rounded-lg p-[2vw]'>
+      <div className='mt-[1vh] bg-basic-black-gray rounded-lg p-[2vw]'>
         {/* ⚡ 활동 목록만 표시 (헤더 제거) */}
         <div>{activityItems}</div>
       </div>

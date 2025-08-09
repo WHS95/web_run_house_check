@@ -9,14 +9,14 @@ import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation"
 // iOS 스타일의 깔끔한 로딩 컴포넌트
 function AdminDashboardSkeleton() {
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
-      {/* 헤더 스켈레톤 - iOS 스타일 */}
-      <div className='sticky top-0 z-10 border-b backdrop-blur-md bg-white/80 border-gray-200/60'>
+    <div className='flex flex-col h-screen bg-basic-black'>
+      {/* 헤더 스켈레톤 */}
+      <div className='sticky top-0 z-10 border-b backdrop-blur-md bg-basic-black-gray/80 border-basic-gray/60'>
         <div className='px-4 py-4 safe-area-pt'>
           <div className='flex justify-between items-center'>
             <div className='flex items-center space-x-3'>
-              <div className='w-24 h-6 bg-gray-200 rounded-lg animate-pulse'></div>
-              <div className='w-20 h-6 bg-gray-200 rounded-lg animate-pulse'></div>
+              <div className='w-24 h-6 bg-basic-gray rounded-lg animate-pulse'></div>
+              <div className='w-20 h-6 bg-basic-gray rounded-lg animate-pulse'></div>
             </div>
           </div>
         </div>
@@ -24,19 +24,19 @@ function AdminDashboardSkeleton() {
 
       <div className='overflow-y-auto flex-1 pb-safe-area-pb'>
         <div className='px-4 py-6 mx-auto max-w-lg'>
-          {/* 기본 통계 스켈레톤 - iOS 카드 스타일 */}
+          {/* 기본 통계 스켈레톤 */}
           <div className='space-y-6'>
             <div className='grid grid-cols-3 gap-4'>
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className='p-4 bg-white rounded-2xl border border-gray-100 shadow-sm'
+                  className='p-4 bg-basic-black-gray rounded-2xl border border-basic-gray/30 shadow-sm'
                 >
                   <div className='flex flex-col items-center space-y-3 text-center'>
-                    <div className='w-10 h-10 bg-gray-200 rounded-xl animate-pulse'></div>
+                    <div className='w-10 h-10 bg-basic-gray rounded-xl animate-pulse'></div>
                     <div>
-                      <div className='w-12 h-3 bg-gray-200 rounded animate-pulse'></div>
-                      <div className='mt-2 w-16 h-6 bg-gray-200 rounded animate-pulse'></div>
+                      <div className='w-12 h-3 bg-basic-gray rounded animate-pulse'></div>
+                      <div className='mt-2 w-16 h-6 bg-basic-gray rounded animate-pulse'></div>
                     </div>
                   </div>
                 </div>
@@ -44,25 +44,25 @@ function AdminDashboardSkeleton() {
             </div>
           </div>
 
-          {/* 이달 현황 스켈레톤 - iOS 리스트 스타일 */}
+          {/* 이달 현황 스켈레톤 */}
           <div className='mt-8'>
             <div className='flex items-center mb-4 space-x-2'>
-              <div className='w-6 h-6 bg-gray-200 rounded-full animate-pulse'></div>
-              <div className='w-24 h-6 bg-gray-200 rounded-lg animate-pulse'></div>
+              <div className='w-6 h-6 bg-basic-gray rounded-full animate-pulse'></div>
+              <div className='w-24 h-6 bg-basic-gray rounded-lg animate-pulse'></div>
             </div>
 
             <div className='space-y-3'>
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
-                  className='p-4 bg-white rounded-2xl border border-gray-100 shadow-sm'
+                  className='p-4 bg-basic-black-gray rounded-2xl border border-basic-gray/30 shadow-sm'
                 >
                   <div className='flex justify-between items-center'>
                     <div>
-                      <div className='w-20 h-4 bg-gray-200 rounded animate-pulse'></div>
-                      <div className='mt-2 w-16 h-6 bg-gray-200 rounded animate-pulse'></div>
+                      <div className='w-20 h-4 bg-basic-gray rounded animate-pulse'></div>
+                      <div className='mt-2 w-16 h-6 bg-basic-gray rounded animate-pulse'></div>
                     </div>
-                    <div className='w-12 h-6 bg-gray-200 rounded animate-pulse'></div>
+                    <div className='w-12 h-6 bg-basic-gray rounded animate-pulse'></div>
                   </div>
                 </div>
               ))}
@@ -121,11 +121,11 @@ export default function AdminPage() {
 
   if (error) {
     return (
-      <div className='flex justify-center items-center min-h-screen bg-gray-50'>
-        <div className='p-6 mx-4 max-w-sm text-center bg-white rounded-2xl border border-red-200 shadow-sm'>
-          <div className='flex justify-center items-center mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full'>
+      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
+        <div className='p-6 mx-4 max-w-sm text-center bg-basic-black-gray rounded-2xl border border-red-500/30 shadow-sm'>
+          <div className='flex justify-center items-center mx-auto mb-4 w-16 h-16 bg-red-500/20 rounded-full'>
             <svg
-              className='w-8 h-8 text-red-600'
+              className='w-8 h-8 text-red-400'
               fill='none'
               stroke='currentColor'
               viewBox='0 0 24 24'
@@ -138,10 +138,10 @@ export default function AdminPage() {
               />
             </svg>
           </div>
-          <h3 className='mb-2 text-lg font-semibold text-gray-900'>
+          <h3 className='mb-2 text-lg font-semibold text-white'>
             오류 발생
           </h3>
-          <p className='text-sm text-gray-600'>{error}</p>
+          <p className='text-sm text-gray-300'>{error}</p>
         </div>
       </div>
     );
@@ -159,20 +159,20 @@ export default function AdminPage() {
   const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
 
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
-      {/* iOS 스타일 헤더 */}
-      <div className='sticky top-0 z-10 border-b backdrop-blur-md bg-white/80 border-gray-200/60'>
+    <div className='flex flex-col h-screen bg-basic-black'>
+      {/* 헤더 */}
+      <div className='sticky top-0 z-10 border-b backdrop-blur-md bg-basic-black-gray/80 border-basic-gray/60'>
         <div className='px-4 py-4 safe-area-pt'>
           <div className='flex justify-between items-center'>
-            {/* 년도/월 선택 드롭다운 - iOS 스타일 */}
+            {/* 년도/월 선택 드롭다운 */}
             <div className='flex items-center space-x-3'>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                className='px-4 py-2 text-sm bg-white rounded-2xl border border-gray-200 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                className='px-4 py-2 text-sm bg-basic-black-gray text-white rounded-2xl border border-basic-gray shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-basic-blue focus:border-transparent'
               >
                 {yearOptions.map((year) => (
-                  <option key={year} value={year}>
+                  <option key={year} value={year} className='bg-basic-black-gray text-white'>
                     {year}년
                   </option>
                 ))}
@@ -181,10 +181,10 @@ export default function AdminPage() {
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                className='px-4 py-2 text-sm bg-white rounded-2xl border border-gray-200 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                className='px-4 py-2 text-sm bg-basic-black-gray text-white rounded-2xl border border-basic-gray shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-basic-blue focus:border-transparent'
               >
                 {monthOptions.map((month) => (
-                  <option key={month} value={month}>
+                  <option key={month} value={month} className='bg-basic-black-gray text-white'>
                     {month}월
                   </option>
                 ))}
@@ -195,7 +195,6 @@ export default function AdminPage() {
       </div>
 
       {/* AdminDashboard 컴포넌트 */}
-
       <AdminDashboard stats={stats} selectedMonth={selectedMonth} />
 
       {/* 하단 네비게이션 */}

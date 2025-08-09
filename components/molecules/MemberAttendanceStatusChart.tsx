@@ -28,9 +28,9 @@ export default function MemberAttendanceStatusChart({
   } = data;
 
   return (
-    <div className='p-6 bg-white rounded-lg border border-gray-200 shadow-sm'>
+    <div className='p-6 rounded-lg  shadow-sm bg-basic-black-gray'>
       <div className='mb-6'>
-        <h3 className='mb-1 text-lg font-semibold text-gray-900'>{title}</h3>
+        <h3 className='mb-1 text-lg font-semibold text-white'>{title}</h3>
         {/* <p className='text-sm text-gray-500'>
           {year}년 {month}월 멤버 출석 현황 분석
         </p> */}
@@ -64,20 +64,18 @@ export default function MemberAttendanceStatusChart({
           <div className='space-y-4'>
             <div>
               <div className='flex justify-between items-center mb-2'>
-                <span className='text-sm font-medium text-gray-700'>
-                  출석율
-                </span>
-                <span className='text-sm font-bold text-blue-600'>
+                <span className='text-sm font-medium text-white'>출석율</span>
+                <span className='text-sm font-bold text-basic-blue'>
                   {attendanceRate}%
                 </span>
               </div>
               <div className='overflow-hidden w-full h-3 bg-gray-200 rounded-full'>
                 <div
-                  className='h-full bg-blue-500 transition-all duration-300 ease-out'
+                  className='h-full bg-basic-blue transition-all duration-300 ease-out'
                   style={{ width: `${attendanceRate}%` }}
                 ></div>
               </div>
-              <div className='flex justify-between mt-1 text-xs text-gray-500'>
+              <div className='flex justify-between mt-1 text-xs text-white'>
                 <span>{attendedMembers}명 출석</span>
                 <span>{absentMembers}명 미출석</span>
               </div>

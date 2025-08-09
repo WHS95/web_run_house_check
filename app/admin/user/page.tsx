@@ -8,32 +8,32 @@ import { getUsersByCrewIdOptimized } from "@/lib/supabase/admin";
 // 로딩 컴포넌트
 function AdminUserManagementSkeleton() {
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
+    <div className='flex flex-col h-screen bg-basic-black'>
       {/* 헤더 스켈레톤 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
+      <div className='sticky top-0 z-10 bg-basic-black-gray border-b border-basic-gray'>
         <div className='px-4 py-4'>
           <div className='flex justify-between items-center'>
             <div>
-              <div className='w-20 h-6 bg-gray-200 rounded animate-pulse'></div>
-              <div className='mt-1 w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
+              <div className='w-20 h-6 bg-basic-gray rounded animate-pulse'></div>
+              <div className='mt-1 w-16 h-4 bg-basic-gray rounded animate-pulse'></div>
             </div>
           </div>
         </div>
       </div>
 
       {/* 검색 및 필터 스켈레톤 */}
-      <div className='sticky top-[73px] z-10 bg-gray-50 px-4 py-4 space-y-4 border-b border-gray-100'>
-        <div className='w-full h-10 bg-gray-200 rounded-lg animate-pulse'></div>
+      <div className='sticky top-[73px] z-10 bg-basic-black px-4 py-4 space-y-4 border-b border-basic-gray'>
+        <div className='w-full h-10 bg-basic-gray rounded-lg animate-pulse'></div>
         <div className='flex justify-between items-center'>
           <div className='flex space-x-2'>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className='w-16 h-8 bg-gray-200 rounded-full animate-pulse'
+                className='w-16 h-8 bg-basic-gray rounded-full animate-pulse'
               ></div>
             ))}
           </div>
-          <div className='w-20 h-8 bg-gray-200 rounded-full animate-pulse'></div>
+          <div className='w-20 h-8 bg-basic-gray rounded-full animate-pulse'></div>
         </div>
       </div>
 
@@ -41,21 +41,21 @@ function AdminUserManagementSkeleton() {
       <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
         <div className='space-y-3'>
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className='p-4 bg-white rounded-lg border-gray-200'>
+            <div key={i} className='p-4 bg-basic-black-gray rounded-lg border border-basic-gray'>
               <div className='flex justify-between items-center'>
                 <div className='flex-1'>
                   <div className='flex justify-between items-center mb-2'>
                     <div className='flex items-center space-x-3'>
-                      <div className='w-20 h-5 bg-gray-200 rounded animate-pulse'></div>
-                      <div className='w-12 h-5 bg-gray-200 rounded-full animate-pulse'></div>
+                      <div className='w-20 h-5 bg-basic-gray rounded animate-pulse'></div>
+                      <div className='w-12 h-5 bg-basic-gray rounded-full animate-pulse'></div>
                     </div>
-                    <div className='w-6 h-6 bg-gray-200 rounded animate-pulse'></div>
+                    <div className='w-6 h-6 bg-basic-gray rounded animate-pulse'></div>
                   </div>
                   <div className='space-y-1'>
                     {[1, 2, 3].map((j) => (
                       <div key={j} className='flex justify-between'>
-                        <div className='w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
-                        <div className='w-24 h-4 bg-gray-200 rounded animate-pulse'></div>
+                        <div className='w-16 h-4 bg-basic-gray rounded animate-pulse'></div>
+                        <div className='w-24 h-4 bg-basic-gray rounded animate-pulse'></div>
                       </div>
                     ))}
                   </div>
@@ -110,13 +110,13 @@ export default function AdminUserPage() {
 
   if (error) {
     return (
-      <div className='flex flex-col h-screen bg-gray-50'>
+      <div className='flex flex-col h-screen bg-basic-black'>
         <div className='flex flex-1 justify-center items-center'>
           <div className='text-center'>
-            <h2 className='mb-2 text-lg font-semibold text-gray-900'>
+            <h2 className='mb-2 text-lg font-semibold text-white'>
               데이터를 불러올 수 없습니다
             </h2>
-            <p className='text-gray-600'>{error}</p>
+            <p className='text-gray-300'>{error}</p>
           </div>
         </div>
       </div>

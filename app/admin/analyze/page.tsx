@@ -93,7 +93,13 @@ async function getDayParticipationAnalysis(
 
   // 요일별 출석 횟수 집계
   const dayAttendanceCounts: { [key: number]: number } = {
-    0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0,
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
   };
 
   let totalAttendanceCount = 0;
@@ -373,14 +379,14 @@ interface AnalyzeData {
 // 로딩 스켈레톤 컴포넌트
 function AnalyzeLoadingSkeleton() {
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
+    <div className='flex flex-col h-screen bg-basic-black'>
       {/* 헤더 스켈레톤 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
+      <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
         <div className='px-4 py-4'>
           <div className='flex justify-between items-center'>
             <div>
-              <div className='w-24 h-6 bg-gray-200 rounded animate-pulse'></div>
-              <div className='mt-1 w-32 h-4 bg-gray-100 rounded animate-pulse'></div>
+              <div className='w-24 h-6 rounded animate-pulse bg-basic-gray'></div>
+              <div className='mt-1 w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
             </div>
           </div>
         </div>
@@ -390,21 +396,21 @@ function AnalyzeLoadingSkeleton() {
       <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
         <div className='space-y-6'>
           {/* 차트 스켈레톤 */}
-          <div className='p-6 bg-white rounded-lg border border-gray-200'>
+          <div className='p-6 rounded-lg border bg-basic-black-gray border-basic-gray'>
             <div className='mb-6'>
-              <div className='mb-2 w-48 h-6 bg-gray-200 rounded animate-pulse'></div>
-              <div className='w-32 h-4 bg-gray-100 rounded animate-pulse'></div>
+              <div className='mb-2 w-48 h-6 rounded animate-pulse bg-basic-gray'></div>
+              <div className='w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
             </div>
 
             {/* 차트 아이템들 스켈레톤 */}
             <div className='space-y-3'>
               {Array.from({ length: 7 }).map((_, i) => (
                 <div key={i} className='flex items-center py-3 space-x-4'>
-                  <div className='w-12 h-4 bg-gray-200 rounded animate-pulse'></div>
-                  <div className='w-3 h-3 bg-gray-200 rounded-full animate-pulse'></div>
-                  <div className='w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
-                  <div className='flex-1 h-2 bg-gray-200 rounded animate-pulse max-w-32'></div>
-                  <div className='w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
+                  <div className='w-12 h-4 rounded animate-pulse bg-basic-gray'></div>
+                  <div className='w-3 h-3 rounded-full animate-pulse bg-basic-gray'></div>
+                  <div className='w-16 h-4 rounded animate-pulse bg-basic-gray'></div>
+                  <div className='flex-1 h-2 rounded animate-pulse bg-basic-gray max-w-32'></div>
+                  <div className='w-16 h-4 rounded animate-pulse bg-basic-gray'></div>
                 </div>
               ))}
             </div>
@@ -443,7 +449,7 @@ export default function AnalyzePage() {
         setError(null);
 
         const supabase = createClient();
-        
+
         // 직접 Supabase 함수 호출
         const [
           dayParticipationData,
@@ -486,12 +492,10 @@ export default function AnalyzePage() {
 
   if (error) {
     return (
-      <div className='flex justify-center items-center min-h-screen bg-gray-50'>
-        <div className='p-6 text-center bg-white rounded-lg border border-red-200 shadow-sm'>
-          <h3 className='mb-2 text-lg font-semibold text-gray-900'>
-            오류 발생
-          </h3>
-          <p className='text-gray-600'>{error}</p>
+      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
+        <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-red-500/30'>
+          <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
+          <p className='text-gray-300'>{error}</p>
         </div>
       </div>
     );
@@ -499,25 +503,23 @@ export default function AnalyzePage() {
 
   if (!analyzeData) {
     return (
-      <div className='flex justify-center items-center min-h-screen bg-gray-50'>
-        <div className='p-6 text-center bg-white rounded-lg border border-gray-200 shadow-sm'>
-          <h3 className='mb-2 text-lg font-semibold text-gray-900'>
-            데이터 없음
-          </h3>
-          <p className='text-gray-600'>분석할 데이터가 없습니다.</p>
+      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
+        <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-basic-gray'>
+          <h3 className='mb-2 text-lg font-semibold text-white'>데이터 없음</h3>
+          <p className='text-gray-300'>분석할 데이터가 없습니다.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
+    <div className='flex flex-col h-screen bg-basic-black'>
       {/* 헤더 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
+      <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
         <div className='px-4 py-4'>
           <div className='flex justify-between items-center'>
             <div>
-              <h1 className='text-xl font-bold text-gray-900'>통계</h1>
+              <h1 className='text-xl font-bold text-white'>통계</h1>
             </div>
 
             {/* 년도/월 선택 드롭다운 */}
@@ -528,18 +530,23 @@ export default function AnalyzePage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    className='bg-white min-w-20'
+                    className='text-white bg-basic-black-gray border-basic-gray hover:bg-basic-gray min-w-20'
                   >
                     {selectedYear}년
                     <ChevronDown className='ml-1 w-4 h-4' />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
+                <DropdownMenuContent
+                  align='end'
+                  className='bg-basic-black-gray border-basic-gray'
+                >
                   {yearOptions.map((year) => (
                     <DropdownMenuItem
                       key={year}
                       onClick={() => setSelectedYear(year)}
-                      className={selectedYear === year ? "bg-blue-50" : ""}
+                      className={`text-white hover:bg-basic-gray ${
+                        selectedYear === year ? "bg-basic-blue" : ""
+                      }`}
                     >
                       {year}년
                     </DropdownMenuItem>
@@ -553,18 +560,23 @@ export default function AnalyzePage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    className='bg-white min-w-16'
+                    className='text-white bg-basic-black-gray border-basic-gray hover:bg-basic-gray min-w-16'
                   >
                     {selectedMonth}월
                     <ChevronDown className='ml-1 w-4 h-4' />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
+                <DropdownMenuContent
+                  align='end'
+                  className='bg-basic-black-gray border-basic-gray'
+                >
                   {monthOptions.map((month) => (
                     <DropdownMenuItem
                       key={month}
                       onClick={() => setSelectedMonth(month)}
-                      className={selectedMonth === month ? "bg-blue-50" : ""}
+                      className={`text-white hover:bg-basic-gray ${
+                        selectedMonth === month ? "bg-basic-blue" : ""
+                      }`}
                     >
                       {month}월
                     </DropdownMenuItem>

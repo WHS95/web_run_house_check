@@ -58,8 +58,8 @@ export default function AdminBottomNavigation() {
 
   return (
     <>
-      <div className='fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 safe-area-pb'>
-        <div className='flex items-center justify-around px-2 py-2'>
+      <div className='fixed right-0 bottom-0 left-0 z-50 border-t bg-basic-black-gray border-basic-gray safe-area-pb'>
+        <div className='flex justify-around items-center px-2 py-2'>
           {navigationItems.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -73,10 +73,10 @@ export default function AdminBottomNavigation() {
                   className='flex-1'
                 >
                   <div
-                    className={`w-full h-auto flex flex-col items-center justify-center py-2 px-1 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-50`}
+                    className={`flex flex-col justify-center items-center px-1 py-2 w-full h-auto text-gray-400 rounded-xl`}
                   >
-                    <item.icon className='w-5 h-5 mb-1 text-gray-500' />
-                    <span className='text-xs font-medium text-gray-500'>
+                    <item.icon className='mb-1 w-5 h-5 text-gray-400' />
+                    <span className='text-xs font-medium text-gray-400'>
                       {item.name}
                     </span>
                   </div>
@@ -89,19 +89,17 @@ export default function AdminBottomNavigation() {
                 <Button
                   variant='ghost'
                   className={`w-full h-auto flex flex-col items-center justify-center py-2 px-1 rounded-xl ${
-                    isActive
-                      ? "text-blue-600 bg-blue-50"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    isActive ? "text-basic-blue" : "text-gray-400"
                   }`}
                 >
                   <item.icon
                     className={`h-5 w-5 mb-1 ${
-                      isActive ? "text-blue-600" : "text-gray-500"
+                      isActive ? "text-basic-blue" : "text-gray-400"
                     }`}
                   />
                   <span
                     className={`text-xs font-medium ${
-                      isActive ? "text-blue-600" : "text-gray-500"
+                      isActive ? "text-basic-blue" : "text-gray-400"
                     }`}
                   >
                     {item.name}

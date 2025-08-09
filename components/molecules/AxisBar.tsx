@@ -18,14 +18,12 @@ export default function DayParticipationItem({
   return (
     <div className='flex justify-between items-center px-1 py-1'>
       <div className='flex flex-1 items-center space-x-3'>
-        <div className='w-12 text-sm font-medium text-gray-500'>
+        <div className='w-12 text-sm font-medium text-white'>
           {participationRate}%
         </div>
         <div className='flex flex-1 items-center space-x-1'>
           <div className={`w-3 h-3 rounded-full ${color}`}></div>
-          <span className='font-medium text-gray-700 min-w-[60px]'>
-            {dayName}
-          </span>
+          <span className='font-medium text-white min-w-[60px]'>{dayName}</span>
         </div>
         <div className='flex-1 h-2 bg-gray-200 rounded-full max-w-48'>
           <div

@@ -281,97 +281,100 @@ export default function AdminUserManagement({
   };
 
   return (
-    <div className='flex overflow-hidden relative flex-col h-screen bg-gray-50'>
+    <div className='flex overflow-hidden relative flex-col h-screen'>
       {/* 검색 및 필터 - 고정 */}
-      <div className='fixed top-0 right-0 left-0 z-50 px-4 py-4 space-y-4 bg-gray-50 border-b border-gray-100'>
+      <div className='fixed top-0 right-0 left-0 z-50 px-4 py-4 space-y-4 bg-black-gray'>
         {/* 검색 */}
         <div className='relative'>
-          <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
           <Input
             placeholder='이름, 전화번호 또는 이메일로 검색'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='pl-10 bg-white rounded-lg border-gray-200'
+            className='pl-10 placeholder-white text-white rounded-lg bg-black-gray'
           />
+          <div className='flex justify-between items-center bg-black-gray'>
+            <div className='flex space-x-2'>
+              {/* 상태 필터 드롭다운 */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='text-white rounded-full bg-black-gray'
+                  >
+                    <ChevronDown className='mr-1 w-4 h-4' />
+                    {statusFilter}
+                    <span className='ml-2 text-white'>
+                      {statusCounts[statusFilter as keyof typeof statusCounts]}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='start'>
+                  {["전체", "활성", "비활성"].map((status) => (
+                    <DropdownMenuItem
+                      key={status}
+                      onClick={() => setStatusFilter(status)}
+                      className={
+                        statusFilter === status
+                          ? "bg-black-gray  font-medium"
+                          : ""
+                      }
+                    >
+                      <div className='flex justify-between items-center w-full text-white'>
+                        <span>{status}</span>
+                        <span className='ml-2'>
+                          {statusCounts[status as keyof typeof statusCounts]}
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            <div className='flex space-x-2 text-white'>
+              {/* 정렬 드롭다운 */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='rounded-full bg-black-gray'
+                  >
+                    <ArrowUpDown className='mr-1 w-4 h-4' />
+                    {getSortLabel()}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuItem
+                    onClick={() => handleSort("lastAttendance")}
+                  >
+                    참석
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSort("joinDate")}>
+                    가입
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSort("name")}>
+                    이름
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
         </div>
 
         {/* 상태 필터 탭과 정렬 */}
-        <div className='flex justify-between items-center'>
-          <div className='flex space-x-2'>
-            {/* 상태 필터 드롭다운 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className='bg-white rounded-full'
-                >
-                  <ChevronDown className='mr-1 w-4 h-4' />
-                  {statusFilter}
-                  <span className='ml-2 text-gray-500'>
-                    {statusCounts[statusFilter as keyof typeof statusCounts]}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='start'>
-                {["전체", "활성", "비활성"].map((status) => (
-                  <DropdownMenuItem
-                    key={status}
-                    onClick={() => setStatusFilter(status)}
-                    className={
-                      statusFilter === status ? "bg-blue-50  font-medium" : ""
-                    }
-                  >
-                    <div className='flex justify-between items-center w-full'>
-                      <span>{status}</span>
-                      <span className='ml-2 text-gray-500'>
-                        {statusCounts[status as keyof typeof statusCounts]}
-                      </span>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          <div className='flex space-x-2'>
-            {/* 정렬 드롭다운 */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className='bg-white rounded-full'
-                >
-                  <ArrowUpDown className='mr-1 w-4 h-4' />
-                  {getSortLabel()}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end'>
-                <DropdownMenuItem onClick={() => handleSort("lastAttendance")}>
-                  참석
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort("joinDate")}>
-                  가입
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort("name")}>
-                  이름
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
       </div>
 
       {/* 메인 컨텐츠 - 스크롤 가능  하단 바텀에 가려지지지 않게 pb-24 반영*/}
-      <div className='overflow-y-auto flex-1 px-4 pt-32 pb-24'>
+      <div className='overflow-y-auto flex-1 px-4 pt-20 pb-24'>
         {/* 사용자 목록 */}
         <div className='space-y-3'>
           {filteredUsers.map((user) => {
             const isExpanded = expandedUsers.has(user.id);
 
             return (
-              <Card key={user.id} className='bg-white border-gray-200'>
+              <Card key={user.id} className='bg-black-gray'>
                 <CardContent className='px-3 py-2'>
                   {/* 메인 사용자 정보 */}
                   <div className='flex justify-between items-center'>
@@ -379,7 +382,7 @@ export default function AdminUserManagement({
                       <div className='flex justify-between items-center'>
                         <div className='flex items-center space-x-2 sm:space-x-3'>
                           <div className='flex items-center space-x-2'>
-                            <h3 className='text-base font-semibold text-gray-900 sm:text-lg'>
+                            <h3 className='text-base font-semibold text-white sm:text-lg'>
                               {getUserDisplayName(user)}
                             </h3>
                             {getStatusBadge(user.status)}
@@ -461,7 +464,7 @@ export default function AdminUserManagement({
                       isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <div className='pt-3 mt-3 border-t border-gray-100'>
+                    <div className='pt-3 mt-3 border-t'>
                       <div className='grid grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-2'>
                         <div className='flex justify-between'>
                           <span className='font-bold'>연락처</span>

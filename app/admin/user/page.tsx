@@ -1,73 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useAdminContext } from "../AdminContextProvider";
 import AdminUserManagement from "@/components/organisms/AdminUserManagement";
 import { getUsersByCrewIdOptimized } from "@/lib/supabase/admin";
+import PageHeader from "@/components/organisms/common/PageHeader";
 
-// 로딩 컴포넌트
-function AdminUserManagementSkeleton() {
-  return (
-    <div className='flex flex-col h-screen bg-gray-50'>
-      {/* 헤더 스켈레톤 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
-        <div className='px-4 py-4'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <div className='w-20 h-6 bg-gray-200 rounded animate-pulse'></div>
-              <div className='mt-1 w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
-            </div>
+// iOS 스타일 로딩 스켈레톤 컴포넌트
+const UserManagementSkeleton = React.memo(() => (
+  <div className='space-y-[3vh] animate-pulse'>
+    {Array.from({ length: 5 }).map((_, index) => (
+      <div key={index} className='bg-basic-black-gray rounded-xl p-[4vw]'>
+        <div className='flex justify-between items-center mb-[2vh]'>
+          <div className='flex items-center space-x-[3vw]'>
+            <div className='h-[1rem] bg-gray-600 rounded w-[24vw]'></div>
+            <div className='h-[1rem] bg-gray-600 rounded-full w-[12vw]'></div>
           </div>
+          <div className='w-[1.5rem] h-[1.5rem] bg-gray-600 rounded'></div>
         </div>
-      </div>
-
-      {/* 검색 및 필터 스켈레톤 */}
-      <div className='sticky top-[73px] z-10 bg-gray-50 px-4 py-4 space-y-4 border-b border-gray-100'>
-        <div className='w-full h-10 bg-gray-200 rounded-lg animate-pulse'></div>
-        <div className='flex justify-between items-center'>
-          <div className='flex space-x-2'>
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className='w-16 h-8 bg-gray-200 rounded-full animate-pulse'
-              ></div>
-            ))}
-          </div>
-          <div className='w-20 h-8 bg-gray-200 rounded-full animate-pulse'></div>
-        </div>
-      </div>
-
-      {/* 사용자 목록 스켈레톤 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
-        <div className='space-y-3'>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className='p-4 bg-white rounded-lg border-gray-200'>
-              <div className='flex justify-between items-center'>
-                <div className='flex-1'>
-                  <div className='flex justify-between items-center mb-2'>
-                    <div className='flex items-center space-x-3'>
-                      <div className='w-20 h-5 bg-gray-200 rounded animate-pulse'></div>
-                      <div className='w-12 h-5 bg-gray-200 rounded-full animate-pulse'></div>
-                    </div>
-                    <div className='w-6 h-6 bg-gray-200 rounded animate-pulse'></div>
-                  </div>
-                  <div className='space-y-1'>
-                    {[1, 2, 3].map((j) => (
-                      <div key={j} className='flex justify-between'>
-                        <div className='w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
-                        <div className='w-24 h-4 bg-gray-200 rounded animate-pulse'></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+        <div className='space-y-[1vh]'>
+          {[1, 2, 3].map((j) => (
+            <div key={j} className='flex justify-between'>
+              <div className='w-[16vw] h-[0.875rem] bg-gray-600 rounded'></div>
+              <div className='w-[24vw] h-[0.875rem] bg-gray-600 rounded'></div>
             </div>
           ))}
         </div>
       </div>
-    </div>
-  );
-}
+    ))}
+  </div>
+));
+UserManagementSkeleton.displayName = "UserManagementSkeleton";
 
 // 메인 페이지 컴포넌트
 export default function AdminUserPage() {
@@ -80,14 +43,14 @@ export default function AdminUserPage() {
     async function fetchUsers() {
       try {
         setIsLoading(true);
-        
+
         // 직접 Supabase 함수 호출
         const { data: users, error } = await getUsersByCrewIdOptimized(crewId);
-        
+
         if (error) {
           throw error;
         }
-        
+
         setUsers(users || []);
       } catch (err) {
         console.error("사용자 데이터 조회 오류:", err);
@@ -104,24 +67,28 @@ export default function AdminUserPage() {
     }
   }, [crewId]);
 
-  if (isLoading) {
-    return <AdminUserManagementSkeleton />;
-  }
-
-  if (error) {
-    return (
-      <div className='flex flex-col h-screen bg-gray-50'>
+  const UserManagementContent = () => {
+    if (error) {
+      return (
         <div className='flex flex-1 justify-center items-center'>
-          <div className='text-center'>
-            <h2 className='mb-2 text-lg font-semibold text-gray-900'>
+          <div className='text-center rounded-xl p-[6vw]'>
+            <h2 className='mb-[1vh] text-lg font-semibold text-white'>
               데이터를 불러올 수 없습니다
             </h2>
-            <p className='text-gray-600'>{error}</p>
+            <p className='text-gray-300'>{error}</p>
           </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
+    return <AdminUserManagement initialUsers={users} />;
+  };
 
-  return <AdminUserManagement initialUsers={users} />;
+  return (
+    <div className='flex overflow-hidden relative flex-col h-screen'>
+      {/* 메인 콘텐츠 - 스크롤 영역 */}
+      <div className='flex-1 overflow-y-auto native-scroll pt-[10vh] pb-[20vh] px-[4vw]'>
+        <UserManagementContent />
+      </div>
+    </div>
+  );
 }

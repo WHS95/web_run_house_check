@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, Suspense } from "react";
 import { useAdminContext } from "../AdminContextProvider";
 import ChartWithAxis from "@/components/molecules/ChartWithAxis";
 import LocationChart from "@/components/molecules/LocationChart";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import PageHeader from "@/components/organisms/common/PageHeader";
 
 // 요일별 참여율 분석 데이터 조회
 async function getDayParticipationAnalysis(
@@ -370,50 +371,45 @@ interface AnalyzeData {
   month: number;
 }
 
-// 로딩 스켈레톤 컴포넌트
-function AnalyzeLoadingSkeleton() {
-  return (
-    <div className='flex flex-col h-screen bg-gray-50'>
-      {/* 헤더 스켈레톤 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
-        <div className='px-4 py-4'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <div className='w-24 h-6 bg-gray-200 rounded animate-pulse'></div>
-              <div className='mt-1 w-32 h-4 bg-gray-100 rounded animate-pulse'></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 메인 컨텐츠 스켈레톤 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
-        <div className='space-y-6'>
-          {/* 차트 스켈레톤 */}
-          <div className='p-6 bg-white rounded-lg border border-gray-200'>
-            <div className='mb-6'>
-              <div className='mb-2 w-48 h-6 bg-gray-200 rounded animate-pulse'></div>
-              <div className='w-32 h-4 bg-gray-100 rounded animate-pulse'></div>
-            </div>
-
-            {/* 차트 아이템들 스켈레톤 */}
-            <div className='space-y-3'>
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className='flex items-center py-3 space-x-4'>
-                  <div className='w-12 h-4 bg-gray-200 rounded animate-pulse'></div>
-                  <div className='w-3 h-3 bg-gray-200 rounded-full animate-pulse'></div>
-                  <div className='w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
-                  <div className='flex-1 h-2 bg-gray-200 rounded animate-pulse max-w-32'></div>
-                  <div className='w-16 h-4 bg-gray-200 rounded animate-pulse'></div>
-                </div>
-              ))}
-            </div>
-          </div>
+// iOS 스타일 로딩 스켈레톤 컴포넌트
+const AnalyzeLoadingSkeleton = React.memo(() => (
+  <div className="space-y-[3vh] animate-pulse">
+    {/* 헤더 스켈레톤 */}
+    <div className='bg-basic-black-gray rounded-xl p-[4vw]'>
+      <div className='flex justify-between items-center'>
+        <div className='w-24 h-6 bg-gray-600 rounded'></div>
+        <div className='flex space-x-2'>
+          <div className='w-20 h-8 bg-gray-600 rounded-lg'></div>
+          <div className='w-16 h-8 bg-gray-600 rounded-lg'></div>
         </div>
       </div>
     </div>
-  );
-}
+
+    {/* 차트 스켈레톤 */}
+    {Array.from({ length: 3 }).map((_, chartIndex) => (
+      <div key={chartIndex} className='bg-basic-black-gray rounded-xl p-[4vw]'>
+        <div className='mb-[3vh]'>
+          <div className='mb-[1vh] w-48 h-6 bg-gray-600 rounded'></div>
+          <div className='w-32 h-4 bg-gray-600 rounded'></div>
+        </div>
+
+        {/* 차트 아이템들 스켈레톤 */}
+        <div className='space-y-[2vh]'>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className='flex items-center py-[1vh] space-x-[2vw]'>
+              <div className='w-12 h-4 bg-gray-600 rounded'></div>
+              <div className='w-3 h-3 bg-gray-600 rounded-full'></div>
+              <div className='w-16 h-4 bg-gray-600 rounded'></div>
+              <div className='flex-1 h-2 bg-gray-600 rounded max-w-32'></div>
+              <div className='w-16 h-4 bg-gray-600 rounded'></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+));
+AnalyzeLoadingSkeleton.displayName = 'AnalyzeLoadingSkeleton';
 
 export default function AnalyzePage() {
   const { crewId } = useAdminContext();
@@ -428,7 +424,7 @@ export default function AnalyzePage() {
 
   // 년도 옵션 생성 (현재 실제 년도 기준 ±2년)
   const currentYear = now.getFullYear();
-  const yearOptions = [];
+  const yearOptions: number[] = [];
   for (let i = currentYear - 2; i <= currentYear + 2; i++) {
     yearOptions.push(i);
   }
@@ -480,47 +476,39 @@ export default function AnalyzePage() {
     }
   }, [crewId, selectedYear, selectedMonth, fetchAnalyzeData]);
 
-  if (isLoading) {
-    return <AnalyzeLoadingSkeleton />;
-  }
-
-  if (error) {
-    return (
-      <div className='flex justify-center items-center min-h-screen bg-gray-50'>
-        <div className='p-6 text-center bg-white rounded-lg border border-red-200 shadow-sm'>
-          <h3 className='mb-2 text-lg font-semibold text-gray-900'>
-            오류 발생
-          </h3>
-          <p className='text-gray-600'>{error}</p>
+  const AnalyzeContent = () => {
+    if (error) {
+      return (
+        <div className='flex flex-1 justify-center items-center'>
+          <div className='text-center bg-basic-black-gray rounded-xl p-[6vw]'>
+            <h3 className='mb-[1vh] text-lg font-semibold text-white'>
+              오류 발생
+            </h3>
+            <p className='text-gray-300'>{error}</p>
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (!analyzeData) {
-    return (
-      <div className='flex justify-center items-center min-h-screen bg-gray-50'>
-        <div className='p-6 text-center bg-white rounded-lg border border-gray-200 shadow-sm'>
-          <h3 className='mb-2 text-lg font-semibold text-gray-900'>
-            데이터 없음
-          </h3>
-          <p className='text-gray-600'>분석할 데이터가 없습니다.</p>
+    if (!analyzeData) {
+      return (
+        <div className='flex flex-1 justify-center items-center'>
+          <div className='text-center bg-basic-black-gray rounded-xl p-[6vw]'>
+            <h3 className='mb-[1vh] text-lg font-semibold text-white'>
+              데이터 없음
+            </h3>
+            <p className='text-gray-300'>분석할 데이터가 없습니다.</p>
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  return (
-    <div className='flex flex-col h-screen bg-gray-50'>
-      {/* 헤더 */}
-      <div className='sticky top-0 z-10 bg-white border-b border-gray-200'>
-        <div className='px-4 py-4'>
+    return (
+      <>
+        {/* 년도/월 선택 */}
+        <div className='bg-basic-black-gray rounded-xl p-[4vw] mb-[3vh]'>
           <div className='flex justify-between items-center'>
-            <div>
-              <h1 className='text-xl font-bold text-gray-900'>통계</h1>
-            </div>
-
-            {/* 년도/월 선택 드롭다운 */}
+            <h1 className='text-xl font-bold text-white'>통계</h1>
             <div className='flex space-x-2'>
               {/* 년도 선택 */}
               <DropdownMenu>
@@ -528,18 +516,18 @@ export default function AnalyzePage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    className='bg-white min-w-20'
+                    className='bg-gray-700 border-gray-600 text-white min-w-20 hover:bg-gray-600'
                   >
                     {selectedYear}년
                     <ChevronDown className='ml-1 w-4 h-4' />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
+                <DropdownMenuContent align='end' className='bg-gray-800 border-gray-600'>
                   {yearOptions.map((year) => (
                     <DropdownMenuItem
                       key={year}
                       onClick={() => setSelectedYear(year)}
-                      className={selectedYear === year ? "bg-blue-50" : ""}
+                      className={`text-white hover:bg-gray-700 ${selectedYear === year ? "bg-gray-700" : ""}`}
                     >
                       {year}년
                     </DropdownMenuItem>
@@ -553,18 +541,18 @@ export default function AnalyzePage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    className='bg-white min-w-16'
+                    className='bg-gray-700 border-gray-600 text-white min-w-16 hover:bg-gray-600'
                   >
                     {selectedMonth}월
                     <ChevronDown className='ml-1 w-4 h-4' />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
+                <DropdownMenuContent align='end' className='bg-gray-800 border-gray-600'>
                   {monthOptions.map((month) => (
                     <DropdownMenuItem
                       key={month}
                       onClick={() => setSelectedMonth(month)}
-                      className={selectedMonth === month ? "bg-blue-50" : ""}
+                      className={`text-white hover:bg-gray-700 ${selectedMonth === month ? "bg-gray-700" : ""}`}
                     >
                       {month}월
                     </DropdownMenuItem>
@@ -574,11 +562,9 @@ export default function AnalyzePage() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 메인 컨텐츠 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
-        <div className='space-y-6'>
+        {/* 차트들 */}
+        <div className='space-y-[3vh]'>
           <MemberAttendanceStatusChart
             title='전체 인원 대비 출석 현황'
             data={analyzeData.memberAttendanceStatus}
@@ -600,6 +586,26 @@ export default function AnalyzePage() {
             month={analyzeData.month}
           />
         </div>
+      </>
+    );
+  };
+
+  return (
+    <div className="h-screen bg-basic-black flex flex-col overflow-hidden relative">
+      {/* 고정 헤더 */}
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <PageHeader title="통계 분석" iconColor="white" borderColor="gray-500" />
+      </div>
+
+      {/* 메인 콘텐츠 - 스크롤 영역 */}
+      <div className="flex-1 overflow-y-auto native-scroll pt-[10vh] pb-[20vh] px-[4vw]">
+        <Suspense fallback={<AnalyzeLoadingSkeleton />}>
+          {isLoading ? (
+            <AnalyzeLoadingSkeleton />
+          ) : (
+            <AnalyzeContent />
+          )}
+        </Suspense>
       </div>
 
       {/* 하단 네비게이션 */}

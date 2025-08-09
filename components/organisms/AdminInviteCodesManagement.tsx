@@ -192,7 +192,13 @@ export default function AdminInviteCodesManagement({
         setActionLoading(false);
       }
     });
-  }, [inviteCode, actionLoading, handleCreateInviteCode, showNotification, showConfirmModal]);
+  }, [
+    inviteCode,
+    actionLoading,
+    handleCreateInviteCode,
+    showNotification,
+    showConfirmModal,
+  ]);
 
   // 초대코드 복사
   const handleCopyCode = useCallback(
@@ -342,20 +348,6 @@ export default function AdminInviteCodesManagement({
                 영문 대문자와 숫자만 사용 가능 (정확히 7자리)
               </p>
             </div>
-            <div>
-              <label className='block mb-[1vh] text-[0.875rem] font-medium text-gray-700'>
-                설명 (선택사항)
-              </label>
-              <Input
-                type='text'
-                placeholder='초대코드 설명'
-                value={editData.description}
-                onChange={(e) =>
-                  setEditData({ ...editData, description: e.target.value })
-                }
-                className='bg-white'
-              />
-            </div>
             <div className='flex space-x-[2vw]'>
               <Button
                 onClick={handleCreateInviteCode}
@@ -477,11 +469,11 @@ export default function AdminInviteCodesManagement({
         isOpen={confirmModal.isOpen}
         onClose={closeConfirmModal}
         onConfirm={confirmModal.onConfirm}
-        title="초대코드 재생성"
-        content="기존 초대코드가 무효화되고 새로운 코드가 생성됩니다. 계속하시겠습니까?"
-        confirmText="재생성"
-        cancelText="취소"
-        variant="destructive"
+        title='초대코드 재생성'
+        content='기존 초대코드가 무효화되고 새로운 코드가 생성됩니다. 계속하시겠습니까?'
+        confirmText='재생성'
+        cancelText='취소'
+        variant='destructive'
       />
     </div>
   );

@@ -539,7 +539,7 @@ export default function AdminAttendanceManagement({
       <div className='overflow-y-auto flex-1 px-4 py-6 pb-24'>
         <div className='space-y-6'>
           {/* 월별 달력 - 높이를 80%로 조정 */}
-          <Card className='ios-card'>
+          <Card className='bg-basic-black-gray border-0'>
             <CardContent className='p-4'>
               {/* 달력 헤더 */}
               <div className='flex justify-between items-center mb-4'>
@@ -547,11 +547,11 @@ export default function AdminAttendanceManagement({
                   variant='ghost'
                   size='icon'
                   onClick={() => changeMonth("prev")}
-                  className='w-8 h-8'
+                  className='w-8 h-8 text-white hover:bg-basic-gray'
                 >
                   <ChevronLeft className='w-4 h-4' />
                 </Button>
-                <h2 className='text-lg font-semibold text-gray-900'>
+                <h2 className='text-lg font-semibold text-white'>
                   {currentDate.getFullYear()}년{" "}
                   {monthNames[currentDate.getMonth()]}
                 </h2>
@@ -559,7 +559,7 @@ export default function AdminAttendanceManagement({
                   variant='ghost'
                   size='icon'
                   onClick={() => changeMonth("next")}
-                  className='w-8 h-8'
+                  className='w-8 h-8 text-white hover:bg-basic-gray'
                 >
                   <ChevronRight className='w-4 h-4' />
                 </Button>
@@ -570,7 +570,7 @@ export default function AdminAttendanceManagement({
                 {dayNames.map((day) => (
                   <div
                     key={day}
-                    className='py-2 text-xs font-medium text-center text-gray-500'
+                    className='py-2 text-xs font-medium text-center text-gray-400'
                   >
                     {day}
                   </div>
@@ -597,19 +597,19 @@ export default function AdminAttendanceManagement({
                         relative h-10 w-full text-sm rounded-lg transition-colors flex flex-col items-center justify-center
                         ${
                           !isCurrentMonth
-                            ? "text-gray-300 cursor-not-allowed"
+                            ? "text-gray-500 cursor-not-allowed"
                             : attendanceInfo.hasAttendance
-                            ? "text-gray-900 hover:bg-blue-50 cursor-pointer"
-                            : "text-gray-400 cursor-not-allowed"
+                            ? "text-white hover:bg-basic-blue/20 cursor-pointer"
+                            : "text-gray-500 cursor-not-allowed"
                         }
                         ${
                           isSelected
-                            ? "bg-blue-100 text-blue-600 font-medium"
+                            ? "bg-basic-blue text-white font-medium"
                             : ""
                         }
                         ${
                           isToday && !isSelected
-                            ? "bg-gray-100 font-medium"
+                            ? "bg-basic-gray text-white font-medium"
                             : ""
                         }
                       `}
@@ -617,8 +617,8 @@ export default function AdminAttendanceManagement({
                       <span className='text-sm'>{date.getDate()}</span>
                       {attendanceInfo.hasAttendance && (
                         <div className='flex items-center space-x-1 mt-0.5'>
-                          <div className='w-1.5 h-1.5 bg-blue-500 rounded-full'></div>
-                          <span className='text-xs font-medium text-blue-600'>
+                          <div className='w-1.5 h-1.5 bg-basic-blue rounded-full'></div>
+                          <span className='text-xs font-medium text-basic-blue'>
                             {attendanceInfo.count}
                           </span>
                         </div>
@@ -629,9 +629,9 @@ export default function AdminAttendanceManagement({
               </div>
 
               {/* 범례 */}
-              <div className='flex justify-center items-center mt-4 text-xs text-gray-500'>
+              <div className='flex justify-center items-center mt-4 text-xs text-gray-400'>
                 <div className='flex items-center space-x-1'>
-                  <div className='w-1.5 h-1.5 bg-blue-500 rounded-full'></div>
+                  <div className='w-1.5 h-1.5 bg-basic-blue rounded-full'></div>
                   <span>출석 기록 (숫자: 출석자 수)</span>
                 </div>
               </div>
@@ -640,11 +640,11 @@ export default function AdminAttendanceManagement({
 
           {/* 로딩 상태 */}
           {isLoading && (
-            <Card className='ios-card'>
+            <Card className='bg-basic-black-gray border-0'>
               <CardContent className='p-4'>
                 <div className='text-center'>
-                  <div className='mx-auto mb-2 w-8 h-8 rounded-full border-b-2 border-blue-600 animate-spin'></div>
-                  <p className='text-sm text-gray-500'>
+                  <div className='mx-auto mb-2 w-8 h-8 rounded-full border-b-2 border-basic-blue animate-spin'></div>
+                  <p className='text-sm text-gray-400'>
                     출석 정보를 불러오는 중...
                   </p>
                 </div>
@@ -656,10 +656,10 @@ export default function AdminAttendanceManagement({
           {selectedDate && !isLoading && (
             <>
               {/* 선택된 날짜 정보 - 모임 건수와 출석 건수만 표시 */}
-              <Card className='ios-card'>
+              <Card className='bg-basic-black-gray border-0'>
                 <CardContent className='p-4'>
                   <div className='text-center'>
-                    <h3 className='mb-2 text-lg font-semibold text-gray-900'>
+                    <h3 className='mb-2 text-lg font-semibold text-white'>
                       {new Date(selectedDate).toLocaleDateString("ko-KR", {
                         year: "numeric",
                         month: "long",
@@ -670,16 +670,16 @@ export default function AdminAttendanceManagement({
                     </h3>
                     <div className='flex justify-center space-x-8'>
                       <div className='text-center'>
-                        <p className='text-2xl font-bold text-blue-600'>
+                        <p className='text-2xl font-bold text-basic-blue'>
                           {groupedMeetings.length}
                         </p>
-                        <p className='text-xs text-gray-600'>모임 건수</p>
+                        <p className='text-xs text-gray-400'>모임 건수</p>
                       </div>
                       <div className='text-center'>
-                        <p className='text-2xl font-bold text-green-600'>
+                        <p className='text-2xl font-bold text-green-400'>
                           {selectedDateDetails.length}
                         </p>
-                        <p className='text-xs text-gray-600'>출석 건수</p>
+                        <p className='text-xs text-gray-400'>출석 건수</p>
                       </div>
                     </div>
                   </div>
@@ -693,7 +693,7 @@ export default function AdminAttendanceManagement({
                   placeholder='이름 또는 장소로 검색'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className='pl-10 bg-white rounded-lg border-gray-200'
+                  className='pl-10 bg-basic-black-gray text-white rounded-lg border-0 placeholder:text-gray-400'
                 />
               </div>
 
@@ -719,23 +719,23 @@ export default function AdminAttendanceManagement({
                 </div>
 
                 {groupedMeetings.map((meeting, groupIndex) => (
-                  <Card key={groupIndex} className='bg-white border-gray-200'>
+                  <Card key={groupIndex} className='bg-basic-black-gray border-0'>
                     <CardContent className='p-4'>
                       {/* 모임 그룹 헤더 */}
-                      <div className='flex items-center pb-2 mb-3 space-x-2 border-b border-gray-100'>
+                      <div className='flex items-center pb-2 mb-3 space-x-2 border-b border-basic-gray'>
                         <div className='flex items-center space-x-2'>
-                          <MapPin className='w-4 h-4 text-blue-600' />
-                          <span className='font-medium text-gray-900'>
+                          <MapPin className='w-4 h-4 text-basic-blue' />
+                          <span className='font-medium text-white'>
                             {meeting.location}
                           </span>
                         </div>
                         <div className='flex items-center space-x-2'>
-                          <Clock className='w-4 h-4 text-gray-500' />
-                          <span className='text-sm text-gray-600'>
+                          <Clock className='w-4 h-4 text-gray-400' />
+                          <span className='text-sm text-gray-300'>
                             {meeting.time}
                           </span>
                         </div>
-                        <Badge variant='outline' className='ml-auto'>
+                        <Badge variant='outline' className='ml-auto bg-basic-gray text-white border-basic-gray'>
                           {meeting.records.length}명
                         </Badge>
                       </div>
@@ -750,14 +750,14 @@ export default function AdminAttendanceManagement({
                             <div className='flex flex-1 items-center space-x-3'>
                               <div className='flex-1 min-w-0'>
                                 <div className='flex items-center mb-1 space-x-2'>
-                                  <h4 className='font-medium text-gray-900'>
+                                  <h4 className='font-medium text-white'>
                                     {record.userName}
                                   </h4>
                                   {getStatusBadge(record.status, record.isHost)}
                                 </div>
                                 <div className='flex items-center space-x-1'>
                                   {getStatusIcon(record.status)}
-                                  <p className='text-sm text-gray-600'>
+                                  <p className='text-sm text-gray-300'>
                                     {new Date(
                                       record.checkInTime
                                     ).toLocaleTimeString("ko-KR", {
@@ -784,16 +784,17 @@ export default function AdminAttendanceManagement({
                                   )}
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align='end' className='w-48'>
+                              <DropdownMenuContent align='end' className='w-48 bg-basic-black-gray border-0'>
                                 <DropdownMenuItem
                                   onClick={() => handleEditAttendance(record)}
                                   disabled={isDeletingRecord === record.id}
+                                  className='text-white hover:bg-basic-gray'
                                 >
                                   <Edit className='mr-2 w-4 h-4' />
                                   정보 수정
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  className='text-red-600 focus:text-red-600'
+                                  className='text-red-400 focus:text-red-400 hover:bg-basic-gray'
                                   onClick={() =>
                                     handleCancelAttendance(record.id)
                                   }
@@ -822,7 +823,7 @@ export default function AdminAttendanceManagement({
 
                 {groupedMeetings.length === 0 && (
                   <div className='py-8 text-center'>
-                    <p className='text-gray-500'>출석 기록이 없습니다.</p>
+                    <p className='text-gray-400'>출석 기록이 없습니다.</p>
                   </div>
                 )}
               </div>
@@ -831,17 +832,17 @@ export default function AdminAttendanceManagement({
 
           {/* 달력 사용 안내 */}
           {!selectedDate && !isLoading && (
-            <Card className='bg-white border-gray-200'>
+            <Card className='bg-basic-black-gray border-0'>
               <CardContent className='p-4'>
-                <div className='text-center text-gray-500'>
-                  <Calendar className='mx-auto mb-2 w-8 h-8 text-gray-400' />
+                <div className='text-center text-gray-400'>
+                  <Calendar className='mx-auto mb-2 w-8 h-8 text-gray-500' />
                   <p className='text-sm'>
                     달력에서 파란색 점과 숫자가 있는 날짜를 클릭하면
                   </p>
                   <p className='text-sm'>
                     해당 날짜의 출석 기록을 확인할 수 있습니다.
                   </p>
-                  <p className='mt-2 text-xs text-gray-400'>
+                  <p className='mt-2 text-xs text-gray-500'>
                     숫자는 해당 날짜의 총 출석자 수입니다.
                   </p>
                 </div>

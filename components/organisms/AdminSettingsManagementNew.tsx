@@ -225,12 +225,12 @@ export default function AdminSettingsManagementNew({
   };
 
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
+    <div className='flex flex-col h-screen bg-basic-black'>
       {/* 메인 컨텐츠 */}
       <div className='flex-1 px-[4vw] py-[3vh] pb-[20vh] space-y-[3vh] overflow-y-auto'>
         {/* 탭 네비게이션 */}
-        <div className='bg-white rounded-[0.75rem] p-[1vw] shadow-sm border border-gray-100'>
-          <div className='flex rounded-[0.5rem] bg-gray-100 p-[0.5vw]'>
+        <div className='bg-basic-black-gray rounded-[0.75rem] p-[1vw] shadow-sm'>
+          <div className='flex rounded-[0.5rem] bg-basic-gray/30 p-[0.5vw]'>
             <button
               onClick={() => {
                 haptic.light();
@@ -238,8 +238,8 @@ export default function AdminSettingsManagementNew({
               }}
               className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
                 activeTab === "locations"
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-basic-blue text-white shadow-sm"
+                  : "text-gray-400 hover:text-white"
               }`}
             >
               <MapPin className='w-[1rem] h-[1rem] mr-[1vw] inline' />
@@ -252,8 +252,8 @@ export default function AdminSettingsManagementNew({
               }}
               className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
                 activeTab === "members"
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-basic-blue text-white shadow-sm"
+                  : "text-gray-400 hover:text-white"
               }`}
             >
               <Users className='w-[1rem] h-[1rem] mr-[1vw] inline' />
@@ -266,8 +266,8 @@ export default function AdminSettingsManagementNew({
               }}
               className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
                 activeTab === "invites"
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-basic-blue text-white shadow-sm"
+                  : "text-gray-400 hover:text-white"
               }`}
             >
               <Ticket className='w-[1rem] h-[1rem] mr-[1vw] inline' />
@@ -278,16 +278,16 @@ export default function AdminSettingsManagementNew({
 
         {/* 활동장소 관리 */}
         {activeTab === "locations" && (
-          <div className='bg-white rounded-[0.75rem] shadow-sm border border-gray-100 overflow-hidden'>
+          <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
             {/* 헤더 */}
-            <div className='p-[4vw] border-b border-gray-100'>
+            <div className='p-[4vw] border-b border-basic-gray'>
               <div className='flex justify-between items-center'>
                 <div className='flex items-center space-x-[2vw]'>
-                  <MapPin className='w-[1.25rem] h-[1.25rem] text-green-600' />
-                  <span className='text-[1.125rem] font-bold text-gray-900'>
+                  <MapPin className='w-[1.25rem] h-[1.25rem] text-basic-blue' />
+                  <span className='text-[1.125rem] font-bold text-white'>
                     활동장소 관리
                   </span>
-                  <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-gray-100 rounded-full text-[0.75rem] font-medium text-gray-600'>
+                  <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-basic-gray rounded-full text-[0.75rem] font-medium text-gray-300'>
                     {locations.length}개
                   </div>
                 </div>
@@ -296,7 +296,7 @@ export default function AdminSettingsManagementNew({
                     haptic.light();
                     setIsCreatingLocation(true);
                   }}
-                  className='px-[3vw] py-[3vw] bg-green-600 hover:bg-green-700 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
+                  className='px-[3vw] py-[3vw] bg-basic-blue hover:bg-basic-blue/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
                   disabled={isCreatingLocation}
                 >
                   <Plus className='w-[1rem] h-[1rem]' />
@@ -307,9 +307,9 @@ export default function AdminSettingsManagementNew({
             <div className='p-[4vw] space-y-[3vh]'>
               {/* 장소 추가 폼 */}
               {isCreatingLocation && (
-                <div className='border border-green-200 bg-green-50 rounded-[0.75rem] p-[4vw] space-y-[2vh]'>
+                <div className='border border-basic-blue bg-basic-blue/20 rounded-[0.75rem] p-[4vw] space-y-[2vh]'>
                   <div>
-                    <label className='block mb-[1vh] text-[0.875rem] font-medium text-gray-700'>
+                    <label className='block mb-[1vh] text-[0.875rem] font-medium text-white'>
                       장소명 *
                     </label>
                     <input
@@ -323,7 +323,7 @@ export default function AdminSettingsManagementNew({
                           handleCreateLocation();
                         }
                       }}
-                      className='w-full px-[3vw] py-[2vh] border border-gray-300 rounded-[0.75rem] text-[1rem] focus:ring-2 focus:ring-green-500 focus:border-transparent'
+                      className='w-full px-[3vw] py-[2vh] border-0 bg-basic-black-gray text-white rounded-[0.75rem] text-[1rem] focus:ring-2 focus:ring-basic-blue focus:border-transparent placeholder:text-gray-400'
                       autoFocus
                     />
                   </div>
@@ -331,7 +331,7 @@ export default function AdminSettingsManagementNew({
                     <button
                       onClick={handleCreateLocation}
                       disabled={loadingStates.create || !newLocationName.trim()}
-                      className='px-[4vw] py-[2vh] bg-green-600 hover:bg-green-700 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
+                      className='px-[4vw] py-[2vh] bg-basic-blue hover:bg-basic-blue/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
                     >
                       {loadingStates.create ? (
                         <Loader2 className='w-[1rem] h-[1rem] mr-[1vw] animate-spin' />
@@ -347,7 +347,7 @@ export default function AdminSettingsManagementNew({
                         setNewLocationName("");
                       }}
                       disabled={loadingStates.create}
-                      className='px-[4vw] py-[2vh] bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
+                      className='px-[4vw] py-[2vh] bg-basic-gray hover:bg-basic-gray/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
                     >
                       <X className='w-[1rem] h-[1rem] mr-[1vw]' />
                       취소
@@ -364,7 +364,7 @@ export default function AdminSettingsManagementNew({
                   placeholder='장소명으로 검색'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className='w-full pl-[10vw] pr-[4vw] py-[3vh] bg-white border border-gray-200 rounded-[0.75rem] text-[1rem] placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  className='w-full pl-[10vw] pr-[4vw] py-[3vh] bg-basic-black text-white border border-basic-gray rounded-[0.75rem] text-[1rem] placeholder-gray-400 focus:ring-2 focus:ring-basic-blue focus:border-transparent'
                 />
               </div>
 
@@ -374,7 +374,7 @@ export default function AdminSettingsManagementNew({
                   filteredLocations.map((location) => (
                     <div
                       key={location.id}
-                      className='bg-gray-50 rounded-[0.75rem] p-[4vw]'
+                      className='bg-basic-gray/20 rounded-[0.75rem] p-[4vw]'
                     >
                       {editingLocation === location.id ? (
                         <div className='space-y-[2vh]'>
@@ -391,14 +391,14 @@ export default function AdminSettingsManagementNew({
                                 handleCancelEdit();
                               }
                             }}
-                            className='w-full px-[3vw] py-[2vh] border border-gray-300 rounded-[0.75rem] text-[1rem] focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                            className='w-full px-[3vw] py-[2vh] border-0 bg-basic-black-gray text-white rounded-[0.75rem] text-[1rem] focus:ring-2 focus:ring-basic-blue focus:border-transparent'
                             autoFocus
                           />
                           <div className='flex space-x-[2vw]'>
                             <button
                               onClick={handleSaveEdit}
                               disabled={loadingStates[`edit-${location.id}`]}
-                              className='px-[3vw] py-[1.5vh] bg-blue-600 hover:bg-blue-700 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
+                              className='px-[3vw] py-[1.5vh] bg-basic-blue hover:bg-basic-blue/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
                             >
                               {loadingStates[`edit-${location.id}`] ? (
                                 <Loader2 className='w-[1rem] h-[1rem] animate-spin' />
@@ -409,7 +409,7 @@ export default function AdminSettingsManagementNew({
                             <button
                               onClick={handleCancelEdit}
                               disabled={loadingStates[`edit-${location.id}`]}
-                              className='px-[3vw] py-[1.5vh] bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
+                              className='px-[3vw] py-[1.5vh] bg-basic-gray hover:bg-basic-gray/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
                             >
                               <X className='w-[1rem] h-[1rem]' />
                             </button>
@@ -417,13 +417,13 @@ export default function AdminSettingsManagementNew({
                         </div>
                       ) : (
                         <div className='flex justify-between items-center'>
-                          <span className='text-[1rem] font-medium text-gray-900'>
+                          <span className='text-[1rem] font-medium text-white'>
                             {location.name}
                           </span>
                           <div className='flex space-x-[1vw]'>
                             <button
                               onClick={() => handleStartEdit(location)}
-                              className='p-[2vw] text-blue-600 hover:bg-blue-50 rounded-[0.5rem] transition-colors active:scale-95'
+                              className='p-[2vw] text-basic-blue hover:bg-basic-blue/20 rounded-[0.5rem] transition-colors active:scale-95'
                             >
                               <Edit className='w-[1.25rem] h-[1.25rem]' />
                             </button>
@@ -432,7 +432,7 @@ export default function AdminSettingsManagementNew({
                                 handleDeleteLocation(location.id, location.name)
                               }
                               disabled={loadingStates[`delete-${location.id}`]}
-                              className='p-[2vw] text-red-600 hover:bg-red-50 rounded-[0.5rem] transition-colors active:scale-95 disabled:opacity-50'
+                              className='p-[2vw] text-red-400 hover:bg-red-500/20 rounded-[0.5rem] transition-colors active:scale-95 disabled:opacity-50'
                             >
                               {loadingStates[`delete-${location.id}`] ? (
                                 <Loader2 className='w-[1.25rem] h-[1.25rem] animate-spin' />
@@ -447,8 +447,8 @@ export default function AdminSettingsManagementNew({
                   ))
                 ) : (
                   <div className='py-[8vh] text-center'>
-                    <MapPin className='w-[4rem] h-[4rem] text-gray-300 mx-auto mb-[2vh]' />
-                    <p className='text-[1rem] font-medium text-gray-500 mb-[1vh]'>
+                    <MapPin className='w-[4rem] h-[4rem] text-gray-500 mx-auto mb-[2vh]' />
+                    <p className='text-[1rem] font-medium text-gray-300 mb-[1vh]'>
                       {searchTerm
                         ? "검색 결과가 없습니다"
                         : "등록된 활동장소가 없습니다"}
@@ -464,7 +464,7 @@ export default function AdminSettingsManagementNew({
                           haptic.light();
                           setIsCreatingLocation(true);
                         }}
-                        className='px-[4vw] py-[2vh] bg-green-600 hover:bg-green-700 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95'
+                        className='px-[4vw] py-[2vh] bg-basic-blue hover:bg-basic-blue/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95'
                       >
                         <Plus className='w-[1rem] h-[1rem] mr-[1vw]' />첫 번째
                         장소 추가하기

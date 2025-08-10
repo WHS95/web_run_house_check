@@ -203,7 +203,9 @@ export default function BulkAttendanceManagement({
 
     try {
       // 한국 시간 기준으로 ISO timestamp 생성
-      const attendanceDateTime = new Date(`${attendanceData.date}T${attendanceData.time}:00`);
+      const attendanceDateTime = new Date(
+        `${attendanceData.date}T${attendanceData.time}:00`
+      );
       const attendanceTimestamp = attendanceDateTime.toISOString();
 
       console.log("선택된 날짜:", attendanceData.date);
@@ -378,7 +380,7 @@ export default function BulkAttendanceManagement({
       <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
         <div className='p-[4vw] border-b border-basic-gray'>
           <div className='flex items-center space-x-[2vw]'>
-            <Users className='w-[1.25rem] h-[1.25rem] text-white' />
+            {/* <Users className='w-[1.25rem] h-[1.25rem] text-white' /> */}
             <span className='text-[1.125rem] font-bold text-white'>크루원</span>
           </div>
         </div>
@@ -457,9 +459,9 @@ export default function BulkAttendanceManagement({
                             </span>
                           )}
                         </div>
-                        <p className='text-sm text-gray-300'>
+                        {/* <p className='text-sm text-gray-300'>
                           {user.email || user.phone || "연락처 없음"}
-                        </p>
+                        </p> */}
                         {/* {user.birth_year && (
                           <p className='text-xs text-gray-400'>
                             {user.birth_year}년생

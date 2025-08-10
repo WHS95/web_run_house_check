@@ -1497,7 +1497,7 @@ interface GetCurrentMonthStatsReturn {
  */
 export async function getUserActivityStatistics(
   userId: string,
-  timePeriod: 'week' | 'month' | 'year' = 'week'
+  timePeriod: "week" | "month" | "year" = "week"
 ): Promise<GetUserActivityStatisticsReturn> {
   try {
     const supabase = await createClient();
@@ -1506,7 +1506,7 @@ export async function getUserActivityStatistics(
       .schema("attendance")
       .rpc("get_user_activity_statistics", {
         p_user_id: userId,
-        p_time_period: timePeriod
+        p_time_period: timePeriod,
       });
 
     if (error) {
@@ -1536,7 +1536,7 @@ export async function getCurrentMonthStats(
     const { data, error } = await supabase
       .schema("attendance")
       .rpc("get_current_month_stats", {
-        p_user_id: userId
+        p_user_id: userId,
       });
 
     if (error) {
@@ -1572,7 +1572,7 @@ export async function getSpecificMonthStats(
       .rpc("get_specific_month_stats", {
         p_user_id: userId,
         p_year: year,
-        p_month: month
+        p_month: month,
       });
 
     if (error) {

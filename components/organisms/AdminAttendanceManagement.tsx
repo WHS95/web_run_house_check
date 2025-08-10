@@ -308,6 +308,38 @@ export default function AdminAttendanceManagement({
         );
         setSelectedDateDetails(updatedDetails);
 
+        // 달력 출석 요약 데이터 업데이트 (카운트 감소)
+        if (selectedDate) {
+          setAttendanceSummary((prevSummary) => {
+            const updatedSummary = [...prevSummary];
+            const summaryIndex = updatedSummary.findIndex(
+              (s) => s.date === selectedDate
+            );
+
+            if (summaryIndex !== -1) {
+              const newCount = updatedSummary[summaryIndex].count - 1;
+              if (newCount > 0) {
+                // 카운트가 0보다 크면 업데이트
+                updatedSummary[summaryIndex] = {
+                  ...updatedSummary[summaryIndex],
+                  count: newCount,
+                };
+              } else {
+                // 카운트가 0이면 해당 날짜 항목 제거
+                updatedSummary.splice(summaryIndex, 1);
+              }
+            }
+
+            return updatedSummary;
+          });
+
+          // 캐시된 상세 데이터도 업데이트
+          setAttendanceDetailData((prev) => ({
+            ...prev,
+            [selectedDate]: updatedDetails,
+          }));
+        }
+
         setNoticeModal({
           isOpen: true,
           title: "삭제 완료",
@@ -575,61 +607,64 @@ export default function AdminAttendanceManagement({
         {activeTab === "calendar" && (
           <div className='space-y-6'>
             {/* 월별 달력 - 높이를 80%로 조정 */}
-          <Card className='bg-basic-black-gray border-0'>
-            <CardContent className='p-4'>
-              {/* 달력 헤더 */}
-              <div className='flex justify-between items-center mb-4'>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  onClick={() => changeMonth("prev")}
-                  className='w-8 h-8 text-white hover:bg-basic-gray'
-                >
-                  <ChevronLeft className='w-4 h-4' />
-                </Button>
-                <h2 className='text-lg font-semibold text-white'>
-                  {currentDate.getFullYear()}년{" "}
-                  {monthNames[currentDate.getMonth()]}
-                </h2>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  onClick={() => changeMonth("next")}
-                  className='w-8 h-8 text-white hover:bg-basic-gray'
-                >
-                  <ChevronRight className='w-4 h-4' />
-                </Button>
-              </div>
-
-              {/* 요일 헤더 */}
-              <div className='grid grid-cols-7 gap-1 mb-2'>
-                {dayNames.map((day) => (
-                  <div
-                    key={day}
-                    className='py-2 text-xs font-medium text-center text-gray-400'
+            <Card className='border-0 bg-basic-black-gray'>
+              <CardContent className='p-4'>
+                {/* 달력 헤더 */}
+                <div className='flex justify-between items-center mb-4'>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    onClick={() => changeMonth("prev")}
+                    className='w-8 h-8 text-white hover:bg-basic-gray'
                   >
-                    {day}
-                  </div>
-                ))}
-              </div>
+                    <ChevronLeft className='w-4 h-4' />
+                  </Button>
+                  <h2 className='text-lg font-semibold text-white'>
+                    {currentDate.getFullYear()}년{" "}
+                    {monthNames[currentDate.getMonth()]}
+                  </h2>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    onClick={() => changeMonth("next")}
+                    className='w-8 h-8 text-white hover:bg-basic-gray'
+                  >
+                    <ChevronRight className='w-4 h-4' />
+                  </Button>
+                </div>
 
-              {/* 달력 날짜들 - 높이를 80%로 조정 */}
-              <div className='grid grid-cols-7 gap-1' style={{ height: "80%" }}>
-                {calendarDays.map((dayInfo, index) => {
-                  const { date, isCurrentMonth } = dayInfo;
-                  const dateStr = formatDate(date);
-                  const attendanceInfo = getAttendanceInfo(date);
-                  const isSelected = selectedDate === dateStr;
-                  const isToday = formatDate(new Date()) === dateStr;
+                {/* 요일 헤더 */}
+                <div className='grid grid-cols-7 gap-1 mb-2'>
+                  {dayNames.map((day) => (
+                    <div
+                      key={day}
+                      className='py-2 text-xs font-medium text-center text-gray-400'
+                    >
+                      {day}
+                    </div>
+                  ))}
+                </div>
 
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => handleDateClick(date, isCurrentMonth)}
-                      disabled={
-                        !isCurrentMonth || !attendanceInfo.hasAttendance
-                      }
-                      className={`
+                {/* 달력 날짜들 - 높이를 80%로 조정 */}
+                <div
+                  className='grid grid-cols-7 gap-1'
+                  style={{ height: "80%" }}
+                >
+                  {calendarDays.map((dayInfo, index) => {
+                    const { date, isCurrentMonth } = dayInfo;
+                    const dateStr = formatDate(date);
+                    const attendanceInfo = getAttendanceInfo(date);
+                    const isSelected = selectedDate === dateStr;
+                    const isToday = formatDate(new Date()) === dateStr;
+
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => handleDateClick(date, isCurrentMonth)}
+                        disabled={
+                          !isCurrentMonth || !attendanceInfo.hasAttendance
+                        }
+                        className={`
                         relative h-10 w-full text-sm rounded-lg transition-colors flex flex-col items-center justify-center
                         ${
                           !isCurrentMonth
@@ -649,226 +684,238 @@ export default function AdminAttendanceManagement({
                             : ""
                         }
                       `}
-                    >
-                      <span className='text-sm'>{date.getDate()}</span>
-                      {attendanceInfo.hasAttendance && (
-                        <div className='flex items-center space-x-1 mt-0.5'>
-                          <div className='w-1.5 h-1.5 bg-basic-blue rounded-full'></div>
-                          <span className='text-xs font-medium text-basic-blue'>
-                            {attendanceInfo.count}
-                          </span>
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* 범례 */}
-              <div className='flex justify-center items-center mt-4 text-xs text-gray-400'>
-                <div className='flex items-center space-x-1'>
-                  <div className='w-1.5 h-1.5 bg-basic-blue rounded-full'></div>
-                  <span>출석 기록 (숫자: 출석자 수)</span>
+                      >
+                        <span className='text-sm'>{date.getDate()}</span>
+                        {attendanceInfo.hasAttendance && (
+                          <div className='flex items-center space-x-1 mt-0.5'>
+                            <div className='w-1.5 h-1.5 bg-basic-blue rounded-full'></div>
+                            <span className='text-xs font-medium text-basic-blue'>
+                              {attendanceInfo.count}
+                            </span>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* 로딩 상태 */}
-          {isLoading && (
-            <Card className='bg-basic-black-gray border-0'>
-              <CardContent className='p-4'>
-                <div className='text-center'>
-                  <div className='mx-auto mb-2 w-8 h-8 rounded-full border-b-2 border-basic-blue animate-spin'></div>
-                  <p className='text-sm text-gray-400'>
-                    출석 정보를 불러오는 중...
-                  </p>
+                {/* 범례 */}
+                <div className='flex justify-center items-center mt-4 text-xs text-gray-400'>
+                  <div className='flex items-center space-x-1'>
+                    <div className='w-1.5 h-1.5 bg-basic-blue rounded-full'></div>
+                    <span>출석 기록 (숫자: 출석자 수)</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
 
-          {/* 선택된 날짜의 출석 기록 */}
-          {selectedDate && !isLoading && (
-            <>
-              {/* 선택된 날짜 정보 - 모임 건수와 출석 건수만 표시 */}
-              <Card className='bg-basic-black-gray border-0'>
+            {/* 로딩 상태 */}
+            {isLoading && (
+              <Card className='border-0 bg-basic-black-gray'>
                 <CardContent className='p-4'>
                   <div className='text-center'>
-                    <h3 className='mb-2 text-lg font-semibold text-white'>
-                      {new Date(selectedDate).toLocaleDateString("ko-KR", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        weekday: "long",
-                      })}{" "}
-                      출석 현황
-                    </h3>
-                    <div className='flex justify-center space-x-8'>
-                      <div className='text-center'>
-                        <p className='text-2xl font-bold text-basic-blue'>
-                          {groupedMeetings.length}
-                        </p>
-                        <p className='text-xs text-gray-400'>모임 건수</p>
-                      </div>
-                      <div className='text-center'>
-                        <p className='text-2xl font-bold text-green-400'>
-                          {selectedDateDetails.length}
-                        </p>
-                        <p className='text-xs text-gray-400'>출석 건수</p>
-                      </div>
-                    </div>
+                    <div className='mx-auto mb-2 w-8 h-8 rounded-full border-b-2 animate-spin border-basic-blue'></div>
+                    <p className='text-sm text-gray-400'>
+                      출석 정보를 불러오는 중...
+                    </p>
                   </div>
                 </CardContent>
               </Card>
+            )}
 
-              {/* 검색 */}
-              <div className='relative'>
-                <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
-                <Input
-                  placeholder='이름 또는 장소로 검색'
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className='pl-10 bg-basic-black-gray text-white rounded-lg border-0 placeholder:text-gray-400'
-                />
-              </div>
+            {/* 선택된 날짜의 출석 기록 */}
+            {selectedDate && !isLoading && (
+              <>
+                {/* 선택된 날짜 정보 - 모임 건수와 출석 건수만 표시 */}
+                <Card className='border-0 bg-basic-black-gray'>
+                  <CardContent className='p-4'>
+                    <div className='text-center'>
+                      <h3 className='mb-2 text-lg font-semibold text-white'>
+                        {new Date(selectedDate).toLocaleDateString("ko-KR", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          weekday: "long",
+                        })}{" "}
+                        출석 현황
+                      </h3>
+                      <div className='flex justify-center space-x-8'>
+                        <div className='text-center'>
+                          <p className='text-2xl font-bold text-basic-blue'>
+                            {groupedMeetings.length}
+                          </p>
+                          <p className='text-xs text-gray-400'>모임 건수</p>
+                        </div>
+                        <div className='text-center'>
+                          <p className='text-2xl font-bold text-green-400'>
+                            {selectedDateDetails.length}
+                          </p>
+                          <p className='text-xs text-gray-400'>출석 건수</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-              {/* 모임별 그룹화된 출석 기록 목록 */}
-              <div className='space-y-3'>
-                <div className='flex justify-between items-center'>
-                  <h3 className='text-lg font-semibold text-white'>
-                    모임별 출석 목록
-                  </h3>
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    onClick={() => {
-                      setSelectedDate(null);
-                      setSelectedDateDetails([]);
-                      setSearchTerm("");
-                      setStatusFilter("all");
-                    }}
-                    className='text-white'
-                  >
-                    닫기
-                  </Button>
+                {/* 검색 */}
+                <div className='relative'>
+                  <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
+                  <Input
+                    placeholder='이름 또는 장소로 검색'
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className='pl-10 text-white rounded-lg border-0 bg-basic-black-gray placeholder:text-gray-400'
+                  />
                 </div>
 
-                {groupedMeetings.map((meeting, groupIndex) => (
-                  <Card key={groupIndex} className='bg-basic-black-gray border-0'>
-                    <CardContent className='p-4'>
-                      {/* 모임 그룹 헤더 */}
-                      <div className='flex items-center pb-2 mb-3 space-x-2 border-b border-basic-gray'>
-                        <div className='flex items-center space-x-2'>
-                          <MapPin className='w-4 h-4 text-basic-blue' />
-                          <span className='font-medium text-white'>
-                            {meeting.location}
-                          </span>
-                        </div>
-                        <div className='flex items-center space-x-2'>
-                          <Clock className='w-4 h-4 text-gray-400' />
-                          <span className='text-sm text-gray-300'>
-                            {meeting.time}
-                          </span>
-                        </div>
-                        <Badge variant='outline' className='ml-auto bg-basic-gray text-white border-basic-gray'>
-                          {meeting.records.length}명
-                        </Badge>
-                      </div>
+                {/* 모임별 그룹화된 출석 기록 목록 */}
+                <div className='space-y-3'>
+                  <div className='flex justify-between items-center'>
+                    <h3 className='text-lg font-semibold text-white'>
+                      모임별 출석 목록
+                    </h3>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      onClick={() => {
+                        setSelectedDate(null);
+                        setSelectedDateDetails([]);
+                        setSearchTerm("");
+                        setStatusFilter("all");
+                      }}
+                      className='text-white'
+                    >
+                      닫기
+                    </Button>
+                  </div>
 
-                      {/* 해당 모임의 출석자 목록 */}
-                      <div className='space-y-3'>
-                        {meeting.records.map((record) => (
-                          <div
-                            key={record.id}
-                            className='flex justify-between items-center'
+                  {groupedMeetings.map((meeting, groupIndex) => (
+                    <Card
+                      key={groupIndex}
+                      className='border-0 bg-basic-black-gray'
+                    >
+                      <CardContent className='p-4'>
+                        {/* 모임 그룹 헤더 */}
+                        <div className='flex items-center pb-2 mb-3 space-x-2 border-b border-basic-gray'>
+                          <div className='flex items-center space-x-2'>
+                            <MapPin className='w-4 h-4 text-basic-blue' />
+                            <span className='font-medium text-white'>
+                              {meeting.location}
+                            </span>
+                          </div>
+                          <div className='flex items-center space-x-2'>
+                            <Clock className='w-4 h-4 text-gray-400' />
+                            <span className='text-sm text-gray-300'>
+                              {meeting.time}
+                            </span>
+                          </div>
+                          <Badge
+                            variant='outline'
+                            className='ml-auto text-white bg-basic-gray border-basic-gray'
                           >
-                            <div className='flex flex-1 items-center space-x-3'>
-                              <div className='flex-1 min-w-0'>
-                                <div className='flex items-center mb-1 space-x-2'>
-                                  <h4 className='font-medium text-white'>
-                                    {record.userName}
-                                  </h4>
-                                  {getStatusBadge(record.status, record.isHost)}
-                                </div>
-                                <div className='flex items-center space-x-1'>
-                                  {getStatusIcon(record.status)}
-                                  <p className='text-sm text-gray-300'>
-                                    {new Date(
-                                      record.checkInTime
-                                    ).toLocaleTimeString("ko-KR", {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
-                                  </p>
+                            {meeting.records.length}명
+                          </Badge>
+                        </div>
+
+                        {/* 해당 모임의 출석자 목록 */}
+                        <div className='space-y-3'>
+                          {meeting.records.map((record) => (
+                            <div
+                              key={record.id}
+                              className='flex justify-between items-center'
+                            >
+                              <div className='flex flex-1 items-center space-x-3'>
+                                <div className='flex-1 min-w-0'>
+                                  <div className='flex items-center mb-1 space-x-2'>
+                                    <h4 className='font-medium text-white'>
+                                      {record.userName}
+                                    </h4>
+                                    {getStatusBadge(
+                                      record.status,
+                                      record.isHost
+                                    )}
+                                  </div>
+                                  <div className='flex items-center space-x-1'>
+                                    {getStatusIcon(record.status)}
+                                    <p className='text-sm text-gray-300'>
+                                      {new Date(
+                                        record.checkInTime
+                                      ).toLocaleTimeString("ko-KR", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
+
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant='ghost'
+                                    size='icon'
+                                    className='w-8 h-8'
+                                    disabled={isDeletingRecord === record.id}
+                                  >
+                                    {isDeletingRecord === record.id ? (
+                                      <div className='w-4 h-4 rounded-full border-2 border-gray-300 animate-spin border-t-gray-600'></div>
+                                    ) : (
+                                      <MoreVertical className='w-4 h-4 text-white' />
+                                    )}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align='end'
+                                  className='w-48 border-0 bg-basic-black-gray'
+                                >
+                                  <DropdownMenuItem
+                                    onClick={() => handleEditAttendance(record)}
+                                    disabled={isDeletingRecord === record.id}
+                                    className='text-white hover:bg-basic-gray'
+                                  >
+                                    <Edit className='mr-2 w-4 h-4' />
+                                    정보 수정
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className='text-red-400 focus:text-red-400 hover:bg-basic-gray'
+                                    onClick={() =>
+                                      handleCancelAttendance(record.id)
+                                    }
+                                    disabled={isDeletingRecord === record.id}
+                                  >
+                                    {isDeletingRecord === record.id ? (
+                                      <>
+                                        <div className='mr-2 w-4 h-4 rounded-full border-2 border-red-300 animate-spin border-t-red-600'></div>
+                                        삭제 중...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <X className='mr-2 w-4 h-4' />
+                                        출석 취소
+                                      </>
+                                    )}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
 
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant='ghost'
-                                  size='icon'
-                                  className='w-8 h-8'
-                                  disabled={isDeletingRecord === record.id}
-                                >
-                                  {isDeletingRecord === record.id ? (
-                                    <div className='w-4 h-4 rounded-full border-2 border-gray-300 animate-spin border-t-gray-600'></div>
-                                  ) : (
-                                    <MoreVertical className='w-4 h-4' />
-                                  )}
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align='end' className='w-48 bg-basic-black-gray border-0'>
-                                <DropdownMenuItem
-                                  onClick={() => handleEditAttendance(record)}
-                                  disabled={isDeletingRecord === record.id}
-                                  className='text-white hover:bg-basic-gray'
-                                >
-                                  <Edit className='mr-2 w-4 h-4' />
-                                  정보 수정
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className='text-red-400 focus:text-red-400 hover:bg-basic-gray'
-                                  onClick={() =>
-                                    handleCancelAttendance(record.id)
-                                  }
-                                  disabled={isDeletingRecord === record.id}
-                                >
-                                  {isDeletingRecord === record.id ? (
-                                    <>
-                                      <div className='mr-2 w-4 h-4 rounded-full border-2 border-red-300 animate-spin border-t-red-600'></div>
-                                      삭제 중...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <X className='mr-2 w-4 h-4' />
-                                      출석 취소
-                                    </>
-                                  )}
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-
-                {groupedMeetings.length === 0 && (
-                  <div className='py-8 text-center'>
-                    <p className='text-gray-400'>출석 기록이 없습니다.</p>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+                  {groupedMeetings.length === 0 && (
+                    <div className='py-8 text-center'>
+                      <p className='text-gray-400'>출석 기록이 없습니다.</p>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
 
             {/* 달력 사용 안내 */}
             {!selectedDate && !isLoading && (
-              <Card className='bg-basic-black-gray border-0'>
+              <Card className='border-0 bg-basic-black-gray'>
                 <CardContent className='p-4'>
                   <div className='text-center text-gray-400'>
                     <Calendar className='mx-auto mb-2 w-8 h-8 text-gray-500' />
@@ -889,9 +936,7 @@ export default function AdminAttendanceManagement({
         )}
 
         {/* 관리 탭 */}
-        {activeTab === "manage" && (
-          <BulkAttendanceManagement crewId={crewId} />
-        )}
+        {activeTab === "manage" && <BulkAttendanceManagement crewId={crewId} />}
       </div>
 
       <AdminBottomNavigation />

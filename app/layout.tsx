@@ -104,13 +104,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        {process.env.NODE_ENV === "development" && (
+        {/* {process.env.NODE_ENV === "development" && (
           <StagewiseToolbar
             config={{
               plugins: [], // Add your custom plugins here
             }}
           />
-        )}
+        )} */}
         <div>{children}</div>
         <ConditionalBottomNav />
         <Analytics />

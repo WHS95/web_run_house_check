@@ -58,8 +58,8 @@ const getTodayString = () => {
 const isFutureDateTime = (date: string, time: string) => {
   const selectedDateTime = new Date(`${date}T${time}:00`);
   const now = new Date();
-  {% comment %} console.log("selectedDateTime", selectedDateTime);  
-  console.log("now", now); {% endcomment %}
+  // console.log("selectedDateTime", selectedDateTime);  
+  // console.log("now", now);
   return selectedDateTime > now;
 };
 

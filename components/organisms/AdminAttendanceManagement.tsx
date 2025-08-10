@@ -23,10 +23,14 @@ import {
   MapPin,
   Clock,
   Edit,
+  Users,
+  UserPlus,
+  Check,
 } from "lucide-react";
 import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import AttendanceEditModal from "@/components/molecules/AttendanceEditModal";
 import NoticeModal from "@/components/molecules/NoticeModal";
+import BulkAttendanceManagement from "@/components/organisms/BulkAttendanceManagement";
 // API 라우트를 통해 출석 기록 관리
 import type {
   AttendanceRecord,
@@ -54,6 +58,7 @@ export default function AdminAttendanceManagement({
   attendanceDetailData: initialDetailData,
 }: AdminAttendanceManagementProps) {
   const { crewId } = useAdminContext();
+  const [activeTab, setActiveTab] = useState<"calendar" | "manage">("calendar");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateDetails, setSelectedDateDetails] = useState<
@@ -535,10 +540,41 @@ export default function AdminAttendanceManagement({
 
   return (
     <div className='flex flex-col h-screen bg-basic-black'>
+      {/* 탭 네비게이션 */}
+      <div className='flex-shrink-0 px-4 pt-4'>
+        <div className='bg-basic-black-gray rounded-[0.75rem] p-[1vw] shadow-sm'>
+          <div className='flex rounded-[0.5rem] bg-basic-gray/30 p-[0.5vw]'>
+            <button
+              onClick={() => setActiveTab("calendar")}
+              className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
+                activeTab === "calendar"
+                  ? "bg-basic-blue text-white shadow-sm"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              <Calendar className='w-[1rem] h-[1rem] mr-[1vw] inline' />
+              달력
+            </button>
+            <button
+              onClick={() => setActiveTab("manage")}
+              className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
+                activeTab === "manage"
+                  ? "bg-basic-blue text-white shadow-sm"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              <UserPlus className='w-[1rem] h-[1rem] mr-[1vw] inline' />
+              관리
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* 메인 컨텐츠 - 스크롤 가능, 하단 바텀에 가려지지 않게 pb-24 적용 */}
       <div className='overflow-y-auto flex-1 px-4 py-6 pb-24'>
-        <div className='space-y-6'>
-          {/* 월별 달력 - 높이를 80%로 조정 */}
+        {activeTab === "calendar" && (
+          <div className='space-y-6'>
+            {/* 월별 달력 - 높이를 80%로 조정 */}
           <Card className='bg-basic-black-gray border-0'>
             <CardContent className='p-4'>
               {/* 달력 헤더 */}
@@ -830,26 +866,32 @@ export default function AdminAttendanceManagement({
             </>
           )}
 
-          {/* 달력 사용 안내 */}
-          {!selectedDate && !isLoading && (
-            <Card className='bg-basic-black-gray border-0'>
-              <CardContent className='p-4'>
-                <div className='text-center text-gray-400'>
-                  <Calendar className='mx-auto mb-2 w-8 h-8 text-gray-500' />
-                  <p className='text-sm'>
-                    달력에서 파란색 점과 숫자가 있는 날짜를 클릭하면
-                  </p>
-                  <p className='text-sm'>
-                    해당 날짜의 출석 기록을 확인할 수 있습니다.
-                  </p>
-                  <p className='mt-2 text-xs text-gray-500'>
-                    숫자는 해당 날짜의 총 출석자 수입니다.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+            {/* 달력 사용 안내 */}
+            {!selectedDate && !isLoading && (
+              <Card className='bg-basic-black-gray border-0'>
+                <CardContent className='p-4'>
+                  <div className='text-center text-gray-400'>
+                    <Calendar className='mx-auto mb-2 w-8 h-8 text-gray-500' />
+                    <p className='text-sm'>
+                      달력에서 파란색 점과 숫자가 있는 날짜를 클릭하면
+                    </p>
+                    <p className='text-sm'>
+                      해당 날짜의 출석 기록을 확인할 수 있습니다.
+                    </p>
+                    <p className='mt-2 text-xs text-gray-500'>
+                      숫자는 해당 날짜의 총 출석자 수입니다.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* 관리 탭 */}
+        {activeTab === "manage" && (
+          <BulkAttendanceManagement crewId={crewId} />
+        )}
       </div>
 
       <AdminBottomNavigation />

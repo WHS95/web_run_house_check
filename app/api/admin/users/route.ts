@@ -21,19 +21,26 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error("사용자 데이터 조회 실패:", error);
       return NextResponse.json(
-        { error: "사용자 데이터를 가져오는데 실패했습니다." },
+        { 
+          success: false,
+          error: "사용자 데이터를 가져오는데 실패했습니다." 
+        },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
-      users: users || [],
+      success: true,
+      data: users || [],
       optimized: true, // 최적화된 버전임을 표시
     });
   } catch (error) {
     console.error("Users API 오류:", error);
     return NextResponse.json(
-      { error: "사용자 데이터를 가져오는데 실패했습니다." },
+      { 
+        success: false,
+        error: "사용자 데이터를 가져오는데 실패했습니다." 
+      },
       { status: 500 }
     );
   }

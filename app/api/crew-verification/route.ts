@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (logError) {
-      console.error("코드 사용 로그 기록 중 오류:", logError);
+      //console.error("코드 사용 로그 기록 중 오류:", logError);
       // 로그 기록 실패는 전체 프로세스를 실패시키지 않음
     }
 
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("크루 인증 처리 중 오류:", error);
+    //console.error("크루 인증 처리 중 오류:", error);
     return NextResponse.json(
       { success: false, message: "서버 오류가 발생했습니다." },
       { status: 500 }
@@ -182,7 +182,7 @@ export async function GET(request: NextRequest) {
       crew: userData.is_crew_verified ? userData.crews : null,
     });
   } catch (error) {
-    console.error("크루 인증 상태 확인 중 오류:", error);
+    //console.error("크루 인증 상태 확인 중 오류:", error);
     return NextResponse.json(
       { success: false, message: "서버 오류가 발생했습니다." },
       { status: 500 }

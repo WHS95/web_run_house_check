@@ -42,10 +42,10 @@ export async function POST(request: Request) {
       .single();
 
     if (inviteCodeError) {
-      console.error(
-        "Error fetching crew invite code:",
-        inviteCodeError.message
-      );
+      // console.error(
+      //   "Error fetching crew invite code:",
+      //   inviteCodeError.message
+      // );
       if (inviteCodeError.code === "PGRST116") {
         // PostgREST error for "No rows found"
         return NextResponse.json(
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Verify crew code API error:", error.message);
+    //console.error("Verify crew code API error:", error.message);
     return NextResponse.json(
       { success: false, message: "서버 오류가 발생했습니다." },
       { status: 500 }

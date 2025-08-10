@@ -49,7 +49,7 @@ export async function createCrewInviteCode(
 
     return { data, error: null };
   } catch (error) {
-    console.error("크루 초대 코드 생성 오류:", error);
+    //console.error("크루 초대 코드 생성 오류:", error);
     return { data: null, error };
   }
 }
@@ -108,7 +108,7 @@ export async function verifyCrewInviteCode(inviteCode: string) {
       },
     };
   } catch (error) {
-    console.error("크루 초대 코드 검증 오류:", error);
+    //console.error("크루 초대 코드 검증 오류:", error);
     return {
       isValid: false,
       reason: "유효하지 않은 초대 코드입니다.",
@@ -160,7 +160,7 @@ export async function verifyUserWithCrewCode(
 
     return { success: true, error: null };
   } catch (error) {
-    console.error("크루 인증 오류:", error);
+    //console.error("크루 인증 오류:", error);
     return { success: false, error };
   }
 }
@@ -197,7 +197,7 @@ export async function checkUserCrewVerification() {
       error: null,
     };
   } catch (error) {
-    console.error("크루 인증 상태 확인 오류:", error);
+    //console.error("크루 인증 상태 확인 오류:", error);
     return { isVerified: false, crewData: null, error };
   }
 }

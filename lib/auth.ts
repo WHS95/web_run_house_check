@@ -14,7 +14,7 @@ export const signInWithKakao = async () => {
   });
 
   if (error) {
-    console.error("카카오 로그인 오류:", error);
+    //console.error("카카오 로그인 오류:", error);
     throw error;
   }
 
@@ -26,7 +26,7 @@ export const signOut = async () => {
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
   if (error) {
-    console.error("로그아웃 오류:", error);
+    //console.error("로그아웃 오류:", error);
     throw error;
   }
 };

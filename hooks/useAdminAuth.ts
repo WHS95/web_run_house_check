@@ -63,7 +63,7 @@ export function useAdminAuth(): AdminAuthData {
           error: null,
         });
       } catch (error) {
-        console.error("인증 확인 중 오류:", error);
+        //console.error("인증 확인 중 오류:", error);
         setAuthData((prev) => ({
           ...prev,
           isLoading: false,

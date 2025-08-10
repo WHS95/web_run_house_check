@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (userError) {
-      console.error("사용자 상태 조회 오류:", userError);
+      //console.error("사용자 상태 조회 오류:", userError);
       return NextResponse.json(
         {
           success: false,
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("사용자 상태 확인 중 오류:", error);
+    //console.error("사용자 상태 확인 중 오류:", error);
     return NextResponse.json(
       {
         success: false,

@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         );
         return NextResponse.json(stats);
       } catch (error) {
-        console.error("통계 데이터 조회 오류:", error);
+        //console.error("통계 데이터 조회 오류:", error);
         return NextResponse.json(
           { error: "통계 데이터를 가져오는데 실패했습니다." },
           { status: 500 }
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     } = await getMonthlyAttendanceData(crewId, parseInt(year), parseInt(month));
 
     if (attendanceError) {
-      console.error("출석 데이터 조회 오류:", attendanceError);
+      //console.error("출석 데이터 조회 오류:", attendanceError);
       return NextResponse.json(
         { error: "출석 데이터를 가져오는데 실패했습니다." },
         { status: 500 }
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       detailData: detailData || {},
     });
   } catch (error) {
-    console.error("Attendance API 오류:", error);
+    //console.error("Attendance API 오류:", error);
     return NextResponse.json(
       { error: "데이터를 가져오는데 실패했습니다." },
       { status: 500 }

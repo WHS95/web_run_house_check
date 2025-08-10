@@ -16,7 +16,9 @@ import {
 import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import AdminCrewMembersManagement from "@/components/organisms/AdminCrewMembersManagement";
 import AdminInviteCodesManagement from "@/components/organisms/AdminInviteCodesManagement";
-import PopupNotification, { NotificationType } from "@/components/molecules/common/PopupNotification";
+import PopupNotification, {
+  NotificationType,
+} from "@/components/molecules/common/PopupNotification";
 import {
   CrewLocation,
   createCrewLocation,
@@ -39,9 +41,9 @@ export default function AdminSettingsManagementNew({
   const [isPending, startTransition] = useTransition();
 
   // 탭 상태
-  const [activeTab, setActiveTab] = useState<"locations" | "members" | "invites">(
-    "locations"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "locations" | "members" | "invites"
+  >("locations");
 
   // 활동장소 관련 상태
   const [locations, setLocations] = useState<CrewLocation[]>(initialLocations);
@@ -104,7 +106,7 @@ export default function AdminSettingsManagementNew({
       });
 
       if (error) {
-        console.error("장소 추가 오류:", error);
+        //console.error("장소 추가 오류:", error);
         haptic.error();
         showNotification("장소 추가 중 오류가 발생했습니다.", "error");
         return;
@@ -121,7 +123,7 @@ export default function AdminSettingsManagementNew({
         });
       }
     } catch (error) {
-      console.error("장소 추가 오류:", error);
+      //console.error("장소 추가 오류:", error);
       haptic.error();
       showNotification("장소 추가 중 오류가 발생했습니다.", "error");
     } finally {
@@ -149,7 +151,7 @@ export default function AdminSettingsManagementNew({
       });
 
       if (error) {
-        console.error("장소 수정 오류:", error);
+        //console.error("장소 수정 오류:", error);
         haptic.error();
         showNotification("장소 수정 중 오류가 발생했습니다.", "error");
         return;
@@ -170,7 +172,7 @@ export default function AdminSettingsManagementNew({
         });
       }
     } catch (error) {
-      console.error("장소 수정 오류:", error);
+      //console.error("장소 수정 오류:", error);
       haptic.error();
       showNotification("장소 수정 중 오류가 발생했습니다.", "error");
     } finally {
@@ -199,7 +201,7 @@ export default function AdminSettingsManagementNew({
       const { success, error } = await deleteCrewLocation(locationId);
 
       if (error) {
-        console.error("장소 삭제 오류:", error);
+        //console.error("장소 삭제 오류:", error);
         haptic.error();
         showNotification("장소 삭제 중 오류가 발생했습니다.", "error");
         return;
@@ -216,7 +218,7 @@ export default function AdminSettingsManagementNew({
         });
       }
     } catch (error) {
-      console.error("장소 삭제 오류:", error);
+      //console.error("장소 삭제 오류:", error);
       haptic.error();
       showNotification("장소 삭제 중 오류가 발생했습니다.", "error");
     } finally {

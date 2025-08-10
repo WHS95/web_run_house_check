@@ -65,7 +65,7 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({
       const result = data?.[0] || null;
       setStats(result);
     } catch (err) {
-      console.error("통계 로딩 오류:", err);
+      //console.error("통계 로딩 오류:", err);
       setError(
         err instanceof Error ? err.message : "통계를 불러올 수 없습니다."
       );

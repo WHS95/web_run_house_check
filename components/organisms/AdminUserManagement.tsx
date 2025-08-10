@@ -160,7 +160,7 @@ export default function AdminUserManagement({
       const { error } = await updateUserStatus(userId, crewId, newStatus);
 
       if (error) {
-        console.error("사용자 상태 업데이트 실패:", error);
+        //console.error("사용자 상태 업데이트 실패:", error);
         alert("사용자 상태 변경에 실패했습니다.");
         return;
       }
@@ -174,7 +174,7 @@ export default function AdminUserManagement({
         )
       );
     } catch (error) {
-      console.error("사용자 상태 업데이트 오류:", error);
+      //console.error("사용자 상태 업데이트 오류:", error);
       alert("사용자 상태 변경 중 오류가 발생했습니다.");
     } finally {
       setIsUpdating(null);
@@ -197,7 +197,7 @@ export default function AdminUserManagement({
       const { error } = await updateUserInfo(selectedUser.id, userData);
 
       if (error) {
-        console.error("사용자 정보 업데이트 실패:", error);
+        //console.error("사용자 정보 업데이트 실패:", error);
         alert("사용자 정보 수정에 실패했습니다.");
         return;
       }
@@ -212,7 +212,7 @@ export default function AdminUserManagement({
       setEditModalOpen(false);
       setSelectedUser(null);
     } catch (error) {
-      console.error("사용자 정보 업데이트 오류:", error);
+      //console.error("사용자 정보 업데이트 오류:", error);
       alert("사용자 정보 수정 중 오류가 발생했습니다.");
     }
   };

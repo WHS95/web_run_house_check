@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error("Auth error:", authError);
+      //console.error("Auth error:", authError);
       return NextResponse.json(
         { success: false, message: "사용자 인증에 실패했습니다." },
         { status: 401 }
@@ -123,7 +123,7 @@ export async function POST(request: Request) {
       .upsert(updateUserData, { onConflict: "id" });
 
     if (upsertError) {
-      console.error("Error upserting user data in 'users' table:", upsertError);
+      //console.error("Error upserting user data in 'users' table:", upsertError);
       return NextResponse.json(
         {
           success: false,
@@ -159,10 +159,10 @@ export async function POST(request: Request) {
       );
 
     if (userCrewError) {
-      console.error(
-        "Error inserting user-crew data in 'user_crews' table:",
-        userCrewError
-      );
+      // //console.error(
+      //   "Error inserting user-crew data in 'user_crews' table:",
+      //   userCrewError
+      // );
       return NextResponse.json(
         { success: false, message: "회원가입 중 오류가 발생했습니다." },
         { status: 500 }
@@ -174,7 +174,7 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Signup API error:", error.message, error.stack);
+    //console.error("Signup API error:", error.message, error.stack);
     return NextResponse.json(
       { success: false, message: "서버 내부 오류가 발생했습니다." },
       { status: 500 }

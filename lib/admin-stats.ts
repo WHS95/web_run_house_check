@@ -31,7 +31,7 @@ export async function getTotalMembers(crewId: string): Promise<number> {
     .eq("crew_id", crewId);
 
   if (error) {
-    console.error("Error fetching total members:", error);
+    //console.error("Error fetching total members:", error);
     return 0;
   }
 
@@ -68,7 +68,7 @@ export async function getTodayStats(crewId: string): Promise<TodayStats> {
     .lte("attendance_timestamp", endUTC.toISOString());
 
   if (error) {
-    console.error("Error fetching today stats:", error);
+    //console.error("Error fetching today stats:", error);
     return { attendanceCount: 0, meetingCount: 0 };
   }
 
@@ -149,7 +149,7 @@ export async function getNewMembersThisMonth(crewId: string): Promise<number> {
     .lte("joined_at", lastDayOfMonth.toISOString());
 
   if (error) {
-    console.error("Error fetching new members this month:", error);
+    //console.error("Error fetching new members this month:", error);
     return 0;
   }
 
@@ -176,7 +176,7 @@ export async function getNewMembersLastMonth(crewId: string): Promise<number> {
     .lte("joined_at", lastDayOfLastMonth.toISOString());
 
   if (error) {
-    console.error("Error fetching new members last month:", error);
+    //console.error("Error fetching new members last month:", error);
     return 0;
   }
 
@@ -212,7 +212,7 @@ export async function getMonthlyMeetingCount(crewId: string): Promise<number> {
     .lte("attendance_timestamp", endDateStr + "T23:59:59Z");
 
   if (error) {
-    console.error("Error fetching monthly meeting count:", error);
+    //console.error("Error fetching monthly meeting count:", error);
     return 0;
   }
 
@@ -283,7 +283,7 @@ export async function getLastMonthMeetingCount(
     .lte("attendance_timestamp", endDateStr + "T23:59:59Z");
 
   if (error) {
-    console.error("Error fetching last month meeting count:", error);
+    //console.error("Error fetching last month meeting count:", error);
     return 0;
   }
 
@@ -342,7 +342,7 @@ export async function getMonthlyParticipationCount(
     .lte("attendance_timestamp", endDateStr + "T23:59:59Z");
 
   if (error) {
-    console.error("Error fetching monthly participation count:", error);
+    //console.error("Error fetching monthly participation count:", error);
     return 0;
   }
 
@@ -390,7 +390,7 @@ export async function getLastMonthParticipationCount(
     .lte("attendance_timestamp", endDateStr + "T23:59:59Z");
 
   if (error) {
-    console.error("Error fetching last month participation count:", error);
+    //console.error("Error fetching last month participation count:", error);
     return 0;
   }
 
@@ -425,7 +425,7 @@ export async function getMonthlyParticipantCount(
     .eq("crew_id", crewId);
 
   if (crewError) {
-    console.error("Error fetching crew members:", crewError);
+    //console.error("Error fetching crew members:", crewError);
     return 0;
   }
 
@@ -447,7 +447,7 @@ export async function getMonthlyParticipantCount(
     .lte("attendance_timestamp", endDateStr + "T23:59:59Z");
 
   if (error) {
-    console.error("Error fetching monthly participant count:", error);
+    //console.error("Error fetching monthly participant count:", error);
     return 0;
   }
 
@@ -495,7 +495,7 @@ export async function getLastMonthParticipantCount(
     .eq("crew_id", crewId);
 
   if (crewError) {
-    console.error("Error fetching crew members:", crewError);
+    //console.error("Error fetching crew members:", crewError);
     return 0;
   }
 
@@ -517,7 +517,7 @@ export async function getLastMonthParticipantCount(
     .lte("attendance_timestamp", endDateStr + "T23:59:59Z");
 
   if (error) {
-    console.error("Error fetching last month participant count:", error);
+    //console.error("Error fetching last month participant count:", error);
     return 0;
   }
 
@@ -552,7 +552,7 @@ export async function getMonthlyHostCount(crewId: string): Promise<number> {
     .eq("crew_id", crewId);
 
   if (crewError) {
-    console.error("Error fetching crew members:", crewError);
+    //console.error("Error fetching crew members:", crewError);
     return 0;
   }
 
@@ -575,7 +575,7 @@ export async function getMonthlyHostCount(crewId: string): Promise<number> {
     .lte("attendance_timestamp", endDateStr + "T23:59:59Z");
 
   if (error) {
-    console.error("Error fetching monthly host count:", error);
+    //console.error("Error fetching monthly host count:", error);
     return 0;
   }
 
@@ -621,7 +621,7 @@ export async function getLastMonthHostCount(crewId: string): Promise<number> {
     .eq("crew_id", crewId);
 
   if (crewError) {
-    console.error("Error fetching crew members:", crewError);
+    //console.error("Error fetching crew members:", crewError);
     return 0;
   }
 
@@ -644,7 +644,7 @@ export async function getLastMonthHostCount(crewId: string): Promise<number> {
     .lte("attendance_timestamp", endDateStr + "T23:59:59Z");
 
   if (error) {
-    console.error("Error fetching last month host count:", error);
+    //console.error("Error fetching last month host count:", error);
     return 0;
   }
 
@@ -730,7 +730,7 @@ export async function getAdminStats(crewId: string): Promise<AdminStats> {
       lastMonthHostCount,
     };
   } catch (error) {
-    console.error("Error fetching admin stats:", error);
+    //console.error("Error fetching admin stats:", error);
     // 에러 발생 시 기본값 반환
     return {
       totalMembers: 0,
@@ -774,13 +774,13 @@ export async function getAdminStatsOptimized(
       });
 
     if (error) {
-      console.error("Error calling get_admin_stats function:", error);
+      //console.error("Error calling get_admin_stats function:", error);
       // fallback to existing function
       return getAdminStats(crewId);
     }
 
     if (!data || !data.success) {
-      console.error("get_admin_stats function returned error:", data?.error);
+      //console.error("get_admin_stats function returned error:", data?.error);
       // fallback to existing function
       return getAdminStats(crewId);
     }
@@ -823,7 +823,7 @@ export async function getAdminStatsOptimized(
       lastMonthHostCount: statsData.lastMonthHostCount,
     };
   } catch (error) {
-    console.error("Error in optimized admin stats:", error);
+    //console.error("Error in optimized admin stats:", error);
     // fallback to existing function
     return getAdminStats(crewId);
   }

@@ -93,12 +93,12 @@ export default function AdminInviteCodesManagement({
       if (response.ok && result.success) {
         setInviteCode(result.data);
       } else {
-        console.error("초대코드 조회 오류:", result.error);
+        //console.error("초대코드 조회 오류:", result.error);
         haptic.error();
         showNotification("초대코드 조회에 실패했습니다.", "error");
       }
     } catch (error) {
-      console.error("초대코드 조회 실패:", error);
+      //console.error("초대코드 조회 실패:", error);
       haptic.error();
       showNotification("초대코드 조회 중 오류가 발생했습니다.", "error");
     } finally {
@@ -147,7 +147,7 @@ export default function AdminInviteCodesManagement({
         );
       }
     } catch (error) {
-      console.error("초대코드 생성 실패:", error);
+      //console.error("초대코드 생성 실패:", error);
       haptic.error();
       showNotification("초대코드 생성 중 오류가 발생했습니다.", "error");
     } finally {
@@ -185,14 +185,20 @@ export default function AdminInviteCodesManagement({
           );
         }
       } catch (error) {
-        console.error("초대코드 재생성 실패:", error);
+        //console.error("초대코드 재생성 실패:", error);
         haptic.error();
         showNotification("초대코드 재생성 중 오류가 발생했습니다.", "error");
       } finally {
         setActionLoading(false);
       }
     });
-  }, [inviteCode, actionLoading, handleCreateInviteCode, showNotification, showConfirmModal]);
+  }, [
+    inviteCode,
+    actionLoading,
+    handleCreateInviteCode,
+    showNotification,
+    showConfirmModal,
+  ]);
 
   // 초대코드 복사
   const handleCopyCode = useCallback(
@@ -202,7 +208,7 @@ export default function AdminInviteCodesManagement({
         haptic.success();
         showNotification("초대코드가 클립보드에 복사되었습니다.", "success");
       } catch (error) {
-        console.error("복사 실패:", error);
+        //console.error("복사 실패:", error);
         haptic.error();
         showNotification("복사에 실패했습니다.", "error");
       }
@@ -478,11 +484,11 @@ export default function AdminInviteCodesManagement({
         isOpen={confirmModal.isOpen}
         onClose={closeConfirmModal}
         onConfirm={confirmModal.onConfirm}
-        title="초대코드 재생성"
-        content="기존 초대코드가 무효화되고 새로운 코드가 생성됩니다. 계속하시겠습니까?"
-        confirmText="재생성"
-        cancelText="취소"
-        variant="destructive"
+        title='초대코드 재생성'
+        content='기존 초대코드가 무효화되고 새로운 코드가 생성됩니다. 계속하시겠습니까?'
+        confirmText='재생성'
+        cancelText='취소'
+        variant='destructive'
       />
     </div>
   );

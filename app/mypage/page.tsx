@@ -114,7 +114,7 @@ export default function MyPage() {
           });
 
         if (error) {
-          console.error("마이페이지 데이터 조회 오류:", error);
+          //console.error("마이페이지 데이터 조회 오류:", error);
           throw new Error(error.message);
         }
 
@@ -147,7 +147,7 @@ export default function MyPage() {
         console.log("1231231", activityInfo);
         setActivityData(activityInfo);
       } catch (error) {
-        console.error("마이페이지 데이터 로딩 오류:", error);
+        //console.error("마이페이지 데이터 로딩 오류:", error);
         setError(
           error instanceof Error
             ? error.message

@@ -124,7 +124,7 @@ const UltraFastRankingTemplate = () => {
       });
 
       if (error) {
-        console.error('랭킹 데이터 조회 오류:', error);
+        //console.error('랭킹 데이터 조회 오류:', error);
         throw new Error(error.message);
       }
 
@@ -151,7 +151,7 @@ const UltraFastRankingTemplate = () => {
       });
 
     } catch (error) {
-      console.error('랭킹 데이터 로딩 오류:', error);
+      //console.error('랭킹 데이터 로딩 오류:', error);
       throw error;
     }
   }, [supabase, router]);

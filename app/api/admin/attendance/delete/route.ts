@@ -29,7 +29,7 @@ export async function DELETE(request: NextRequest) {
     const { success, error } = await deleteAttendanceRecord(recordId);
 
     if (!success || error) {
-      console.error("출석 기록 삭제 실패:", error);
+      //console.error("출석 기록 삭제 실패:", error);
       return NextResponse.json(
         {
           success: false,
@@ -44,7 +44,7 @@ export async function DELETE(request: NextRequest) {
       message: "출석 기록이 성공적으로 삭제되었습니다.",
     });
   } catch (error) {
-    console.error("Delete Attendance API 오류:", error);
+    //console.error("Delete Attendance API 오류:", error);
     return NextResponse.json(
       {
         success: false,

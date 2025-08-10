@@ -26,7 +26,7 @@ export async function checkUserCrewVerificationServer(userId: string) {
       error: null,
     };
   } catch (error) {
-    console.error("서버에서 크루 인증 상태 확인 오류:", error);
+    //console.error("서버에서 크루 인증 상태 확인 오류:", error);
     return { isVerified: false, crewData: null, error };
   }
 }

@@ -29,7 +29,7 @@ export default function UserProfile() {
           setUser(user);
         }
       } catch (error) {
-        // console.error("사용자 정보 가져오기 오류:", error);
+        // //console.error("사용자 정보 가져오기 오류:", error);
       } finally {
         setLoading(false);
       }

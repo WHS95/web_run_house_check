@@ -355,7 +355,7 @@ const UltraFastAttendanceTemplate = () => {
             }
           }
         } catch (statusError) {
-          console.error('사용자 상태 확인 오류:', statusError);
+          //console.error('사용자 상태 확인 오류:', statusError);
           // 상태 확인 실패 시에도 계속 진행 (기본적으로는 허용)
         }
 
@@ -365,7 +365,7 @@ const UltraFastAttendanceTemplate = () => {
         });
 
         if (error) {
-          console.error('폼 데이터 조회 오류:', error);
+          //console.error('폼 데이터 조회 오류:', error);
           throw new Error(error.message);
         }
 
@@ -402,7 +402,7 @@ const UltraFastAttendanceTemplate = () => {
         }));
         
       } catch (error) {
-        console.error('데이터 로딩 오류:', error);
+        //console.error('데이터 로딩 오류:', error);
         haptic.error();
         setNotificationType('error');
         setNotificationMessage('데이터를 불러오지 못했습니다.');

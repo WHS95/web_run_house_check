@@ -66,7 +66,7 @@ async function getDayParticipationAnalysis(
     .eq("status", "ACTIVE");
 
   if (memberError) {
-    console.error("Error fetching active members:", memberError);
+    //console.error("Error fetching active members:", memberError);
     throw new Error("활성 멤버 조회에 실패했습니다.");
   }
 
@@ -106,7 +106,7 @@ async function getDayParticipationAnalysis(
     .lte("attendance_timestamp", endUTC.toISOString());
 
   if (attendanceError) {
-    console.error("Error fetching attendance data:", attendanceError);
+    //console.error("Error fetching attendance data:", attendanceError);
     throw new Error("출석 데이터 조회에 실패했습니다.");
   }
 
@@ -211,7 +211,7 @@ async function getLocationParticipationAnalysis(
     .eq("status", "ACTIVE");
 
   if (memberError) {
-    console.error("Error fetching active members:", memberError);
+    //console.error("Error fetching active members:", memberError);
     throw new Error("활성 멤버 조회에 실패했습니다.");
   }
 
@@ -234,7 +234,7 @@ async function getLocationParticipationAnalysis(
     .lte("attendance_timestamp", endUTC.toISOString());
 
   if (attendanceError) {
-    console.error("Error fetching attendance data:", attendanceError);
+    //console.error("Error fetching attendance data:", attendanceError);
     throw new Error("출석 데이터 조회에 실패했습니다.");
   }
 
@@ -333,7 +333,7 @@ async function getMemberAttendanceStatus(
     .eq("status", "ACTIVE");
 
   if (memberError) {
-    console.error("Error fetching active members:", memberError);
+    //console.error("Error fetching active members:", memberError);
     throw new Error("활성 멤버 조회에 실패했습니다.");
   }
 
@@ -364,7 +364,7 @@ async function getMemberAttendanceStatus(
     .lte("attendance_timestamp", endUTC.toISOString());
 
   if (attendanceError) {
-    console.error("Error fetching attendance data:", attendanceError);
+    //console.error("Error fetching attendance data:", attendanceError);
     throw new Error("출석 데이터 조회에 실패했습니다.");
   }
 
@@ -454,7 +454,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Analyze API 오류:", error);
+    //console.error("Analyze API 오류:", error);
     return NextResponse.json(
       {
         error:

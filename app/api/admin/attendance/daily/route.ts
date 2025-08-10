@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       await getDailyAttendanceDetails(crewId, date);
 
     if (attendanceError) {
-      console.error("일별 출석 상세 조회 오류:", attendanceError);
+      //console.error("일별 출석 상세 조회 오류:", attendanceError);
       return NextResponse.json(
         { error: "출석 상세 데이터를 가져오는데 실패했습니다." },
         { status: 500 }
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       date,
     });
   } catch (error) {
-    console.error("Daily Attendance API 오류:", error);
+    //console.error("Daily Attendance API 오류:", error);
     return NextResponse.json(
       { error: "출석 상세 데이터를 가져오는데 실패했습니다." },
       { status: 500 }

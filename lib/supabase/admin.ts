@@ -62,13 +62,13 @@ export async function getAllCrews() {
       .order("name");
 
     if (error) {
-      console.error("크루 목록 조회 오류 (Supabase):", error);
+      //console.error("크루 목록 조회 오류 (Supabase):", error);
       return { data: null, error: new Error(error.message) };
     }
 
     return { data, error: null };
   } catch (error: any) {
-    console.error("크루 목록 조회 오류 (Catch):", error);
+    //console.error("크루 목록 조회 오류 (Catch):", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -102,7 +102,7 @@ export async function getCrewById(crewId: string) {
 
     return { data, error: null };
   } catch (error) {
-    console.error("크루 정보 조회 오류:", error);
+    //console.error("크루 정보 조회 오류:", error);
     return { data: null, error };
   }
 }
@@ -128,7 +128,7 @@ export async function createCrew(name: string, description?: string) {
 
     return { data, error: null };
   } catch (error) {
-    console.error("크루 생성 오류:", error);
+    //console.error("크루 생성 오류:", error);
     return { data: null, error };
   }
 }
@@ -155,7 +155,7 @@ export async function updateCrew(
 
     return { data, error: null };
   } catch (error) {
-    console.error("크루 업데이트 오류:", error);
+    //console.error("크루 업데이트 오류:", error);
     return { data: null, error };
   }
 }
@@ -188,13 +188,13 @@ export async function getCrewInviteCodes(crewId: string) {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("초대 코드 목록 조회 오류 (Supabase):", error);
+      //console.error("초대 코드 목록 조회 오류 (Supabase):", error);
       return { data: null, error: new Error(error.message) };
     }
 
     return { data, error: null };
   } catch (error: any) {
-    console.error("초대 코드 목록 조회 오류 (Catch):", error);
+    //console.error("초대 코드 목록 조회 오류 (Catch):", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -236,7 +236,7 @@ export async function createCrewInviteCode(
 
     return { data, error: null };
   } catch (error) {
-    console.error("초대 코드 생성 오류:", error);
+    //console.error("초대 코드 생성 오류:", error);
     return { data: null, error };
   }
 }
@@ -263,7 +263,7 @@ export async function toggleInviteCodeStatus(
 
     return { data, error: null };
   } catch (error) {
-    console.error("초대 코드 상태 변경 오류:", error);
+    //console.error("초대 코드 상태 변경 오류:", error);
     return { data: null, error };
   }
 }
@@ -317,7 +317,7 @@ export async function getCrewMembers(
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("크루 회원 목록 조회 오류 (Supabase):", error);
+      //console.error("크루 회원 목록 조회 오류 (Supabase):", error);
       return { data: null, error: new Error(error.message) };
     }
     if (!data) return { data: [], error: null };
@@ -331,7 +331,7 @@ export async function getCrewMembers(
 
     return { data: members, error: null };
   } catch (error: any) {
-    console.error("크루 회원 목록 조회 오류 (Catch):", error);
+    //console.error("크루 회원 목록 조회 오류 (Catch):", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -357,7 +357,7 @@ export async function removeUserFromCrew(userCrewId: string) {
 
     return { success: true, error: null };
   } catch (error) {
-    console.error("크루 회원 제거 오류:", error);
+    //console.error("크루 회원 제거 오류:", error);
     return { success: false, error };
   }
 }
@@ -393,7 +393,7 @@ export async function getInviteCodeUsageLogs(codeId: number) {
 
     return { data, error: null };
   } catch (error) {
-    console.error("초대 코드 사용 로그 조회 오류:", error);
+    //console.error("초대 코드 사용 로그 조회 오류:", error);
     return { data: null, error };
   }
 }
@@ -422,7 +422,7 @@ export async function checkIsSuperAdmin(userId: string) {
 
     return { isSuperAdmin: data?.is_super_admin || false, error: null };
   } catch (error) {
-    console.error("슈퍼 관리자 확인 오류:", error);
+    //console.error("슈퍼 관리자 확인 오류:", error);
     return { isSuperAdmin: false, error };
   }
 }
@@ -476,7 +476,7 @@ export async function getAllUsers(): Promise<GetAllUsersReturn> {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("사용자 목록 조회 오류 (Supabase):", error);
+      //console.error("사용자 목록 조회 오류 (Supabase):", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -506,7 +506,7 @@ export async function getAllUsers(): Promise<GetAllUsersReturn> {
 
     return { data: usersWithAttendance, error: null };
   } catch (error: any) {
-    console.error("사용자 목록 조회 오류 (Catch):", error);
+    //console.error("사용자 목록 조회 오류 (Catch):", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -553,7 +553,7 @@ export async function updateUserStatus(
 
     return { data, error: null };
   } catch (error) {
-    console.error("사용자 크루 상태 업데이트 오류:", error);
+    //console.error("사용자 크루 상태 업데이트 오류:", error);
     return { data: null, error };
   }
 }
@@ -589,7 +589,7 @@ export async function updateUserInfo(
 
     return { data, error: null };
   } catch (error) {
-    console.error("사용자 정보 업데이트 오류:", error);
+    //console.error("사용자 정보 업데이트 오류:", error);
     return { data: null, error };
   }
 }
@@ -610,10 +610,10 @@ export async function getUsersByCrewIdOptimized(
       .rpc("get_admin_users_unified", { p_crew_id: crewId });
 
     if (error) {
-      console.error(
-        "최적화된 크루별 사용자 목록 조회 오류 (PostgreSQL Function):",
-        error
-      );
+      //console.error(
+      //   "최적화된 크루별 사용자 목록 조회 오류 (PostgreSQL Function):",
+      //   error
+      // );
       return { data: null, error: new Error(error.message) };
     }
 
@@ -627,7 +627,7 @@ export async function getUsersByCrewIdOptimized(
     const users = functionResult.data as UserForAdmin[];
     return { data: users || [], error: null };
   } catch (error: any) {
-    console.error("최적화된 크루별 사용자 목록 조회 오류 (Catch):", error);
+    //console.error("최적화된 크루별 사용자 목록 조회 오류 (Catch):", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -696,7 +696,7 @@ export async function getMonthlyAttendanceSummary(
       .order("attendance_timestamp");
 
     if (error) {
-      console.error("월별 출석 요약 조회 오류:", error);
+      //console.error("월별 출석 요약 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -724,7 +724,7 @@ export async function getMonthlyAttendanceSummary(
 
     return { data: summary, error: null };
   } catch (error: any) {
-    console.error("월별 출석 요약 조회 오류:", error);
+    //console.error("월별 출석 요약 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -774,7 +774,7 @@ export async function getDailyAttendanceDetails(
       .order("attendance_timestamp");
 
     if (error) {
-      console.error("일별 출석 상세 조회 오류:", error);
+      //console.error("일별 출석 상세 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -815,7 +815,7 @@ export async function getDailyAttendanceDetails(
 
     return { data: attendanceRecords, error: null };
   } catch (error: any) {
-    console.error("일별 출석 상세 조회 오류:", error);
+    //console.error("일별 출석 상세 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -853,7 +853,7 @@ export async function getMonthlyAttendanceData(
           await getDailyAttendanceDetails(crewId, item.date);
 
         if (dailyError) {
-          console.error(`${item.date} 출석 상세 조회 오류:`, dailyError);
+          //console.error(`${item.date} 출석 상세 조회 오류:`, dailyError);
           continue;
         }
 
@@ -865,7 +865,7 @@ export async function getMonthlyAttendanceData(
 
     return { summary, detailData, error: null };
   } catch (error: any) {
-    console.error("월별 출석 데이터 조회 오류:", error);
+    //console.error("월별 출석 데이터 조회 오류:", error);
     return {
       summary: null,
       detailData: null,
@@ -893,7 +893,7 @@ export async function deleteAttendanceRecord(recordId: string) {
       .select();
 
     if (error) {
-      console.error("출석 기록 삭제 오류:", error);
+      //console.error("출석 기록 삭제 오류:", error);
       return { success: false, error: new Error(error.message) };
     }
 
@@ -907,7 +907,7 @@ export async function deleteAttendanceRecord(recordId: string) {
 
     return { success: true, error: null };
   } catch (error: any) {
-    console.error("출석 기록 삭제 오류:", error);
+    //console.error("출석 기록 삭제 오류:", error);
     return {
       success: false,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -933,7 +933,7 @@ export async function restoreAttendanceRecord(recordId: string) {
       .select();
 
     if (error) {
-      console.error("출석 기록 복원 오류:", error);
+      //console.error("출석 기록 복원 오류:", error);
       return { success: false, error: new Error(error.message) };
     }
 
@@ -946,7 +946,7 @@ export async function restoreAttendanceRecord(recordId: string) {
 
     return { success: true, error: null };
   } catch (error: any) {
-    console.error("출석 기록 복원 오류:", error);
+    //console.error("출석 기록 복원 오류:", error);
     return {
       success: false,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -989,7 +989,7 @@ export async function getDeletedAttendanceRecords(
       .limit(limit);
 
     if (error) {
-      console.error("삭제된 출석 기록 조회 오류:", error);
+      //console.error("삭제된 출석 기록 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -1008,7 +1008,7 @@ export async function getDeletedAttendanceRecords(
 
     return { data: attendanceRecords, error: null };
   } catch (error: any) {
-    console.error("삭제된 출석 기록 조회 오류:", error);
+    //console.error("삭제된 출석 기록 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1068,7 +1068,7 @@ export async function getCrewLocations(
       .order("name");
 
     if (error) {
-      console.error("크루 모임 장소 조회 오류:", error);
+      //console.error("크루 모임 장소 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -1088,7 +1088,7 @@ export async function getCrewLocations(
 
     return { data: locations, error: null };
   } catch (error: any) {
-    console.error("크루 모임 장소 조회 오류:", error);
+    //console.error("크루 모임 장소 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1126,7 +1126,7 @@ export async function createCrewLocation(
       .single();
 
     if (error) {
-      console.error("크루 모임 장소 생성 오류:", error);
+      //console.error("크루 모임 장소 생성 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -1144,7 +1144,7 @@ export async function createCrewLocation(
 
     return { data: location, error: null };
   } catch (error: any) {
-    console.error("크루 모임 장소 생성 오류:", error);
+    //console.error("크루 모임 장소 생성 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1177,7 +1177,7 @@ export async function updateCrewLocation(
       .single();
 
     if (error) {
-      console.error("크루 모임 장소 업데이트 오류:", error);
+      //console.error("크루 모임 장소 업데이트 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -1195,7 +1195,7 @@ export async function updateCrewLocation(
 
     return { data: location, error: null };
   } catch (error: any) {
-    console.error("크루 모임 장소 업데이트 오류:", error);
+    //console.error("크루 모임 장소 업데이트 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1219,13 +1219,13 @@ export async function deleteCrewLocation(locationId: number) {
       .single();
 
     if (error) {
-      console.error("크루 모임 장소 삭제 오류:", error);
+      //console.error("크루 모임 장소 삭제 오류:", error);
       return { success: false, error: new Error(error.message) };
     }
 
     return { success: true, error: null };
   } catch (error: any) {
-    console.error("크루 모임 장소 삭제 오류:", error);
+    //console.error("크루 모임 장소 삭제 오류:", error);
     return {
       success: false,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1260,13 +1260,13 @@ export async function updateCrewSettings(
       .single();
 
     if (error) {
-      console.error("크루 설정 업데이트 오류:", error);
+      //console.error("크루 설정 업데이트 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
     return { data, error: null };
   } catch (error: any) {
-    console.error("크루 설정 업데이트 오류:", error);
+    //console.error("크루 설정 업데이트 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1295,7 +1295,7 @@ export async function getCrewExerciseTypes(crewId: string) {
       .eq("crew_id", crewId);
 
     if (error) {
-      console.error("크루 운동 종류 조회 오류:", error);
+      //console.error("크루 운동 종류 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -1305,7 +1305,7 @@ export async function getCrewExerciseTypes(crewId: string) {
 
     return { data: exerciseTypes, error: null };
   } catch (error: any) {
-    console.error("크루 운동 종류 조회 오류:", error);
+    //console.error("크루 운동 종류 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1327,13 +1327,13 @@ export async function getAllExerciseTypes() {
       .order("name");
 
     if (error) {
-      console.error("운동 종류 조회 오류:", error);
+      //console.error("운동 종류 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
     return { data, error: null };
   } catch (error: any) {
-    console.error("운동 종류 조회 오류:", error);
+    //console.error("운동 종류 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1361,13 +1361,13 @@ export async function addCrewExerciseType(
       .select();
 
     if (error) {
-      console.error("크루 운동 종류 추가 오류:", error);
+      //console.error("크루 운동 종류 추가 오류:", error);
       return { success: false, error: new Error(error.message) };
     }
 
     return { success: true, error: null };
   } catch (error: any) {
-    console.error("크루 운동 종류 추가 오류:", error);
+    //console.error("크루 운동 종류 추가 오류:", error);
     return {
       success: false,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1393,13 +1393,13 @@ export async function removeCrewExerciseType(
       .eq("exercise_type_id", exerciseTypeId);
 
     if (error) {
-      console.error("크루 운동 종류 제거 오류:", error);
+      //console.error("크루 운동 종류 제거 오류:", error);
       return { success: false, error: new Error(error.message) };
     }
 
     return { success: true, error: null };
   } catch (error: any) {
-    console.error("크루 운동 종류 제거 오류:", error);
+    //console.error("크루 운동 종류 제거 오류:", error);
     return {
       success: false,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1443,7 +1443,7 @@ export async function updateAttendanceRecord(
       .single();
 
     if (error) {
-      console.error("출석 기록 업데이트 오류:", error);
+      //console.error("출석 기록 업데이트 오류:", error);
       return { success: false, error: new Error(error.message) };
     }
 
@@ -1456,7 +1456,7 @@ export async function updateAttendanceRecord(
 
     return { success: true, error: null };
   } catch (error: any) {
-    console.error("출석 기록 업데이트 오류:", error);
+    //console.error("출석 기록 업데이트 오류:", error);
     return {
       success: false,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1510,13 +1510,13 @@ export async function getUserActivityStatistics(
       });
 
     if (error) {
-      console.error("사용자 활동 통계 조회 오류:", error);
+      //console.error("사용자 활동 통계 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
     return { data: data || [], error: null };
   } catch (error: any) {
-    console.error("사용자 활동 통계 조회 오류:", error);
+    //console.error("사용자 활동 통계 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1540,7 +1540,7 @@ export async function getCurrentMonthStats(
       });
 
     if (error) {
-      console.error("이번 달 통계 조회 오류:", error);
+      //console.error("이번 달 통계 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -1548,7 +1548,7 @@ export async function getCurrentMonthStats(
     const result = data?.[0] || null;
     return { data: result, error: null };
   } catch (error: any) {
-    console.error("이번 달 통계 조회 오류:", error);
+    //console.error("이번 달 통계 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1576,7 +1576,7 @@ export async function getSpecificMonthStats(
       });
 
     if (error) {
-      console.error("특정 월 통계 조회 오류:", error);
+      //console.error("특정 월 통계 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -1584,7 +1584,7 @@ export async function getSpecificMonthStats(
     const result = data?.[0] || null;
     return { data: result, error: null };
   } catch (error: any) {
-    console.error("특정 월 통계 조회 오류:", error);
+    //console.error("특정 월 통계 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),

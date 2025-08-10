@@ -205,7 +205,7 @@ export default function AdminAttendanceManagement({
       setAttendanceSummary(data.summary || []);
       setAttendanceDetailData(data.detailData || {});
     } catch (error) {
-      console.error("월별 데이터 조회 오류:", error);
+      //console.error("월별 데이터 조회 오류:", error);
       setNoticeModal({
         isOpen: true,
         title: "오류 발생",
@@ -268,7 +268,7 @@ export default function AdminAttendanceManagement({
             throw new Error("상세 데이터 조회 실패");
           }
         } catch (error) {
-          console.error("날짜별 상세 데이터 조회 오류:", error);
+          //console.error("날짜별 상세 데이터 조회 오류:", error);
           setSelectedDateDetails([]);
           setNoticeModal({
             isOpen: true,
@@ -346,7 +346,7 @@ export default function AdminAttendanceManagement({
           content: "출석 기록이 성공적으로 삭제되었습니다.",
         });
       } else {
-        console.error("출석 기록 삭제 실패:", result.error);
+        //console.error("출석 기록 삭제 실패:", result.error);
         setNoticeModal({
           isOpen: true,
           title: "삭제 실패",
@@ -356,7 +356,7 @@ export default function AdminAttendanceManagement({
         });
       }
     } catch (error) {
-      console.error("출석 기록 삭제 중 오류:", error);
+      //console.error("출석 기록 삭제 중 오류:", error);
       setNoticeModal({
         isOpen: true,
         title: "오류 발생",
@@ -397,7 +397,7 @@ export default function AdminAttendanceManagement({
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        console.error("출석 정보 업데이트 실패:", result.error);
+        //console.error("출석 정보 업데이트 실패:", result.error);
         setNoticeModal({
           isOpen: true,
           title: "수정 실패",
@@ -506,7 +506,7 @@ export default function AdminAttendanceManagement({
           : "출석 정보가 성공적으로 수정되었습니다.",
       });
     } catch (error) {
-      console.error("출석 정보 업데이트 오류:", error);
+      //console.error("출석 정보 업데이트 오류:", error);
       setNoticeModal({
         isOpen: true,
         title: "오류 발생",

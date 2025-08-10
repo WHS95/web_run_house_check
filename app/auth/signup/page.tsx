@@ -288,7 +288,7 @@ export default function SignupPage() {
           }
         }
       } catch (error) {
-        console.error("Session fetch error:", error);
+        //console.error("Session fetch error:", error);
       }
     };
 
@@ -335,7 +335,7 @@ export default function SignupPage() {
         });
       }
     } catch (error) {
-      console.error("Crew code verification error:", error);
+      //console.error("Crew code verification error:", error);
       setFormError("crewCode", {
         type: "manual",
         message: "크루 코드 인증 중 오류가 발생했습니다.",
@@ -404,7 +404,7 @@ export default function SignupPage() {
           setIsNotificationVisible(true);
         }
       } catch (error) {
-        console.error("Signup error:", error);
+        //console.error("Signup error:", error);
         setNotificationMessage("회원가입 중 오류가 발생했습니다.");
         setNotificationType("error");
         setIsNotificationVisible(true);

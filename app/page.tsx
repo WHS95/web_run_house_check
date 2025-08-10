@@ -88,7 +88,7 @@ const HomePage = () => {
           });
 
         if (functionError) {
-          console.error("Database function 오류:", functionError);
+          //console.error("Database function 오류:", functionError);
           throw functionError;
         }
 
@@ -118,7 +118,7 @@ const HomePage = () => {
         setPageData(finalData);
         setCachedData(user.id, finalData);
       } catch (error) {
-        console.error("홈 데이터 로딩 오류:", error);
+        //console.error("홈 데이터 로딩 오류:", error);
         haptic.error();
 
         // 오류 발생 시 기본 데이터 설정

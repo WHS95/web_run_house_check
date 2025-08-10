@@ -79,7 +79,7 @@ export default function AdminSettingsManagement({
       });
 
       if (error) {
-        console.error("장소 추가 오류:", error);
+        //console.error("장소 추가 오류:", error);
         alert("장소 추가 중 오류가 발생했습니다.");
         return;
       }
@@ -95,7 +95,7 @@ export default function AdminSettingsManagement({
         });
       }
     } catch (error) {
-      console.error("장소 추가 오류:", error);
+      //console.error("장소 추가 오류:", error);
       alert("장소 추가 중 오류가 발생했습니다.");
     } finally {
       setLoading("create", false);
@@ -120,7 +120,7 @@ export default function AdminSettingsManagement({
       });
 
       if (error) {
-        console.error("장소 수정 오류:", error);
+        //console.error("장소 수정 오류:", error);
         alert("장소 수정 중 오류가 발생했습니다.");
         return;
       }
@@ -140,7 +140,7 @@ export default function AdminSettingsManagement({
         });
       }
     } catch (error) {
-      console.error("장소 수정 오류:", error);
+      //console.error("장소 수정 오류:", error);
       alert("장소 수정 중 오류가 발생했습니다.");
     } finally {
       setLoading(`edit-${editingLocation}`, false);
@@ -163,7 +163,7 @@ export default function AdminSettingsManagement({
       const { success, error } = await deleteCrewLocation(locationId);
 
       if (error) {
-        console.error("장소 삭제 오류:", error);
+        //console.error("장소 삭제 오류:", error);
         alert("장소 삭제 중 오류가 발생했습니다.");
         return;
       }
@@ -179,7 +179,7 @@ export default function AdminSettingsManagement({
         });
       }
     } catch (error) {
-      console.error("장소 삭제 오류:", error);
+      //console.error("장소 삭제 오류:", error);
       alert("장소 삭제 중 오류가 발생했습니다.");
     } finally {
       setLoading(`delete-${locationId}`, false);

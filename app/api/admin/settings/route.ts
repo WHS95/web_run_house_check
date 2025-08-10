@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
 
     if (!crewId) {
       return NextResponse.json(
-        { 
+        {
           success: false,
-          error: "crewId가 필요합니다." 
+          error: "crewId가 필요합니다.",
         },
         { status: 400 }
       );
@@ -23,11 +23,11 @@ export async function GET(request: NextRequest) {
     const { data: crewData, error: crewError } = await getCrewById(crewId);
 
     if (crewError || !crewData) {
-      console.error("크루 정보 조회 오류:", crewError);
+      //console.error("크루 정보 조회 오류:", crewError);
       return NextResponse.json(
-        { 
+        {
           success: false,
-          error: "크루 정보를 가져오는데 실패했습니다." 
+          error: "크루 정보를 가져오는데 실패했습니다.",
         },
         { status: 500 }
       );
@@ -39,11 +39,11 @@ export async function GET(request: NextRequest) {
     );
 
     if (locationsError) {
-      console.error("크루 모임 장소 조회 오류:", locationsError);
+      //console.error("크루 모임 장소 조회 오류:", locationsError);
       return NextResponse.json(
-        { 
+        {
           success: false,
-          error: "모임 장소 정보를 가져오는데 실패했습니다." 
+          error: "모임 장소 정보를 가져오는데 실패했습니다.",
         },
         { status: 500 }
       );
@@ -54,14 +54,14 @@ export async function GET(request: NextRequest) {
       data: {
         crewData,
         locations: locations || [],
-      }
+      },
     });
   } catch (error) {
-    console.error("Settings API 오류:", error);
+    //console.error("Settings API 오류:", error);
     return NextResponse.json(
-      { 
+      {
         success: false,
-        error: "설정 데이터를 가져오는데 실패했습니다." 
+        error: "설정 데이터를 가져오는데 실패했습니다.",
       },
       { status: 500 }
     );

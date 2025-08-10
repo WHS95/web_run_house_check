@@ -56,7 +56,7 @@ export async function PUT(request: NextRequest) {
     );
 
     if (!success || error) {
-      console.error("출석 기록 수정 실패:", error);
+      //console.error("출석 기록 수정 실패:", error);
       return NextResponse.json(
         {
           success: false,
@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
       message: "출석 기록이 성공적으로 수정되었습니다.",
     });
   } catch (error) {
-    console.error("Update Attendance API 오류:", error);
+    //console.error("Update Attendance API 오류:", error);
     return NextResponse.json(
       {
         success: false,

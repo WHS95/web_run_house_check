@@ -101,7 +101,7 @@ export default function AdminPage() {
         );
         setStats(data);
       } catch (err) {
-        console.error("통계 데이터 조회 오류:", err);
+        // //console.error("통계 데이터 조회 오류:", err);
         setError(
           err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
         );
@@ -138,9 +138,7 @@ export default function AdminPage() {
               />
             </svg>
           </div>
-          <h3 className='mb-2 text-lg font-semibold text-white'>
-            오류 발생
-          </h3>
+          <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
           <p className='text-sm text-gray-300'>{error}</p>
         </div>
       </div>
@@ -172,7 +170,11 @@ export default function AdminPage() {
                 className='px-4 py-2 text-sm bg-basic-black-gray text-white rounded-2xl border border-basic-gray shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-basic-blue focus:border-transparent'
               >
                 {yearOptions.map((year) => (
-                  <option key={year} value={year} className='bg-basic-black-gray text-white'>
+                  <option
+                    key={year}
+                    value={year}
+                    className='bg-basic-black-gray text-white'
+                  >
                     {year}년
                   </option>
                 ))}
@@ -184,7 +186,11 @@ export default function AdminPage() {
                 className='px-4 py-2 text-sm bg-basic-black-gray text-white rounded-2xl border border-basic-gray shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-basic-blue focus:border-transparent'
               >
                 {monthOptions.map((month) => (
-                  <option key={month} value={month} className='bg-basic-black-gray text-white'>
+                  <option
+                    key={month}
+                    value={month}
+                    className='bg-basic-black-gray text-white'
+                  >
                     {month}월
                   </option>
                 ))}

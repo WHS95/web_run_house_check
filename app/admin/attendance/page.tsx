@@ -10,33 +10,33 @@ function AttendanceLoadingSkeleton() {
   return (
     <div className='flex flex-col h-screen bg-basic-black'>
       {/* 헤더 스켈레톤 */}
-      <div className='sticky top-0 z-10 bg-basic-black-gray border-b border-basic-gray'>
+      <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
         <div className='px-4 py-4'>
-          <div className='flex items-center justify-between'>
+          <div className='flex justify-between items-center'>
             <div>
-              <div className='w-24 h-6 bg-basic-gray rounded animate-pulse'></div>
-              <div className='w-32 h-4 mt-1 bg-basic-gray/70 rounded animate-pulse'></div>
+              <div className='w-24 h-6 rounded animate-pulse bg-basic-gray'></div>
+              <div className='mt-1 w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
             </div>
           </div>
         </div>
       </div>
 
       {/* 메인 컨텐츠 스켈레톤 */}
-      <div className='flex-1 px-4 py-4 pb-24 overflow-y-auto'>
+      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
         <div className='space-y-6'>
           {/* 달력 스켈레톤 */}
-          <div className='p-4 bg-basic-black-gray border border-basic-gray rounded-lg'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-8 h-8 bg-basic-gray rounded animate-pulse'></div>
-              <div className='w-32 h-6 bg-basic-gray rounded animate-pulse'></div>
-              <div className='w-8 h-8 bg-basic-gray rounded animate-pulse'></div>
+          <div className='p-4 rounded-lg border bg-basic-black-gray border-basic-gray'>
+            <div className='flex justify-between items-center mb-4'>
+              <div className='w-8 h-8 rounded animate-pulse bg-basic-gray'></div>
+              <div className='w-32 h-6 rounded animate-pulse bg-basic-gray'></div>
+              <div className='w-8 h-8 rounded animate-pulse bg-basic-gray'></div>
             </div>
 
             {/* 요일 헤더 */}
             <div className='grid grid-cols-7 gap-1 mb-2'>
               {Array.from({ length: 7 }).map((_, i) => (
                 <div key={i} className='py-2 text-center'>
-                  <div className='w-4 h-4 mx-auto bg-basic-gray rounded animate-pulse'></div>
+                  <div className='mx-auto w-4 h-4 rounded animate-pulse bg-basic-gray'></div>
                 </div>
               ))}
             </div>
@@ -46,18 +46,18 @@ function AttendanceLoadingSkeleton() {
               {Array.from({ length: 35 }).map((_, i) => (
                 <div
                   key={i}
-                  className='h-10 bg-basic-gray/50 rounded animate-pulse'
+                  className='h-10 rounded animate-pulse bg-basic-gray/50'
                 ></div>
               ))}
             </div>
           </div>
 
           {/* 안내 메시지 스켈레톤 */}
-          <div className='p-4 bg-basic-black-gray border border-basic-gray rounded-lg'>
+          <div className='p-4 rounded-lg border bg-basic-black-gray border-basic-gray'>
             <div className='text-center'>
-              <div className='w-8 h-8 mx-auto mb-2 bg-basic-gray rounded animate-pulse'></div>
-              <div className='w-48 h-4 mx-auto mb-1 bg-basic-gray rounded animate-pulse'></div>
-              <div className='w-40 h-4 mx-auto bg-basic-gray rounded animate-pulse'></div>
+              <div className='mx-auto mb-2 w-8 h-8 rounded animate-pulse bg-basic-gray'></div>
+              <div className='mx-auto mb-1 w-48 h-4 rounded animate-pulse bg-basic-gray'></div>
+              <div className='mx-auto w-40 h-4 rounded animate-pulse bg-basic-gray'></div>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function AttendancePage() {
           detailData: detailData || {},
         });
       } catch (err) {
-        console.error("출석 데이터 조회 오류:", err);
+        // //console.error("출석 데이터 조회 오류:", err);
         setError(
           err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
         );
@@ -120,11 +120,9 @@ export default function AttendancePage() {
 
   if (error) {
     return (
-      <div className='flex items-center justify-center min-h-screen bg-basic-black'>
-        <div className='p-6 text-center bg-basic-black-gray border border-red-500/30 rounded-lg shadow-sm'>
-          <h3 className='mb-2 text-lg font-semibold text-white'>
-            오류 발생
-          </h3>
+      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
+        <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-red-500/30'>
+          <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
           <p className='text-gray-300'>{error}</p>
         </div>
       </div>

@@ -57,7 +57,7 @@ export async function GET(request: Request) {
         // console.log("기존 회원 로그인 성공");
         return NextResponse.redirect(getRedirectUrl(next));
       } catch (dbError) {
-        // console.error("DB 조회 중 오류:", dbError);
+        // //console.error("DB 조회 중 오류:", dbError);
         // DB 오류 시에도 회원가입 페이지로 리다이렉트
         const forwardedHost = request.headers.get("x-forwarded-host");
         const isLocalEnv = process.env.NODE_ENV === "development";

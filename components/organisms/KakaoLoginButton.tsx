@@ -13,7 +13,7 @@ const KakaoLoginButton: React.FC = () => {
       setLoading(true);
       await signInWithKakao();
     } catch (err) {
-      console.error("로그인 중 오류 발생:", err);
+      //console.error("로그인 중 오류 발생:", err);
 
       // Supabase 연결 오류인지 확인
       const errorMessage = err instanceof Error ? err.message : String(err);

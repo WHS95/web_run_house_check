@@ -68,7 +68,7 @@ export default function MenuPage() {
       const { error } = await supabase.auth.signOut();
 
       if (error) {
-        console.error("로그아웃 중 오류:", error);
+        //console.error("로그아웃 중 오류:", error);
         alert("로그아웃 중 오류가 발생했습니다.");
         return;
       }
@@ -76,7 +76,7 @@ export default function MenuPage() {
       // 로그인 페이지로 리다이렉트
       router.push("/auth/login");
     } catch (error) {
-      console.error("로그아웃 처리 중 예외:", error);
+      //console.error("로그아웃 처리 중 예외:", error);
       alert("로그아웃 처리 중 문제가 발생했습니다.");
     }
   };

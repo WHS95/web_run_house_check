@@ -88,12 +88,12 @@ export default function AdminCrewMembersManagement({
       if (response.ok && result.success) {
         setMembers(result.data);
       } else {
-        console.error("멤버 조회 오류:", result.error);
+        //console.error("멤버 조회 오류:", result.error);
         haptic.error();
         showNotification("멤버 조회에 실패했습니다.", "error");
       }
     } catch (error) {
-      console.error("멤버 조회 실패:", error);
+      //console.error("멤버 조회 실패:", error);
       haptic.error();
       showNotification("멤버 조회 중 오류가 발생했습니다.", "error");
     } finally {
@@ -134,7 +134,7 @@ export default function AdminCrewMembersManagement({
           );
         }
       } catch (error) {
-        console.error("권한 변경 실패:", error);
+        //console.error("권한 변경 실패:", error);
         haptic.error();
         showNotification("권한 변경 중 오류가 발생했습니다.", "error");
       } finally {

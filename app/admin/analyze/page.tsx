@@ -469,7 +469,7 @@ export default function AnalyzePage() {
           month: month,
         });
       } catch (err) {
-        console.error("분석 데이터 조회 오류:", err);
+        // //console.error("분석 데이터 조회 오류:", err);
         setError(
           err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
         );

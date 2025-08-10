@@ -32,7 +32,7 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
 
     return subscription;
   } catch (error) {
-    console.error("푸시 구독 실패:", error);
+    //console.error("푸시 구독 실패:", error);
     return null;
   }
 }
@@ -79,7 +79,7 @@ export async function initializePushNotifications(): Promise<boolean> {
 
     return false;
   } catch (error) {
-    console.error("푸시 알림 초기화 실패:", error);
+    //console.error("푸시 알림 초기화 실패:", error);
     return false;
   }
 }

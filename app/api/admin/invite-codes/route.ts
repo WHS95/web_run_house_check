@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 
     if (error && error.code !== "PGRST116") {
       // PGRST116: 데이터가 없음
-      console.error("초대코드 조회 오류:", error);
+      //console.error("초대코드 조회 오류:", error);
       return NextResponse.json(
         { success: false, error: "초대코드 조회 중 오류가 발생했습니다." },
         { status: 500 }
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
       data: inviteCode || null,
     });
   } catch (error) {
-    console.error("초대코드 조회 API 오류:", error);
+    //console.error("초대코드 조회 API 오류:", error);
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }
@@ -149,10 +149,13 @@ export async function POST(request: NextRequest) {
     if (customInviteCode && customInviteCode.trim()) {
       // 사용자가 직접 입력한 코드 사용
       const trimmedCode = customInviteCode.trim().toUpperCase();
-      
+
       if (!validateCustomCode(trimmedCode)) {
         return NextResponse.json(
-          { success: false, error: "초대코드는 영문 대문자와 숫자로만 구성된 7자리여야 합니다." },
+          {
+            success: false,
+            error: "초대코드는 영문 대문자와 숫자로만 구성된 7자리여야 합니다.",
+          },
           { status: 400 }
         );
       }
@@ -167,7 +170,10 @@ export async function POST(request: NextRequest) {
 
       if (duplicate && duplicate.crew_id !== crewId) {
         return NextResponse.json(
-          { success: false, error: "이미 사용 중인 초대코드입니다. 다른 코드를 선택해주세요." },
+          {
+            success: false,
+            error: "이미 사용 중인 초대코드입니다. 다른 코드를 선택해주세요.",
+          },
           { status: 400 }
         );
       }
@@ -221,7 +227,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
-        console.error("초대코드 수정 오류:", error);
+        //console.error("초대코드 수정 오류:", error);
         return NextResponse.json(
           { success: false, error: "초대코드 수정 중 오류가 발생했습니다." },
           { status: 500 }
@@ -243,7 +249,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
-        console.error("초대코드 생성 오류:", error);
+        //console.error("초대코드 생성 오류:", error);
         return NextResponse.json(
           { success: false, error: "초대코드 생성 중 오류가 발생했습니다." },
           { status: 500 }
@@ -257,7 +263,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("초대코드 생성/수정 API 오류:", error);
+    //console.error("초대코드 생성/수정 API 오류:", error);
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }
@@ -317,7 +323,7 @@ export async function DELETE(request: NextRequest) {
       .eq("id", parseInt(codeId));
 
     if (error) {
-      console.error("초대코드 삭제 오류:", error);
+      //console.error("초대코드 삭제 오류:", error);
       return NextResponse.json(
         { success: false, error: "초대코드 삭제 중 오류가 발생했습니다." },
         { status: 500 }
@@ -329,7 +335,7 @@ export async function DELETE(request: NextRequest) {
       message: "초대코드가 삭제되었습니다.",
     });
   } catch (error) {
-    console.error("초대코드 삭제 API 오류:", error);
+    //console.error("초대코드 삭제 API 오류:", error);
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }

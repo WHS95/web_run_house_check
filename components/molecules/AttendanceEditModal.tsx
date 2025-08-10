@@ -73,10 +73,10 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
         if (!error && data) {
           setLocations(data);
         } else if (error) {
-          // console.error("Supabase 오류:", error);
+          // //console.error("Supabase 오류:", error);
         }
       } catch (error) {
-        // console.error("크루 활동장소 목록 조회 실패:", error);
+        // //console.error("크루 활동장소 목록 조회 실패:", error);
       }
     };
 
@@ -109,7 +109,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
       await onSave(formData);
       onClose();
     } catch (error) {
-      // console.error("출석 정보 수정 실패:", error);
+      // //console.error("출석 정보 수정 실패:", error);
     } finally {
       setIsLoading(false);
     }

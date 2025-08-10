@@ -41,7 +41,10 @@ function AdminUserManagementSkeleton() {
       <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
         <div className='space-y-3'>
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className='p-4 bg-basic-black-gray rounded-lg border border-basic-gray'>
+            <div
+              key={i}
+              className='p-4 bg-basic-black-gray rounded-lg border border-basic-gray'
+            >
               <div className='flex justify-between items-center'>
                 <div className='flex-1'>
                   <div className='flex justify-between items-center mb-2'>
@@ -80,17 +83,17 @@ export default function AdminUserPage() {
     async function fetchUsers() {
       try {
         setIsLoading(true);
-        
+
         // 직접 Supabase 함수 호출
         const { data: users, error } = await getUsersByCrewIdOptimized(crewId);
-        
+
         if (error) {
           throw error;
         }
-        
+
         setUsers(users || []);
       } catch (err) {
-        console.error("사용자 데이터 조회 오류:", err);
+        // //console.error("사용자 데이터 조회 오류:", err);
         setError(
           err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
         );

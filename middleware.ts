@@ -101,7 +101,7 @@ export async function middleware(req: NextRequest) {
       }
     }
   } catch (error) {
-    console.error("미들웨어에서 사용자 크루 인증 상태 확인 중 오류:", error);
+    // //console.error("미들웨어에서 사용자 크루 인증 상태 확인 중 오류:", error);
     // 오류 발생 시 일단 통과시킴 (보안보다 사용성 우선)
   }
 

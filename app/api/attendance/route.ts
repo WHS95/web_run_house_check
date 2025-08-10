@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const parsedData = attendanceSubmissionSchema.safeParse(body);
 
     if (!parsedData.success) {
-      console.error("Invalid attendance data:", parsedData.error.flatten());
+      //console.error("Invalid attendance data:", parsedData.error.flatten());
       return NextResponse.json(
         {
           success: false,
@@ -83,12 +83,12 @@ export async function POST(request: Request) {
       locationValidation.value.error ||
       !locationValidation.value.data
     ) {
-      console.error(
-        "Error fetching location name:",
-        locationValidation.status === "fulfilled"
-          ? locationValidation.value.error
-          : locationValidation.reason
-      );
+      //console.error(
+      //   "Error fetching location name:",
+      //   locationValidation.status === "fulfilled"
+      //     ? locationValidation.value.error
+      //     : locationValidation.reason
+      // );
       return NextResponse.json(
         {
           success: false,
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
       .single();
 
     if (insertError) {
-      console.error("Error inserting attendance record:", insertError);
+      //console.error("Error inserting attendance record:", insertError);
       return NextResponse.json(
         {
           success: false,
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("API Error in /api/attendance/route.ts:", error);
+    //console.error("API Error in /api/attendance/route.ts:", error);
     let errorMessage = "서버 내부 오류가 발생했습니다.";
     let statusCode = 500;
 

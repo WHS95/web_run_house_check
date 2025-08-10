@@ -33,7 +33,7 @@ export default async function VerifyCrewPage() {
 
   // 사용자 데이터를 가져오는데 오류가 있으면 로그인 페이지로 리다이렉트
   if (userDataError) {
-    // console.error("사용자 정보를 가져오는 중 오류:", userDataError);
+    // //console.error("사용자 정보를 가져오는 중 오류:", userDataError);
     redirect("/auth/signup");
   }
 

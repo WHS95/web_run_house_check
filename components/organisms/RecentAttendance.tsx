@@ -150,7 +150,7 @@ export default function RecentAttendance() {
         const data = await getRecentAttendance();
         setAttendanceData(data);
       } catch (error) {
-        console.error('출석 데이터 로딩 실패:', error);
+        //console.error('출석 데이터 로딩 실패:', error);
       } finally {
         setIsLoading(false);
       }

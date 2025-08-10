@@ -238,10 +238,15 @@ export default function AdminUserManagement({
     });
   };
 
-  // const getStatusBadge = (status: string | null) => {
-  //   // status가 'ACTIVE' 또는 null이면 활성, 'SUSPENDED'면 비활성
-  //   const isActive = status === "ACTIVE" || status === null;
-  // };
+  const getStatusBadge = (status: string | null) => {
+    // status가 'ACTIVE' 또는 null이면 활성, 'SUSPENDED'면 비활성
+    const isActive = status === "ACTIVE" || status === null;
+    return (
+      <Badge className='text-white bg-basic-gray'>
+        {isActive ? "활성" : "비활성"}
+      </Badge>
+    );
+  };
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "정보 없음";
@@ -391,7 +396,7 @@ export default function AdminUserManagement({
                             <h3 className='text-base font-semibold text-white sm:text-lg'>
                               {getUserDisplayName(user)}
                             </h3>
-                            {/* {getStatusBadge(user.status)} */}
+                            {getStatusBadge(user.status)}
                           </div>
                         </div>
 
@@ -423,7 +428,7 @@ export default function AdminUserManagement({
                             className='p-1 w-8 h-8 transition-transform duration-200 sm:h-6 sm:w-6'
                           >
                             <ChevronRight
-                              className={`w-4 h-4 transition-transform duration-200 ${
+                              className={`w-4 h-4 transition-transform duration-200 text-white ${
                                 isExpanded ? "rotate-90" : "rotate-0"
                               }`}
                             />
@@ -436,7 +441,7 @@ export default function AdminUserManagement({
                                 className='w-8 h-8 sm:w-8 sm:h-8'
                                 disabled={isUpdating === user.id}
                               >
-                                <MoreVertical className='w-4 h-4' />
+                                <MoreVertical className='w-4 h-4 text-white' />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent

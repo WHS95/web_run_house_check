@@ -449,9 +449,7 @@ const UltraFastAttendanceTemplate = () => {
               <div className="animate-spin rounded-full h-[1.5rem] w-[1.5rem] border-2 border-white border-t-transparent"></div>
               <span>처리 중...</span>
             </div>
-          ) : isDataLoading ? (
-            "데이터 로딩 중..."
-          ) : userStatus && !userStatus.isActive ? (
+          ) :  userStatus && !userStatus.isActive ? (
             "출석 불가"
           ) : (
             "출석 체크"

@@ -209,6 +209,7 @@ const UltraFastAttendanceTemplate = () => {
   const [exerciseOptions, setExerciseOptions] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const [userStatus, setUserStatus] = useState<any>(null);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationType, setNotificationType] = useState<NotificationType | null>(null);
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -255,6 +256,15 @@ const UltraFastAttendanceTemplate = () => {
   // ⚡ 메모화된 제출 핸들러
   const handleSubmit = useCallback(async () => {
     if (isSubmitting || !currentUser || !crewInfo) return;
+
+    // 사용자 상태 확인
+    if (userStatus && !userStatus.isActive) {
+      haptic.error();
+      setNotificationType('error');
+      setNotificationMessage(`${userStatus.statusMessage}\n\n${userStatus.suspensionReason}`);
+      setShowNotification(true);
+      return;
+    }
 
     // 현재 시간보다 이후인지 검증 (미래 시간 차단)
     if (isFutureDateTime(formData.date, formData.time)) {
@@ -310,7 +320,7 @@ const UltraFastAttendanceTemplate = () => {
     }
 
     setShowNotification(true);
-  }, [isSubmitting, currentUser, crewInfo, formData]);
+  }, [isSubmitting, currentUser, crewInfo, formData, userStatus]);
 
   // ⚡ 데이터 로딩 - 통합 함수 사용으로 대폭 간소화
   useEffect(() => {
@@ -321,6 +331,32 @@ const UltraFastAttendanceTemplate = () => {
         if (authError || !user) {
           router.push('/auth/login');
           return;
+        }
+
+        // 1-1. 사용자 상태 확인
+        try {
+          const statusResponse = await fetch('/api/user/status');
+          const statusResult = await statusResponse.json();
+          
+          if (statusResult.success) {
+            setUserStatus(statusResult.data);
+            
+            // 사용자가 비활성화된 상태인 경우 알림 표시 후 리턴 (출석 불가)
+            if (!statusResult.data.isActive) {
+              setNotificationType('error');
+              setNotificationMessage(`${statusResult.data.statusMessage}\n\n${statusResult.data.suspensionReason}`);
+              setShowNotification(true);
+              setIsDataLoading(false);
+              // 알림 후 홈으로 이동하기 위해 타이머 설정
+              setTimeout(() => {
+                router.push('/');
+              }, 3000);
+              return;
+            }
+          }
+        } catch (statusError) {
+          console.error('사용자 상태 확인 오류:', statusError);
+          // 상태 확인 실패 시에도 계속 진행 (기본적으로는 허용)
         }
 
         // 2. 통합 폼 데이터 조회 (5번 통신 → 1번 통신)
@@ -400,9 +436,9 @@ const UltraFastAttendanceTemplate = () => {
           )}
           <button  
           onClick={handleSubmit}
-          disabled={isSubmitting || isDataLoading || !currentUser}
+          disabled={isSubmitting || isDataLoading || !currentUser || (userStatus && !userStatus.isActive)}
           className={`mt-[2vh] p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-[7vh] font-bold text-white ${
-            isSubmitting || isDataLoading || !currentUser
+            isSubmitting || isDataLoading || !currentUser || (userStatus && !userStatus.isActive)
               ? 'bg-gray-400 cursor-not-allowed' 
               : 'bg-basic-blue hover:bg-blue-600'
           }`}
@@ -415,6 +451,8 @@ const UltraFastAttendanceTemplate = () => {
             </div>
           ) : isDataLoading ? (
             "데이터 로딩 중..."
+          ) : userStatus && !userStatus.isActive ? (
+            "출석 불가"
           ) : (
             "출석 체크"
           )}
@@ -439,6 +477,9 @@ const UltraFastAttendanceTemplate = () => {
             setShowNotification(false);
             if (notificationType === 'success') {
               setTimeout(() => router.push('/ranking'), 100);
+            } else if (notificationType === 'error' && userStatus && !userStatus.isActive) {
+              // 출석 불가 상태의 에러 알림이면 홈으로 이동
+              setTimeout(() => router.push('/'), 100);
             }
           }}
         />

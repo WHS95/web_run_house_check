@@ -49,17 +49,19 @@ const InputField = memo<InputFieldProps>(
     onChange,
   }) => (
     <div className='mb-4'>
-      <label className='block mb-2 text-sm font-semibold'>{label}</label>
+      <label className='block mb-2 text-sm font-semibold text-white'>
+        {label}
+      </label>
       <input
         type={type}
         {...register}
         onChange={onChange}
         placeholder={placeholder}
         readOnly={readOnly}
-        className={`w-full p-3 border border-[#EAEAF3] rounded-md text-sm placeholder-black/40 focus:outline-none focus:ring-1 focus:ring-primary-blue ${
+        className={`w-full p-3 border-0 rounded-md text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-basic-blue ${
           readOnly
-            ? "bg-gray-200 opacity-60 cursor-not-allowed text-gray-700 border-gray-300 placeholder-black/20"
-            : "bg-[#F8F8FD] placeholder-black/20"
+            ? "text-gray-300 opacity-60 cursor-not-allowed bg-basic-gray"
+            : "bg-basic-black-gray"
         }`}
       />
       {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
@@ -103,9 +105,9 @@ const CrewCodeVerification = memo<CrewCodeVerificationProps>(
 
     const inputClassName = useMemo(() => {
       const baseClass =
-        "flex-1 p-3 border border-[#EAEAF3] rounded-md bg-[#F8F8FD] text-sm placeholder-black/20 focus:outline-none focus:ring-1 focus:ring-primary-blue";
+        "flex-1 p-3 border-0 rounded-md bg-basic-black-gray text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-basic-blue";
       const disabledClass =
-        "opacity-60 cursor-not-allowed bg-gray-200 text-gray-700 border-gray-300";
+        "opacity-60 cursor-not-allowed bg-basic-gray text-gray-300";
       return `${baseClass} ${
         isCrewCodeVerifying || crewCodeVerified ? disabledClass : ""
       }`;
@@ -113,7 +115,7 @@ const CrewCodeVerification = memo<CrewCodeVerificationProps>(
 
     return (
       <div className='mb-4'>
-        <label className='block mb-2 text-sm font-semibold'>
+        <label className='block mb-2 text-sm font-semibold text-white'>
           크루 초대 코드
         </label>
         <div className='flex items-center space-x-2'>
@@ -132,7 +134,7 @@ const CrewCodeVerification = memo<CrewCodeVerificationProps>(
             type='button'
             onClick={onVerifyCrewCode}
             disabled={isButtonDisabled}
-            className='px-4 py-3 border border-[#EAEAF3] rounded-md text-sm text-black font-medium bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-primary-blue disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed'
+            className='px-4 py-3 text-sm font-medium text-white rounded-md border-0 bg-basic-blue hover:bg-basic-blue/80 focus:outline-none focus:ring-2 focus:ring-basic-blue disabled:bg-basic-gray disabled:text-gray-400 disabled:cursor-not-allowed'
           >
             {buttonText}
           </button>
@@ -206,12 +208,12 @@ const SubmitButton = memo<SubmitButtonProps>(
     }, [isSubmitting, isDisabled]);
 
     return (
-      <div className='flex-shrink-0 p-4 shadow-lg'>
+      <div className='flex-shrink-0 p-4 border-t bg-basic-black border-basic-gray'>
         <button
           type='submit'
           onClick={onSubmit}
           disabled={isDisabled}
-          className='w-full px-4 py-3 text-sm font-medium text-white rounded-md bg-basic-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue disabled:bg-basic-black disabled:cursor-not-allowed'
+          className='px-4 py-3 w-full text-sm font-medium text-white rounded-md bg-basic-blue hover:bg-basic-blue/80 focus:outline-none focus:ring-2 focus:ring-basic-blue disabled:bg-basic-gray disabled:text-gray-400 disabled:cursor-not-allowed'
         >
           {buttonText}
         </button>
@@ -423,7 +425,7 @@ export default function SignupPage() {
   }, [handleSubmit, onFormSubmit]);
 
   return (
-    <div className='flex flex-col h-screen bg-white'>
+    <div className='flex flex-col h-screen bg-basic-black'>
       <PopupNotification
         isVisible={isNotificationVisible}
         message={notificationMessage}
@@ -433,17 +435,18 @@ export default function SignupPage() {
       />
 
       {/* ⚡ 헤더 - 메모이제이션됨 */}
-      <div className='flex-shrink-0 bg-white border-b border-[#EAEAF3]'>
+      <div className='flex-shrink-0 border-b bg-basic-black-gray border-basic-gray'>
         <PageHeader
           title='회원가입'
           backLink='/auth/login'
-          iconColor='black'
-          borderColor='border-[#EAEAF3]'
+          iconColor='white'
+          borderColor='border-basic-gray'
+          backgroundColor='bg-basic-black-gray'
         />
       </div>
 
       {/* ⚡ 폼 영역 - 스크롤 가능 */}
-      <div className='flex-1 overflow-y-auto'>
+      <div className='overflow-y-auto flex-1 bg-basic-black'>
         <div className='px-4 py-6'>
           <form onSubmit={handleSubmit(onFormSubmit)} className='space-y-4'>
             {/* ⚡ 개별 입력 필드들 */}
@@ -473,14 +476,14 @@ export default function SignupPage() {
 
             <InputField
               label='생년'
-              placeholder='1995(YYYY)'
+              placeholder='1991(YYYY)'
               register={register("birthYear")}
               error={errors.birthYear?.message}
               type='number'
             />
 
             {/* 구분선 */}
-            <div className='my-6 border-t border-[#EAEAF3]'></div>
+            <div className='my-6 border-t border-basic-gray'></div>
 
             {/* ⚡ 크루 코드 검증 */}
             <CrewCodeVerification
@@ -495,7 +498,7 @@ export default function SignupPage() {
             />
 
             {/* 구분선 */}
-            <div className='my-6 border-t border-[#EAEAF3]'></div>
+            <div className='my-6 border-t border-basic-gray'></div>
 
             {/* ⚡ 동의 항목들 */}
             <ConsentAgreement

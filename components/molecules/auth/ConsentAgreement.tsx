@@ -112,15 +112,15 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
       <>
         <div className='mb-4'>
           {/* 전체 동의 */}
-          <div className='pb-4 mb-4 border-b border-gray-200'>
+          <div className='pb-4 mb-4 border-b border-basic-gray'>
             <label className='flex items-center cursor-pointer'>
               <input
                 type='checkbox'
                 checked={allAgreed}
                 onChange={handleAllAgreementClick}
-                className='w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2'
+                className='w-5 h-5 text-basic-blue bg-basic-black-gray border-basic-gray rounded focus:ring-basic-blue focus:ring-2'
               />
-              <span className='ml-3 text-base font-semibold text-gray-900'>
+              <span className='ml-3 text-base font-semibold text-white'>
                 전체동의
               </span>
             </label>
@@ -135,13 +135,13 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
                   type='checkbox'
                   checked={termsOfService}
                   onChange={handleTermsOfServiceChange}
-                  className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2'
+                  className='w-4 h-4 text-basic-blue bg-basic-black-gray border-basic-gray rounded focus:ring-basic-blue focus:ring-2'
                 />
                 <div className='ml-3'>
-                  <span className='text-sm font-medium text-blue-600'>
+                  <span className='text-sm font-medium text-basic-blue'>
                     필수
                   </span>
-                  <span className='ml-2 text-sm text-gray-900'>
+                  <span className='ml-2 text-sm text-white'>
                     서비스 이용약관
                   </span>
                 </div>
@@ -149,7 +149,7 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
               <button
                 type='button'
                 onClick={openTermsModal}
-                className='text-gray-400 hover:text-gray-600'
+                className='text-gray-400 hover:text-gray-300'
               >
                 <ChevronRightIcon />
               </button>
@@ -162,13 +162,13 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
                   type='checkbox'
                   checked={privacyConsent}
                   onChange={handlePrivacyConsentChange}
-                  className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2'
+                  className='w-4 h-4 text-basic-blue bg-basic-black-gray border-basic-gray rounded focus:ring-basic-blue focus:ring-2'
                 />
                 <div className='ml-3'>
-                  <span className='text-sm font-medium text-blue-600'>
+                  <span className='text-sm font-medium text-basic-blue'>
                     필수
                   </span>
-                  <span className='ml-2 text-sm text-gray-900'>
+                  <span className='ml-2 text-sm text-white'>
                     개인정보 수집 및 이용동의
                   </span>
                 </div>
@@ -176,7 +176,7 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
               <button
                 type='button'
                 onClick={openPrivacyModal}
-                className='text-gray-400 hover:text-gray-600'
+                className='text-gray-400 hover:text-gray-300'
               >
                 <ChevronRightIcon />
               </button>

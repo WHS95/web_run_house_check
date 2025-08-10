@@ -19,11 +19,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   borderColor,
   rightAction,
 }) => {
-  const textColor = iconColor === "white" ? "text-white" : "text-basic-black";
+  const textColor = iconColor === "white" ? "text-white" : "text-white";
 
   return (
     <header
-      className={`flex relative z-50 items-center py-4 border-b border-gray-500 shadow-sm ${backgroundColor}`}
+      className={`flex relative z-50 items-center py-4 border-b border-basic-gray shadow-sm ${backgroundColor}`}
     >
       <div className='flex-1 px-4'>
         {/* 

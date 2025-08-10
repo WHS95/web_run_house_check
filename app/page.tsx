@@ -46,7 +46,7 @@ const HomePage = () => {
     crewName: null,
     noticeText: null,
   });
-  console.log("pageData", pageData);
+  // console.log("pageData", pageData);
 
   // ⚡ Supabase 클라이언트 (한 번만 생성)
   const supabase = useMemo(
@@ -101,10 +101,7 @@ const HomePage = () => {
 
           // 오류가 있어도 기본 데이터는 표시
           const fallbackData = functionResult.data || {
-            userName:
-              user.user_metadata?.full_name ||
-              user.email ||
-              "사용자",
+            userName: user.user_metadata?.full_name || user.email || "사용자",
             crewName: null,
             noticeText: null,
           };
@@ -117,7 +114,7 @@ const HomePage = () => {
 
         // 5. 성공적으로 데이터를 가져온 경우
         const finalData = functionResult.data;
-        console.log("finalData", finalData);
+        // console.log("finalData", finalData);
         setPageData(finalData);
         setCachedData(user.id, finalData);
       } catch (error) {

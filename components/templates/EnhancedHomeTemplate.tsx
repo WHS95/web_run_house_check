@@ -21,7 +21,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     crewName,
     noticeText,
 }) => {
-    console.log("EnhancedHomeTemplate noticeText:", noticeText);
+    {% comment %} console.log("EnhancedHomeTemplate noticeText:", noticeText); {% endcomment %}
     const router = useRouter();
 
     // 랭킹 페이지로 이동 - 최적화

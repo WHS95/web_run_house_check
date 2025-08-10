@@ -15,10 +15,13 @@ export async function GET(request: Request) {
     if (!error && data.session) {
       try {
         // 사용자 인증 확인
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
         if (authError || !user) {
-          console.log("사용자 인증 실패, 로그인 페이지로 리다이렉트");
+          // console.log("사용자 인증 실패, 로그인 페이지로 리다이렉트");
           return NextResponse.redirect(`${origin}/auth/login?error=인증 실패`);
         }
 
@@ -46,15 +49,15 @@ export async function GET(request: Request) {
 
         // 사용자가 DB에 없거나 오류가 발생한 경우 (신규 회원)
         if (userError || !userData) {
-          console.log("신규 회원 감지, 회원가입 페이지로 리다이렉트");
+          // console.log("신규 회원 감지, 회원가입 페이지로 리다이렉트");
           return NextResponse.redirect(getRedirectUrl("/auth/signup"));
         }
 
         // 기존 회원인 경우 원래 페이지로 리다이렉트
-        console.log("기존 회원 로그인 성공");
+        // console.log("기존 회원 로그인 성공");
         return NextResponse.redirect(getRedirectUrl(next));
       } catch (dbError) {
-        console.error("DB 조회 중 오류:", dbError);
+        // console.error("DB 조회 중 오류:", dbError);
         // DB 오류 시에도 회원가입 페이지로 리다이렉트
         const forwardedHost = request.headers.get("x-forwarded-host");
         const isLocalEnv = process.env.NODE_ENV === "development";

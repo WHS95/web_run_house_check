@@ -51,17 +51,17 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
   // 크루별 활동장소 목록 조회
   useEffect(() => {
     const fetchCrewLocations = async () => {
-      console.log("=== AttendanceEditModal Debug ===");
-      console.log("crewId:", crewId);
-      console.log("isOpen:", isOpen);
+      // console.log("=== AttendanceEditModal Debug ===");
+      // console.log("crewId:", crewId);
+      // console.log("isOpen:", isOpen);
 
       if (!crewId) {
-        console.log("crewId가 없어서 장소 조회를 건너뜁니다.");
+        // console.log("crewId가 없어서 장소 조회를 건너뜁니다.");
         return;
       }
 
       try {
-        console.log("crew_locations 조회 시작...");
+        // console.log("crew_locations 조회 시작...");
         const { data, error } = await supabase
           .schema("attendance")
           .from("crew_locations")
@@ -73,10 +73,10 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
         if (!error && data) {
           setLocations(data);
         } else if (error) {
-          console.error("Supabase 오류:", error);
+          // console.error("Supabase 오류:", error);
         }
       } catch (error) {
-        console.error("크루 활동장소 목록 조회 실패:", error);
+        // console.error("크루 활동장소 목록 조회 실패:", error);
       }
     };
 
@@ -109,7 +109,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
       await onSave(formData);
       onClose();
     } catch (error) {
-      console.error("출석 정보 수정 실패:", error);
+      // console.error("출석 정보 수정 실패:", error);
     } finally {
       setIsLoading(false);
     }
@@ -145,15 +145,15 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center'>
+    <div className='flex fixed inset-0 z-50 justify-center items-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 bg-basic-black/50 backdrop-blur-sm'
+        className='absolute inset-0 backdrop-blur-sm bg-basic-black/50'
         onClick={onClose}
       />
 
       {/* 모달 컨텐츠 */}
-      <div className='relative w-full max-w-md p-8 mx-4 bg-white shadow-2xl rounded-3xl'>
+      <div className='relative p-8 mx-4 w-full max-w-md bg-white rounded-3xl shadow-2xl'>
         <div className='text-center'>
           {/* 제목 */}
           <h2 className='mb-6 text-xl font-bold text-gray-900'>
@@ -161,7 +161,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
           </h2>
 
           {/* 사용자 정보 (읽기 전용) */}
-          <div className='p-4 mb-6 rounded-lg bg-gray-50'>
+          <div className='p-4 mb-6 bg-gray-50 rounded-lg'>
             <p className='font-medium text-gray-900'>{attendance.userName}</p>
             <p className='text-xs text-gray-500'>{attendance.exerciseType}</p>
           </div>
@@ -182,7 +182,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     checkInTime: formatInputToDateTime(e.target.value),
                   })
                 }
-                className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
               />
             </div>
 
@@ -199,13 +199,13 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     setFormData({ ...formData, location: e.target.value })
                   }
                   onFocus={() => setShowLocationDropdown(true)}
-                  className='w-full p-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                  className='p-3 pr-10 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
                   placeholder='모임 장소를 입력하세요'
                 />
                 <button
                   type='button'
                   onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-                  className='absolute text-gray-400 transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-600'
+                  className='absolute right-3 top-1/2 text-gray-400 transform -translate-y-1/2 hover:text-gray-600'
                 >
                   <svg
                     className='w-5 h-5'
@@ -225,7 +225,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
 
               {/* 드롭다운 메뉴 */}
               {showLocationDropdown && (
-                <div className='absolute z-10 w-full mt-1 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-60'>
+                <div className='overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-gray-300 shadow-lg'>
                   {locations.length > 0 && (
                     <>
                       {locations.map((location) => (
@@ -233,7 +233,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                           key={location.id}
                           type='button'
                           onClick={() => handleLocationSelect(location)}
-                          className='w-full px-3 py-3 text-left border-b border-gray-100 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none last:border-b-0'
+                          className='px-3 py-3 w-full text-left border-b border-gray-100 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none last:border-b-0'
                         >
                           <div className='font-medium text-gray-900'>
                             {location.name}

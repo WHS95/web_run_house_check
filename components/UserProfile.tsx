@@ -17,19 +17,19 @@ export default function UserProfile() {
 
         if (user) {
           // 콘솔에 전체 사용자 객체 출력
-          console.log("전체 사용자 객체:", user);
+          // console.log("전체 사용자 객체:", user);
 
           // 개별 필드 출력
-          console.log("ID:", user.id);
-          console.log("이메일:", user.email);
-          console.log("사용자 메타데이터:", user.user_metadata);
-          console.log("앱 메타데이터:", user.app_metadata);
-          console.log("제공자:", user.app_metadata.provider);
+          // console.log("ID:", user.id);
+          // console.log("이메일:", user.email);
+          // console.log("사용자 메타데이터:", user.user_metadata);
+          // console.log("앱 메타데이터:", user.app_metadata);
+          // console.log("제공자:", user.app_metadata.provider);
 
           setUser(user);
         }
       } catch (error) {
-        console.error("사용자 정보 가져오기 오류:", error);
+        // console.error("사용자 정보 가져오기 오류:", error);
       } finally {
         setLoading(false);
       }

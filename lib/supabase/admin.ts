@@ -792,10 +792,10 @@ export async function getDailyAttendanceDetails(
 
     // Debug: 조회 결과 로그 (개발 환경에서만)
     if (process.env.NODE_ENV === "development") {
-      console.log(`날짜 ${date} 조회 결과:`, {
-        totalRecords: data.length,
-        filteredRecords: filteredData.length,
-      });
+      // console.log(`날짜 ${date} 조회 결과:`, {
+      //   totalRecords: data.length,
+      //   filteredRecords: filteredData.length,
+      // });
     }
 
     // 데이터 변환

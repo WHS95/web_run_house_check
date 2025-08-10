@@ -1,7 +1,7 @@
 // 푸시 알림 권한 요청
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!("Notification" in window)) {
-    console.log("이 브라우저는 알림을 지원하지 않습니다.");
+    // console.log("이 브라우저는 알림을 지원하지 않습니다.");
     return "denied";
   }
 
@@ -72,7 +72,7 @@ export async function initializePushNotifications(): Promise<boolean> {
 
       if (subscription) {
         // 여기서 구독 정보를 서버에 저장할 수 있습니다
-        console.log("푸시 알림 구독 성공:", subscription);
+        // console.log("푸시 알림 구독 성공:", subscription);
         return true;
       }
     }

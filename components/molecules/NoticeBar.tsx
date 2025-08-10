@@ -5,7 +5,7 @@ interface NoticeBarProps {
 }
 
 const NoticeBar: React.FC<NoticeBarProps> = ({ noticeText }) => {
-  console.log("NoticeBar 렌더링됨, noticeText:", noticeText);
+  // console.log("NoticeBar 렌더링됨, noticeText:", noticeText);
   return (
     <div className='relative flex items-center gap-3 p-3 rounded-lg bg-basic-gray backdrop-blur-md'>
       <div className='px-2 py-1 font-normal text-white rounded-lg bg-basic-blue text-15'>

@@ -128,7 +128,7 @@ export default function BulkAttendanceManagement({
           }
         }
       } catch (error) {
-        console.error("데이터 로드 실패:", error);
+        // console.error("데이터 로드 실패:", error);
         showNotification("데이터를 불러오는데 실패했습니다.", "error");
       } finally {
         setIsLoading(false);
@@ -208,9 +208,9 @@ export default function BulkAttendanceManagement({
       );
       const attendanceTimestamp = attendanceDateTime.toISOString();
 
-      console.log("선택된 날짜:", attendanceData.date);
-      console.log("선택된 시간:", attendanceData.time);
-      console.log("생성된 타임스탬프:", attendanceTimestamp);
+      // console.log("선택된 날짜:", attendanceData.date);
+      // console.log("선택된 시간:", attendanceData.time);
+      // console.log("생성된 타임스탬프:", attendanceTimestamp);
 
       const response = await fetch("/api/admin/attendance/bulk", {
         method: "POST",
@@ -240,7 +240,7 @@ export default function BulkAttendanceManagement({
         );
       }
     } catch (error) {
-      console.error("일괄 출석 처리 실패:", error);
+      // console.error("일괄 출석 처리 실패:", error);
       haptic.error();
       showNotification("출석 처리 중 오류가 발생했습니다.", "error");
     } finally {

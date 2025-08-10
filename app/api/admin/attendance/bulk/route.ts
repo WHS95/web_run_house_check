@@ -63,8 +63,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (locationError || !locationData) {
-      console.log("locationError", locationError);
-      console.log("locationData", locationData);
+      // console.log("locationError", locationError);
+      // console.log("locationData", locationData);
       return NextResponse.json(
         {
           success: false,
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
-    console.log("attendanceTimestamp", attendanceTimestamp);
+    // console.log("attendanceTimestamp", attendanceTimestamp);
 
     // 일괄 출석 기록 생성
     const attendanceRecords = userIds.map((userId: string) => ({
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
       .select("id, user_id");
 
     if (insertError) {
-      console.error("일괄 출석 기록 생성 오류:", insertError);
+      // console.error("일괄 출석 기록 생성 오류:", insertError);
 
       // 중복 출석 체크 (같은 날짜에 이미 출석한 경우)
       if (insertError.code === "23505") {
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("일괄 출석 처리 중 오류:", error);
+    // console.error("일괄 출석 처리 중 오류:", error);
     return NextResponse.json(
       {
         success: false,

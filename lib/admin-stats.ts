@@ -90,10 +90,10 @@ export async function getTodayStats(crewId: string): Promise<TodayStats> {
 
   // Debug: 조회 결과 로그 (개발 환경에서만) - daily API와 동일
   if (process.env.NODE_ENV === "development") {
-    console.log(`오늘(${today}) 통계 조회 결과:`, {
-      totalRecords: data.length,
-      filteredRecords: filteredData.length,
-    });
+    // console.log(`오늘(${today}) 통계 조회 결과:`, {
+    //   totalRecords: data.length,
+    //   filteredRecords: filteredData.length,
+    // });
   }
 
   // 1. 출석 건수: 필터링된 기록 수

@@ -47,9 +47,9 @@ export default function InstallPrompt() {
     const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === "accepted") {
-      console.log("사용자가 앱 설치를 수락했습니다");
+      // console.log("사용자가 앱 설치를 수락했습니다");
     } else {
-      console.log("사용자가 앱 설치를 거부했습니다");
+      // console.log("사용자가 앱 설치를 거부했습니다");
     }
 
     setDeferredPrompt(null);

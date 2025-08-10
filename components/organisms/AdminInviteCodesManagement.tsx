@@ -330,7 +330,7 @@ export default function AdminInviteCodesManagement({
                       setEditData({ ...editData, inviteCode: value });
                     }
                   }}
-                  className='font-mono bg-basic-black-gray text-white border-0 placeholder:text-gray-400'
+                  className='font-mono text-white border-0 bg-basic-black-gray placeholder:text-gray-400'
                   maxLength={7}
                 />
                 <Button
@@ -339,7 +339,7 @@ export default function AdminInviteCodesManagement({
                   size='sm'
                   onClick={handleGenerateRandomCode}
                   disabled={actionLoading}
-                  className='px-3 bg-basic-black-gray text-white border-0 hover:bg-basic-gray'
+                  className='px-3 text-white border-0 bg-basic-black-gray hover:bg-basic-gray'
                 >
                   <Shuffle className='w-4 h-4' />
                 </Button>
@@ -348,7 +348,7 @@ export default function AdminInviteCodesManagement({
                 영문 대문자와 숫자만 사용 가능 (정확히 7자리)
               </p>
             </div>
-            <div>
+            {/* <div>
               <label className='block mb-[1vh] text-[0.875rem] font-medium text-white'>
                 설명 (선택사항)
               </label>
@@ -359,9 +359,9 @@ export default function AdminInviteCodesManagement({
                 onChange={(e) =>
                   setEditData({ ...editData, description: e.target.value })
                 }
-                className='bg-basic-black-gray text-white border-0 placeholder:text-gray-400'
+                className='text-white border-0 bg-basic-black-gray placeholder:text-gray-400'
               />
-            </div>
+            </div> */}
             <div className='flex space-x-[2vw]'>
               <Button
                 onClick={handleCreateInviteCode}
@@ -378,7 +378,7 @@ export default function AdminInviteCodesManagement({
                 variant='outline'
                 onClick={handleCancelEdit}
                 disabled={actionLoading}
-                className='bg-basic-gray text-white border-0 hover:bg-basic-gray/80'
+                className='text-white border-0 bg-basic-gray hover:bg-basic-gray/80'
               >
                 취소
               </Button>
@@ -388,12 +388,12 @@ export default function AdminInviteCodesManagement({
 
         {/* 현재 초대코드 표시 */}
         {inviteCode && !isEditing && (
-          <Card className='bg-basic-black-gray border-0'>
+          <Card className='border-0 bg-basic-black-gray'>
             <CardContent className='px-4 py-4'>
               <div className='flex justify-between items-start'>
                 <div className='flex-1'>
                   <div className='flex items-center mb-3 space-x-3'>
-                    <code className='px-3 py-2 font-mono text-xl font-bold text-basic-blue bg-basic-blue/20 rounded-lg'>
+                    <code className='px-3 py-2 font-mono text-xl font-bold rounded-lg text-basic-blue bg-basic-blue/20'>
                       {inviteCode.invite_code}
                     </code>
                   </div>

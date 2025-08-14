@@ -340,7 +340,7 @@
   }
   
   .native-list-item {
-    @apply px-4 py-3 active:bg-gray-50 transition-colors duration-150;
+    @apply px-4 pt-[1.5vh] pb-[1vh] active:bg-gray-50 transition-colors duration-150;
     -webkit-tap-highlight-color: transparent;
   }
   

@@ -53,21 +53,29 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
   };
 
   return (
-    <div className='flex overflow-y-auto justify-between items-center px-[4vw] py-[1.5vh] border-b border-white'>
-      <span
-        className={`w-1/6 text-center ${rank <= 3 ? "text-[1.5rem]" : "text-[0.875rem]"}`}
-      >
-        {getRankDisplay()}
-      </span>
-      <div className='flex justify-center items-center w-3/6'>
+    <div className='flex overflow-y-auto justify-between items-center px-[4vw] pb-[1.5vh] border-b border-basic-gray'>
+      <div className='w-1/6 flex items-center justify-center h-[2rem]'>
+        <span
+          className={`text-center text-white ${
+            rank <= 3
+              ? "text-[1rem] leading-[1rem]"
+              : "text-[0.875rem] leading-[1rem]"
+          }`}
+        >
+          {getRankDisplay()}
+        </span>
+      </div>
+      <div className='flex justify-center items-center w-3/6 h-[2rem]'>
         {/* <ProfileIcon /> */}
-        <span className='text-[0.875rem] font-normal text-center text-white'>
+        <span className='text-[0.875rem] font-normal text-center text-white leading-[1rem]'>
           {name}
         </span>
       </div>
-      <span className='w-2/6 text-[0.875rem] font-normal text-center text-white'>
-        {score}
-      </span>
+      <div className='w-2/6 flex items-center justify-center h-[2rem]'>
+        <span className='text-[0.875rem] font-normal text-center text-white leading-[1rem]'>
+          {score}
+        </span>
+      </div>
     </div>
   );
 };

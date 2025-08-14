@@ -32,19 +32,17 @@ export interface RankingData {
 
 // ⚡ 랭킹 리스트 로딩 스켈레톤
 const RankingListSkeleton = React.memo(() => (
-  <div className="flex-1 overflow-y-auto native-scroll">
-    <div className="pb-safe space-y-2">
-      {Array.from({ length: 8 }).map((_, index) => (
-        <div key={index} className="flex items-center p-4 animate-pulse">
-          <div className="w-8 h-6 bg-gray-200 rounded mr-4"></div>
-          <div className="w-10 h-10 bg-gray-200 rounded-full mr-4"></div>
-          <div className="flex-1">
-            <div className="h-4 bg-gray-200 rounded w-20 mb-1"></div>
-          </div>
-          <div className="w-12 h-4 bg-gray-200 rounded"></div>
+  <div className="pb-safe space-y-2">
+    {Array.from({ length: 8 }).map((_, index) => (
+      <div key={index} className="flex items-center p-4 animate-pulse">
+        <div className="w-8 h-6 bg-gray-200 rounded mr-4"></div>
+        <div className="w-10 h-10 bg-gray-200 rounded-full mr-4"></div>
+        <div className="flex-1">
+          <div className="h-4 bg-gray-200 rounded w-20 mb-1"></div>
         </div>
-      ))}
-    </div>
+        <div className="w-12 h-4 bg-gray-200 rounded"></div>
+      </div>
+    ))}
   </div>
 ));
 RankingListSkeleton.displayName = 'RankingListSkeleton';
@@ -55,21 +53,19 @@ const UltraFastRankingList = React.memo<{
   activeTab: string;
 }>(({ rankingData, activeTab }) => {
   return (
-    <div className="flex-1 overflow-y-auto native-scroll">
-      <div className="pb-safe">
-        {rankingData.map((item) => (
-          <div 
-            key={item.user_id}
-            className="native-list-item"
-          >
-            <RankingListItem 
-              rank={item.rank}
-              name={item.name || '알 수 없음'}          
-              score={item.value}
-            />
-          </div>
-        ))}
-      </div>
+    <div className="pb-safe">
+      {rankingData.map((item) => (
+        <div 
+          key={item.user_id}
+          className="native-list-item"
+        >
+          <RankingListItem 
+            rank={item.rank}
+            name={item.name || '알 수 없음'}          
+            score={item.value}
+          />
+        </div>
+      ))}
     </div>
   );
 });
@@ -156,6 +152,7 @@ const UltraFastRankingTemplate = () => {
     }
   }, [supabase, router]);
 
+
   // ⚡ 초기 데이터 로딩
   useEffect(() => {
     const loadInitialData = async () => {
@@ -163,6 +160,7 @@ const UltraFastRankingTemplate = () => {
         const year = parseInt(searchParams.get('year') || '') || new Date().getFullYear();
         const month = parseInt(searchParams.get('month') || '') || new Date().getMonth() + 1;
         
+
         await fetchRankingData(year, month);
       } catch (error) {
         haptic.error();
@@ -175,7 +173,7 @@ const UltraFastRankingTemplate = () => {
     };
 
     loadInitialData();
-  }, [searchParams, fetchRankingData]);
+  }, [searchParams, fetchRankingData]); 
 
   // ⚡ 월 변경 핸들러들 - URL 업데이트 제거로 간소화
   const handlePrevMonth = useCallback(async () => {
@@ -311,24 +309,24 @@ const UltraFastRankingTemplate = () => {
             onTabChange={handleTabChange}
           />
         </div>
-        
-        {/* ⚡ 고정된 랭킹 리스트 헤더 */}
-        <div className="border-gray-200">
-          <RankingListHeader 
-            headers={[
-              '등수', 
-              '프로필', 
-              '이름', 
-              activeTab === 'attendance' ? '출석횟수' : '개설횟수'
-            ]} 
-          />
-        </div>
+      </div>
+
+      {/* ⚡ 고정된 랭킹 리스트 헤더 */}
+      <div className="fixed top-[32vh] left-0 right-0 bg-basic-black z-10 border-gray-200">
+        <RankingListHeader 
+          headers={[
+            '등수', 
+            '프로필', 
+            '이름', 
+            activeTab === 'attendance' ? '출석횟수' : '개설횟수'
+          ]} 
+        />
       </div>
       
       {/* ⚡ 스크롤 가능한 랭킹 리스트 영역 */}
-      <div className="flex-1 bg-basic-black text-black flex flex-col mt-[35vh] hw-accelerated">
+      <div className="absolute top-[37vh] left-0 right-0 bottom-0 bg-basic-black text-black hw-accelerated">
         {/* ⚡ 데이터 또는 로딩 스피너 표시 */}
-        <div className="flex-1 overflow-y-auto native-scroll">
+        <div className="h-full overflow-y-auto native-scroll">
           {isDataLoading ? (
             <RankingListSkeleton />
           ) : currentRankingData.length > 0 ? (
@@ -337,14 +335,14 @@ const UltraFastRankingTemplate = () => {
               activeTab={activeTab}
             />
           ) : (
-            <div className="flex-1 flex items-center justify-center pb-safe min-h-[50vh]">
+            <div className="h-full flex items-center justify-center pb-safe">
               <div className="text-center">
                 <div className="mb-[2vh] text-gray-400">
                   <svg className="w-[4rem] h-[4rem] mx-auto opacity-50" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <p className="text-gray-500 text-[1.125rem] font-medium">해당 월의 랭킹 데이터가 없습니다</p>
+                <p className="text-gray-500 text-[1.125rem] font-medium">해당 월의 출석 데이터가 없습니다</p>
                 <p className="text-gray-400 text-[0.875rem] mt-[1vh]">다른 월을 확인해보세요</p>
               </div>
             </div>

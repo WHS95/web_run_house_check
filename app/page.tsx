@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import EnhancedHomeTemplate from "@/components/templates/EnhancedHomeTemplate";
 import SplashScreen from "@/components/molecules/common/SplashScreen";
+import PopupNotification, {
+  NotificationType,
+} from "@/components/molecules/common/PopupNotification";
 import { haptic } from "@/lib/haptic";
 
 // ⚡ 메모리 캐시 (1분 유효)
@@ -46,6 +49,13 @@ const HomePage = () => {
     crewName: null,
     noticeText: null,
   });
+  
+  // 알림 상태
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: NotificationType;
+  } | null>(null);
+  
   // console.log("pageData", pageData);
 
   // ⚡ Supabase 클라이언트 (한 번만 생성)
@@ -57,6 +67,41 @@ const HomePage = () => {
       ),
     []
   );
+
+  // URL 파라미터로 전달된 에러 메시지 처리
+  useEffect(() => {
+    // 클라이언트에서만 실행
+    if (typeof window === 'undefined') return;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get("error");
+    const message = urlParams.get("message");
+    
+    if (error === "access_denied" && message) {
+      setNotification({
+        message: decodeURIComponent(message),
+        type: "error"
+      });
+      haptic.error();
+      
+      // URL에서 파라미터 제거
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("error");
+      newUrl.searchParams.delete("message");
+      window.history.replaceState({}, "", newUrl.pathname);
+    } else if (error === "permission_check_failed") {
+      setNotification({
+        message: "권한 확인 중 오류가 발생했습니다.",
+        type: "error"
+      });
+      haptic.error();
+      
+      // URL에서 파라미터 제거
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("error");
+      window.history.replaceState({}, "", newUrl.pathname);
+    }
+  }, []);
 
   // ⚡ 최적화된 데이터 로딩 (Database Function 사용)
   useEffect(() => {
@@ -145,12 +190,25 @@ const HomePage = () => {
   }
 
   return (
-    <EnhancedHomeTemplate
-      username={pageData.userName}
-      crewName={pageData.crewName}
-      rankName='Beginer' // 기본값으로 고정
-      noticeText={pageData.noticeText}
-    />
+    <>
+      <EnhancedHomeTemplate
+        username={pageData.userName}
+        crewName={pageData.crewName}
+        rankName='Beginer' // 기본값으로 고정
+        noticeText={pageData.noticeText}
+      />
+      
+      {/* 알림 */}
+      {notification && (
+        <PopupNotification
+          isVisible={!!notification}
+          message={notification.message}
+          type={notification.type}
+          duration={4000}
+          onClose={() => setNotification(null)}
+        />
+      )}
+    </>
   );
 };
 

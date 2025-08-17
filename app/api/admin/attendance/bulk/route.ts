@@ -94,41 +94,22 @@ export async function POST(request: NextRequest) {
     //   );
     // }
 
-    // 관리자 권한 확인 (user_roles 테이블 사용)
+    // 관리자 권한 확인 (user_crews 테이블 사용)
     const { data: roleCheck, error: roleError } = await supabase
       .schema("attendance")
-      .from("user_roles")
-      .select("role_id, roles(name)")
-      .eq("user_id", user.id)
-      .single();
-
-    if (roleError || !roleCheck || roleCheck.role_id !== 2) {
-      // role_id 2 = ADMIN
-      return NextResponse.json(
-        {
-          success: false,
-          error: "forbidden",
-          message: "관리자 권한이 필요합니다.",
-        },
-        { status: 403 }
-      );
-    }
-
-    // 사용자가 해당 크루에 속해 있는지 확인
-    const { data: crewMemberCheck, error: crewError } = await supabase
-      .schema("attendance")
       .from("user_crews")
-      .select("crew_id")
+      .select("crew_role")
       .eq("user_id", user.id)
       .eq("crew_id", crewId)
+      .eq("crew_role", "CREW_MANAGER")
       .single();
 
-    if (crewError || !crewMemberCheck) {
+    if (roleError || !roleCheck) {
       return NextResponse.json(
         {
           success: false,
           error: "forbidden",
-          message: "해당 크루에 접근 권한이 없습니다.",
+          message: "크루 운영진 권한이 필요합니다.",
         },
         { status: 403 }
       );

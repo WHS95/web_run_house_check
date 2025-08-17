@@ -53,53 +53,44 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 크루 운영진 권한 확인 (user_roles 테이블 기준)
+    // 크루 운영진 권한 확인 (user_crews 테이블 기준)
     const { data: adminCheck } = await supabase
       .schema("attendance")
-      .from("user_roles")
-      .select(
-        `
-        role_id,
-        users!inner(verified_crew_id)
-      `
-      )
+      .from("user_crews")
+      .select("crew_role")
       .eq("user_id", user.id)
-      .eq("role_id", 2) // ADMIN role
+      .eq("crew_id", crewId)
+      .eq("crew_role", "CREW_MANAGER")
       .single();
 
-    const { data: userInfo } = await supabase
-      .schema("attendance")
-      .from("users")
-      .select("verified_crew_id")
-      .eq("id", user.id)
-      .single();
-
-    if (!adminCheck || userInfo?.verified_crew_id !== crewId) {
+    if (!adminCheck) {
       return NextResponse.json(
         { error: "크루 운영진 권한이 필요합니다." },
         { status: 403 }
       );
     }
 
-    // 크루 멤버 목록 조회 (user_roles와 조인)
+    // 크루 멤버 목록 조회 (user_crews와 조인)
     const { data: members, error } = await supabase
       .schema("attendance")
-      .from("users")
+      .from("user_crews")
       .select(
         `
-        id,
-        first_name,
-        email,
-        phone,
-        birth_year,
-        profile_image_url,
-        is_crew_verified,
-        created_at,
-        user_roles(role_id)
+        crew_role,
+        users!inner(
+          id,
+          first_name,
+          email,
+          phone,
+          birth_year,
+          profile_image_url,
+          is_crew_verified,
+          created_at
+        )
       `
       )
-      .eq("verified_crew_id", crewId)
-      .order("created_at", { ascending: false });
+      .eq("crew_id", crewId)
+      .order("users(created_at)", { ascending: false });
 
     if (error) {
       //console.error('크루 멤버 조회 오류:', error);
@@ -109,11 +100,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // role_id를 평면화하여 응답
+    // crew_role을 role_id로 변환하여 응답
     const formattedMembers = (members || []).map((member) => ({
-      ...member,
-      role_id: member.user_roles?.[0]?.role_id || 3, // 기본값은 USER(3)
-      user_roles: undefined, // 제거
+      ...member.users,
+      role_id: member.crew_role === "CREW_MANAGER" ? 2 : 3, // CREW_MANAGER: 2, MEMBER: 3
+      crew_role: member.crew_role,
     }));
 
     return NextResponse.json({
@@ -154,28 +145,17 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // 크루 운영진 권한 확인 (user_roles 테이블 기준)
+    // 크루 운영진 권한 확인 (user_crews 테이블 기준)
     const { data: adminCheck } = await supabase
       .schema("attendance")
-      .from("user_roles")
-      .select(
-        `
-        role_id,
-        users!inner(verified_crew_id)
-      `
-      )
+      .from("user_crews")
+      .select("crew_role")
       .eq("user_id", user.id)
-      .eq("role_id", 2) // ADMIN role
+      .eq("crew_id", crewId)
+      .eq("crew_role", "CREW_MANAGER")
       .single();
 
-    const { data: userInfo } = await supabase
-      .schema("attendance")
-      .from("users")
-      .select("verified_crew_id")
-      .eq("id", user.id)
-      .single();
-
-    if (!adminCheck || userInfo?.verified_crew_id !== crewId) {
+    if (!adminCheck) {
       return NextResponse.json(
         { error: "크루 운영진 권한이 필요합니다." },
         { status: 403 }
@@ -190,20 +170,14 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // 사용자의 역할 업데이트 (user_roles 테이블)
-    // 먼저 기존 역할 제거
-    await supabase
-      .schema("attendance")
-      .from("user_roles")
-      .delete()
-      .eq("user_id", userId);
-
-    // 새로운 역할 추가
-    const newRoleId = isAdmin ? 2 : 3; // 2: ADMIN, 3: USER
+    // 사용자의 역할 업데이트 (user_crews 테이블의 crew_role 변경)
+    const newCrewRole = isAdmin ? "CREW_MANAGER" : "MEMBER";
     const { data, error } = await supabase
       .schema("attendance")
-      .from("user_roles")
-      .insert({ user_id: userId, role_id: newRoleId })
+      .from("user_crews")
+      .update({ crew_role: newCrewRole })
+      .eq("user_id", userId)
+      .eq("crew_id", crewId)
       .select()
       .single();
 
@@ -258,28 +232,17 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // 크루 운영진 권한 확인 (user_roles 테이블 기준)
+    // 크루 운영진 권한 확인 (user_crews 테이블 기준)
     const { data: adminCheck } = await supabase
       .schema("attendance")
-      .from("user_roles")
-      .select(
-        `
-        role_id,
-        users!inner(verified_crew_id)
-      `
-      )
+      .from("user_crews")
+      .select("crew_role")
       .eq("user_id", user.id)
-      .eq("role_id", 2) // ADMIN role
+      .eq("crew_id", crewId)
+      .eq("crew_role", "CREW_MANAGER")
       .single();
 
-    const { data: userInfo } = await supabase
-      .schema("attendance")
-      .from("users")
-      .select("verified_crew_id")
-      .eq("id", user.id)
-      .single();
-
-    if (!adminCheck || userInfo?.verified_crew_id !== crewId) {
+    if (!adminCheck) {
       return NextResponse.json(
         { error: "크루 운영진 권한이 필요합니다." },
         { status: 403 }
@@ -294,7 +257,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // 사용자의 크루 정보 초기화 및 역할 제거
+    // 사용자의 크루 정보 초기화 및 크루 멤버십 제거
     const { error: userUpdateError } = await supabase
       .schema("attendance")
       .from("users")
@@ -305,14 +268,15 @@ export async function DELETE(request: NextRequest) {
       .eq("id", userId)
       .eq("verified_crew_id", crewId);
 
-    // user_roles에서 역할 제거
-    const { error: roleDeleteError } = await supabase
+    // user_crews에서 크루 멤버십 제거
+    const { error: crewMemberDeleteError } = await supabase
       .schema("attendance")
-      .from("user_roles")
+      .from("user_crews")
       .delete()
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .eq("crew_id", crewId);
 
-    const error = userUpdateError || roleDeleteError;
+    const error = userUpdateError || crewMemberDeleteError;
 
     if (error) {
       //console.error('멤버 추방 오류:', error);

@@ -32,15 +32,16 @@ export async function GET(request: NextRequest) {
     // 사용자 권한 확인 (크루 운영진인지 확인)
     const { data: roleCheck } = await supabase
       .schema("attendance")
-      .from("user_roles")
-      .select("role_id")
+      .from("user_crews")
+      .select("crew_role")
       .eq("user_id", user.id)
-      .eq("role_id", 2) // ADMIN role
+      .eq("crew_id", crewId)
+      .eq("crew_role", "CREW_MANAGER")
       .single();
 
     if (!roleCheck) {
       return NextResponse.json(
-        { success: false, error: "권한이 없습니다." },
+        { success: false, error: "크루 운영진 권한이 필요합니다." },
         { status: 403 }
       );
     }
@@ -106,15 +107,16 @@ export async function POST(request: NextRequest) {
     // 사용자 권한 확인 (크루 운영진인지 확인)
     const { data: roleCheck } = await supabase
       .schema("attendance")
-      .from("user_roles")
-      .select("role_id")
+      .from("user_crews")
+      .select("crew_role")
       .eq("user_id", user.id)
-      .eq("role_id", 2) // ADMIN role
+      .eq("crew_id", crewId)
+      .eq("crew_role", "CREW_MANAGER")
       .single();
 
     if (!roleCheck) {
       return NextResponse.json(
-        { success: false, error: "권한이 없습니다." },
+        { success: false, error: "크루 운영진 권한이 필요합니다." },
         { status: 403 }
       );
     }
@@ -299,18 +301,34 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // 초대코드 정보를 먼저 조회하여 crewId 확인
+    const { data: codeInfo } = await supabase
+      .schema("attendance")
+      .from("crew_invite_codes")
+      .select("crew_id")
+      .eq("id", parseInt(codeId))
+      .single();
+
+    if (!codeInfo) {
+      return NextResponse.json(
+        { success: false, error: "초대코드를 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+
     // 사용자 권한 확인 (크루 운영진인지 확인)
     const { data: roleCheck } = await supabase
       .schema("attendance")
-      .from("user_roles")
-      .select("role_id")
+      .from("user_crews")
+      .select("crew_role")
       .eq("user_id", user.id)
-      .eq("role_id", 2) // ADMIN role
+      .eq("crew_id", codeInfo.crew_id)
+      .eq("crew_role", "CREW_MANAGER")
       .single();
 
     if (!roleCheck) {
       return NextResponse.json(
-        { success: false, error: "권한이 없습니다." },
+        { success: false, error: "크루 운영진 권한이 필요합니다." },
         { status: 403 }
       );
     }

@@ -404,7 +404,7 @@ export default function AdminInviteCodesManagement({
                     </p>
                   )}
 
-                  <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
+                  {/* <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
                     <div className='flex items-center space-x-2'>
                       <Calendar className='w-4 h-4 text-gray-400' />
                       <span>생성: {formatDate(inviteCode.created_at)}</span>
@@ -413,7 +413,7 @@ export default function AdminInviteCodesManagement({
                       <Calendar className='w-4 h-4 text-gray-400' />
                       <span>수정: {formatDate(inviteCode.updated_at)}</span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
                 <div className='flex items-center space-x-2'>
                   <Button

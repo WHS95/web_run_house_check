@@ -98,11 +98,46 @@ export async function middleware(req: NextRequest) {
         const redirectUrl = req.nextUrl.clone();
         redirectUrl.pathname = "/";
         redirectUrl.searchParams.set("error", "access_denied");
-        redirectUrl.searchParams.set("message", "마스터 관리자 권한이 필요합니다.");
+        redirectUrl.searchParams.set(
+          "message",
+          "마스터 관리자 권한이 필요합니다."
+        );
         return NextResponse.redirect(redirectUrl);
       }
     } catch (error) {
       console.error("마스터 관리자 권한 확인 중 오류:", error);
+      // 오류 발생 시 접근 거부
+      const redirectUrl = req.nextUrl.clone();
+      redirectUrl.pathname = "/";
+      redirectUrl.searchParams.set("error", "permission_check_failed");
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
+
+  // 크루 관리자 페이지 접근 권한 확인
+  if (req.nextUrl.pathname.startsWith("/admin")) {
+    try {
+      const { data: crewRoleCheck, error: crewRoleError } = await supabase
+        .schema("attendance")
+        .from("user_crews")
+        .select("crew_role")
+        .eq("user_id", user.id)
+        .eq("crew_role", "CREW_MANAGER")
+        .single();
+
+      // CREW_MANAGER 권한이 없으면 접근 거부
+      if (crewRoleError || !crewRoleCheck) {
+        const redirectUrl = req.nextUrl.clone();
+        redirectUrl.pathname = "/";
+        redirectUrl.searchParams.set("error", "access_denied");
+        redirectUrl.searchParams.set(
+          "message",
+          "크루 운영진 권한이 필요합니다."
+        );
+        return NextResponse.redirect(redirectUrl);
+      }
+    } catch (error) {
+      console.error("크루 운영진 권한 확인 중 오류:", error);
       // 오류 발생 시 접근 거부
       const redirectUrl = req.nextUrl.clone();
       redirectUrl.pathname = "/";

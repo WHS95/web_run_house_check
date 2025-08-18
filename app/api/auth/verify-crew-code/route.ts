@@ -37,15 +37,15 @@ export async function POST(request: Request) {
     const { data: inviteCodeData, error: inviteCodeError } = await supabase
       .schema("attendance")
       .from("crew_invite_codes")
-      .select("crew_id, is_active, expires_at, max_uses, used_count")
+      .select("crew_id, is_active")
       .eq("invite_code", crewCode)
       .single();
 
     if (inviteCodeError) {
-      // console.error(
-      //   "Error fetching crew invite code:",
-      //   inviteCodeError.message
-      // );
+      console.error(
+        "Error fetching crew invite code:",
+        inviteCodeError.message
+      );
       if (inviteCodeError.code === "PGRST116") {
         // PostgREST error for "No rows found"
         return NextResponse.json(
@@ -74,25 +74,25 @@ export async function POST(request: Request) {
       );
     }
 
-    if (
-      inviteCodeData.expires_at &&
-      new Date(inviteCodeData.expires_at) < new Date()
-    ) {
-      return NextResponse.json(
-        { success: false, message: "만료된 크루 코드입니다." },
-        { status: 403 }
-      );
-    }
+    // if (
+    //   inviteCodeData.expires_at &&
+    //   new Date(inviteCodeData.expires_at) < new Date()
+    // ) {
+    //   return NextResponse.json(
+    //     { success: false, message: "만료된 크루 코드입니다." },
+    //     { status: 403 }
+    //   );
+    // }
 
-    if (
-      inviteCodeData.max_uses !== null &&
-      inviteCodeData.used_count >= inviteCodeData.max_uses
-    ) {
-      return NextResponse.json(
-        { success: false, message: "사용 한도를 초과한 크루 코드입니다." },
-        { status: 403 }
-      );
-    }
+    // if (
+    //   inviteCodeData.max_uses !== null &&
+    //   inviteCodeData.used_count >= inviteCodeData.max_uses
+    // ) {
+    //   return NextResponse.json(
+    //     { success: false, message: "사용 한도를 초과한 크루 코드입니다." },
+    //     { status: 403 }
+    //   );
+    // }
 
     return NextResponse.json(
       { success: true, crewId: inviteCodeData.crew_id },

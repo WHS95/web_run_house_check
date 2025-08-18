@@ -10,7 +10,12 @@ import {
   Building2,
   Calendar,
   Users,
-  Key
+  Key,
+  ChevronDown,
+  ChevronUp,
+  UserCheck,
+  Shield,
+  Crown
 } from "lucide-react";
 import { haptic } from "@/lib/haptic";
 
@@ -33,6 +38,18 @@ interface Crew {
   updated_at: string;
 }
 
+interface CrewMember {
+  id: string;
+  first_name: string;
+  email: string;
+  phone: string | null;
+  birth_year: number | null;
+  profile_image_url: string | null;
+  is_crew_verified: boolean;
+  created_at: string;
+  crew_role: string;
+}
+
 interface CrewManagementProps {
   crews: Crew[];
   onCrewCreated: () => void;
@@ -48,6 +65,105 @@ export default function CrewManagement({ crews, onCrewCreated, showNotification 
     inviteCodeDescription: "",
   });
   const [isCreating, setIsCreating] = useState(false);
+
+  // 크루 멤버 관리 상태
+  const [expandedCrews, setExpandedCrews] = useState<Set<string>>(new Set());
+  const [crewMembers, setCrewMembers] = useState<Record<string, CrewMember[]>>({});
+  const [loadingMembers, setLoadingMembers] = useState<Set<string>>(new Set());
+  const [updatingMembers, setUpdatingMembers] = useState<Set<string>>(new Set());
+
+  // 크루 멤버 조회
+  const loadCrewMembers = async (crewId: string) => {
+    setLoadingMembers(prev => new Set([...prev, crewId]));
+    
+    try {
+      const response = await fetch(`/api/master/crew-members?crewId=${crewId}`);
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
+        setCrewMembers(prev => ({ ...prev, [crewId]: result.data || [] }));
+      } else {
+        showNotification("크루 멤버 조회에 실패했습니다.", "error");
+      }
+    } catch (error) {
+      console.error("크루 멤버 조회 오류:", error);
+      showNotification("크루 멤버 조회 중 오류가 발생했습니다.", "error");
+    } finally {
+      setLoadingMembers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(crewId);
+        return newSet;
+      });
+    }
+  };
+
+  // 크루 확장/축소 토글
+  const toggleCrewExpansion = async (crewId: string) => {
+    const isExpanded = expandedCrews.has(crewId);
+    
+    if (isExpanded) {
+      setExpandedCrews(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(crewId);
+        return newSet;
+      });
+    } else {
+      setExpandedCrews(prev => new Set([...prev, crewId]));
+      // 멤버 데이터가 없으면 로드
+      if (!crewMembers[crewId]) {
+        await loadCrewMembers(crewId);
+      }
+    }
+  };
+
+  // 운영진 권한 변경
+  const handleRoleChange = async (crewId: string, userId: string, currentRole: string) => {
+    const newRole = currentRole === "CREW_MANAGER" ? "MEMBER" : "CREW_MANAGER";
+    const memberKey = `${crewId}-${userId}`;
+    
+    setUpdatingMembers(prev => new Set([...prev, memberKey]));
+    haptic.medium();
+
+    try {
+      const response = await fetch("/api/master/crew-members", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          crewId,
+          userId,
+          newRole
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // 로컬 상태 업데이트
+        setCrewMembers(prev => ({
+          ...prev,
+          [crewId]: prev[crewId]?.map(member => 
+            member.id === userId 
+              ? { ...member, crew_role: newRole }
+              : member
+          ) || []
+        }));
+        
+        const roleText = newRole === "CREW_MANAGER" ? "운영진" : "일반 멤버";
+        showNotification(`${roleText}로 권한이 변경되었습니다.`, "success");
+      } else {
+        showNotification(result.message || "권한 변경에 실패했습니다.", "error");
+      }
+    } catch (error) {
+      console.error("권한 변경 오류:", error);
+      showNotification("권한 변경 중 오류가 발생했습니다.", "error");
+    } finally {
+      setUpdatingMembers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(memberKey);
+        return newSet;
+      });
+    }
+  };
 
   // 크루 생성 (초대 코드 포함)
   const handleCreateCrew = async () => {
@@ -222,36 +338,151 @@ export default function CrewManagement({ crews, onCrewCreated, showNotification 
           </Card>
         ) : (
           <div className="grid gap-3">
-            {crews.map((crew) => (
-              <Card key={crew.id} className="bg-basic-black-gray border-basic-gray hover:border-basic-blue transition-colors">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h4 className="font-medium text-white">{crew.name}</h4>
-                        <Badge variant="outline" className="bg-basic-blue text-white border-basic-blue text-xs">
-                          ID: {crew.id.slice(0, 8)}...
-                        </Badge>
-                      </div>
-                      {crew.description && (
-                        <p className="text-sm text-gray-300 mb-2">{crew.description}</p>
-                      )}
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="w-3 h-3" />
-                          <span>생성: {new Date(crew.created_at).toLocaleDateString('ko-KR')}</span>
-                        </div>
-                        {crew.updated_at !== crew.created_at && (
-                          <div className="flex items-center space-x-1">
-                            <span>수정: {new Date(crew.updated_at).toLocaleDateString('ko-KR')}</span>
+            {crews.map((crew) => {
+              const isExpanded = expandedCrews.has(crew.id);
+              const members = crewMembers[crew.id] || [];
+              const isLoadingMembers = loadingMembers.has(crew.id);
+              const managerCount = members.filter(m => m.crew_role === "CREW_MANAGER").length;
+              
+              return (
+                <Card key={crew.id} className="bg-basic-black-gray border-basic-gray hover:border-basic-blue transition-colors">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      {/* 크루 기본 정보 */}
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h4 className="font-medium text-white">{crew.name}</h4>
+                            <Badge variant="outline" className="bg-basic-blue text-white border-basic-blue text-xs">
+                              ID: {crew.id.slice(0, 8)}...
+                            </Badge>
+                            {managerCount > 0 && (
+                              <Badge variant="outline" className="bg-green-600 text-white border-green-600 text-xs">
+                                운영진 {managerCount}명
+                              </Badge>
+                            )}
                           </div>
-                        )}
+                          {crew.description && (
+                            <p className="text-sm text-gray-300 mb-2">{crew.description}</p>
+                          )}
+                          <div className="flex items-center space-x-4 text-xs text-gray-500">
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="w-3 h-3" />
+                              <span>생성: {new Date(crew.created_at).toLocaleDateString('ko-KR')}</span>
+                            </div>
+                            {crew.updated_at !== crew.created_at && (
+                              <div className="flex items-center space-x-1">
+                                <span>수정: {new Date(crew.updated_at).toLocaleDateString('ko-KR')}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* 멤버 관리 버튼 */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleCrewExpansion(crew.id)}
+                          className="text-gray-400 hover:text-white"
+                        >
+                          <Users className="w-4 h-4 mr-1" />
+                          멤버 관리
+                          {isExpanded ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
+                        </Button>
                       </div>
+
+                      {/* 멤버 목록 (확장 시) */}
+                      {isExpanded && (
+                        <div className="border-t border-basic-gray pt-3">
+                          <h5 className="text-sm font-medium text-gray-300 mb-3 flex items-center space-x-2">
+                            <UserCheck className="w-4 h-4" />
+                            <span>크루 멤버 ({members.length}명)</span>
+                          </h5>
+                          
+                          {isLoadingMembers ? (
+                            <div className="flex justify-center items-center py-4">
+                              <div className="w-5 h-5 rounded-full border-2 animate-spin border-basic-blue border-t-transparent"></div>
+                              <span className="ml-2 text-sm text-gray-400">멤버 목록 로딩 중...</span>
+                            </div>
+                          ) : members.length === 0 ? (
+                            <div className="text-center py-4">
+                              <Users className="w-8 h-8 text-gray-500 mx-auto mb-2" />
+                              <p className="text-sm text-gray-400">아직 가입한 멤버가 없습니다.</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              {members.map((member) => {
+                                const memberKey = `${crew.id}-${member.id}`;
+                                const isUpdating = updatingMembers.has(memberKey);
+                                const isManager = member.crew_role === "CREW_MANAGER";
+                                
+                                return (
+                                  <div
+                                    key={member.id}
+                                    className="flex items-center justify-between p-3 bg-basic-black rounded-lg border border-basic-gray"
+                                  >
+                                    <div className="flex items-center space-x-3">
+                                      <div className="w-8 h-8 rounded-full bg-basic-gray flex items-center justify-center">
+                                        {isManager ? (
+                                          <Crown className="w-4 h-4 text-yellow-500" />
+                                        ) : (
+                                          <Users className="w-4 h-4 text-gray-400" />
+                                        )}
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-white">{member.first_name}</p>
+                                        <p className="text-xs text-gray-400">{member.email}</p>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center space-x-2">
+                                      <Badge 
+                                        variant="outline" 
+                                        className={isManager 
+                                          ? "bg-yellow-600 text-white border-yellow-600" 
+                                          : "bg-gray-600 text-white border-gray-600"
+                                        }
+                                      >
+                                        {isManager ? "운영진" : "멤버"}
+                                      </Badge>
+                                      
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => handleRoleChange(crew.id, member.id, member.crew_role)}
+                                        disabled={isUpdating}
+                                        className={`text-xs ${isManager 
+                                          ? "text-red-400 hover:text-red-300" 
+                                          : "text-green-400 hover:text-green-300"
+                                        }`}
+                                      >
+                                        {isUpdating ? (
+                                          <div className="w-3 h-3 rounded-full border animate-spin border-current border-t-transparent" />
+                                        ) : isManager ? (
+                                          <>
+                                            <Shield className="w-3 h-3 mr-1" />
+                                            운영진 해제
+                                          </>
+                                        ) : (
+                                          <>
+                                            <Crown className="w-3 h-3 mr-1" />
+                                            운영진 승격
+                                          </>
+                                        )}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

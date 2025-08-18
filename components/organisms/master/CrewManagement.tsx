@@ -74,7 +74,7 @@ export default function CrewManagement({ crews, onCrewCreated, showNotification 
 
   // 크루 멤버 조회
   const loadCrewMembers = async (crewId: string) => {
-    setLoadingMembers(prev => new Set([...prev, crewId]));
+    setLoadingMembers(prev => new Set([...Array.from(prev), crewId]));
     
     try {
       const response = await fetch(`/api/master/crew-members?crewId=${crewId}`);
@@ -108,7 +108,7 @@ export default function CrewManagement({ crews, onCrewCreated, showNotification 
         return newSet;
       });
     } else {
-      setExpandedCrews(prev => new Set([...prev, crewId]));
+      setExpandedCrews(prev => new Set([...Array.from(prev), crewId]));
       // 멤버 데이터가 없으면 로드
       if (!crewMembers[crewId]) {
         await loadCrewMembers(crewId);
@@ -121,7 +121,7 @@ export default function CrewManagement({ crews, onCrewCreated, showNotification 
     const newRole = currentRole === "CREW_MANAGER" ? "MEMBER" : "CREW_MANAGER";
     const memberKey = `${crewId}-${userId}`;
     
-    setUpdatingMembers(prev => new Set([...prev, memberKey]));
+    setUpdatingMembers(prev => new Set([...Array.from(prev), memberKey]));
     haptic.medium();
 
     try {

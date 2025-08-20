@@ -8,7 +8,7 @@ import { getMonthlyAttendanceData } from "@/lib/supabase/admin";
 // 로딩 스켈레톤 컴포넌트
 function AttendanceLoadingSkeleton() {
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-full bg-basic-black'>
       {/* 헤더 스켈레톤 */}
       <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
         <div className='px-4 py-4'>
@@ -22,7 +22,7 @@ function AttendanceLoadingSkeleton() {
       </div>
 
       {/* 메인 컨텐츠 스켈레톤 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
+      <div className='overflow-y-auto flex-1 px-4 py-4'>
         <div className='space-y-6'>
           {/* 달력 스켈레톤 */}
           <div className='p-4 rounded-lg border bg-basic-black-gray border-basic-gray'>

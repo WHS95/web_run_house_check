@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { AdminContextProvider } from "./AdminContextProvider";
 import { verifyAdminAuth } from "@/lib/admin-auth";
+import AdminLayoutWrapper from "@/components/organisms/AdminLayoutWrapper";
 import type { Metadata } from "next";
 
 // 관리자 페이지 메타데이터
@@ -50,7 +51,9 @@ export default async function AdminLayout({
       userId={authData.userId}
       firstName={authData.firstName}
     >
-      {children}
+      <AdminLayoutWrapper>
+        {children}
+      </AdminLayoutWrapper>
     </AdminContextProvider>
   );
 }

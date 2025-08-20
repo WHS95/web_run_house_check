@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
+// import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import UserEditModal from "@/components/molecules/UserEditModal";
 import {
   UserForAdmin,
@@ -282,7 +282,7 @@ export default function AdminUserManagement({
   return (
     <div className='flex overflow-hidden relative flex-col h-screen bg-basic-black'>
       {/* 검색 및 필터 - 고정 */}
-      <div className='fixed top-0 right-0 left-0 z-50 px-4 py-4 space-y-4 bg-basic-black'>
+      <div className='sticky top-[28px] z-10 bg-basic-black px-4 py-4 space-y-4 '>
         {/* 검색 */}
         <div className='relative'>
           <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
@@ -377,8 +377,8 @@ export default function AdminUserManagement({
         </div>
       </div>
 
-      {/* 메인 컨텐츠 - 스크롤 가능  하단 바텀에 가려지지지 않게 pb-24 반영*/}
-      <div className='overflow-y-auto flex-1 px-4 pt-32 pb-24'>
+      {/* 메인 컨텐츠 */}
+      <div className='overflow-y-auto flex-1 px-4 py-4'>
         {/* 사용자 목록 */}
         <div className='space-y-3'>
           {filteredUsers.map((user) => {
@@ -527,7 +527,7 @@ export default function AdminUserManagement({
       </div>
 
       {/* 하단 네비게이션 */}
-      <AdminBottomNavigation />
+      {/* <AdminBottomNavigation /> */}
 
       {/* 사용자 정보 수정 모달 */}
       {selectedUser && (

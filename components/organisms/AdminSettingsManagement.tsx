@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
+// import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import {
   CrewLocation,
   createCrewLocation,
@@ -415,7 +415,7 @@ export default function AdminSettingsManagement({
       </div>
 
       {/* 하단 네비게이션 */}
-      <AdminBottomNavigation />
+      {/* <AdminBottomNavigation /> */}
     </div>
   );
 }

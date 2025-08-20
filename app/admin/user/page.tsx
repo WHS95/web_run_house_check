@@ -8,7 +8,7 @@ import { getUsersByCrewIdOptimized } from "@/lib/supabase/admin";
 // 로딩 컴포넌트
 function AdminUserManagementSkeleton() {
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-full bg-basic-black'>
       {/* 헤더 스켈레톤 */}
       <div className='sticky top-0 z-10 bg-basic-black-gray border-b border-basic-gray'>
         <div className='px-4 py-4'>
@@ -38,7 +38,7 @@ function AdminUserManagementSkeleton() {
       </div>
 
       {/* 사용자 목록 스켈레톤 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
+      <div className='overflow-y-auto flex-1 px-4 py-4'>
         <div className='space-y-3'>
           {[1, 2, 3, 4, 5].map((i) => (
             <div
@@ -113,7 +113,7 @@ export default function AdminUserPage() {
 
   if (error) {
     return (
-      <div className='flex flex-col h-screen bg-basic-black'>
+      <div className='flex flex-col h-full bg-basic-black'>
         <div className='flex flex-1 justify-center items-center'>
           <div className='text-center'>
             <h2 className='mb-2 text-lg font-semibold text-white'>

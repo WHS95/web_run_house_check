@@ -27,7 +27,7 @@ import {
   UserPlus,
   Check,
 } from "lucide-react";
-import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
+// import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import AttendanceEditModal from "@/components/molecules/AttendanceEditModal";
 import NoticeModal from "@/components/molecules/NoticeModal";
 import BulkAttendanceManagement from "@/components/organisms/BulkAttendanceManagement";
@@ -939,7 +939,7 @@ export default function AdminAttendanceManagement({
         {activeTab === "manage" && <BulkAttendanceManagement crewId={crewId} />}
       </div>
 
-      <AdminBottomNavigation />
+      {/* <AdminBottomNavigation /> */}
 
       {/* 출석 정보 수정 모달 */}
       {selectedAttendance && (

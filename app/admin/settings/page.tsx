@@ -8,7 +8,7 @@ import { getCrewLocations, getCrewById } from "@/lib/supabase/admin";
 // iOS 스타일 로딩 스켈레톤 컴포넌트
 function SettingsLoadingSkeleton() {
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-full bg-basic-black'>
       <div className='flex-1 px-[4vw] py-[3vh] pb-[20vh] space-y-[3vh] overflow-y-auto animate-pulse'>
         {/* 탭 네비게이션 스켈레톤 */}
         <div className='bg-basic-black-gray rounded-[0.75rem] p-[1vw] shadow-sm border border-basic-gray'>

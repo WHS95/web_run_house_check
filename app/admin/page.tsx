@@ -4,7 +4,6 @@ import { Suspense, useEffect, useState } from "react";
 import AdminDashboard from "@/components/organisms/AdminDashboard";
 import { useAdminContext } from "./AdminContextProvider";
 import { getAdminStatsOptimized } from "@/lib/admin-stats";
-import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 
 // iOS 스타일의 깔끔한 로딩 컴포넌트
 function AdminDashboardSkeleton() {
@@ -157,10 +156,10 @@ export default function AdminPage() {
   const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-full bg-basic-black'>
       {/* 헤더 */}
       <div className='sticky top-0 z-10 border-b backdrop-blur-md bg-basic-black-gray/80 border-basic-gray/60'>
-        <div className='px-4 py-4 safe-area-pt'>
+        <div className='px-4 py-4'>
           <div className='flex justify-between items-center'>
             {/* 년도/월 선택 드롭다운 */}
             <div className='flex items-center space-x-3'>
@@ -202,9 +201,6 @@ export default function AdminPage() {
 
       {/* AdminDashboard 컴포넌트 */}
       <AdminDashboard stats={stats} selectedMonth={selectedMonth} />
-
-      {/* 하단 네비게이션 */}
-      <AdminBottomNavigation />
     </div>
   );
 }

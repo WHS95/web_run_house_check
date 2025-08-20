@@ -5,7 +5,6 @@ import { useAdminContext } from "../AdminContextProvider";
 import ChartWithAxis from "@/components/molecules/ChartWithAxis";
 import LocationChart from "@/components/molecules/LocationChart";
 import MemberAttendanceStatusChart from "@/components/molecules/MemberAttendanceStatusChart";
-import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -513,7 +512,7 @@ export default function AnalyzePage() {
   }
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-full bg-basic-black'>
       {/* 헤더 */}
       <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
         <div className='px-4 py-4'>
@@ -589,7 +588,7 @@ export default function AnalyzePage() {
       </div>
 
       {/* 메인 컨텐츠 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
+      <div className='overflow-y-auto flex-1 px-4 py-4'>
         <div className='space-y-6'>
           <MemberAttendanceStatusChart
             title='전체 인원 대비 출석 현황'
@@ -613,9 +612,6 @@ export default function AnalyzePage() {
           />
         </div>
       </div>
-
-      {/* 하단 네비게이션 */}
-      <AdminBottomNavigation />
     </div>
   );
 }

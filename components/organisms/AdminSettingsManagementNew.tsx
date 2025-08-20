@@ -13,7 +13,7 @@ import {
   Loader2,
   Ticket,
 } from "lucide-react";
-import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
+// import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import AdminCrewMembersManagement from "@/components/organisms/AdminCrewMembersManagement";
 import AdminInviteCodesManagement from "@/components/organisms/AdminInviteCodesManagement";
 import PopupNotification, {
@@ -491,7 +491,7 @@ export default function AdminSettingsManagementNew({
       </div>
 
       {/* 하단 네비게이션 */}
-      <AdminBottomNavigation />
+      {/* <AdminBottomNavigation /> */}
 
       {/* 팝업 알림 */}
       <PopupNotification

@@ -290,9 +290,6 @@ export default function AdminInviteCodesManagement({
             <span className='text-[1.125rem] font-bold text-white'>
               초대코드 관리
             </span>
-            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-basic-gray rounded-full text-[0.75rem] font-medium text-gray-300'>
-              {inviteCode ? "1개" : "0개"}
-            </div>
           </div>
           {!inviteCode && (
             <button

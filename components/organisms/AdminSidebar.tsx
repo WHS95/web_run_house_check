@@ -2,15 +2,15 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { 
-  Home, 
-  Users, 
-  Calendar, 
-  Settings, 
+import {
+  Home,
+  Users,
+  Calendar,
+  Settings,
   BarChart3,
   Shield,
   Menu,
-  X
+  X,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -28,7 +28,7 @@ const sidebarItems = [
   {
     id: "user",
     label: "회원 관리",
-    href: "/admin/user", 
+    href: "/admin/user",
     icon: Users,
     description: "멤버 관리 및 권한 설정",
   },
@@ -53,6 +53,13 @@ const sidebarItems = [
     icon: Settings,
     description: "크루 설정 및 관리",
   },
+  {
+    id: "home",
+    label: "홈",
+    href: "/",
+    icon: Home,
+    description: "홈으로 돌아가기",
+  },
 ];
 
 interface AdminSidebarProps {
@@ -60,13 +67,16 @@ interface AdminSidebarProps {
   setSidebarOpen: (open: boolean) => void;
 }
 
-export default function AdminSidebar({ sidebarOpen, setSidebarOpen }: AdminSidebarProps) {
+export default function AdminSidebar({
+  sidebarOpen,
+  setSidebarOpen,
+}: AdminSidebarProps) {
   const pathname = usePathname();
   const { firstName } = useAdminContext();
 
   // 현재 활성 섹션 확인
   const getActiveSection = () => {
-    const currentItem = sidebarItems.find(item => {
+    const currentItem = sidebarItems.find((item) => {
       if (item.href === "/admin") {
         return pathname === "/admin";
       }
@@ -88,7 +98,7 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen }: AdminSideb
       {/* 사이드바 오버레이 (모바일) */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          className='fixed inset-0 z-[55] bg-black bg-opacity-50 lg:hidden'
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -96,36 +106,38 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen }: AdminSideb
       {/* 사이드바 */}
       <div
         className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-basic-black-gray border-r border-basic-gray transform transition-transform duration-300 ease-in-out
+        fixed lg:static inset-y-0 left-0 z-[60] w-64 bg-basic-black-gray border-r border-basic-gray transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
         {/* 사이드바 헤더 */}
-        <div className="flex justify-between items-center p-4 border-b border-basic-gray">
-          <div className="flex items-center space-x-3">
-            <Shield className="w-6 h-6 text-basic-blue" />
+        <div className='flex justify-between items-center p-4 border-b border-basic-gray'>
+          <div className='flex items-center space-x-3'>
+            <Shield className='w-6 h-6 text-basic-blue' />
             <div>
-              <h1 className="text-lg font-semibold text-white">크루 관리자</h1>
-              <p className="text-xs text-gray-400">{firstName || "CREW MANAGER"}</p>
+              <h1 className='text-lg font-semibold text-white'>크루 관리자</h1>
+              <p className='text-xs text-gray-400'>
+                {firstName || "CREW MANAGER"}
+              </p>
             </div>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="text-gray-400 lg:hidden hover:text-white"
+            className='text-gray-400 lg:hidden hover:text-white'
           >
-            <X className="w-5 h-5" />
+            <X className='w-5 h-5' />
           </button>
         </div>
 
         {/* 네비게이션 메뉴 */}
-        <nav className="p-4 space-y-2">
+        <nav className='p-4 space-y-2'>
           {sidebarItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
 
             return (
-              <Link 
-                key={item.id} 
+              <Link
+                key={item.id}
                 href={item.href}
                 onClick={handleSidebarItemClick}
               >
@@ -139,10 +151,10 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen }: AdminSideb
                     }
                   `}
                 >
-                  <Icon className="flex-shrink-0 w-5 h-5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium">{item.label}</p>
-                    <p className="text-xs truncate opacity-75">
+                  <Icon className='flex-shrink-0 w-5 h-5' />
+                  <div className='flex-1 min-w-0'>
+                    <p className='font-medium'>{item.label}</p>
+                    <p className='text-xs truncate opacity-75'>
                       {item.description}
                     </p>
                   </div>
@@ -153,8 +165,8 @@ export default function AdminSidebar({ sidebarOpen, setSidebarOpen }: AdminSideb
         </nav>
 
         {/* 사이드바 푸터 */}
-        <div className="absolute right-0 bottom-0 left-0 p-4 border-t border-basic-gray">
-          <div className="text-xs text-center text-gray-500">
+        <div className='absolute right-0 bottom-0 left-0 p-4 border-t border-basic-gray'>
+          <div className='text-xs text-center text-gray-500'>
             RunHouse Admin
             <br />
             v1.0.0

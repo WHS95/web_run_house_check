@@ -280,9 +280,9 @@ export default function AdminUserManagement({
   };
 
   return (
-    <div className='flex overflow-hidden relative flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-screen bg-basic-black'>
       {/* 검색 및 필터 - 고정 */}
-      <div className='sticky top-[28px] z-10 bg-basic-black px-4 py-4 space-y-4 '>
+      <div className='sticky top-[10px] z-10 bg-basic-black px-4 py-4 space-y-4 '>
         {/* 검색 */}
         <div className='relative'>
           <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
@@ -376,7 +376,6 @@ export default function AdminUserManagement({
           </div>
         </div>
       </div>
-
       {/* 메인 컨텐츠 */}
       <div className='overflow-y-auto flex-1 px-4 py-4'>
         {/* 사용자 목록 */}
@@ -525,10 +524,8 @@ export default function AdminUserManagement({
           </div>
         )}
       </div>
-
       {/* 하단 네비게이션 */}
       {/* <AdminBottomNavigation /> */}
-
       {/* 사용자 정보 수정 모달 */}
       {selectedUser && (
         <UserEditModal

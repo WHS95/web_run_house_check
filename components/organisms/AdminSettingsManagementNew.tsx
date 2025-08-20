@@ -289,9 +289,6 @@ export default function AdminSettingsManagementNew({
                   <span className='text-[1.125rem] font-bold text-white'>
                     활동장소 관리
                   </span>
-                  <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-basic-gray rounded-full text-[0.75rem] font-medium text-gray-300'>
-                    {locations.length}개
-                  </div>
                 </div>
                 <button
                   onClick={() => {
@@ -360,13 +357,13 @@ export default function AdminSettingsManagementNew({
 
               {/* 검색 */}
               <div className='relative'>
-                <Search className='absolute left-[3vw] top-1/2 transform -translate-y-1/2 w-[1.25rem] h-[1.25rem] text-gray-400' />
+                <Search className='absolute left-[3vw] top-1/2 transform -translate-y-1/2 w-[1rem] h-[1rem] text-gray-400' />
                 <input
                   type='text'
                   placeholder='장소명으로 검색'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className='w-full pl-[10vw] pr-[4vw] py-[3vh] bg-basic-black text-white border border-basic-gray rounded-[0.75rem] text-[1rem] placeholder-gray-400 focus:ring-2 focus:ring-basic-blue focus:border-transparent'
+                  className='w-full pl-[10vw] pr-[2vw] py-[1vh] bg-basic-black text-white border border-basic-gray rounded-[0.75rem] text-[1rem] placeholder-gray-400 focus:ring-2 focus:ring-basic-blue focus:border-transparent'
                 />
               </div>
 
@@ -376,7 +373,7 @@ export default function AdminSettingsManagementNew({
                   filteredLocations.map((location) => (
                     <div
                       key={location.id}
-                      className='bg-basic-gray/20 rounded-[0.75rem] p-[4vw]'
+                      className='bg-basic-gray/20 rounded-[0.75rem] p-[3vw]'
                     >
                       {editingLocation === location.id ? (
                         <div className='space-y-[2vh]'>

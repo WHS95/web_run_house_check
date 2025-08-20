@@ -50,8 +50,12 @@ const getCurrentTime = () => {
 };
 
 const getTodayString = () => {
-  const today = new Date();
-  return today.toISOString().split('T')[0];
+    // 한국 시간(UTC+9) 기준으로 오늘 날짜 반환
+    const now = new Date();
+    // UTC+9로 변환
+    const koreaOffset = 9 * 60; // 분 단위
+    const localTime = new Date(now.getTime() + (koreaOffset - now.getTimezoneOffset()) * 60000);
+    return localTime.toISOString().split('T')[0];
 };
 
 // ⚡ 현재 시간보다 이후인지 확인하는 함수 (미래 시간인지)

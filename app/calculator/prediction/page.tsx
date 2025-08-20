@@ -4,7 +4,6 @@ import { useState } from "react";
 import { FormLayout } from "@/components/layout/FormLayout";
 import {
   timeToSeconds,
-  secondsToTimeString,
   validateTimeInputs,
   predictFinishTime,
   calculatePace,
@@ -40,6 +39,17 @@ export default function PredictionCalculatorPage() {
     const hasValidTime = inputHours > 0 || inputMinutes > 0 || inputSeconds > 0;
 
     return hasValidDistance && hasValidTargetDistance && hasValidTime;
+  };
+
+  // 항상 hh:mm:ss 형식으로 포맷팅하는 함수
+  const formatTimeToHHMMSS = (totalSeconds: number): string => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
   const handleCalculate = () => {
@@ -84,7 +94,7 @@ export default function PredictionCalculatorPage() {
     const pace = calculatePace(targetDist, predictedSeconds);
 
     setResult({
-      time: secondsToTimeString(predictedSeconds),
+      time: formatTimeToHHMMSS(predictedSeconds),
       pace: pace,
     });
   };

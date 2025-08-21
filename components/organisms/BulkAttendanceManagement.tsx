@@ -299,7 +299,8 @@ export default function BulkAttendanceManagement({
                 onChange={(e) =>
                   handleAttendanceDataChange("date", e.target.value)
                 }
-                className='text-white border-0 bg-basic-black placeholder:text-gray-400'
+                className='w-full text-white border-0 bg-basic-black placeholder:text-gray-400'
+                //  className='justify-between w-full text-white border-0 bg-basic-black'
               />
             </div>
 

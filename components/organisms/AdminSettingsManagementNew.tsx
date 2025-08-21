@@ -13,6 +13,7 @@ import {
   Loader2,
   Ticket,
 } from "lucide-react";
+import LoadingSpinner from "../atoms/LoadingSpinner";
 // import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import AdminCrewMembersManagement from "@/components/organisms/AdminCrewMembersManagement";
 import AdminInviteCodesManagement from "@/components/organisms/AdminInviteCodesManagement";
@@ -333,7 +334,11 @@ export default function AdminSettingsManagementNew({
                       className='px-[4vw] py-[2vh] bg-basic-blue hover:bg-basic-blue/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
                     >
                       {loadingStates.create ? (
-                        <Loader2 className='w-[1rem] h-[1rem] mr-[1vw] animate-spin' />
+                        <LoadingSpinner
+                          size='sm'
+                          color='white'
+                          className='mr-[1vw]'
+                        />
                       ) : (
                         <Save className='w-[1rem] h-[1rem] mr-[1vw]' />
                       )}
@@ -400,7 +405,7 @@ export default function AdminSettingsManagementNew({
                               className='px-[3vw] py-[1.5vh] bg-basic-blue hover:bg-basic-blue/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
                             >
                               {loadingStates[`edit-${location.id}`] ? (
-                                <Loader2 className='w-[1rem] h-[1rem] animate-spin' />
+                                <LoadingSpinner size='sm' color='white' />
                               ) : (
                                 <Save className='w-[1rem] h-[1rem]' />
                               )}
@@ -434,7 +439,7 @@ export default function AdminSettingsManagementNew({
                               className='p-[2vw] text-red-400 hover:bg-red-500/20 rounded-[0.5rem] transition-colors active:scale-95 disabled:opacity-50'
                             >
                               {loadingStates[`delete-${location.id}`] ? (
-                                <Loader2 className='w-[1.25rem] h-[1.25rem] animate-spin' />
+                                <LoadingSpinner size='md' color='red' />
                               ) : (
                                 <Trash2 className='w-[1.25rem] h-[1.25rem]' />
                               )}

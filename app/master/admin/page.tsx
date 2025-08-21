@@ -6,6 +6,7 @@ import PopupNotification, {
   NotificationType,
 } from "@/components/molecules/common/PopupNotification";
 import { haptic } from "@/lib/haptic";
+import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 
 // 개별 컴포넌트 임포트
 import MasterDashboard from "@/components/organisms/master/MasterDashboard";
@@ -114,7 +115,7 @@ export default function MasterAdminPage() {
     if (isLoading) {
       return (
         <div className='flex justify-center items-center h-64'>
-          <div className='w-8 h-8 rounded-full border-2 animate-spin border-basic-blue border-t-transparent'></div>
+          <LoadingSpinner size='lg' color='blue' />
         </div>
       );
     }

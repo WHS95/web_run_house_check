@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import nextDynamic from "next/dynamic";
+import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 
 // ⚡ 성능 최적화: 컴포넌트 프리로딩
 const UltraFastRankingTemplate = nextDynamic(
@@ -7,7 +8,7 @@ const UltraFastRankingTemplate = nextDynamic(
   {
     loading: () => (
       <div className='flex items-center justify-center min-h-screen bg-basic-black'>
-        <div className='w-8 h-8 border-2 border-basic-black rounded-full animate-spin border-t-transparent'></div>
+        <LoadingSpinner size='lg' color='blue' />
       </div>
     ),
     ssr: false, // 클라이언트 사이드에서만 렌더링 (최적화됨)

@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import nextDynamic from "next/dynamic";
+import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 
 // 동적 로딩으로 번들 크기 최적화
 const UltraFastAttendanceTemplate = nextDynamic(
@@ -7,7 +8,7 @@ const UltraFastAttendanceTemplate = nextDynamic(
   {
     loading: () => (
       <div className='flex justify-center items-center min-h-screen bg-basic-black'>
-        <div className='w-[2rem] h-[2rem] rounded-full border-2 border-blue-500 animate-spin border-t-transparent'></div>
+        <LoadingSpinner size='lg' color='blue' />
       </div>
     ),
     ssr: false, // 클라이언트 사이드에서만 렌더링

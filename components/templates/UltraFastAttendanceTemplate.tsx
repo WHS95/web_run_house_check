@@ -8,6 +8,7 @@ import PopupNotification, { NotificationType } from '@/components/molecules/comm
 import { haptic } from '@/lib/haptic';
 import { AiOutlineCalendar } from "react-icons/ai";
 import { IoChevronDown } from "react-icons/io5";
+import LoadingSpinner from '../atoms/LoadingSpinner';
 
 // ⚡ 심플한 폼 로딩 스켈레톤
 const FormSkeleton = React.memo(() => (
@@ -450,7 +451,7 @@ const UltraFastAttendanceTemplate = () => {
         >
           {isSubmitting ? (
             <div className="flex items-center justify-center space-x-[1vw]">
-              <div className="animate-spin rounded-full h-[1.5rem] w-[1.5rem] border-2 border-white border-t-transparent"></div>
+              <LoadingSpinner size="md" color="white" />
               <span>처리 중...</span>
             </div>
           ) :  userStatus && !userStatus.isActive ? (

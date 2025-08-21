@@ -27,6 +27,7 @@ import {
   UserPlus,
   Check,
 } from "lucide-react";
+import LoadingSpinner from "../atoms/LoadingSpinner";
 // import AdminBottomNavigation from "@/components/organisms/AdminBottomNavigation";
 import AttendanceEditModal from "@/components/molecules/AttendanceEditModal";
 import NoticeModal from "@/components/molecules/NoticeModal";
@@ -714,7 +715,11 @@ export default function AdminAttendanceManagement({
               <Card className='border-0 bg-basic-black-gray'>
                 <CardContent className='p-4'>
                   <div className='text-center'>
-                    <div className='mx-auto mb-2 w-8 h-8 rounded-full border-b-2 animate-spin border-basic-blue'></div>
+                    <LoadingSpinner
+                      size='sm'
+                      color='blue'
+                      className='mx-auto mb-2'
+                    />
                     <p className='text-sm text-gray-400'>
                       출석 정보를 불러오는 중...
                     </p>
@@ -858,7 +863,7 @@ export default function AdminAttendanceManagement({
                                     disabled={isDeletingRecord === record.id}
                                   >
                                     {isDeletingRecord === record.id ? (
-                                      <div className='w-4 h-4 rounded-full border-2 border-gray-300 animate-spin border-t-gray-600'></div>
+                                      <LoadingSpinner size='sm' color='gray' />
                                     ) : (
                                       <MoreVertical className='w-4 h-4 text-white' />
                                     )}
@@ -885,7 +890,11 @@ export default function AdminAttendanceManagement({
                                   >
                                     {isDeletingRecord === record.id ? (
                                       <>
-                                        <div className='mr-2 w-4 h-4 rounded-full border-2 border-red-300 animate-spin border-t-red-600'></div>
+                                        <LoadingSpinner
+                                          size='sm'
+                                          color='red'
+                                          className='mr-2'
+                                        />
                                         삭제 중...
                                       </>
                                     ) : (

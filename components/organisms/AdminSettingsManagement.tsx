@@ -16,6 +16,7 @@ import {
   Trash2,
   Loader2,
 } from "lucide-react";
+import LoadingSpinner from "../atoms/LoadingSpinner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -245,7 +246,11 @@ export default function AdminSettingsManagement({
                       disabled={loadingStates.create || !newLocationName.trim()}
                     >
                       {loadingStates.create ? (
-                        <Loader2 className='mr-1 w-4 h-4 animate-spin' />
+                        <LoadingSpinner
+                          size='sm'
+                          color='white'
+                          className='mr-1'
+                        />
                       ) : (
                         <Save className='mr-1 w-4 h-4' />
                       )}
@@ -329,7 +334,7 @@ export default function AdminSettingsManagement({
                                 disabled={loadingStates[`edit-${location.id}`]}
                               >
                                 {loadingStates[`edit-${location.id}`] ? (
-                                  <Loader2 className='w-3 h-3 animate-spin' />
+                                  <LoadingSpinner size='sm' color='white' />
                                 ) : (
                                   <Save className='w-3 h-3' />
                                 )}
@@ -357,7 +362,7 @@ export default function AdminSettingsManagement({
                                     }
                                   >
                                     {loadingStates[`delete-${location.id}`] ? (
-                                      <Loader2 className='w-4 h-4 animate-spin' />
+                                      <LoadingSpinner size='sm' color='white' />
                                     ) : (
                                       <MoreVertical className='w-4 h-4' />
                                     )}

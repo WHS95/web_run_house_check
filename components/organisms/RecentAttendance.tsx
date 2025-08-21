@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { User, Clock, MapPin } from "lucide-react";
+import LoadingSpinner from "../atoms/LoadingSpinner";
 
 // AttendanceRecord 타입을 직접 정의합니다.
 interface AttendanceRecord {
@@ -171,10 +172,10 @@ export default function RecentAttendance() {
   const displayRecords = showAll ? attendanceData : initialRecords;
 
   return (
-    <div className='bg-gray-800 rounded-lg p-4 shadow-lg'>
+    <div className='p-4 bg-gray-800 rounded-lg shadow-lg'>
       <div className='flex justify-between items-center mb-4'>
         <h2 className='text-xl font-semibold'>최근 24시간 출석 현황</h2>
-        <div className='text-sm text-gray-400 flex items-center'>
+        <div className='flex items-center text-sm text-gray-400'>
           <Clock size={14} className='mr-1' />
           <span>현재 총 {attendanceData.length}명 출석</span>
         </div>
@@ -182,7 +183,7 @@ export default function RecentAttendance() {
 
       {isLoading ? (
         <div className='flex justify-center py-8'>
-          <div className='animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500'></div>
+          <LoadingSpinner size='sm' color='white' />
         </div>
       ) : (
         <>
@@ -190,9 +191,9 @@ export default function RecentAttendance() {
             {displayRecords.map((record) => (
               <div
                 key={record.id}
-                className='flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors'
+                className='flex items-center p-3 bg-gray-700 rounded-lg transition-colors hover:bg-gray-600'
               >
-                <div className='w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center text-white mr-4'>
+                <div className='flex justify-center items-center mr-4 w-10 h-10 text-white bg-gray-500 rounded-full'>
                   <User size={20} />
                 </div>
                 <div className='flex-1'>
@@ -206,7 +207,7 @@ export default function RecentAttendance() {
                       {record.exerciseType}
                     </span>
                   </div>
-                  <div className='flex items-center text-sm text-gray-400 mt-1'>
+                  <div className='flex items-center mt-1 text-sm text-gray-400'>
                     <MapPin size={14} className='mr-1' />
                     <span className='truncate'>{record.location}</span>
                   </div>
@@ -219,7 +220,7 @@ export default function RecentAttendance() {
           {!showAll && remainingRecords.length > 0 && (
             <button
               onClick={() => setShowAll(true)}
-              className='mt-4 w-full py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-gray-300 text-sm flex items-center justify-center'
+              className='flex justify-center items-center py-2 mt-4 w-full text-sm text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600'
             >
               더보기 ({remainingRecords.length}명)
             </button>
@@ -228,7 +229,7 @@ export default function RecentAttendance() {
           {showAll && (
             <button
               onClick={() => setShowAll(false)}
-              className='mt-4 w-full py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-gray-300 text-sm flex items-center justify-center'
+              className='flex justify-center items-center py-2 mt-4 w-full text-sm text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600'
             >
               접기
             </button>

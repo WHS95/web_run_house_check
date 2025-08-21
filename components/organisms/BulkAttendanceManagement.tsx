@@ -15,6 +15,7 @@ import {
   UserPlus,
   Loader2,
 } from "lucide-react";
+import LoadingSpinner from "../atoms/LoadingSpinner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -364,7 +365,7 @@ export default function BulkAttendanceManagement({
           >
             {isSubmitting ? (
               <>
-                <Loader2 className='mr-2 w-4 h-4 animate-spin' />
+                <LoadingSpinner size='sm' color='white' className='mr-2' />
                 처리 중...
               </>
             ) : (

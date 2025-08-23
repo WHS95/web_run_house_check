@@ -87,7 +87,7 @@ export default function MenuPage() {
   }, [supabase, router]);
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-screen bg-basic-black main-content'>
       <div className='fixed top-0 right-0 left-0 z-10 bg-basic-black-gray'>
         <PageHeader
           title='러닝 계산기'

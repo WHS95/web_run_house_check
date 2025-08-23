@@ -82,7 +82,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     };
 
     return (
-        <div >
+        <div className="main-content">
             {/* 🔒 헤더 - Header 컴포넌트에서 fixed 처리됨 */}
             <Header title={"RUN HOUSE"} />
 

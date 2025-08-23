@@ -446,7 +446,7 @@ const UltraFastAttendanceTemplate = () => {
         >
           {isSubmitting ? (
             <div className="flex items-center justify-center space-x-[1vw]">
-              <LoadingSpinner size="md" color="white" />
+              <LoadingSpinner size="sm" color="white" />
               <span>처리 중...</span>
             </div>
           ) :  userStatus && !userStatus.isActive ? (

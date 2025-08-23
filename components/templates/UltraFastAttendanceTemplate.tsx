@@ -327,7 +327,7 @@ const UltraFastAttendanceTemplate = () => {
     setShowNotification(true);
   }, [isSubmitting, currentUser, crewInfo, formData, userStatus]);
 
-  // ⚡ 데이터 로딩 - 통합 함수 사용으로 대폭 간소화
+  // ⚡ 병렬 데이터 로딩으로 성능 최적화
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -338,43 +338,42 @@ const UltraFastAttendanceTemplate = () => {
           return;
         }
 
-        // 1-1. 사용자 상태 확인
-        try {
-          const statusResponse = await fetch('/api/user/status');
-          const statusResult = await statusResponse.json();
-          
-          if (statusResult.success) {
-            setUserStatus(statusResult.data);
-            
-            // 사용자가 비활성화된 상태인 경우 알림 표시 후 리턴 (출석 불가)
-            if (!statusResult.data.isActive) {
-              setNotificationType('error');
-              setNotificationMessage(`${statusResult.data.statusMessage}\n\n${statusResult.data.suspensionReason}`);
-              setShowNotification(true);
-              setIsDataLoading(false);
-              // 알림 후 홈으로 이동하기 위해 타이머 설정
-              setTimeout(() => {
-                router.push('/');
-              }, 3000);
-              return;
+        // 2. 병렬 처리: 사용자 상태 확인과 폼 데이터 동시 조회
+        const [statusResponse, formDataResult] = await Promise.all([
+          fetch('/api/user/status').catch(() => null),
+          supabase.schema('attendance').rpc('get_attendance_form_data', {
+            p_user_id: user.id
+          })
+        ]);
+
+        // 2-1. 사용자 상태 확인 결과 처리
+        if (statusResponse) {
+          try {
+            const statusResult = await statusResponse.json();
+            if (statusResult.success) {
+              setUserStatus(statusResult.data);
+              
+              // 사용자가 비활성화된 상태인 경우
+              if (!statusResult.data.isActive) {
+                setNotificationType('error');
+                setNotificationMessage(`${statusResult.data.statusMessage}\n\n${statusResult.data.suspensionReason}`);
+                setShowNotification(true);
+                setIsDataLoading(false);
+                setTimeout(() => router.push('/'), 3000);
+                return;
+              }
             }
+          } catch (error) {
+            // 상태 확인 실패 시에도 계속 진행
           }
-        } catch (statusError) {
-          //console.error('사용자 상태 확인 오류:', statusError);
-          // 상태 확인 실패 시에도 계속 진행 (기본적으로는 허용)
         }
 
-        // 2. 통합 폼 데이터 조회 (5번 통신 → 1번 통신)
-        const { data: result, error } = await supabase.schema('attendance').rpc('get_attendance_form_data', {
-          p_user_id: user.id
-        });
-
+        // 2-2. 폼 데이터 결과 처리
+        const { data: result, error } = formDataResult;
         if (error) {
-          //console.error('폼 데이터 조회 오류:', error);
           throw new Error(error.message);
         }
 
-        // 3. 결과 처리
         if (!result.success) {
           if (result.error === 'user_not_found') {
             router.push('/auth/login');
@@ -387,18 +386,15 @@ const UltraFastAttendanceTemplate = () => {
           throw new Error(result.message || '알 수 없는 오류가 발생했습니다.');
         }
 
-        // 4. 상태 업데이트
+        // 3. 상태 업데이트
         const { userName, crewInfo, locationOptions, exerciseOptions } = result.data;
         
-        setCurrentUser({
-          id: user.id,
-          name: userName
-        });
+        setCurrentUser({ id: user.id, name: userName });
         setCrewInfo(crewInfo);
         setLocationOptions(locationOptions);
         setExerciseOptions(exerciseOptions);
         
-        // 5. 폼 데이터 설정
+        // 4. 폼 데이터 설정
         setFormData(prev => ({ 
           ...prev, 
           name: userName,
@@ -407,7 +403,6 @@ const UltraFastAttendanceTemplate = () => {
         }));
         
       } catch (error) {
-        //console.error('데이터 로딩 오류:', error);
         haptic.error();
         setNotificationType('error');
         setNotificationMessage('데이터를 불러오지 못했습니다.');

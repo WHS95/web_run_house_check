@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { FiChevronLeft } from "react-icons/fi";
 
 interface FormLayoutProps {

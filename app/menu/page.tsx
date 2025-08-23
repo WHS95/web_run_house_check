@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Calculator,
@@ -11,7 +11,12 @@ import {
   LogOut,
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
-import PageHeader from "@/components/organisms/common/PageHeader";
+import dynamic from "next/dynamic";
+
+// 동적 로딩으로 번들 크기 최적화
+const PageHeader = dynamic(() => import("@/components/organisms/common/PageHeader"), {
+  ssr: true,
+});
 
 const menuItems = [
   {
@@ -43,21 +48,21 @@ const menuItems = [
 export default function MenuPage() {
   const router = useRouter();
 
-  // Supabase 클라이언트 생성
-  const supabase = createBrowserClient(
+  // Supabase 클라이언트 메모화
+  const supabase = useMemo(() => createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  ), []);
 
-  const handleItemClick = (item: (typeof menuItems)[0]) => {
+  const handleItemClick = useCallback((item: (typeof menuItems)[0]) => {
     // 햅틱 피드백
     if (typeof window !== "undefined" && window.navigator.vibrate) {
       window.navigator.vibrate(50);
     }
     router.push(item.href);
-  };
+  }, [router]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       // 햅틱 피드백
       if (typeof window !== "undefined" && window.navigator.vibrate) {
@@ -79,7 +84,7 @@ export default function MenuPage() {
       //console.error("로그아웃 처리 중 예외:", error);
       alert("로그아웃 처리 중 문제가 발생했습니다.");
     }
-  };
+  }, [supabase, router]);
 
   return (
     <div className='flex flex-col h-screen bg-basic-black'>

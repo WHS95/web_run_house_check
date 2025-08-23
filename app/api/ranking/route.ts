@@ -200,6 +200,14 @@ async function getRankingData(
 
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const isPrefetch = searchParams.get('prefetch') === 'true';
+    
+    // 프리페치 요청의 경우 캐시 헤더 설정
+    const cacheHeaders = isPrefetch 
+      ? { 'Cache-Control': 'public, max-age=300, stale-while-revalidate=60' }
+      : { 'Cache-Control': 'public, max-age=60' };
+
     const supabase = await createSupabaseServerClient();
     const {
       data: { user },
@@ -209,10 +217,9 @@ export async function GET(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json(
         { error: "인증이 필요합니다." },
-        { status: 401 }
+        { status: 401, headers: cacheHeaders }
       );
     }
-    const { searchParams } = new URL(request.url);
 
     // URL 파라미터에서 년도와 월 추출
     const currentYear = new Date().getFullYear();
@@ -239,7 +246,9 @@ export async function GET(request: NextRequest) {
       crewName: crewName,
     };
 
-    return NextResponse.json(rankingData);
+    return NextResponse.json(rankingData, {
+      headers: cacheHeaders
+    });
   } catch (error) {
     console.error("랭킹 API 오류:", error);
     return NextResponse.json(

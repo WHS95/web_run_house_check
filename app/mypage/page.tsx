@@ -1,9 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import MemberDetailTemplate from "@/components/templates/MemberDetailTemplate";
+import dynamic from "next/dynamic";
+
+// 동적 로딩으로 번들 크기 최적화
+const MemberDetailTemplate = dynamic(
+  () => import("@/components/templates/MemberDetailTemplate"),
+  {
+    ssr: false,
+    loading: () => <MyPageSkeleton />
+  }
+);
 
 // ⚡ 타입 정의
 interface UserProfileForMyPage {
@@ -190,10 +199,12 @@ export default function MyPage() {
   }
 
   return (
-    <MemberDetailTemplate
-      userProfile={userProfile}
-      activityData={activityData}
-      userId={userId || undefined}
-    />
+    <Suspense fallback={<MyPageSkeleton />}>
+      <MemberDetailTemplate
+        userProfile={userProfile}
+        activityData={activityData}
+        userId={userId || undefined}
+      />
+    </Suspense>
   );
 }

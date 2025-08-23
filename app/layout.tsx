@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { StagewiseToolbar } from "@stagewise/toolbar-next";
 import { Analytics } from "@vercel/analytics/react";
 import ConditionalBottomNav from "@/components/ConditionalBottomNav";
+import { NavigationProvider } from "@/components/providers/NavigationProvider";
 
 import type { Metadata, Viewport } from "next";
 
@@ -111,8 +112,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }}
           />
         )} */}
-        <div>{children}</div>
-        <ConditionalBottomNav />
+        <NavigationProvider>
+          <div className="main-content">{children}</div>
+          <ConditionalBottomNav />
+        </NavigationProvider>
         <Analytics />
       </body>
     </html>

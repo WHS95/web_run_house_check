@@ -52,21 +52,21 @@ export async function POST(request: Request) {
       attendanceTimestamp,
     } = parsedData.data;
 
-    // 현재 시간 + 2시간까지 허용 (클라이언트와 동일한 로직)
+    // KST 기준 현재 시간 + 2시간까지 허용
     const now = new Date();
     const koreaTime = new Date(
-      new Date(
-        now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-      ).getTime() +
-        2 * 60 * 60 * 1000 // 2시간 더하기(클라이어트 요청있엉므)
+      now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
     );
+    // 현재 한국 시간 + 2시간까지 허용
+    const maxAllowedTime = new Date(koreaTime.getTime() + 2 * 60 * 60 * 1000);
+    
     const attendanceTime = new Date(attendanceTimestamp);
 
-    if (attendanceTime > koreaTime) {
+    if (attendanceTime > maxAllowedTime) {
       return NextResponse.json(
         {
           success: false,
-          message: "허용된 시간 범위를 초과했습니다.",
+          message: "허용된 시간 범위를 초과했습니다. 현재 시간으로부터 2시간까지만 출석이 가능합니다.",
         },
         { status: 400 }
       );

@@ -3,21 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
 import ClientHomePage from "@/components/pages/ClientHomePage";
+import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 
 // 동적 로딩으로 번들 크기 최적화 (클라이언트 전용)
 const EnhancedHomeTemplate = dynamic(
   () => import("@/components/templates/EnhancedHomeTemplate"),
-  { 
+  {
     ssr: false,
-    loading: () => (
-      <div className="min-h-screen bg-basic-black flex items-center justify-center">
-        <div className='flex space-x-2'>
-          <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-          <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-          <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-        </div>
-      </div>
-    )
+    loading: () => <LoadingSpinner size='sm' color='white' />,
   }
 );
 
@@ -25,13 +18,13 @@ const EnhancedHomeTemplate = dynamic(
 async function getInitialHomeData() {
   try {
     const supabase = await createClient();
-    
+
     // 서버에서 사용자 인증 확인
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
-    
+
     if (authError || !user) {
       return { needsAuth: true };
     }
@@ -51,19 +44,19 @@ async function getInitialHomeData() {
       if (functionResult.error === "crew_not_verified") {
         return { needsCrewVerification: true };
       }
-      
+
       // 기본 데이터 반환
       return {
         pageData: {
           userName: user.user_metadata?.full_name || user.email || "사용자",
           crewName: null,
           noticeText: null,
-        }
+        },
       };
     }
 
     return {
-      pageData: functionResult.data
+      pageData: functionResult.data,
     };
   } catch (error) {
     // 오류 발생 시 기본 데이터 반환
@@ -72,7 +65,7 @@ async function getInitialHomeData() {
         userName: "사용자",
         crewName: null,
         noticeText: null,
-      }
+      },
     };
   }
 }
@@ -92,17 +85,18 @@ export default async function HomePage() {
 
   // 클라이언트 컴포넌트에 초기 데이터 전달
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-basic-black flex items-center justify-center">
-        <div className='flex space-x-2'>
-          <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-          <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-          <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
+    <Suspense
+      fallback={
+        <div className='flex items-center justify-center min-h-screen bg-basic-black'>
+          <div className='flex space-x-2'>
+            <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
+            <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
+            <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <ClientHomePage initialData={initialData.pageData!} />
     </Suspense>
   );
 }
-

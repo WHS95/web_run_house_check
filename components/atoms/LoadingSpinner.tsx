@@ -13,9 +13,9 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 }) => {
   // 크기별 클래스 정의
   const sizeClasses = {
-    sm: "w-4 h-4",
-    md: "w-6 h-6",
-    lg: "w-8 h-8",
+    sm: "w-2 h-2",
+    md: "w-4 h-4",
+    lg: "w-6 h-6",
   };
 
   // 색상별 클래스 정의

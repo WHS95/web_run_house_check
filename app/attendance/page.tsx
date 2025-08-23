@@ -2,7 +2,6 @@ import React, { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ClientAttendancePage from "@/components/pages/ClientAttendancePage";
-import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 
 // 페이지 메타데이터 최적화
 export const metadata = {
@@ -16,16 +15,19 @@ async function getAttendanceFormData() {
     const supabase = await createClient();
 
     // 1. 사용자 인증 확인
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
     if (authError || !user) {
       return { needsAuth: true };
     }
 
     // 2. 통합 폼 데이터 조회
     const { data: result, error } = await supabase
-      .schema('attendance')
-      .rpc('get_attendance_form_data', {
-        p_user_id: user.id
+      .schema("attendance")
+      .rpc("get_attendance_form_data", {
+        p_user_id: user.id,
       });
 
     if (error) {
@@ -33,24 +35,26 @@ async function getAttendanceFormData() {
     }
 
     if (!result.success) {
-      if (result.error === 'user_not_found') {
+      if (result.error === "user_not_found") {
         return { needsAuth: true };
       }
-      if (result.error === 'crew_not_verified') {
+      if (result.error === "crew_not_verified") {
         return { needsCrewVerification: true };
       }
-      throw new Error(result.message || '알 수 없는 오류가 발생했습니다.');
+      throw new Error(result.message || "알 수 없는 오류가 발생했습니다.");
     }
 
     return {
       formData: result.data,
-      userId: user.id
+      userId: user.id,
     };
-
   } catch (error) {
-    console.error('출석 폼 데이터 로딩 오류:', error);
+    console.error("출석 폼 데이터 로딩 오류:", error);
     return {
-      error: error instanceof Error ? error.message : '데이터를 불러오지 못했습니다.'
+      error:
+        error instanceof Error
+          ? error.message
+          : "데이터를 불러오지 못했습니다.",
     };
   }
 }
@@ -100,7 +104,7 @@ export default async function AttendancePage() {
   // 정상 데이터로 렌더링
   return (
     <Suspense fallback={<AttendancePageFallback />}>
-      <ClientAttendancePage 
+      <ClientAttendancePage
         initialFormData={data.formData!}
         userId={data.userId!}
       />

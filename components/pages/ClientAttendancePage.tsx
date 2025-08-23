@@ -17,27 +17,26 @@ const HOST_OPTIONS = [
 ];
 
 // 현재 시간 계산 함수들
-// 한국 시간 기준으로 현재 시각을 10분 단위로 반올림하여 반환하는 함수
+// 한국 시간 기준으로 현재 시각을 10분 단위로 올림하여 반환하는 함수 (디폴트 시간용)
 const getCurrentTime = () => {
   // 1. 현재 시각을 한국 시간으로 가져온다
   const now = new Date();
-
-  // 2. 한국 시간대로 변환 (UTC+9) 후 2시간을 더함 (고객 요청)
   const koreaTime = new Date(
-    new Date(
-      now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-    ).getTime() +
-      2 * 60 * 60 * 1000 // 2시간(7200000ms) 더하기
+    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
   );
 
-  // 3. 분 단위로 10분 단위 반올림
+  // 2. 분 단위로 10분 단위 올림 처리
   const currentMinutes = koreaTime.getMinutes();
   const remainder = currentMinutes % 10;
   let adjustedMinutes;
   let adjustedHours = koreaTime.getHours();
 
-  // 5분 미만이어도 무조건 올림 처리
-  adjustedMinutes = currentMinutes + (10 - remainder);
+  // 무조건 올림 처리 (현재 시간이 정확히 10분 단위가 아니면 다음 10분 단위로 올림)
+  if (remainder === 0) {
+    adjustedMinutes = currentMinutes;
+  } else {
+    adjustedMinutes = currentMinutes + (10 - remainder);
+  }
 
   // 60분을 넘으면 시간 조정
   if (adjustedMinutes >= 60) {
@@ -45,7 +44,7 @@ const getCurrentTime = () => {
     adjustedMinutes = 0;
   }
 
-  // 4. "HH:mm" 형식으로 반환
+  // 3. "HH:mm" 형식으로 반환
   return `${adjustedHours.toString().padStart(2, "0")}:${adjustedMinutes
     .toString()
     .padStart(2, "0")}`;
@@ -63,16 +62,14 @@ const getTodayString = () => {
 const isFutureDateTime = (date: string, time: string) => {
   const selectedDateTime = new Date(`${date}T${time}:00`);
 
-  // 현재 시간 + 2시간까지 허용 (서버와 동일한 로직)
+  // 현재 한국 시간 + 2시간까지 허용
   const now = new Date();
   const koreaTime = new Date(
-    new Date(
-      now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-    ).getTime() +
-      2 * 60 * 60 * 1000 // 2시간 더하기
+    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
   );
+  const maxAllowedTime = new Date(koreaTime.getTime() + 2 * 60 * 60 * 1000); // 2시간 더하기
 
-  return selectedDateTime > koreaTime;
+  return selectedDateTime > maxAllowedTime;
 };
 
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) =>
@@ -88,9 +85,20 @@ const getAvailableTimeOptions = (selectedDate: string) => {
     return TIME_OPTIONS;
   }
 
-  // 현재 시간까지만 선택 가능하도록 필터링
-  const currentTime = getCurrentTime();
-  return TIME_OPTIONS.filter((option) => option.value <= currentTime);
+  // 한국 시간 기준으로 현재 시간 + 2시간까지 선택 가능하도록 필터링
+  const now = new Date();
+  const koreaTime = new Date(
+    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+  );
+
+  // 현재 시간 + 2시간
+  const maxAllowedTime = new Date(koreaTime.getTime() + 2 * 60 * 60 * 1000);
+  const maxTimeString = `${maxAllowedTime
+    .getHours()
+    .toString()
+    .padStart(2, "0")}:${Math.floor(maxAllowedTime.getMinutes() / 10) * 10}`;
+
+  return TIME_OPTIONS.filter((option) => option.value <= maxTimeString);
 };
 
 interface ClientAttendancePageProps {
@@ -245,7 +253,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   // 에러 상태 처리
   if (error) {
     return (
-      <div className='flex flex-col justify-center items-center h-screen bg-basic-black'>
+      <div className='flex flex-col items-center justify-center h-screen bg-basic-black'>
         <div className='p-4 text-center text-white'>
           <h2 className='mb-4 text-xl font-bold'>오류가 발생했습니다</h2>
           <p className='mb-4'>{error}</p>
@@ -263,16 +271,16 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   // 초기 데이터가 없는 경우
   if (!initialFormData) {
     return (
-      <div className='flex justify-center items-center h-screen bg-basic-black'>
+      <div className='flex items-center justify-center h-screen bg-basic-black'>
         <LoadingSpinner size='sm' color='white' />
       </div>
     );
   }
 
   return (
-    <div className='flex overflow-hidden relative flex-col h-screen bg-basic-black'>
+    <div className='relative flex flex-col h-screen overflow-hidden bg-basic-black'>
       {/* 헤더 */}
-      <div className='fixed top-0 right-0 left-0 z-50'>
+      <div className='fixed top-0 left-0 right-0 z-50'>
         <PageHeader
           title='출석 체크'
           iconColor='white'
@@ -281,7 +289,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       </div>
 
       {/* 메인 콘텐츠 */}
-      <div className='flex-1 overflow-y-auto native-scroll pt-[10vh] pb-[20vh] px-[4vw]'>
+      <div className='flex-1 overflow-y-auto native-scroll pt-[10vh] pb-[40vh] px-[4vw]'>
         <div className='space-y-[3vh]'>
           {/* 이름 */}
           <div>
@@ -346,7 +354,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                   </option>
                 ))}
               </select>
-              <div className='flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none'>
+              <div className='absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none'>
                 <IoChevronDown className='w-5 h-5 text-gray-400' />
               </div>
             </div>
@@ -371,7 +379,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                   </option>
                 ))}
               </select>
-              <div className='flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none'>
+              <div className='absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none'>
                 <IoChevronDown className='w-5 h-5 text-gray-400' />
               </div>
             </div>

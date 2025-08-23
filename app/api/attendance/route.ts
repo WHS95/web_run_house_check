@@ -62,13 +62,11 @@ export async function POST(request: Request) {
 
     const attendanceTime = new Date(attendanceTimestamp);
 
- 
     if (attendanceTime > maxAllowedTime) {
       return NextResponse.json(
         {
           success: false,
-          message:
-            "허용된 시간 범위를 초과했습니다. 현재 시간으로부터 2시간까지만 출석이 가능합니다.",
+          message: "허용된 시간 범위를 초과했습니다.",
         },
         { status: 400 }
       );

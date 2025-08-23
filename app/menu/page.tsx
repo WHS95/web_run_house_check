@@ -7,6 +7,7 @@ import {
   Timer,
   Target,
   Heart,
+  MapPin,
   ChevronRight,
   LogOut,
 } from "lucide-react";
@@ -42,6 +43,12 @@ const menuItems = [
     title: "심박수 존 계산기",
     description: "나이별 트레이닝 존 계산",
     href: "/calculator/heart-rate",
+  },
+  {
+    icon: MapPin,
+    title: "트랙 페이스 계산기",
+    description: "1레인/2레인 트랙 페이스 계산",
+    href: "/calculator/track-pace",
   },
 ];
 

@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
 // 동적 로딩으로 번들 크기 최적화
-const PageHeader = dynamic(() => import("@/components/organisms/common/PageHeader"), {
-  ssr: true,
-});
+const PageHeader = dynamic(
+  () => import("@/components/organisms/common/PageHeader"),
+  {
+    ssr: true,
+  }
+);
 
 const calculatorItems = [
   {
@@ -30,6 +33,11 @@ const calculatorItems = [
     description: "나이별 트레이닝 존 계산",
     href: "/calculator/heart-rate",
   },
+  {
+    title: "트랙 페이스 계산기",
+    description: "트랙 페이스 계산",
+    href: "/calculator/track-pace",
+  },
 ];
 
 export default function CalculatorPage() {
@@ -39,9 +47,10 @@ export default function CalculatorPage() {
   useEffect(() => {
     const calculatorRoutes = [
       "/calculator/pace",
-      "/calculator/prediction", 
+      "/calculator/prediction",
       "/calculator/split-time",
-      "/calculator/heart-rate"
+      "/calculator/heart-rate",
+      "/calculator/track-pace",
     ];
 
     // 각 계산기 페이지를 순차적으로 prefetch
@@ -55,7 +64,7 @@ export default function CalculatorPage() {
 
   return (
     <div className='flex flex-col h-screen bg-basic-black main-content'>
-      <div className='fixed top-0 right-0 left-0 z-10 bg-basic-black-gray'>
+      <div className='fixed top-0 left-0 right-0 z-10 bg-basic-black-gray'>
         <PageHeader
           title='러닝 계산기'
           iconColor='white'
@@ -71,9 +80,9 @@ export default function CalculatorPage() {
               onClick={() => router.push(item.href)}
               onMouseEnter={() => router.prefetch(item.href)}
               onFocus={() => router.prefetch(item.href)}
-              className='flex justify-between items-center px-2 py-6 w-full transition-colors hover:bg-basic-black-gray'
+              className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-basic-black-gray'
             >
-              <div className='flex gap-3 items-center'>
+              <div className='flex items-center gap-3'>
                 <div className='text-left'>
                   <div className='font-extrabold text-basic-blue'>
                     {item.title}

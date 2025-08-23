@@ -52,14 +52,15 @@ const getCurrentTime = () => {
 
 const getTodayString = () => {
   const now = new Date();
-  const koreaOffset = 9 * 60;
-  const localTime = new Date(
-    now.getTime() + (koreaOffset - now.getTimezoneOffset()) * 60000
+  const koreaTime = new Date(
+    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
   );
-  return localTime.toISOString().split("T")[0];
+  return koreaTime.toISOString().split("T")[0];
 };
 
 const isFutureDateTime = (date: string, time: string) => {
+
+
   const selectedDateTime = new Date(`${date}T${time}:00`);
 
   // 현재 한국 시간 + 2시간까지 허용
@@ -68,6 +69,8 @@ const isFutureDateTime = (date: string, time: string) => {
     now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
   );
   const maxAllowedTime = new Date(koreaTime.getTime() + 2 * 60 * 60 * 1000); // 2시간 더하기
+
+
 
   return selectedDateTime > maxAllowedTime;
 };
@@ -253,7 +256,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   // 에러 상태 처리
   if (error) {
     return (
-      <div className='flex flex-col items-center justify-center h-screen bg-basic-black'>
+      <div className='flex flex-col justify-center items-center h-screen bg-basic-black'>
         <div className='p-4 text-center text-white'>
           <h2 className='mb-4 text-xl font-bold'>오류가 발생했습니다</h2>
           <p className='mb-4'>{error}</p>
@@ -271,16 +274,16 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   // 초기 데이터가 없는 경우
   if (!initialFormData) {
     return (
-      <div className='flex items-center justify-center h-screen bg-basic-black'>
+      <div className='flex justify-center items-center h-screen bg-basic-black'>
         <LoadingSpinner size='sm' color='white' />
       </div>
     );
   }
 
   return (
-    <div className='relative flex flex-col h-screen overflow-hidden bg-basic-black'>
+    <div className='flex overflow-hidden relative flex-col h-screen bg-basic-black'>
       {/* 헤더 */}
-      <div className='fixed top-0 left-0 right-0 z-50'>
+      <div className='fixed top-0 right-0 left-0 z-50'>
         <PageHeader
           title='출석 체크'
           iconColor='white'
@@ -354,7 +357,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                   </option>
                 ))}
               </select>
-              <div className='absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none'>
+              <div className='flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none'>
                 <IoChevronDown className='w-5 h-5 text-gray-400' />
               </div>
             </div>
@@ -379,7 +382,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                   </option>
                 ))}
               </select>
-              <div className='absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none'>
+              <div className='flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none'>
                 <IoChevronDown className='w-5 h-5 text-gray-400' />
               </div>
             </div>

@@ -17,24 +17,35 @@ const HOST_OPTIONS = [
 ];
 
 // 현재 시간 계산 함수들
+// 한국 시간 기준으로 현재 시각을 10분 단위로 반올림하여 반환하는 함수
 const getCurrentTime = () => {
+  // 1. 현재 시각을 한국 시간으로 가져온다
   const now = new Date();
-  const currentMinutes = now.getMinutes();
+
+  // 2. 한국 시간대로 변환 (UTC+9) 후 2시간을 더함 (고객 요청)
+  const koreaTime = new Date(
+    new Date(
+      now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+    ).getTime() +
+      2 * 60 * 60 * 1000 // 2시간(7200000ms) 더하기
+  );
+
+  // 3. 분 단위로 10분 단위 반올림
+  const currentMinutes = koreaTime.getMinutes();
   const remainder = currentMinutes % 10;
   let adjustedMinutes;
-  let adjustedHours = now.getHours();
+  let adjustedHours = koreaTime.getHours();
 
-  if (remainder >= 5) {
-    adjustedMinutes = currentMinutes + (10 - remainder);
-  } else {
-    adjustedMinutes = currentMinutes - remainder;
-  }
+  // 5분 미만이어도 무조건 올림 처리
+  adjustedMinutes = currentMinutes + (10 - remainder);
 
+  // 60분을 넘으면 시간 조정
   if (adjustedMinutes >= 60) {
     adjustedHours = (adjustedHours + 1) % 24;
     adjustedMinutes = 0;
   }
 
+  // 4. "HH:mm" 형식으로 반환
   return `${adjustedHours.toString().padStart(2, "0")}:${adjustedMinutes
     .toString()
     .padStart(2, "0")}`;
@@ -51,8 +62,17 @@ const getTodayString = () => {
 
 const isFutureDateTime = (date: string, time: string) => {
   const selectedDateTime = new Date(`${date}T${time}:00`);
+
+  // 현재 시간 + 2시간까지 허용 (서버와 동일한 로직)
   const now = new Date();
-  return selectedDateTime > now;
+  const koreaTime = new Date(
+    new Date(
+      now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+    ).getTime() +
+      2 * 60 * 60 * 1000 // 2시간 더하기
+  );
+
+  return selectedDateTime > koreaTime;
 };
 
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) =>
@@ -68,12 +88,8 @@ const getAvailableTimeOptions = (selectedDate: string) => {
     return TIME_OPTIONS;
   }
 
-  const now = new Date();
-  const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
-
+  // 현재 시간까지만 선택 가능하도록 필터링
+  const currentTime = getCurrentTime();
   return TIME_OPTIONS.filter((option) => option.value <= currentTime);
 };
 
@@ -132,11 +148,12 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
         if (value === getTodayString()) {
           const availableOptions = getAvailableTimeOptions(value);
-          if (
-            availableOptions.length > 0 &&
-            !availableOptions.find((opt) => opt.value === prev.time)
-          ) {
-            newData.time = availableOptions[availableOptions.length - 1].value;
+          if (availableOptions.length > 0) {
+            // 현재 시간이 선택 가능한 옵션에 없으면 가장 최근 시간으로 설정
+            if (!availableOptions.find((opt) => opt.value === prev.time)) {
+              newData.time =
+                availableOptions[availableOptions.length - 1].value;
+            }
           }
         }
 
@@ -161,13 +178,11 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       return;
     }
 
-    // 미래 시간 차단
+    // 허용된 시간 범위 검증
     if (isFutureDateTime(formData.date, formData.time)) {
       haptic.error();
       setNotificationType("error");
-      setNotificationMessage(
-        "현재 시간보다 이후 시간으로는 출석할 수 없습니다."
-      );
+      setNotificationMessage("허용된 시간 범위를 초과했습니다.");
       setShowNotification(true);
       return;
     }

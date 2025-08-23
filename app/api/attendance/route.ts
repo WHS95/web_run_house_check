@@ -52,15 +52,21 @@ export async function POST(request: Request) {
       attendanceTimestamp,
     } = parsedData.data;
 
-    // 현재 시간보다 이후 시간인지 검증 (미래 시간 차단)
-    const currentTime = new Date();
+    // 현재 시간 + 2시간까지 허용 (클라이언트와 동일한 로직)
+    const now = new Date();
+    const koreaTime = new Date(
+      new Date(
+        now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
+      ).getTime() +
+        2 * 60 * 60 * 1000 // 2시간 더하기(클라이어트 요청있엉므)
+    );
     const attendanceTime = new Date(attendanceTimestamp);
 
-    if (attendanceTime > currentTime) {
+    if (attendanceTime > koreaTime) {
       return NextResponse.json(
         {
           success: false,
-          message: "현재 시간보다 이후 시간으로는 출석할 수 없습니다.",
+          message: "허용된 시간 범위를 초과했습니다.",
         },
         { status: 400 }
       );

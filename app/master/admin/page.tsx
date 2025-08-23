@@ -115,7 +115,7 @@ export default function MasterAdminPage() {
     if (isLoading) {
       return (
         <div className='flex justify-center items-center h-64'>
-          <LoadingSpinner size='lg' color='blue' />
+          <LoadingSpinner size='sm' color='white' />
         </div>
       );
     }

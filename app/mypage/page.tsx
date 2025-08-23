@@ -10,7 +10,7 @@ const MemberDetailTemplate = dynamic(
   () => import("@/components/templates/MemberDetailTemplate"),
   {
     ssr: false,
-    loading: () => <MyPageSkeleton />
+    loading: () => <MyPageSkeleton />,
   }
 );
 
@@ -153,7 +153,7 @@ export default function MyPage() {
         };
 
         setUserProfile(formattedProfile);
-        console.log("1231231", activityInfo);
+        // console.log("1231231", activityInfo);
         setActivityData(activityInfo);
       } catch (error) {
         //console.error("마이페이지 데이터 로딩 오류:", error);

@@ -439,7 +439,7 @@ export default function AdminSettingsManagementNew({
                               className='p-[2vw] text-red-400 hover:bg-red-500/20 rounded-[0.5rem] transition-colors active:scale-95 disabled:opacity-50'
                             >
                               {loadingStates[`delete-${location.id}`] ? (
-                                <LoadingSpinner size='md' color='red' />
+                                <LoadingSpinner size='sm' color='white' />
                               ) : (
                                 <Trash2 className='w-[1.25rem] h-[1.25rem]' />
                               )}

@@ -863,7 +863,7 @@ export default function AdminAttendanceManagement({
                                     disabled={isDeletingRecord === record.id}
                                   >
                                     {isDeletingRecord === record.id ? (
-                                      <LoadingSpinner size='sm' color='gray' />
+                                      <LoadingSpinner size='sm' color='white' />
                                     ) : (
                                       <MoreVertical className='w-4 h-4 text-white' />
                                     )}

@@ -7,8 +7,8 @@ const UltraFastRankingTemplate = nextDynamic(
   () => import("@/components/templates/UltraFastRankingTemplate"),
   {
     loading: () => (
-      <div className='flex items-center justify-center min-h-screen bg-basic-black'>
-        <LoadingSpinner size='lg' color='blue' />
+      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
+        <LoadingSpinner size='sm' color='white' />
       </div>
     ),
     ssr: false, // 클라이언트 사이드에서만 렌더링 (최적화됨)
@@ -29,23 +29,23 @@ export const metadata = {
 const RankingPageFallback = React.memo(() => (
   <div className='min-h-screen bg-basic-black'>
     <div className='pt-safe'>
-      <div className='flex items-center justify-between w-full px-4 py-4 border-b border-gray-500'>
-        <div className='w-16 h-6 bg-basic-black rounded animate-pulse'></div>
-        <div className='w-6 h-6 bg-basic-black rounded animate-pulse'></div>
+      <div className='flex justify-between items-center px-4 py-4 w-full border-b border-gray-500'>
+        <div className='w-16 h-6 rounded animate-pulse bg-basic-black'></div>
+        <div className='w-6 h-6 rounded animate-pulse bg-basic-black'></div>
       </div>
     </div>
 
     {/* 랭킹 정보 스켈레톤 */}
     <div className='px-4 pt-6'>
-      <div className='p-4 mb-6 bg-basic-black rounded-2xl animate-pulse'>
-        <div className='w-32 h-4 mb-2 bg-basic-black rounded'></div>
-        <div className='w-20 h-8 bg-basic-black rounded'></div>
+      <div className='p-4 mb-6 rounded-2xl animate-pulse bg-basic-black'>
+        <div className='mb-2 w-32 h-4 rounded bg-basic-black'></div>
+        <div className='w-20 h-8 rounded bg-basic-black'></div>
       </div>
 
       {/* 탭 스켈레톤 */}
       <div className='flex mb-6 space-x-2'>
-        <div className='w-20 h-10 bg-basic-black rounded-xl animate-pulse'></div>
-        <div className='w-20 h-10 bg-basic-black rounded-xl animate-pulse'></div>
+        <div className='w-20 h-10 rounded-xl animate-pulse bg-basic-black'></div>
+        <div className='w-20 h-10 rounded-xl animate-pulse bg-basic-black'></div>
       </div>
 
       {/* 리스트 스켈레톤 */}
@@ -55,12 +55,12 @@ const RankingPageFallback = React.memo(() => (
             key={index}
             className='flex items-center p-3 space-x-3 animate-pulse'
           >
-            <div className='w-8 h-8 bg-basic-black rounded-full'></div>
+            <div className='w-8 h-8 rounded-full bg-basic-black'></div>
             <div className='flex-1'>
-              <div className='w-24 h-4 mb-1 bg-basic-black rounded'></div>
-              <div className='w-16 h-3 bg-basic-black rounded'></div>
+              <div className='mb-1 w-24 h-4 rounded bg-basic-black'></div>
+              <div className='w-16 h-3 rounded bg-basic-black'></div>
             </div>
-            <div className='w-12 h-4 bg-basic-black rounded'></div>
+            <div className='w-12 h-4 rounded bg-basic-black'></div>
           </div>
         ))}
       </div>

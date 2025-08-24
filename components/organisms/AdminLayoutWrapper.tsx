@@ -14,15 +14,15 @@ export default function AdminLayoutWrapper({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex h-screen bg-basic-black'>
       {/* 사이드바 */}
       <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* 메인 콘텐츠 */}
-      <div className='flex flex-col flex-1 min-h-screen'>
-        {/* 모바일 헤더 - 상단 고정 */}
-        <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
-          <div className='flex justify-between items-center p-5'>
+      <div className='flex flex-col flex-1 lg:ml-64 min-h-screen'>
+        {/* 헤더 - 모바일에서만 표시 */}
+        <div className='sticky top-0 z-20 border-b bg-basic-black-gray border-basic-gray lg:hidden'>
+          <div className='flex justify-between items-center p-4'>
             <button
               onClick={() => setSidebarOpen(true)}
               className='text-gray-400 hover:text-white'
@@ -38,7 +38,7 @@ export default function AdminLayoutWrapper({
         </div>
 
         {/* 콘텐츠 영역 */}
-        <div className='overflow-auto flex-1'>{children}</div>
+        <div className='flex-1 overflow-auto'>{children}</div>
       </div>
     </div>
   );

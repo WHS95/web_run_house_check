@@ -1,4 +1,9 @@
 // 네이버 지도 API 타입 정의
+export interface NaverMapPosition {
+  lat: number;
+  lng: number;
+}
+
 export interface NaverMap {
   setCenter: (latlng: NaverLatLng) => void;
   getCenter: () => NaverLatLng;

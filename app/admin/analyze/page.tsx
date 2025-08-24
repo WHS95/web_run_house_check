@@ -5,6 +5,7 @@ import { useAdminContext } from "../AdminContextProvider";
 import ChartWithAxis from "@/components/molecules/ChartWithAxis";
 import LocationChart from "@/components/molecules/LocationChart";
 import MemberAttendanceStatusChart from "@/components/molecules/MemberAttendanceStatusChart";
+import AdminPageContainer from "@/components/layouts/AdminPageContainer";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -378,24 +379,23 @@ interface AnalyzeData {
 // 로딩 스켈레톤 컴포넌트
 function AnalyzeLoadingSkeleton() {
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <AdminPageContainer>
       {/* 헤더 스켈레톤 */}
-      <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
-        <div className='px-4 py-4'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <div className='w-24 h-6 rounded animate-pulse bg-basic-gray'></div>
-              <div className='mt-1 w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
-            </div>
-          </div>
+      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-basic-black py-4'>
+        <div>
+          <div className='w-24 h-6 rounded animate-pulse bg-basic-gray'></div>
+          <div className='mt-1 w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
+        </div>
+        <div className='flex space-x-2'>
+          <div className='w-20 h-8 rounded animate-pulse bg-basic-gray'></div>
+          <div className='w-16 h-8 rounded animate-pulse bg-basic-gray'></div>
         </div>
       </div>
 
-      {/* 메인 컨텐츠 스켈레톤 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4 pb-24'>
-        <div className='space-y-6'>
-          {/* 차트 스켈레톤 */}
-          <div className='p-6 rounded-lg border bg-basic-black-gray border-basic-gray'>
+      {/* 차트 스켈레톤 */}
+      <div className='space-y-6'>
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className='p-6 rounded-lg border bg-basic-black-gray border-basic-gray'>
             <div className='mb-6'>
               <div className='mb-2 w-48 h-6 rounded animate-pulse bg-basic-gray'></div>
               <div className='w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
@@ -414,9 +414,9 @@ function AnalyzeLoadingSkeleton() {
               ))}
             </div>
           </div>
-        </div>
+        ))}
       </div>
-    </div>
+    </AdminPageContainer>
   );
 }
 
@@ -491,127 +491,125 @@ export default function AnalyzePage() {
 
   if (error) {
     return (
-      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
-        <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-red-500/30'>
-          <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
-          <p className='text-gray-300'>{error}</p>
+      <AdminPageContainer>
+        <div className='flex justify-center items-center min-h-64'>
+          <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-red-500/30'>
+            <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
+            <p className='text-gray-300'>{error}</p>
+          </div>
         </div>
-      </div>
+      </AdminPageContainer>
     );
   }
 
   if (!analyzeData) {
     return (
-      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
-        <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-basic-gray'>
-          <h3 className='mb-2 text-lg font-semibold text-white'>데이터 없음</h3>
-          <p className='text-gray-300'>분석할 데이터가 없습니다.</p>
+      <AdminPageContainer>
+        <div className='flex justify-center items-center min-h-64'>
+          <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-basic-gray'>
+            <h3 className='mb-2 text-lg font-semibold text-white'>데이터 없음</h3>
+            <p className='text-gray-300'>분석할 데이터가 없습니다.</p>
+          </div>
         </div>
-      </div>
+      </AdminPageContainer>
     );
   }
 
   return (
-    <div className='flex flex-col h-full bg-basic-black'>
+    <AdminPageContainer>
       {/* 헤더 */}
-      <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
-        <div className='px-4 py-4'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <h1 className='text-xl font-bold text-white'>통계</h1>
-            </div>
+      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-basic-black py-4'>
+        <div>
+          <h1 className='text-xl font-bold text-white'>통계</h1>
+        </div>
 
-            {/* 년도/월 선택 드롭다운 */}
-            <div className='flex space-x-2'>
-              {/* 년도 선택 */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className='text-white bg-basic-black-gray border-basic-gray hover:bg-basic-gray min-w-20'
-                  >
-                    {selectedYear}년
-                    <ChevronDown className='ml-1 w-4 h-4' />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align='end'
-                  className='bg-basic-black-gray border-basic-gray'
+        {/* 년도/월 선택 드롭다운 */}
+        <div className='flex space-x-2'>
+          {/* 년도 선택 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='outline'
+                size='sm'
+                className='text-white bg-basic-black-gray border-basic-gray hover:bg-basic-gray min-w-20'
+              >
+                {selectedYear}년
+                <ChevronDown className='ml-1 w-4 h-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align='end'
+              className='bg-basic-black-gray border-basic-gray'
+            >
+              {yearOptions.map((year) => (
+                <DropdownMenuItem
+                  key={year}
+                  onClick={() => setSelectedYear(year)}
+                  className={`text-white hover:bg-basic-gray ${
+                    selectedYear === year ? "bg-basic-blue" : ""
+                  }`}
                 >
-                  {yearOptions.map((year) => (
-                    <DropdownMenuItem
-                      key={year}
-                      onClick={() => setSelectedYear(year)}
-                      className={`text-white hover:bg-basic-gray ${
-                        selectedYear === year ? "bg-basic-blue" : ""
-                      }`}
-                    >
-                      {year}년
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  {year}년
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-              {/* 월 선택 */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className='text-white bg-basic-black-gray border-basic-gray hover:bg-basic-gray min-w-16'
-                  >
-                    {selectedMonth}월
-                    <ChevronDown className='ml-1 w-4 h-4' />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align='end'
-                  className='bg-basic-black-gray border-basic-gray'
+          {/* 월 선택 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='outline'
+                size='sm'
+                className='text-white bg-basic-black-gray border-basic-gray hover:bg-basic-gray min-w-16'
+              >
+                {selectedMonth}월
+                <ChevronDown className='ml-1 w-4 h-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align='end'
+              className='bg-basic-black-gray border-basic-gray'
+            >
+              {monthOptions.map((month) => (
+                <DropdownMenuItem
+                  key={month}
+                  onClick={() => setSelectedMonth(month)}
+                  className={`text-white hover:bg-basic-gray ${
+                    selectedMonth === month ? "bg-basic-blue" : ""
+                  }`}
                 >
-                  {monthOptions.map((month) => (
-                    <DropdownMenuItem
-                      key={month}
-                      onClick={() => setSelectedMonth(month)}
-                      className={`text-white hover:bg-basic-gray ${
-                        selectedMonth === month ? "bg-basic-blue" : ""
-                      }`}
-                    >
-                      {month}월
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
+                  {month}월
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* 메인 컨텐츠 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4'>
-        <div className='space-y-6'>
-          <MemberAttendanceStatusChart
-            title='전체 인원 대비 출석 현황'
-            data={analyzeData.memberAttendanceStatus}
-            year={analyzeData.year}
-            month={analyzeData.month}
-          />
+      {/* 차트 컨텐츠 */}
+      <div className='space-y-6'>
+        <MemberAttendanceStatusChart
+          title='전체 인원 대비 출석 현황'
+          data={analyzeData.memberAttendanceStatus}
+          year={analyzeData.year}
+          month={analyzeData.month}
+        />
 
-          <ChartWithAxis
-            title='요일별 출석 분석'
-            data={analyzeData.dayParticipation}
-            year={analyzeData.year}
-            month={analyzeData.month}
-          />
+        <ChartWithAxis
+          title='요일별 출석 분석'
+          data={analyzeData.dayParticipation}
+          year={analyzeData.year}
+          month={analyzeData.month}
+        />
 
-          <LocationChart
-            title='장소별 출석 분석'
-            data={analyzeData.locationParticipation}
-            year={analyzeData.year}
-            month={analyzeData.month}
-          />
-        </div>
+        <LocationChart
+          title='장소별 출석 분석'
+          data={analyzeData.locationParticipation}
+          year={analyzeData.year}
+          month={analyzeData.month}
+        />
       </div>
-    </div>
+    </AdminPageContainer>
   );
 }

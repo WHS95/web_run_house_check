@@ -126,6 +126,7 @@ export default function AdminSettingsPage() {
     <AdminSettingsManagementNew
       initialLocations={settingsData?.locations || []}
       crewId={crewId}
+      locationBasedAttendance={settingsData?.crewData?.location_based_attendance || false}
     />
   );
 }

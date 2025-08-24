@@ -17,3 +17,5 @@ export function NaverMapLoader({ children }: NaverMapLoaderProps) {
     </>
   );
 }
+
+export default NaverMapLoader;

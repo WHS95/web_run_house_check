@@ -98,7 +98,7 @@ export default function AdminSidebar({
       {/* 사이드바 오버레이 (모바일) */}
       {sidebarOpen && (
         <div
-          className='fixed inset-0 z-[55] bg-black bg-opacity-50 lg:hidden'
+          className='fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden'
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -106,7 +106,7 @@ export default function AdminSidebar({
       {/* 사이드바 */}
       <div
         className={`
-        fixed lg:static inset-y-0 left-0 z-[60] w-64 bg-basic-black-gray border-r border-basic-gray transform transition-transform duration-300 ease-in-out
+        fixed lg:fixed inset-y-0 left-0 z-50 w-64 bg-basic-black-gray border-r border-basic-gray transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >

@@ -100,6 +100,11 @@ export default function CrewLocationManagement({
 
   // 활동장소 추가/수정
   const handleLocationSubmit = async (data: CrewLocationForm) => {
+    console.log("🚀 [CrewLocationManagement] 활동장소 저장 시작");
+    console.log("📝 데이터:", data);
+    console.log("👥 크루 ID:", crewId);
+    console.log("✏️ 편집 모드:", modalState.mode);
+    
     setLoading(true);
     
     try {
@@ -109,19 +114,26 @@ export default function CrewLocationManagement({
         : "/api/admin/crew-locations";
       
       const method = isEditing ? "PUT" : "POST";
+      const requestBody = isEditing ? data : { crew_id: crewId, ...data };
+      
+      console.log("🌐 API 요청:");
+      console.log("  URL:", url);
+      console.log("  Method:", method);
+      console.log("  Body:", JSON.stringify(requestBody, null, 2));
       
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...(isEditing ? data : { crew_id: crewId, ...data }),
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log("📡 응답 상태:", response.status, response.statusText);
+      
       if (response.ok) {
         const result = await response.json();
+        console.log("✅ API 응답 성공:", result);
         
         if (isEditing) {
           setLocations(prev => 
@@ -133,15 +145,25 @@ export default function CrewLocationManagement({
         
         haptic.success();
         onLocationUpdate?.();
+        console.log("🎉 활동장소 저장 완료");
       } else {
-        throw new Error("활동장소 저장에 실패했습니다.");
+        const errorData = await response.text();
+        console.error("❌ API 응답 오류:");
+        console.error("  상태:", response.status, response.statusText);
+        console.error("  응답:", errorData);
+        throw new Error(`활동장소 저장에 실패했습니다. (${response.status})`);
       }
     } catch (error) {
-      console.error("활동장소 저장 오류:", error);
+      console.error("💥 활동장소 저장 오류:", error);
+      if (error instanceof Error) {
+        console.error("  에러 메시지:", error.message);
+        console.error("  스택 트레이스:", error.stack);
+      }
       haptic.error();
       throw error;
     } finally {
       setLoading(false);
+      console.log("🏁 활동장소 저장 프로세스 종료");
     }
   };
 

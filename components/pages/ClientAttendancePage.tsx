@@ -6,9 +6,12 @@ import PageHeader from "@/components/organisms/common/PageHeader";
 import PopupNotification, {
   NotificationType,
 } from "@/components/molecules/common/PopupNotification";
+import LocationVerificationModal from "@/components/molecules/LocationVerificationModal";
+import LocationStatusIndicator from "@/components/molecules/LocationStatusIndicator";
 import { haptic } from "@/lib/haptic";
 import { AiOutlineCalendar } from "react-icons/ai";
 import { IoChevronDown } from "react-icons/io5";
+import { MapPin } from "lucide-react";
 import LoadingSpinner from "../atoms/LoadingSpinner";
 
 const HOST_OPTIONS = [
@@ -110,6 +113,12 @@ interface ClientAttendancePageProps {
     crewInfo: any;
     locationOptions: any[];
     exerciseOptions: any[];
+    crewLocations?: Array<{
+      id: number;
+      name: string;
+      latitude: number | null;
+      longitude: number | null;
+    }>;
   };
   userStatus?: any;
   userId?: string;
@@ -129,6 +138,12 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   const [notificationType, setNotificationType] =
     useState<NotificationType | null>(null);
   const [notificationMessage, setNotificationMessage] = useState("");
+
+  // 위치 기반 출석 관련 상태
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [locationVerified, setLocationVerified] = useState<boolean | null>(null);
+  const [locationMessage, setLocationMessage] = useState("");
+  const [canAttendByLocation, setCanAttendByLocation] = useState(true); // 위치 기반 출석 가능 여부
 
   // 초기 폼 데이터
   const [formData, setFormData] = useState(() => {
@@ -175,29 +190,32 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
     }
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    if (isSubmitting || !userId) return;
+  // 위치 상태 변경 핸들러
+  const handleLocationStatusChange = useCallback((canAttend: boolean, message: string) => {
+    setCanAttendByLocation(canAttend);
+    setLocationMessage(message);
+  }, []);
 
-    // 사용자 상태 확인
-    if (userStatus && !userStatus.isActive) {
+  // 위치 검증 완료 핸들러
+  const handleLocationVerified = useCallback((isVerified: boolean, message: string) => {
+    setLocationVerified(isVerified);
+    setLocationMessage(message);
+    setShowLocationModal(false);
+
+    if (isVerified) {
+      // 위치 검증 성공 시 출석 제출
+      proceedWithSubmission();
+    } else {
+      // 위치 검증 실패
       haptic.error();
       setNotificationType("error");
-      setNotificationMessage(
-        `${userStatus.statusMessage}\n\n${userStatus.suspensionReason}`
-      );
+      setNotificationMessage(message);
       setShowNotification(true);
-      return;
     }
+  }, []);
 
-    // 허용된 시간 범위 검증
-    if (isFutureDateTime(formData.date, formData.time)) {
-      haptic.error();
-      setNotificationType("error");
-      setNotificationMessage("허용된 시간 범위를 초과했습니다.");
-      setShowNotification(true);
-      return;
-    }
-
+  // 실제 출석 제출 처리
+  const proceedWithSubmission = useCallback(async () => {
     setIsSubmitting(true);
     haptic.medium();
 
@@ -243,9 +261,51 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       setNotificationMessage("네트워크 오류가 발생했습니다.");
     } finally {
       setIsSubmitting(false);
+      setShowNotification(true);
+    }
+  }, [formData, initialFormData, userId]);
+
+  const handleSubmit = useCallback(async () => {
+    if (isSubmitting || !userId) return;
+
+    // 사용자 상태 확인
+    if (userStatus && !userStatus.isActive) {
+      haptic.error();
+      setNotificationType("error");
+      setNotificationMessage(
+        `${userStatus.statusMessage}\n\n${userStatus.suspensionReason}`
+      );
+      setShowNotification(true);
+      return;
     }
 
-    setShowNotification(true);
+    // 허용된 시간 범위 검증
+    if (isFutureDateTime(formData.date, formData.time)) {
+      haptic.error();
+      setNotificationType("error");
+      setNotificationMessage("허용된 시간 범위를 초과했습니다.");
+      setShowNotification(true);
+      return;
+    }
+
+    // 위치 기반 출석이 활성화된 경우
+    if (initialFormData?.crewInfo?.location_based_attendance) {
+      // 위치 상태가 출석 불가능한 경우 출석 차단
+      if (!canAttendByLocation) {
+        haptic.error();
+        setNotificationType("error");
+        setNotificationMessage(locationMessage || "현재 위치에서는 출석할 수 없습니다.");
+        setShowNotification(true);
+        return;
+      }
+      
+      // 위치 검증 모달 표시
+      setShowLocationModal(true);
+      return;
+    }
+
+    // 위치 기반 출석이 비활성화된 경우 바로 제출
+    proceedWithSubmission();
   }, [isSubmitting, userId, userStatus, formData, initialFormData]);
 
   const availableTimeOptions = useMemo(
@@ -414,12 +474,26 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           </div>
         </div>
 
+        {/* 위치 상태 표시 컴포넌트 */}
+        <LocationStatusIndicator
+          isLocationBasedAttendance={initialFormData?.crewInfo?.location_based_attendance || false}
+          crewLocations={initialFormData?.crewLocations || []}
+          allowedRadius={50}
+          onStatusChange={handleLocationStatusChange}
+        />
+
         {/* 제출 버튼 */}
         <button
           onClick={handleSubmit}
-          disabled={isSubmitting || (userStatus && !userStatus.isActive)}
+          disabled={
+            isSubmitting || 
+            (userStatus && !userStatus.isActive) ||
+            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
+          }
           className={`mt-[2vh] p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-[7vh] font-bold text-white ${
-            isSubmitting || (userStatus && !userStatus.isActive)
+            isSubmitting || 
+            (userStatus && !userStatus.isActive) ||
+            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-basic-blue hover:bg-blue-600"
           }`}
@@ -432,11 +506,30 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
             </div>
           ) : userStatus && !userStatus.isActive ? (
             "출석 불가"
+          ) : initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation ? (
+            <div className='flex items-center justify-center space-x-[1vw]'>
+              <MapPin className="w-4 h-4" />
+              <span>위치 확인 필요</span>
+            </div>
+          ) : initialFormData?.crewInfo?.location_based_attendance ? (
+            <div className='flex items-center justify-center space-x-[1vw]'>
+              <MapPin className="w-4 h-4" />
+              <span>위치 확인 후 출석</span>
+            </div>
           ) : (
             "출석 체크"
           )}
         </button>
       </div>
+
+      {/* 위치 검증 모달 */}
+      <LocationVerificationModal
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        onVerified={handleLocationVerified}
+        crewLocations={initialFormData?.crewLocations || []}
+        allowedRadius={50}
+      />
 
       {/* 알림 팝업 */}
       {notificationType && (

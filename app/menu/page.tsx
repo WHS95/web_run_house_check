@@ -15,9 +15,12 @@ import { createBrowserClient } from "@supabase/ssr";
 import dynamic from "next/dynamic";
 
 // 동적 로딩으로 번들 크기 최적화
-const PageHeader = dynamic(() => import("@/components/organisms/common/PageHeader"), {
-  ssr: true,
-});
+const PageHeader = dynamic(
+  () => import("@/components/organisms/common/PageHeader"),
+  {
+    ssr: true,
+  }
+);
 
 const menuItems = [
   {
@@ -47,7 +50,7 @@ const menuItems = [
   {
     icon: MapPin,
     title: "트랙 페이스 계산기",
-    description: "1레인/2레인 트랙 페이스 계산",
+    description: "트랙 페이스 계산",
     href: "/calculator/track-pace",
   },
 ];
@@ -56,18 +59,25 @@ export default function MenuPage() {
   const router = useRouter();
 
   // Supabase 클라이언트 메모화
-  const supabase = useMemo(() => createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  ), []);
+  const supabase = useMemo(
+    () =>
+      createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      ),
+    []
+  );
 
-  const handleItemClick = useCallback((item: (typeof menuItems)[0]) => {
-    // 햅틱 피드백
-    if (typeof window !== "undefined" && window.navigator.vibrate) {
-      window.navigator.vibrate(50);
-    }
-    router.push(item.href);
-  }, [router]);
+  const handleItemClick = useCallback(
+    (item: (typeof menuItems)[0]) => {
+      // 햅틱 피드백
+      if (typeof window !== "undefined" && window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+      router.push(item.href);
+    },
+    [router]
+  );
 
   const handleLogout = useCallback(async () => {
     try {
@@ -95,7 +105,7 @@ export default function MenuPage() {
 
   return (
     <div className='flex flex-col h-screen bg-basic-black main-content'>
-      <div className='fixed top-0 right-0 left-0 z-10 bg-basic-black-gray'>
+      <div className='fixed top-0 left-0 right-0 z-10 bg-basic-black-gray'>
         <PageHeader
           title='러닝 계산기'
           iconColor='white'
@@ -113,10 +123,10 @@ export default function MenuPage() {
               <button
                 key={index}
                 onClick={() => handleItemClick(item)}
-                className='flex justify-between items-center px-2 py-6 w-full transition-colors hover:bg-basic-black-gray'
+                className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-basic-black-gray'
               >
-                <div className='flex gap-3 items-center'>
-                  <div className='flex justify-center items-center w-10 h-10 rounded-full bg-basic-black-gray'>
+                <div className='flex items-center gap-3'>
+                  <div className='flex items-center justify-center w-10 h-10 rounded-full bg-basic-black-gray'>
                     <IconComponent size={20} className='text-white' />
                   </div>
                   <div className='text-left'>
@@ -137,10 +147,10 @@ export default function MenuPage() {
           {/* 로그아웃 버튼 */}
           <button
             onClick={handleLogout}
-            className='flex justify-between items-center px-2 py-6 w-full transition-colors hover:bg-red-900/20'
+            className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-red-900/20'
           >
-            <div className='flex gap-3 items-center'>
-              <div className='flex justify-center items-center w-10 h-10 bg-red-600 rounded-full'>
+            <div className='flex items-center gap-3'>
+              <div className='flex items-center justify-center w-10 h-10 bg-red-600 rounded-full'>
                 <LogOut size={20} className='text-white' />
               </div>
               <div className='text-left'>

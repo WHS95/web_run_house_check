@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { CrewLocation, CrewLocationForm } from "@/lib/types/crew-locations";
 import NaverMapContainer from "@/components/map/NaverMapContainer";
 import LocationList from "./LocationList";
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { MapPin, Plus, Settings } from "lucide-react";
 import { haptic } from "@/lib/haptic";
+import { useNaverMap } from "@/hooks/useNaverMap";
 
 interface CrewLocationManagementProps {
   crewId: string;
@@ -26,9 +27,17 @@ export default function CrewLocationManagement({
   onLocationUpdate,
 }: CrewLocationManagementProps) {
   const [locations, setLocations] = useState<CrewLocation[]>(initialLocations);
-  const [selectedLocation, setSelectedLocation] = useState<CrewLocation | null>(null);
-  const [isLocationBasedEnabled, setIsLocationBasedEnabled] = useState(locationBasedAttendance);
-  
+  const [selectedLocation, setSelectedLocation] = useState<CrewLocation | null>(
+    null
+  );
+  const [isLocationBasedEnabled, setIsLocationBasedEnabled] = useState(
+    locationBasedAttendance
+  );
+
+  const mapRef = useRef<HTMLDivElement>(null);
+  const { latitude, longitude, initMap, updateMapLocation } =
+    useNaverMap(mapRef);
+
   // 모달 상태
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -48,14 +57,17 @@ export default function CrewLocationManagement({
   }, [initialLocations]);
 
   // 모달 열기
-  const openModal = useCallback((mode: "add" | "edit" | "delete", location?: CrewLocation) => {
-    haptic.light();
-    setModalState({
-      isOpen: true,
-      mode,
-      location: location || null,
-    });
-  }, []);
+  const openModal = useCallback(
+    (mode: "add" | "edit" | "delete", location?: CrewLocation) => {
+      haptic.light();
+      setModalState({
+        isOpen: true,
+        mode,
+        location: location || null,
+      });
+    },
+    []
+  );
 
   // 모달 닫기
   const closeModal = useCallback(() => {
@@ -72,16 +84,19 @@ export default function CrewLocationManagement({
     haptic.medium();
 
     try {
-      const response = await fetch("/api/admin/crew-settings/location-attendance", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          crew_id: crewId,
-          location_based_attendance: enabled,
-        }),
-      });
+      const response = await fetch(
+        "/api/admin/crew-settings/location-attendance",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            crew_id: crewId,
+            location_based_attendance: enabled,
+          }),
+        }
+      );
 
       if (response.ok) {
         setIsLocationBasedEnabled(enabled);
@@ -104,23 +119,23 @@ export default function CrewLocationManagement({
     console.log("📝 데이터:", data);
     console.log("👥 크루 ID:", crewId);
     console.log("✏️ 편집 모드:", modalState.mode);
-    
+
     setLoading(true);
-    
+
     try {
       const isEditing = modalState.mode === "edit" && modalState.location;
-      const url = isEditing 
+      const url = isEditing
         ? `/api/admin/crew-locations/${modalState.location!.id}`
         : "/api/admin/crew-locations";
-      
+
       const method = isEditing ? "PUT" : "POST";
       const requestBody = isEditing ? data : { crew_id: crewId, ...data };
-      
+
       console.log("🌐 API 요청:");
       console.log("  URL:", url);
       console.log("  Method:", method);
       console.log("  Body:", JSON.stringify(requestBody, null, 2));
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -130,19 +145,21 @@ export default function CrewLocationManagement({
       });
 
       console.log("📡 응답 상태:", response.status, response.statusText);
-      
+
       if (response.ok) {
         const result = await response.json();
         console.log("✅ API 응답 성공:", result);
-        
+
         if (isEditing) {
-          setLocations(prev => 
-            prev.map(loc => loc.id === modalState.location!.id ? result.data : loc)
+          setLocations((prev) =>
+            prev.map((loc) =>
+              loc.id === modalState.location!.id ? result.data : loc
+            )
           );
         } else {
-          setLocations(prev => [...prev, result.data]);
+          setLocations((prev) => [...prev, result.data]);
         }
-        
+
         haptic.success();
         onLocationUpdate?.();
         console.log("🎉 활동장소 저장 완료");
@@ -170,19 +187,19 @@ export default function CrewLocationManagement({
   // 활동장소 삭제
   const handleLocationDelete = async (location: CrewLocation) => {
     setLoading(true);
-    
+
     try {
       const response = await fetch(`/api/admin/crew-locations/${location.id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
-        setLocations(prev => prev.filter(loc => loc.id !== location.id));
-        
+        setLocations((prev) => prev.filter((loc) => loc.id !== location.id));
+
         if (selectedLocation?.id === location.id) {
           setSelectedLocation(null);
         }
-        
+
         haptic.success();
         onLocationUpdate?.();
       } else {
@@ -200,7 +217,7 @@ export default function CrewLocationManagement({
   // 활동장소 상태 토글
   const handleLocationToggle = async (location: CrewLocation) => {
     setLoading(true);
-    
+
     try {
       const response = await fetch(`/api/admin/crew-locations/${location.id}`, {
         method: "PATCH",
@@ -214,10 +231,10 @@ export default function CrewLocationManagement({
 
       if (response.ok) {
         const result = await response.json();
-        setLocations(prev => 
-          prev.map(loc => loc.id === location.id ? result.data : loc)
+        setLocations((prev) =>
+          prev.map((loc) => (loc.id === location.id ? result.data : loc))
         );
-        
+
         haptic.success();
         onLocationUpdate?.();
       } else {
@@ -232,59 +249,62 @@ export default function CrewLocationManagement({
   };
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* 위치 기반 출석 설정 */}
-      <Card className="bg-basic-black-gray border-gray-600">
+      <Card className='border-gray-600 bg-basic-black-gray'>
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Settings className="h-5 w-5 text-basic-blue" />
+          <CardTitle className='flex items-center gap-2 text-white'>
+            <Settings className='w-5 h-5 text-basic-blue' />
             출석 설정
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label htmlFor="location-based" className="text-white font-medium">
+          <div className='flex items-center justify-between'>
+            <div className='space-y-1'>
+              <Label
+                htmlFor='location-based'
+                className='font-medium text-white'
+              >
                 위치 기반 출석
               </Label>
-              <p className="text-sm text-gray-400">
+              <p className='text-sm text-gray-400'>
                 등록된 활동장소 근처에서만 출석을 허용합니다
               </p>
             </div>
             <Switch
-              id="location-based"
+              id='location-based'
               checked={isLocationBasedEnabled}
               onCheckedChange={handleLocationBasedToggle}
               disabled={loading}
-              className="data-[state=checked]:bg-basic-blue"
+              className='data-[state=checked]:bg-basic-blue'
             />
           </div>
         </CardContent>
       </Card>
 
       {/* 활동장소 관리 */}
-      <Card className="bg-basic-black-gray border-gray-600">
+      <Card className='border-gray-600 bg-basic-black-gray'>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-white flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-basic-blue" />
+          <div className='flex items-center justify-between'>
+            <CardTitle className='flex items-center gap-2 text-white'>
+              <MapPin className='w-5 h-5 text-basic-blue' />
               활동장소 관리
             </CardTitle>
             <Button
               onClick={() => openModal("add")}
-              className="bg-basic-blue hover:bg-basic-blue/80 text-white"
+              className='text-white bg-basic-blue hover:bg-basic-blue/80'
               disabled={loading}
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className='w-4 h-4 mr-2' />
               장소 추가
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CardContent className='p-6'>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             {/* 활동장소 목록 */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white">등록된 장소</h3>
+            <div className='space-y-4'>
+              <h3 className='text-lg font-semibold text-white'>등록된 장소</h3>
               <LocationList
                 locations={locations}
                 selectedLocation={selectedLocation}
@@ -297,28 +317,26 @@ export default function CrewLocationManagement({
             </div>
 
             {/* 지도 */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white">위치 보기</h3>
-              <NaverMapContainer
-                locations={locations.filter(loc => loc.is_active)}
-                selectedLocation={selectedLocation}
-                onLocationClick={setSelectedLocation}
-                height="400px"
-                showControls={true}
+            <div className='space-y-4'>
+              <h3 className='text-lg font-semibold text-white'>위치 보기</h3>
+              <div
+                ref={mapRef}
+                className='w-full h-[400px] border border-gray-300 rounded'
               />
               {selectedLocation && (
-                <Card className="bg-basic-black border-gray-600">
-                  <CardContent className="p-4">
-                    <h4 className="font-semibold text-white mb-2">
+                <Card className='border-gray-600 bg-basic-black'>
+                  <CardContent className='p-4'>
+                    <h4 className='mb-2 font-semibold text-white'>
                       {selectedLocation.name}
                     </h4>
                     {selectedLocation.description && (
-                      <p className="text-sm text-gray-300 mb-2">
+                      <p className='mb-2 text-sm text-gray-300'>
                         {selectedLocation.description}
                       </p>
                     )}
-                    <p className="text-xs text-gray-400">
-                      좌표: {selectedLocation.latitude?.toFixed(6)}, {selectedLocation.longitude?.toFixed(6)}
+                    <p className='text-xs text-gray-400'>
+                      좌표: {selectedLocation.latitude?.toFixed(6)},{" "}
+                      {selectedLocation.longitude?.toFixed(6)}
                     </p>
                   </CardContent>
                 </Card>

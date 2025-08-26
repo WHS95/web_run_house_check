@@ -1,11 +1,12 @@
 "use client";
-
-import React, { useState, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
+// import React, { useState, useTransition } from "react";
 import { MapPin, Users, Ticket } from "lucide-react";
 import AdminCrewMembersManagement from "@/components/organisms/AdminCrewMembersManagement";
 import AdminInviteCodesManagement from "@/components/organisms/AdminInviteCodesManagement";
 import CrewLocationManagement from "@/components/admin/locations/CrewLocationManagement";
 import NaverMapLoader from "@/components/map/NaverMapLoader";
+
 import AdminPageContainer from "@/components/layouts/AdminPageContainer";
 import PopupNotification, {
   NotificationType,
@@ -66,12 +67,11 @@ export default function AdminSettingsManagementNew({
     showNotification("변경사항이 저장되었습니다.", "success");
   };
 
-
   return (
     <AdminPageContainer>
       {/* 탭 네비게이션 */}
-      <div className='bg-basic-black-gray rounded-lg p-2 shadow-sm sticky top-4 lg:top-6 z-30'>
-        <div className='flex rounded-lg bg-basic-gray/30 p-1'>
+      <div className='sticky z-30 p-2 rounded-lg shadow-sm bg-basic-black-gray top-4 lg:top-6'>
+        <div className='flex p-1 rounded-lg bg-basic-gray/30'>
           <button
             onClick={() => {
               haptic.light();
@@ -84,7 +84,7 @@ export default function AdminSettingsManagementNew({
             }`}
           >
             <MapPin className='w-4 h-4' />
-            <span className="hidden sm:inline">장소</span>
+            <span className='hidden sm:inline'>장소</span>
           </button>
           <button
             onClick={() => {
@@ -98,7 +98,7 @@ export default function AdminSettingsManagementNew({
             }`}
           >
             <Users className='w-4 h-4' />
-            <span className="hidden sm:inline">운영진</span>
+            <span className='hidden sm:inline'>운영진</span>
           </button>
           <button
             onClick={() => {
@@ -112,7 +112,7 @@ export default function AdminSettingsManagementNew({
             }`}
           >
             <Ticket className='w-4 h-4' />
-            <span className="hidden sm:inline">초대코드</span>
+            <span className='hidden sm:inline'>초대코드</span>
           </button>
         </div>
       </div>

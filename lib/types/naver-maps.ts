@@ -16,6 +16,7 @@ export interface NaverLatLng {
 
 export interface Marker {
   setPosition: (latlng: NaverLatLng) => void;
+  setMap: (map: NaverMap | null) => void;
 }
 
 export interface NaverClickEvent {
@@ -39,6 +40,14 @@ export interface NaverMapsAPI {
         options: { query: string },
         callback: (status: string, response: GeocodeResponse) => void
       ) => void;
+      reverseGeocode: (
+        options: { coords: NaverLatLng; orders: string },
+        callback: (status: string, response: any) => void
+      ) => void;
+      OrderType: {
+        ROAD_ADDR: string;
+        ADDR: string;
+      };
       Status: {
         ERROR: string;
       };

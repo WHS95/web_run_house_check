@@ -42,11 +42,20 @@ export default function AddressSearch({
   }, [hookHistory]);
 
   // 검색 기록 저장
-  const saveToHistory = useCallback((query: string) => {
-    const newHistory = [query, ...searchHistory.filter(item => item !== query)].slice(0, 5);
-    setSearchHistory(newHistory);
-    localStorage.setItem("address-search-history", JSON.stringify(newHistory));
-  }, [searchHistory]);
+  const saveToHistory = useCallback(
+    (query: string) => {
+      const newHistory = [
+        query,
+        ...searchHistory.filter((item) => item !== query),
+      ].slice(0, 5);
+      setSearchHistory(newHistory);
+      localStorage.setItem(
+        "address-search-history",
+        JSON.stringify(newHistory)
+      );
+    },
+    [searchHistory]
+  );
 
   // 주소 검색 실행
   const handleSearch = useCallback(async () => {
@@ -63,13 +72,15 @@ export default function AddressSearch({
           position: { lat, lng },
           roadAddress: searchQuery,
         };
-        
+
         setSearchResults([searchResult]);
         setIsOpen(true);
         saveToHistory(searchQuery);
         setLoading(false);
       },
       (errorMessage: string) => {
+        console.log("error1231", errorMessage);
+        //검색 결과가 없습니다. 다른 키워드로 검색해 보세요.( ex.도로명 주소 )
         setError(errorMessage);
         setSearchResults([]);
         setIsOpen(true);
@@ -124,71 +135,77 @@ export default function AddressSearch({
 
   return (
     <div className={`relative address-search-container ${className}`}>
-      <div className="flex gap-2">
+      <div className='flex gap-2'>
         <Input
-          type="text"
+          type='text'
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           placeholder={placeholder}
-          className="flex-1 bg-basic-black-gray border-gray-600 text-white placeholder-gray-400 focus:border-basic-blue"
+          className='flex-1 text-white placeholder-gray-400 border-gray-600 bg-basic-black-gray focus:border-basic-blue'
         />
         <Button
           onClick={handleSearch}
           disabled={loading || !searchQuery.trim()}
-          className="bg-basic-blue hover:bg-basic-blue/80 text-white"
+          className='text-white bg-basic-blue hover:bg-basic-blue/80'
         >
           {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className='w-4 h-4 animate-spin' />
           ) : (
-            <Search className="h-4 w-4" />
+            <Search className='w-4 h-4' />
           )}
         </Button>
       </div>
 
       {/* 검색 결과 / 검색 기록 드롭다운 */}
       {isOpen && (
-        <Card className="absolute top-full left-0 right-0 mt-1 z-50 bg-basic-black-gray border-gray-600 shadow-lg">
-          <CardContent className="p-0">
+        <Card className='absolute left-0 right-0 z-50 mt-1 border-gray-600 shadow-lg top-full bg-basic-black-gray'>
+          <CardContent className='p-0'>
             {loading && (
-              <div className="p-4 text-center">
-                <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2 text-basic-blue" />
-                <p className="text-sm text-gray-400">주소 검색 중...</p>
+              <div className='p-4 text-center'>
+                <Loader2 className='w-5 h-5 mx-auto mb-2 animate-spin text-basic-blue' />
+                <p className='text-sm text-gray-400'>주소 검색 중...</p>
               </div>
             )}
 
             {error && (
-              <div className="p-4 text-center">
-                <p className="text-sm text-red-400">검색 중 오류가 발생했습니다</p>
-                <p className="text-xs text-gray-500 mt-1">{error}</p>
+              <div className='p-4 text-center'>
+                <p className='text-sm text-red-400'>
+                  검색 중 오류가 발생했습니다
+                </p>
+                <p className='mt-1 text-xs text-gray-500'>{error}</p>
               </div>
             )}
 
             {!loading && !error && searchResults.length > 0 && (
               <div>
-                <div className="p-2 border-b border-gray-600">
-                  <p className="text-xs font-medium text-gray-400 uppercase">검색 결과</p>
+                <div className='p-2 border-b border-gray-600'>
+                  <p className='text-xs font-medium text-gray-400 uppercase'>
+                    검색 결과
+                  </p>
                 </div>
                 {searchResults.map((result, index) => (
                   <button
                     key={index}
                     onClick={() => handleResultSelect(result)}
-                    className="w-full p-3 text-left hover:bg-basic-black transition-colors"
+                    className='w-full p-3 text-left transition-colors hover:bg-basic-black'
                   >
-                    <div className="flex items-start gap-3">
-                      <MapPin className="h-4 w-4 mt-1 text-basic-blue flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white font-medium truncate">
+                    <div className='flex items-start gap-3'>
+                      <MapPin className='flex-shrink-0 w-4 h-4 mt-1 text-basic-blue' />
+                      <div className='flex-1 min-w-0'>
+                        <p className='text-sm font-medium text-white truncate'>
                           {result.roadAddress || result.address}
                         </p>
-                        {result.roadAddress && result.address !== result.roadAddress && (
-                          <p className="text-xs text-gray-400 mt-1">
-                            지번: {result.address}
-                          </p>
-                        )}
-                        <p className="text-xs text-gray-500 mt-1">
-                          좌표: {result.position.lat.toFixed(6)}, {result.position.lng.toFixed(6)}
+                        {result.roadAddress &&
+                          result.address !== result.roadAddress && (
+                            <p className='mt-1 text-xs text-gray-400'>
+                              지번: {result.address}
+                            </p>
+                          )}
+                        <p className='mt-1 text-xs text-gray-500'>
+                          좌표: {result.position.lat.toFixed(6)},{" "}
+                          {result.position.lng.toFixed(6)}
                         </p>
                       </div>
                     </div>
@@ -197,27 +214,36 @@ export default function AddressSearch({
               </div>
             )}
 
-            {!loading && !error && searchResults.length === 0 && searchQuery && (
-              <div className="p-4 text-center">
-                <p className="text-sm text-gray-400">검색 결과가 없습니다</p>
-                <p className="text-xs text-gray-500 mt-1">다른 키워드로 검색해보세요</p>
-              </div>
-            )}
+            {!loading &&
+              !error &&
+              searchResults.length === 0 &&
+              searchQuery && (
+                <div className='p-4 text-center'>
+                  <p className='text-sm text-gray-400'>검색 결과가 없습니다</p>
+                  <p className='mt-1 text-xs text-gray-500'>
+                    다른 키워드로 검색해보세요
+                  </p>
+                </div>
+              )}
 
             {!loading && !error && !searchQuery && searchHistory.length > 0 && (
               <div>
-                <div className="p-2 border-b border-gray-600">
-                  <p className="text-xs font-medium text-gray-400 uppercase">최근 검색</p>
+                <div className='p-2 border-b border-gray-600'>
+                  <p className='text-xs font-medium text-gray-400 uppercase'>
+                    최근 검색
+                  </p>
                 </div>
                 {searchHistory.map((historyItem, index) => (
                   <button
                     key={index}
                     onClick={() => handleHistorySelect(historyItem)}
-                    className="w-full p-3 text-left hover:bg-basic-black transition-colors"
+                    className='w-full p-3 text-left transition-colors hover:bg-basic-black'
                   >
-                    <div className="flex items-center gap-3">
-                      <Search className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                      <span className="text-sm text-gray-300 truncate">{historyItem}</span>
+                    <div className='flex items-center gap-3'>
+                      <Search className='flex-shrink-0 w-4 h-4 text-gray-400' />
+                      <span className='text-sm text-gray-300 truncate'>
+                        {historyItem}
+                      </span>
                     </div>
                   </button>
                 ))}

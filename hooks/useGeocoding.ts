@@ -241,6 +241,69 @@ export const useGeocoding = () => {
     );
   };
 
+  // 역지오코딩 (좌표 -> 주소)
+  const reverseGeocode = async (
+    lat: number,
+    lng: number,
+    onSuccess: (roadAddress: string, jibunAddress: string) => void,
+    onError: (message: string) => void
+  ) => {
+    if (!window.naver || !window.naver.maps || !window.naver.maps.Service) {
+      onError("네이버 지도 API가 로드되지 않았습니다.");
+      return;
+    }
+
+    const coords = new window.naver.maps.LatLng(lat, lng);
+
+    window.naver.maps.Service.reverseGeocode(
+      {
+        coords: coords,
+        orders: [
+          window.naver.maps.Service.OrderType.ROAD_ADDR,
+          window.naver.maps.Service.OrderType.ADDR
+        ].join(',')
+      },
+      (status: string, response: any) => {
+        if (status === window.naver.maps.Service.Status.ERROR) {
+          onError("주소 변환에 실패했습니다.");
+          return;
+        }
+
+        if (!response.v2 || !response.v2.results || response.v2.results.length === 0) {
+          onError("해당 위치의 주소를 찾을 수 없습니다.");
+          return;
+        }
+
+        const results = response.v2.results;
+        let roadAddress = "";
+        let jibunAddress = "";
+
+        // 도로명 주소 찾기
+        const roadResult = results.find((result: any) => result.name === "roadaddr");
+        if (roadResult && roadResult.region) {
+          const region = roadResult.region;
+          const land = roadResult.land || {};
+          roadAddress = `${region.area1.name} ${region.area2.name} ${region.area3.name} ${land.name || ""} ${land.number1 || ""} ${land.number2 ? `-${land.number2}` : ""}`.trim();
+        }
+
+        // 지번 주소 찾기
+        const addrResult = results.find((result: any) => result.name === "addr");
+        if (addrResult && addrResult.region) {
+          const region = addrResult.region;
+          const land = addrResult.land || {};
+          jibunAddress = `${region.area1.name} ${region.area2.name} ${region.area3.name} ${land.type || ""} ${land.number1 || ""} ${land.number2 ? `-${land.number2}` : ""}`.trim();
+        }
+
+        if (!roadAddress && !jibunAddress) {
+          onError("주소 정보를 찾을 수 없습니다.");
+          return;
+        }
+
+        onSuccess(roadAddress, jibunAddress || roadAddress);
+      }
+    );
+  };
+
   return {
     searchHistory,
     setSearchHistory,
@@ -248,5 +311,6 @@ export const useGeocoding = () => {
     searchAddressMultiple,
     getAddressCache,
     setAddressCache,
+    reverseGeocode,
   };
 };

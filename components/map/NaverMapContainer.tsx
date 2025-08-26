@@ -21,7 +21,7 @@ export default function NaverMapContainer({
   selectedLocation,
   onLocationClick,
   onMapClick,
-  center = { lat: 37.5665, lng: 126.9780 }, // 서울 시청 기본값
+  center = { lat: 37.5665, lng: 126.978 }, // 서울 시청 기본값
   zoom = 15,
   height = "400px",
   showControls = true,
@@ -29,7 +29,7 @@ export default function NaverMapContainer({
 }: NaverMapContainerProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<any[]>([]);
-  
+
   const [map, setMap] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,15 @@ export default function NaverMapContainer({
 
     const initMap = () => {
       try {
+        console.log("🗺️ [NaverMapContainer] 지도 초기화 시작");
+        console.log(
+          "🔑 Client ID:",
+          process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID
+        );
+        console.log("🌐 Naver API 상태:", !!window.naver?.maps);
+
         if (!window.naver?.maps) {
+          console.error("❌ 네이버 지도 API가 로드되지 않았습니다.");
           setError("네이버 지도 API가 로드되지 않았습니다.");
           return;
         }
@@ -57,18 +65,28 @@ export default function NaverMapContainer({
 
         setMap(naverMap);
         setIsLoaded(true);
+        console.log("✅ [NaverMapContainer] 지도 초기화 완료");
       } catch (err) {
+        console.error("❌ [NaverMapContainer] 지도 초기화 오류:", err);
         setError("지도 초기화 중 오류가 발생했습니다.");
-        console.error("Map initialization error:", err);
       }
     };
+
+    console.log("⏳ [NaverMapContainer] 네이버 지도 API 로딩 상태 확인");
+    console.log("window", window);
+    console.log("window.naver", window.naver);
+    console.log("window.naver.map", window.naver?.maps);
 
     if (window.naver?.maps) {
       initMap();
     } else {
+      initMap();
+      console.log("⏳ [NaverMapContainer] 네이버 지도 API 로딩 대기 중...");
+
       // API 로딩 대기
       const checkAPI = setInterval(() => {
         if (window.naver?.maps) {
+          console.log("✅ [NaverMapContainer] 네이버 지도 API 로딩 완료");
           clearInterval(checkAPI);
           initMap();
         }
@@ -78,6 +96,9 @@ export default function NaverMapContainer({
       setTimeout(() => {
         clearInterval(checkAPI);
         if (!window.naver?.maps) {
+          console.error(
+            "❌ [NaverMapContainer] 네이버 지도 API 로딩 시간 초과"
+          );
           setError("네이버 지도 API 로딩 시간이 초과되었습니다.");
         }
       }, 10000);
@@ -85,19 +106,24 @@ export default function NaverMapContainer({
   }, [center, zoom, showControls]);
 
   // 마커 생성 함수
-  const createMarker = useCallback((position: { lat: number; lng: number }, options: any) => {
-    if (!map || !window.naver?.maps) return null;
+  const createMarker = useCallback(
+    (position: { lat: number; lng: number }, options: any) => {
+      if (!map || !window.naver?.maps) return null;
 
-    return new window.naver.maps.Marker({
-      position: new window.naver.maps.LatLng(position.lat, position.lng),
-      map: map,
-      ...options,
-    });
-  }, [map]);
+      return new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(position.lat, position.lng),
+        map: map,
+        ...options,
+      });
+    },
+    [map]
+  );
 
   // 모든 마커 제거 함수
   const removeAllMarkers = useCallback(() => {
-    markersRef.current.forEach(marker => {
+    markersRef.current.forEach((marker) => {
+      console.log("Removing marker:", marker);
+
       if (marker.setMap) {
         marker.setMap(null);
       }
@@ -106,10 +132,13 @@ export default function NaverMapContainer({
   }, []);
 
   // 지도 중심 이동 함수
-  const panTo = useCallback((position: { lat: number; lng: number }) => {
-    if (!map || !window.naver?.maps) return;
-    map.setCenter(new window.naver.maps.LatLng(position.lat, position.lng));
-  }, [map]);
+  const panTo = useCallback(
+    (position: { lat: number; lng: number }) => {
+      if (!map || !window.naver?.maps) return;
+      map.setCenter(new window.naver.maps.LatLng(position.lat, position.lng));
+    },
+    [map]
+  );
 
   // 마커 생성 및 관리
   const updateMarkers = useCallback(() => {
@@ -125,18 +154,22 @@ export default function NaverMapContainer({
 
       const position = { lat: location.latitude, lng: location.longitude };
       const isSelected = selectedLocation?.id === location.id;
-      
+
       const marker = createMarker(position, {
         title: location.name,
         icon: {
           content: `
             <div class="relative">
               <div class="w-8 h-8 bg-basic-blue rounded-full border-2 border-white shadow-lg flex items-center justify-center ${
-                isSelected ? 'ring-2 ring-basic-blue ring-offset-2' : ''
+                isSelected ? "ring-2 ring-basic-blue ring-offset-2" : ""
               }">
                 <div class="w-3 h-3 bg-white rounded-full"></div>
               </div>
-              ${isSelected ? '<div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-4 border-transparent border-t-basic-blue"></div>' : ''}
+              ${
+                isSelected
+                  ? '<div class="absolute -bottom-1 left-1/2 w-0 h-0 border-t-4 border-r-2 border-l-2 border-transparent transform -translate-x-1/2 border-t-basic-blue"></div>'
+                  : ""
+              }
             </div>
           `,
           // size와 anchor는 자동으로 처리됨
@@ -152,7 +185,15 @@ export default function NaverMapContainer({
 
       markersRef.current.push(marker);
     });
-  }, [map, isLoaded, locations, selectedLocation, createMarker, removeAllMarkers, onLocationClick]);
+  }, [
+    map,
+    isLoaded,
+    locations,
+    selectedLocation,
+    createMarker,
+    removeAllMarkers,
+    onLocationClick,
+  ]);
 
   // 지도 클릭 이벤트
   useEffect(() => {
@@ -168,7 +209,11 @@ export default function NaverMapContainer({
 
     let listener: any = null;
     if (window.naver?.maps?.Event) {
-      listener = window.naver.maps.Event.addListener(map, "click", clickHandler);
+      listener = window.naver.maps.Event.addListener(
+        map,
+        "click",
+        clickHandler
+      );
     }
 
     return () => {
@@ -185,43 +230,52 @@ export default function NaverMapContainer({
 
   // 선택된 위치로 지도 이동
   useEffect(() => {
-    if (selectedLocation && selectedLocation.latitude && selectedLocation.longitude) {
-      panTo({ lat: selectedLocation.latitude, lng: selectedLocation.longitude });
+    if (
+      selectedLocation &&
+      selectedLocation.latitude &&
+      selectedLocation.longitude
+    ) {
+      panTo({
+        lat: selectedLocation.latitude,
+        lng: selectedLocation.longitude,
+      });
     }
   }, [selectedLocation, panTo]);
+
+  console.log("Map State:", { map, isLoaded, error });
 
   if (error) {
     return (
       <div
-        className="flex items-center justify-center bg-basic-black-gray rounded-lg border border-gray-600"
+        className='flex items-center justify-center border border-gray-600 rounded-lg bg-basic-black-gray'
         style={{ height }}
       >
-        <div className="text-center">
-          <p className="text-red-400 mb-2">지도 로딩 실패</p>
-          <p className="text-sm text-gray-400">{error}</p>
+        <div className='text-center'>
+          <p className='mb-2 text-red-400'>지도 로딩 실패</p>
+          <p className='text-sm text-gray-400'>{error}</p>
         </div>
       </div>
     );
   }
 
-  if (!isLoaded) {
-    return (
-      <div
-        className="flex items-center justify-center bg-basic-black-gray rounded-lg border border-gray-600"
-        style={{ height }}
-      >
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-basic-blue border-t-transparent rounded-full animate-spin mb-2"></div>
-          <p className="text-gray-400">지도 로딩 중...</p>
-        </div>
-      </div>
-    );
+  if (isLoaded) {
+    // return (
+    //   // <div
+    //   //   className='flex items-center justify-center border border-gray-600 rounded-lg bg-basic-black-gray'
+    //   //   style={{ height }}
+    //   // >
+    //   //   <div className='text-center'>
+    //   //     <div className='w-8 h-8 mb-2 border-2 rounded-full animate-spin border-basic-blue border-t-transparent'></div>
+    //   //     <p className='text-gray-400'>지도 로딩 중...</p>
+    //   //   </div>
+    //   // </div>
+    // );
   }
 
   return (
     <div
       ref={mapRef}
-      className="w-full rounded-lg overflow-hidden border border-gray-600"
+      className='w-full overflow-hidden border border-gray-600 rounded-lg'
       style={{ height }}
     />
   );

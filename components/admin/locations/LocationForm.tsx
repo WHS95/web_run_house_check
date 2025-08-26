@@ -5,12 +5,13 @@ import { CrewLocation, CrewLocationForm } from "@/lib/types/crew-locations";
 import { NaverMapPosition } from "@/lib/types/naver-maps";
 import NaverMapContainer from "@/components/map/NaverMapContainer";
 import AddressSearch from "@/components/map/AddressSearch";
+import { useGeocoding } from "@/hooks/useGeocoding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Save, X } from "lucide-react";
+import { MapPin, Save, X, RefreshCw } from "lucide-react";
 
 interface LocationFormProps {
   initialData?: CrewLocation | null;
@@ -43,6 +44,9 @@ export default function LocationForm({
   const [selectedPosition, setSelectedPosition] =
     useState<NaverMapPosition | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [reverseGeocoding, setReverseGeocoding] = useState(false);
+
+  const { reverseGeocode } = useGeocoding();
 
   // 초기 데이터 설정
   useEffect(() => {
@@ -114,7 +118,9 @@ export default function LocationForm({
   };
 
   // 지도 클릭 처리
-  const handleMapClick = (position: NaverMapPosition) => {
+  const handleMapClick = async (position: NaverMapPosition) => {
+    console.log("🗺️ [LocationForm] 지도 클릭:", position);
+    
     setFormData((prev) => ({
       ...prev,
       latitude: position.lat,
@@ -130,6 +136,32 @@ export default function LocationForm({
         position: "",
       }));
     }
+
+    // 자동으로 역지오코딩 실행
+    await handleReverseGeocode(position.lat, position.lng);
+  };
+
+  // 역지오코딩 실행
+  const handleReverseGeocode = async (lat: number, lng: number) => {
+    console.log("🔄 [LocationForm] 역지오코딩 시작:", { lat, lng });
+    setReverseGeocoding(true);
+
+    reverseGeocode(
+      lat,
+      lng,
+      (roadAddress: string, jibunAddress: string) => {
+        console.log("✅ [LocationForm] 역지오코딩 성공:", { roadAddress, jibunAddress });
+        setFormData((prev) => ({
+          ...prev,
+          address: roadAddress || jibunAddress,
+        }));
+        setReverseGeocoding(false);
+      },
+      (error: string) => {
+        console.error("❌ [LocationForm] 역지오코딩 실패:", error);
+        setReverseGeocoding(false);
+      }
+    );
   };
 
   // 폼 제출
@@ -232,36 +264,72 @@ export default function LocationForm({
               </span>
             </Label>
             <NaverMapContainer
-              locations={[]}
+              locations={
+                selectedPosition
+                  ? [
+                      {
+                        id: 0,
+                        crew_id: "",
+                        name: "선택된 위치",
+                        description: "",
+                        latitude: selectedPosition.lat,
+                        longitude: selectedPosition.lng,
+                        is_active: true,
+                        created_at: "",
+                        updated_at: "",
+                      },
+                    ]
+                  : []
+              }
               center={mapCenter}
               onMapClick={handleMapClick}
               clickable={true}
               height='300px'
             />
 
-            {/* 임시 마커 표시 (선택된 위치가 있을 때) */}
-            {selectedPosition && (
-              <NaverMapContainer
-                locations={[]}
-                center={mapCenter}
-                onMapClick={handleMapClick}
-                clickable={true}
-                height='300px'
-              />
-            )}
-
             {errors.position && (
               <p className='text-sm text-red-400'>{errors.position}</p>
             )}
           </div>
 
-          {/* 좌표 정보 */}
+          {/* 좌표 및 주소 정보 */}
           {formData.latitude !== 0 && formData.longitude !== 0 && (
             <div className='p-3 border border-gray-600 rounded-lg bg-basic-black'>
-              <Label className='text-sm text-white'>선택된 좌표</Label>
-              <div className='mt-1 text-sm text-gray-300'>
-                위도: {formData.latitude?.toFixed(6)} / 경도:{" "}
-                {formData.longitude?.toFixed(6)}
+              <div className='flex items-center justify-between mb-2'>
+                <Label className='text-sm text-white'>선택된 위치 정보</Label>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  onClick={() => handleReverseGeocode(formData.latitude, formData.longitude)}
+                  disabled={reverseGeocoding}
+                  className='text-xs text-gray-400 border-gray-600 hover:bg-gray-600/20'
+                >
+                  {reverseGeocoding ? (
+                    <RefreshCw className='w-3 h-3 mr-1 animate-spin' />
+                  ) : (
+                    <RefreshCw className='w-3 h-3 mr-1' />
+                  )}
+                  주소 가져오기
+                </Button>
+              </div>
+              
+              <div className='space-y-2 text-sm'>
+                <div className='text-gray-300'>
+                  <span className='font-medium text-white'>좌표:</span> {formData.latitude?.toFixed(6)}, {formData.longitude?.toFixed(6)}
+                </div>
+                
+                {formData.address && (
+                  <div className='text-gray-300'>
+                    <span className='font-medium text-white'>주소:</span> {formData.address}
+                  </div>
+                )}
+                
+                {reverseGeocoding && (
+                  <div className='text-basic-blue'>
+                    주소 정보를 가져오는 중...
+                  </div>
+                )}
               </div>
             </div>
           )}

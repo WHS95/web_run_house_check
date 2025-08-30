@@ -91,6 +91,7 @@ export async function getCrewById(crewId: string) {
                 id,
                 name,
                 description,
+                location_based_attendance,
                 created_at,
                 updated_at
             `

@@ -253,22 +253,16 @@ export default function CrewLocationManagement({
       {/* 위치 기반 출석 설정 */}
       <Card className='border-gray-600 bg-basic-black-gray'>
         <CardHeader>
-          <CardTitle className='flex items-center gap-2 text-white'>
+          <CardTitle className='flex gap-2 items-center text-white'>
             <Settings className='w-5 h-5 text-basic-blue' />
-            출석 설정
+            위치 기반 출석 설정
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='flex items-center justify-between'>
+          <div className='flex justify-between items-center'>
             <div className='space-y-1'>
-              <Label
-                htmlFor='location-based'
-                className='font-medium text-white'
-              >
-                위치 기반 출석
-              </Label>
               <p className='text-sm text-gray-400'>
-                등록된 활동장소 근처에서만 출석을 허용합니다
+                등록된 활동장소 근처에서만 출석을 허용
               </p>
             </div>
             <Switch
@@ -285,8 +279,8 @@ export default function CrewLocationManagement({
       {/* 활동장소 관리 */}
       <Card className='border-gray-600 bg-basic-black-gray'>
         <CardHeader>
-          <div className='flex items-center justify-between'>
-            <CardTitle className='flex items-center gap-2 text-white'>
+          <div className='flex justify-between items-center'>
+            <CardTitle className='flex gap-2 items-center text-white'>
               <MapPin className='w-5 h-5 text-basic-blue' />
               활동장소 관리
             </CardTitle>
@@ -295,8 +289,7 @@ export default function CrewLocationManagement({
               className='text-white bg-basic-blue hover:bg-basic-blue/80'
               disabled={loading}
             >
-              <Plus className='w-4 h-4 mr-2' />
-              장소 추가
+              <Plus className='w-2 h-2' />
             </Button>
           </div>
         </CardHeader>
@@ -304,7 +297,7 @@ export default function CrewLocationManagement({
           <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             {/* 활동장소 목록 */}
             <div className='space-y-4'>
-              <h3 className='text-lg font-semibold text-white'>등록된 장소</h3>
+              {/* <h3 className='text-lg font-semibold text-white'>등록된 장소</h3> */}
               <LocationList
                 locations={locations}
                 selectedLocation={selectedLocation}
@@ -314,33 +307,6 @@ export default function CrewLocationManagement({
                 onLocationToggle={handleLocationToggle}
                 loading={loading}
               />
-            </div>
-
-            {/* 지도 */}
-            <div className='space-y-4'>
-              <h3 className='text-lg font-semibold text-white'>위치 보기</h3>
-              <div
-                ref={mapRef}
-                className='w-full h-[400px] border border-gray-300 rounded'
-              />
-              {selectedLocation && (
-                <Card className='border-gray-600 bg-basic-black'>
-                  <CardContent className='p-4'>
-                    <h4 className='mb-2 font-semibold text-white'>
-                      {selectedLocation.name}
-                    </h4>
-                    {selectedLocation.description && (
-                      <p className='mb-2 text-sm text-gray-300'>
-                        {selectedLocation.description}
-                      </p>
-                    )}
-                    <p className='text-xs text-gray-400'>
-                      좌표: {selectedLocation.latitude?.toFixed(6)},{" "}
-                      {selectedLocation.longitude?.toFixed(6)}
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </div>
         </CardContent>

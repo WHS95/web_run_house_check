@@ -1,5 +1,5 @@
 import { useState, useCallback, RefObject } from "react";
-import { NaverMap, Marker, NaverClickEvent } from "@/types/naver-maps";
+import { NaverMap, Marker, NaverClickEvent } from "@/lib/types/naver-maps";
 
 export const useNaverMap = (mapRef: RefObject<HTMLDivElement | null>) => {
   const [map, setMap] = useState<NaverMap | null>(null);

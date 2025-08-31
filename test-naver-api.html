@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네이버 지도 API 테스트</title>
+</head>
+<body>
+    <h1>네이버 지도 API 로딩 테스트</h1>
+    <div id="test-results"></div>
+    <div id="map" style="width:100%;height:400px;margin-top:20px;border:1px solid #ccc;"></div>
+
+    <script>
+        const CLIENT_ID = 'kb4kwgxef5';
+        const testResults = document.getElementById('test-results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.style.padding = '5px';
+            div.style.margin = '5px 0';
+            div.style.borderLeft = `4px solid ${type === 'error' ? 'red' : type === 'success' ? 'green' : 'blue'}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            testResults.appendChild(div);
+            console.log(message);
+        }
+
+        // 여러 URL 시도
+        const testUrls = [
+            `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${CLIENT_ID}&submodules=geocoder`,
+            `https://oapi.map.naver.com/openapi/v3/maps.js?clientId=${CLIENT_ID}&submodules=geocoder`,
+            `https://openapi.map.naver.com/openapi/v3/maps.js?clientId=${CLIENT_ID}&submodules=geocoder`
+        ];
+
+        let currentUrlIndex = 0;
+
+        function loadScript(url) {
+            return new Promise((resolve, reject) => {
+                addResult(`🔄 시도 중: ${url}`);
+                
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = () => {
+                    addResult(`✅ 스크립트 로드 성공: ${url}`, 'success');
+                    
+                    // window.naver 체크
+                    if (window.naver) {
+                        addResult(`✅ window.naver 존재함`, 'success');
+                        if (window.naver.maps) {
+                            addResult(`✅ window.naver.maps 존재함`, 'success');
+                            resolve(true);
+                        } else {
+                            addResult(`❌ window.naver.maps가 없음`, 'error');
+                            reject(new Error('window.naver.maps not found'));
+                        }
+                    } else {
+                        addResult(`❌ window.naver가 없음`, 'error');
+                        reject(new Error('window.naver not found'));
+                    }
+                };
+                script.onerror = (error) => {
+                    addResult(`❌ 스크립트 로드 실패: ${url}`, 'error');
+                    reject(error);
+                };
+                
+                document.head.appendChild(script);
+            });
+        }
+
+        async function testAPI() {
+            addResult(`🎯 클라이언트 ID: ${CLIENT_ID}`);
+            
+            for (let i = 0; i < testUrls.length; i++) {
+                try {
+                    await loadScript(testUrls[i]);
+                    
+                    // 지도 초기화 테스트
+                    try {
+                        const mapDiv = document.getElementById('map');
+                        const map = new window.naver.maps.Map(mapDiv, {
+                            center: new window.naver.maps.LatLng(37.5665, 126.9780),
+                            zoom: 15
+                        });
+                        
+                        addResult(`🗺️ 지도 초기화 성공!`, 'success');
+                        
+                        // 마커 추가 테스트
+                        const marker = new window.naver.maps.Marker({
+                            position: new window.naver.maps.LatLng(37.5665, 126.9780),
+                            map: map
+                        });
+                        
+                        addResult(`📍 마커 추가 성공!`, 'success');
+                        break;
+                        
+                    } catch (mapError) {
+                        addResult(`❌ 지도 초기화 실패: ${mapError.message}`, 'error');
+                    }
+                    
+                } catch (error) {
+                    addResult(`❌ URL ${i+1} 실패, 다음 URL 시도 중...`, 'error');
+                    if (i === testUrls.length - 1) {
+                        addResult(`❌ 모든 URL 시도 실패`, 'error');
+                    }
+                }
+            }
+        }
+
+        // 페이지 로드 후 테스트 실행
+        window.addEventListener('load', testAPI);
+    </script>
+</body>
+</html>

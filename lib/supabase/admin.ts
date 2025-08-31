@@ -1141,7 +1141,7 @@ export async function updateCrewLocation(
     description?: string;
     latitude?: number;
     longitude?: number;
-    isActive?: boolean;
+    is_active?: boolean;
   }
 ) {
   try {
@@ -1183,7 +1183,7 @@ export async function updateCrewLocation(
 }
 
 /**
- * 크루 모임 장소를 비활성화합니다 (soft delete).
+ * 크루 모임 장소를 완전히 삭제합니다 (hard delete).
  */
 export async function deleteCrewLocation(locationId: number) {
   try {
@@ -1192,7 +1192,7 @@ export async function deleteCrewLocation(locationId: number) {
     const { data, error } = await supabase
       .schema("attendance")
       .from("crew_locations")
-      .update({ is_active: false })
+      .delete()
       .eq("id", locationId)
       .select()
       .single();

@@ -10,13 +10,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Save, X, RefreshCw } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  MapPin,
+  Save,
+  X,
+  RefreshCw,
+  Trash2,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 
 interface LocationFormProps {
   initialData?: CrewLocation | null;
   onSubmit: (data: CrewLocationForm) => Promise<void>;
   onCancel: () => void;
+  onDelete?: (location: CrewLocation) => Promise<void>;
+  onToggleStatus?: (location: CrewLocation) => Promise<void>;
   loading?: boolean;
   title?: string;
 }
@@ -25,6 +44,8 @@ export default function LocationForm({
   initialData,
   onSubmit,
   onCancel,
+  onDelete,
+  onToggleStatus,
   loading = false,
   title = "활동장소 추가",
 }: LocationFormProps) {
@@ -45,6 +66,8 @@ export default function LocationForm({
     useState<NaverMapPosition | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [reverseGeocoding, setReverseGeocoding] = useState(false);
+  const [isActive, setIsActive] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { reverseGeocode } = useGeocoding();
 
@@ -58,6 +81,8 @@ export default function LocationForm({
         longitude: initialData.longitude,
         address: "",
       });
+
+      setIsActive(initialData.is_active);
 
       const position = {
         lat: initialData.latitude,
@@ -74,7 +99,7 @@ export default function LocationForm({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "활동장소 이름을 입력해주세요.";
+      newErrors.name = "장소 이름을 입력해주세요.";
     }
 
     if (formData.latitude === 0 || formData.longitude === 0) {
@@ -119,8 +144,8 @@ export default function LocationForm({
 
   // 지도 클릭 처리
   const handleMapClick = async (position: NaverMapPosition) => {
-    console.log("🗺️ [LocationForm] 지도 클릭:", position);
-    
+    // console.log("🗺️ [LocationForm] 지도 클릭:", position);
+
     setFormData((prev) => ({
       ...prev,
       latitude: position.lat,
@@ -150,7 +175,6 @@ export default function LocationForm({
       lat,
       lng,
       (roadAddress: string, jibunAddress: string) => {
-        console.log("✅ [LocationForm] 역지오코딩 성공:", { roadAddress, jibunAddress });
         setFormData((prev) => ({
           ...prev,
           address: roadAddress || jibunAddress,
@@ -184,6 +208,20 @@ export default function LocationForm({
     }
   };
 
+  // 삭제 확인 핸들러
+  const handleDeleteConfirm = async () => {
+    if (onDelete && initialData) {
+      try {
+        await onDelete(initialData);
+        setShowDeleteConfirm(false);
+        onCancel();
+      } catch (error) {
+        console.error("삭제 오류:", error);
+        setShowDeleteConfirm(false);
+      }
+    }
+  };
+
   // 입력값 변경 처리
   const handleInputChange = (
     field: keyof CrewLocationForm,
@@ -205,64 +243,64 @@ export default function LocationForm({
 
   return (
     <Card className='border-gray-600 bg-basic-black-gray'>
-      <CardHeader>
-        <CardTitle className='flex items-center gap-2 text-white'>
-          <MapPin className='w-5 h-5 text-basic-blue' />
-          {title}
-        </CardTitle>
-      </CardHeader>
-
       <CardContent>
         <form onSubmit={handleSubmit} className='space-y-6'>
           {/* 활동장소 이름 */}
           <div className='space-y-2'>
-            <Label htmlFor='name' className='text-white'>
-              활동장소 이름 *
+            <Label htmlFor='name' className='font-semibold text-white'>
+              모임 장소명
             </Label>
             <Input
               id='name'
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
-              placeholder='예: 한강공원 잠실대교 남단'
-              className='text-white placeholder-gray-400 border-gray-600 bg-basic-black focus:border-basic-blue'
+              placeholder='예: 한강공원 정기런닝 장소'
+              className='placeholder-gray-400 text-white border-gray-600 bg-basic-black focus:border-basic-blue'
             />
             {errors.name && (
               <p className='text-sm text-red-400'>{errors.name}</p>
             )}
           </div>
 
-          {/* 설명 */}
-          <div className='space-y-2'>
-            <Label htmlFor='description' className='text-white'>
-              설명 (선택사항)
-            </Label>
-            <Textarea
-              id='description'
-              value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder='활동장소에 대한 추가 설명을 입력하세요'
-              rows={3}
-              className='text-white placeholder-gray-400 border-gray-600 resize-none bg-basic-black focus:border-basic-blue'
-            />
-          </div>
-
           {/* 주소 검색 */}
           <div className='space-y-2'>
-            <Label className='text-white'>주소 검색</Label>
+            <Label className='font-semibold text-white'>주소 검색</Label>
             <AddressSearch
               onAddressSelect={handleAddressSelect}
-              placeholder='주소를 입력하여 위치를 찾으세요'
+              placeholder='도로명 주소 입력'
             />
           </div>
+          {/* 좌표 및 주소 정보 */}
+          {formData.latitude !== 0 && formData.longitude !== 0 && (
+            <div className='p-3 rounded-lg border border-gray-600 bg-basic-black'>
+              <div className='flex justify-between items-center mb-2'>
+                <Label className='text-sm text-white'>선택된 위치 정보</Label>
+              </div>
+
+              <div className='space-y-2 text-sm'>
+                <div className='text-gray-300'>
+                  <span className='font-medium text-white'>좌표:</span>{" "}
+                  {formData.latitude?.toFixed(6)},{" "}
+                  {formData.longitude?.toFixed(6)}
+                </div>
+
+                {formData.address && (
+                  <div className='text-gray-300'>
+                    <span className='font-medium text-white'>주소:</span>{" "}
+                    {formData.address}
+                  </div>
+                )}
+
+                {reverseGeocoding && (
+                  <div className='text-basic-blue'>주소 정보 가져오는 중</div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* 지도 */}
           <div className='space-y-2'>
-            <Label className='text-white'>
-              위치 선택 *
-              <span className='ml-2 text-sm font-normal text-gray-400'>
-                지도를 클릭하여 정확한 위치를 선택하세요
-              </span>
-            </Label>
+            <Label className='font-semibold text-white'>위치 선택</Label>
             <NaverMapContainer
               locations={
                 selectedPosition
@@ -292,44 +330,21 @@ export default function LocationForm({
             )}
           </div>
 
-          {/* 좌표 및 주소 정보 */}
-          {formData.latitude !== 0 && formData.longitude !== 0 && (
-            <div className='p-3 border border-gray-600 rounded-lg bg-basic-black'>
-              <div className='flex items-center justify-between mb-2'>
-                <Label className='text-sm text-white'>선택된 위치 정보</Label>
+          {/* 편집 모드 전용 컨트롤 */}
+          {initialData && (
+            <div className='pt-4 space-y-4'>
+              {/* 삭제 버튼 */}
+              <div className='flex justify-end'>
                 <Button
                   type='button'
                   variant='outline'
-                  size='sm'
-                  onClick={() => handleReverseGeocode(formData.latitude, formData.longitude)}
-                  disabled={reverseGeocoding}
-                  className='text-xs text-gray-400 border-gray-600 hover:bg-gray-600/20'
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={loading}
+                  className='text-white bg-basic-black border-basic-black hover:bg-basic-black/20'
                 >
-                  {reverseGeocoding ? (
-                    <RefreshCw className='w-3 h-3 mr-1 animate-spin' />
-                  ) : (
-                    <RefreshCw className='w-3 h-3 mr-1' />
-                  )}
-                  주소 가져오기
+                  <Trash2 className='mr-2 w-4 h-4 text-red-400' />
+                  장소 삭제
                 </Button>
-              </div>
-              
-              <div className='space-y-2 text-sm'>
-                <div className='text-gray-300'>
-                  <span className='font-medium text-white'>좌표:</span> {formData.latitude?.toFixed(6)}, {formData.longitude?.toFixed(6)}
-                </div>
-                
-                {formData.address && (
-                  <div className='text-gray-300'>
-                    <span className='font-medium text-white'>주소:</span> {formData.address}
-                  </div>
-                )}
-                
-                {reverseGeocoding && (
-                  <div className='text-basic-blue'>
-                    주소 정보를 가져오는 중...
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -342,12 +357,12 @@ export default function LocationForm({
               className='flex-1 text-white bg-basic-blue hover:bg-basic-blue/80'
             >
               {loading ? (
-                <div className='flex items-center gap-2'>
-                  <div className='w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin'></div>
+                <div className='flex gap-2 items-center'>
+                  <div className='w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent'></div>
                   저장 중...
                 </div>
               ) : (
-                <div className='flex items-center gap-2'>
+                <div className='flex gap-2 items-center'>
                   <Save className='w-4 h-4' />
                   {initialData ? "수정" : "추가"}
                 </div>
@@ -359,14 +374,65 @@ export default function LocationForm({
               variant='outline'
               onClick={onCancel}
               disabled={loading}
-              className='flex-1 text-white border-gray-600 hover:bg-gray-600/20'
+              className='flex-1 text-white bg-basic-black border-basic-black hover:bg-basic-black/20'
             >
-              <X className='w-4 h-4 mr-2' />
+              <X className='mr-2 w-4 h-4 text-white' />
               취소
             </Button>
           </div>
         </form>
       </CardContent>
+
+      {/* 삭제 확인 모달 */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className='border-gray-600 bg-basic-black-gray'>
+          <DialogHeader>
+            <DialogTitle className='text-white'>장소 삭제</DialogTitle>
+            <DialogDescription className='text-gray-400'>
+              <span className='font-medium text-red-400'>
+                이 작업은 되돌릴 수 없습니다.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant='outline'
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={loading}
+              className='text-white bg-basic-black border-basic-black hover:bg-basic-black/20'
+            >
+              취소
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              disabled={loading}
+              className='text-white bg-basic-black'
+            >
+              {loading ? "삭제 중..." : "삭제"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
+}
+
+{
+  /* <Button
+type='button'
+variant='outline'
+size='sm'
+onClick={() =>
+  handleReverseGeocode(formData.latitude, formData.longitude)
+}
+disabled={reverseGeocoding}
+className='text-xs text-gray-400 border-gray-600 hover:bg-gray-600/20'
+>
+{reverseGeocoding ? (
+  <RefreshCw className='mr-1 w-3 h-3 animate-spin' />
+) : (
+  <RefreshCw className='mr-1 w-3 h-3' />
+)}
+주소 가져오기
+</Button> */
 }

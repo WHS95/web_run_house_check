@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef, memo } from "react";
 import { CrewLocation, CrewLocationForm } from "@/lib/types/crew-locations";
-import NaverMapContainer from "@/components/map/NaverMapContainer";
 import LocationList from "./LocationList";
 import LocationModal from "./LocationModal";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { MapPin, Plus, Settings } from "lucide-react";
 import { haptic } from "@/lib/haptic";
 import { useNaverMap } from "@/hooks/useNaverMap";
@@ -20,7 +18,7 @@ interface CrewLocationManagementProps {
   onLocationUpdate?: () => void;
 }
 
-export default function CrewLocationManagement({
+function CrewLocationManagement({
   crewId,
   initialLocations,
   locationBasedAttendance = false,
@@ -51,10 +49,12 @@ export default function CrewLocationManagement({
 
   const [loading, setLoading] = useState(false);
 
-  // 초기 locations 업데이트
+  // 초기 locations 설정 (한 번만 실행)
   useEffect(() => {
-    setLocations(initialLocations);
-  }, [initialLocations]);
+    if (locations.length === 0 && initialLocations.length > 0) {
+      setLocations(initialLocations);
+    }
+  }, [initialLocations, locations.length]);
 
   // 모달 열기
   const openModal = useCallback(
@@ -101,7 +101,7 @@ export default function CrewLocationManagement({
       if (response.ok) {
         setIsLocationBasedEnabled(enabled);
         haptic.success();
-        onLocationUpdate?.();
+        // onLocationUpdate 제거 - 팝업 없이 내부 상태만 업데이트
       } else {
         throw new Error("위치 기반 출석 설정 변경에 실패했습니다.");
       }
@@ -161,7 +161,7 @@ export default function CrewLocationManagement({
         }
 
         haptic.success();
-        onLocationUpdate?.();
+        // onLocationUpdate 제거 - 팝업 없이 내부 상태만 업데이트
         console.log("🎉 활동장소 저장 완료");
       } else {
         const errorData = await response.text();
@@ -184,40 +184,45 @@ export default function CrewLocationManagement({
     }
   };
 
-  // 활동장소 삭제
-  const handleLocationDelete = async (location: CrewLocation) => {
-    setLoading(true);
+  // 활동장소 삭제 - 최적화
+  const handleLocationDelete = useCallback(
+    async (location: CrewLocation) => {
+      setLoading(true);
 
-    try {
-      const response = await fetch(`/api/admin/crew-locations/${location.id}`, {
-        method: "DELETE",
-      });
+      try {
+        const response = await fetch(
+          `/api/admin/crew-locations/${location.id}`,
+          {
+            method: "DELETE",
+          }
+        );
 
-      if (response.ok) {
-        setLocations((prev) => prev.filter((loc) => loc.id !== location.id));
+        if (response.ok) {
+          // 삭제된 항목만 제거 (필터링)
+          setLocations((prev) => prev.filter((loc) => loc.id !== location.id));
 
-        if (selectedLocation?.id === location.id) {
-          setSelectedLocation(null);
+          if (selectedLocation?.id === location.id) {
+            setSelectedLocation(null);
+          }
+
+          haptic.success();
+          // onLocationUpdate 제거 - 팝업 없이 내부 상태만 업데이트
+        } else {
+          throw new Error("활동장소 삭제에 실패했습니다.");
         }
-
-        haptic.success();
-        onLocationUpdate?.();
-      } else {
-        throw new Error("활동장소 삭제에 실패했습니다.");
+      } catch (error) {
+        console.error("활동장소 삭제 오류:", error);
+        haptic.error();
+        throw error;
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("활동장소 삭제 오류:", error);
-      haptic.error();
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [selectedLocation?.id]
+  );
 
-  // 활동장소 상태 토글
-  const handleLocationToggle = async (location: CrewLocation) => {
-    setLoading(true);
-
+  // 활동장소 상태 토글 - 개별 항목만 업데이트
+  const handleLocationToggle = useCallback(async (location: CrewLocation) => {
     try {
       const response = await fetch(`/api/admin/crew-locations/${location.id}`, {
         method: "PATCH",
@@ -231,22 +236,26 @@ export default function CrewLocationManagement({
 
       if (response.ok) {
         const result = await response.json();
+
+        // 변경된 location만 업데이트 (React key를 활용한 최적화)
         setLocations((prev) =>
-          prev.map((loc) => (loc.id === location.id ? result.data : loc))
+          prev.map((loc) =>
+            loc.id === location.id
+              ? { ...result.data, updated_at: new Date().toISOString() } // timestamp 추가로 리렌더링 보장
+              : loc
+          )
         );
 
         haptic.success();
-        onLocationUpdate?.();
+        // onLocationUpdate 제거 - 팝업 없이 내부 상태만 업데이트
       } else {
         throw new Error("활동장소 상태 변경에 실패했습니다.");
       }
     } catch (error) {
       console.error("활동장소 상태 변경 오류:", error);
       haptic.error();
-    } finally {
-      setLoading(false);
     }
-  };
+  }, []);
 
   return (
     <div className='space-y-6'>
@@ -262,7 +271,7 @@ export default function CrewLocationManagement({
           <div className='flex justify-between items-center'>
             <div className='space-y-1'>
               <p className='text-sm text-gray-400'>
-                등록된 활동장소 근처에서만 출석을 허용
+                등록된 주소의 위경도 기준 약 300m 이내 출석 가능
               </p>
             </div>
             <Switch
@@ -282,7 +291,7 @@ export default function CrewLocationManagement({
           <div className='flex justify-between items-center'>
             <CardTitle className='flex gap-2 items-center text-white'>
               <MapPin className='w-5 h-5 text-basic-blue' />
-              활동장소 관리
+              장소
             </CardTitle>
             <Button
               onClick={() => openModal("add")}
@@ -293,8 +302,8 @@ export default function CrewLocationManagement({
             </Button>
           </div>
         </CardHeader>
-        <CardContent className='p-6'>
-          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <CardContent className='p-3'>
+          <div className='grid grid-cols-1 gap-6'>
             {/* 활동장소 목록 */}
             <div className='space-y-4'>
               {/* <h3 className='text-lg font-semibold text-white'>등록된 장소</h3> */}
@@ -320,8 +329,12 @@ export default function CrewLocationManagement({
         location={modalState.location}
         onSubmit={handleLocationSubmit}
         onDelete={handleLocationDelete}
+        onToggleStatus={handleLocationToggle}
         loading={loading}
       />
     </div>
   );
 }
+
+// React.memo로 컴포넌트 최적화 - props가 변경될 때만 리렌더링
+export default memo(CrewLocationManagement);

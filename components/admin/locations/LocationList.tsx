@@ -1,10 +1,66 @@
 "use client";
 
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { CrewLocation } from "@/lib/types/crew-locations";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Edit, CheckCircle, XCircle } from "lucide-react";
+import { MoreVertical, CheckCircle, XCircle } from "lucide-react";
+
+// 개별 LocationItem 컴포넌트 - 최적화를 위해 분리
+interface LocationItemProps {
+  location: CrewLocation;
+  isSelected: boolean;
+  onLocationSelect?: (location: CrewLocation) => void;
+  onLocationEdit?: (location: CrewLocation) => void;
+  onLocationToggle?: (location: CrewLocation) => void;
+}
+
+const LocationItem = memo(function LocationItem({
+  location,
+  onLocationSelect,
+  onLocationEdit,
+}: LocationItemProps) {
+  const handleSelect = useCallback(() => {
+    onLocationSelect?.(location);
+  }, [onLocationSelect, location]);
+
+  const handleEdit = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onLocationEdit?.(location);
+    },
+    [onLocationEdit, location]
+  );
+
+  return (
+    <Card
+      className={`flex justify-between items-center border-gray-600 transition-all cursor-pointer bg-basic-black-gray hover:border-basic-blue/50`}
+      onClick={handleSelect}
+    >
+      <CardContent>
+        <div className='flex justify-between items-center'>
+          <div className='flex flex-1 gap-3 items-center'>
+            <div className='flex-1 min-w-0'>
+              <div className='flex gap-2 items-center mb-1'>
+                <h3 className='font-medium text-white truncate'>
+                  {location.name}
+                </h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+      <Button
+        variant='ghost'
+        size='sm'
+        onClick={handleEdit}
+        className='flex-shrink-0 text-gray-400 hover:text-white hover:bg-basic-blue/20'
+      >
+        <MoreVertical className='w-4 h-4' />
+      </Button>
+    </Card>
+  );
+});
 
 interface LocationListProps {
   locations: CrewLocation[];
@@ -16,7 +72,7 @@ interface LocationListProps {
   loading?: boolean;
 }
 
-export default function LocationList({
+function LocationList({
   locations,
   selectedLocation,
   onLocationSelect,
@@ -27,10 +83,10 @@ export default function LocationList({
 }: LocationListProps) {
   if (loading) {
     return (
-      <div className='space-y-3'>
+      <div>
         {[1, 2, 3].map((i) => (
           <Card key={i} className='border-gray-600 bg-basic-black-gray'>
-            <CardContent className='p-4'>
+            <CardContent className='p-1'>
               <div className='animate-pulse'>
                 <div className='mb-2 w-3/4 h-4 bg-gray-600 rounded'></div>
                 <div className='mb-3 w-1/2 h-3 bg-gray-700 rounded'></div>
@@ -62,63 +118,19 @@ export default function LocationList({
 
   return (
     <div className='space-y-3'>
-      {locations.map((location) => {
-        const isSelected = selectedLocation?.id === location.id;
-
-        return (
-          <Card
-            key={location.id}
-            className={`bg-basic-black-gray border-gray-600 transition-all cursor-pointer hover:border-basic-blue/50 ${
-              isSelected ? "ring-1 border-basic-blue ring-basic-blue/30" : ""
-            }`}
-            onClick={() => onLocationSelect?.(location)}
-          >
-            <CardContent className='p-4'>
-              <div className='flex justify-between items-center'>
-                <div className='flex flex-1 gap-3 items-center'>
-                  <div className='flex-1 min-w-0'>
-                    <div className='flex gap-2 items-center mb-1'>
-                      <h3 className='font-medium text-white truncate'>
-                        {location.name}
-                      </h3>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onLocationToggle?.(location);
-                        }}
-                        className='flex-shrink-0 transition-colors hover:scale-110'
-                        title={
-                          location.is_active
-                            ? "활성 상태 (클릭하여 비활성화)"
-                            : "비활성 상태 (클릭하여 활성화)"
-                        }
-                      >
-                        {location.is_active ? (
-                          <CheckCircle className='w-4 h-4 text-green-500 hover:text-green-400' />
-                        ) : (
-                          <XCircle className='w-4 h-4 text-gray-500 hover:text-green-500' />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onLocationEdit?.(location);
-                  }}
-                  className='flex-shrink-0 text-gray-400 hover:text-white hover:bg-basic-blue/20'
-                >
-                  <Edit className='w-4 h-4' />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+      {locations.map((location) => (
+        <LocationItem
+          key={`${location.id}-${location.updated_at}`}
+          location={location}
+          isSelected={selectedLocation?.id === location.id}
+          onLocationSelect={onLocationSelect}
+          onLocationEdit={onLocationEdit}
+          onLocationToggle={onLocationToggle}
+        />
+      ))}
     </div>
   );
 }
+
+// React.memo로 최적화 - locations, selectedLocation, loading이 변경될 때만 리렌더링
+export default memo(LocationList);

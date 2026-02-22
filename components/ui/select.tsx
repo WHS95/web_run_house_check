@@ -19,7 +19,7 @@ interface SelectContextType {
 }
 
 const SelectContext = React.createContext<SelectContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function Select({
@@ -41,7 +41,7 @@ export function Select({
       onValueChange?.(newValue);
       setOpen(false);
     },
-    [value, onValueChange]
+    [value, onValueChange],
   );
 
   const contextValue = React.useMemo(
@@ -51,7 +51,7 @@ export function Select({
       open,
       setOpen,
     }),
-    [currentValue, handleValueChange, open]
+    [currentValue, handleValueChange, open],
   );
 
   return (
@@ -65,7 +65,9 @@ export function SelectTrigger({
   children,
   className,
   ...props
-}: React.HTMLAttributes<HTMLButtonElement> & { className?: string }) {
+}: React.HTMLAttributes<HTMLButtonElement> & {
+  className?: string;
+}) {
   const context = React.useContext(SelectContext);
   if (!context) throw new Error("SelectTrigger must be used within Select");
 
@@ -73,14 +75,14 @@ export function SelectTrigger({
     <button
       type='button'
       className={cn(
-        "flex justify-between items-center px-3 py-2 w-full h-10 text-sm rounded-md bg-background ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-        className
+        "flex justify-between items-center px-4 py-3 w-full h-11 text-ios-body bg-ios-elevated-2 text-ios-label rounded-md focus:outline-none focus:shadow-[0_0_0_1px_#669ff2,0_0_0_4px_rgba(102,159,242,0.1)] disabled:cursor-not-allowed disabled:opacity-40",
+        className,
       )}
       onClick={() => context.setOpen(!context.open)}
       {...props}
     >
       {children}
-      <ChevronDown className='w-4 h-4 opacity-50' />
+      <ChevronDown className='w-4 h-4 text-ios-label-tertiary' />
     </button>
   );
 }
@@ -100,7 +102,9 @@ export function SelectContent({
   children,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { className?: string }) {
+}: React.HTMLAttributes<HTMLDivElement> & {
+  className?: string;
+}) {
   const context = React.useContext(SelectContext);
   if (!context) throw new Error("SelectContent must be used within Select");
 
@@ -109,8 +113,8 @@ export function SelectContent({
   return (
     <div
       className={cn(
-        "overflow-auto absolute top-full z-50 mt-1 w-full max-h-60 rounded-md border shadow-md bg-popover text-popover-foreground",
-        className
+        "overflow-auto absolute top-full z-50 mt-1 w-full max-h-60 rounded-md bg-ios-elevated-2 text-ios-label border border-ios-separator animate-scale-in",
+        className,
       )}
       {...props}
     >
@@ -131,16 +135,22 @@ export function SelectItem({
   const context = React.useContext(SelectContext);
   if (!context) throw new Error("SelectItem must be used within Select");
 
+  const isSelected = context.value === value;
+
   return (
     <div
       className={cn(
-        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        className
+        "relative flex w-full cursor-default select-none items-center min-h-[44px] pl-4 pr-8 text-ios-body outline-none active:bg-ios-elevated-3 transition-colors",
+        isSelected && "text-ios-accent font-semibold",
+        className,
       )}
       onClick={() => context.onValueChange?.(value)}
       {...props}
     >
       {children}
+      {isSelected && (
+        <span className='absolute right-4 text-ios-accent'>✓</span>
+      )}
     </div>
   );
 }

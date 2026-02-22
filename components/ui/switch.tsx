@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface SwitchProps {
   checked?: boolean;
@@ -12,31 +12,41 @@ interface SwitchProps {
 }
 
 const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
-  ({ className, checked = false, onCheckedChange, disabled = false, id, ...props }, ref) => (
+  (
+    {
+      className,
+      checked = false,
+      onCheckedChange,
+      disabled = false,
+      id,
+      ...props
+    },
+    ref,
+  ) => (
     <button
-      type="button"
-      role="switch"
+      type='button'
+      role='switch'
       aria-checked={checked}
       id={id}
       disabled={disabled}
       onClick={() => onCheckedChange?.(!checked)}
       className={cn(
-        "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-basic-blue focus-visible:ring-offset-2 focus-visible:ring-offset-basic-black disabled:cursor-not-allowed disabled:opacity-50",
-        checked ? "bg-basic-blue" : "bg-gray-600",
-        className
+        "peer inline-flex h-[31px] w-[51px] shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ios-accent focus-visible:ring-offset-2 focus-visible:ring-offset-ios-system-bg disabled:cursor-not-allowed disabled:opacity-40",
+        checked ? "bg-ios-accent" : "bg-ios-elevated-3",
+        className,
       )}
       {...props}
       ref={ref}
     >
       <span
         className={cn(
-          "pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform",
-          checked ? "translate-x-5" : "translate-x-0"
+          "pointer-events-none block h-[27px] w-[27px] rounded-full bg-white shadow-lg ring-0 transition-transform",
+          checked ? "translate-x-5" : "translate-x-0",
         )}
       />
     </button>
-  )
-)
-Switch.displayName = "Switch"
+  ),
+);
+Switch.displayName = "Switch";
 
-export { Switch }
+export { Switch };

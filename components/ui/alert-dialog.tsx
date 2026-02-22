@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface AlertDialogProps {
   open?: boolean;
@@ -14,10 +14,10 @@ interface AlertDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: () => void;
 }
 
-const AlertDialog: React.FC<AlertDialogProps> = ({ 
-  open = false, 
-  onOpenChange, 
-  children 
+const AlertDialog: React.FC<AlertDialogProps> = ({
+  open = false,
+  onOpenChange,
+  children,
 }) => {
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -40,33 +40,35 @@ const AlertDialog: React.FC<AlertDialogProps> = ({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50">
-      <div 
-        className="fixed inset-0 bg-black/80" 
+    <div className='fixed inset-0 z-50'>
+      {/* iOS 스타일 오버레이 */}
+      <div
+        className='fixed inset-0 bg-black/40 backdrop-blur-sm animate-fade-in'
         onClick={() => onOpenChange?.(false)}
       />
-      <div className="fixed inset-0 flex items-center justify-center p-4">
+      <div className='fixed inset-0 flex items-center justify-center p-4'>
         {children}
       </div>
     </div>
   );
 };
 
-const AlertDialogContent = React.forwardRef<HTMLDivElement, AlertDialogContentProps>(
-  ({ className, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "grid w-full max-w-lg gap-4 border bg-basic-black-gray border-gray-600 p-6 shadow-lg sm:rounded-lg",
-        className
-      )}
-      onClick={(e) => e.stopPropagation()}
-      {...props}
-    >
-      {children}
-    </div>
-  )
-);
+const AlertDialogContent = React.forwardRef<
+  HTMLDivElement,
+  AlertDialogContentProps
+>(({ className, children, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "grid w-[270px] gap-4 rounded-lg bg-ios-elevated-2 p-6 backdrop-blur-[40px] animate-ios-alert-in",
+      className,
+    )}
+    onClick={(e) => e.stopPropagation()}
+    {...props}
+  >
+    {children}
+  </div>
+));
 AlertDialogContent.displayName = "AlertDialogContent";
 
 const AlertDialogHeader = ({
@@ -74,10 +76,7 @@ const AlertDialogHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn(
-      "flex flex-col space-y-2 text-center sm:text-left",
-      className
-    )}
+    className={cn("flex flex-col space-y-2 text-center", className)}
     {...props}
   />
 );
@@ -90,7 +89,7 @@ const AlertDialogFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
+      className,
     )}
     {...props}
   />
@@ -103,7 +102,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h2
     ref={ref}
-    className={cn("text-lg font-semibold text-white", className)}
+    className={cn("text-ios-title-3 text-ios-label text-center", className)}
     {...props}
   />
 ));
@@ -115,7 +114,10 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-gray-300", className)}
+    className={cn(
+      "text-ios-body text-ios-label-secondary text-center",
+      className,
+    )}
     {...props}
   />
 ));
@@ -127,7 +129,11 @@ const AlertDialogAction = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <Button
     ref={ref}
-    className={className}
+    variant='ghost'
+    className={cn(
+      "h-11 text-ios-body font-semibold text-ios-accent",
+      className,
+    )}
     {...props}
   >
     {children}
@@ -141,8 +147,11 @@ const AlertDialogCancel = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <Button
     ref={ref}
-    variant="outline"
-    className={cn("mt-2 sm:mt-0", className)}
+    variant='ghost'
+    className={cn(
+      "h-11 text-ios-body font-normal text-ios-accent mt-2 sm:mt-0",
+      className,
+    )}
     {...props}
   >
     {children}

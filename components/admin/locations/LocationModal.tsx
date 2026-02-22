@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, memo } from "react";
-import { CrewLocation, CrewLocationForm } from "@/lib/types/crew-locations";
+import { CrewLocation, CrewLocationForm } from "@/lib/validators/crewLocationSchema";
 import LocationForm from "./LocationForm";
 import {
   Dialog,

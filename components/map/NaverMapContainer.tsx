@@ -24,7 +24,7 @@ export default function NaverMapContainer({
   center = { lat: 37.5665, lng: 126.978 }, // 서울 시청 기본값
   zoom = 15,
   height = "400px",
-  showControls = true,
+  showControls = false,
   clickable = false,
 }: NaverMapContainerProps) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -40,11 +40,11 @@ export default function NaverMapContainer({
 
     const initMap = () => {
       try {
-        console.log("🗺️ [NaverMapContainer] 지도 초기화 시작");
-        console.log(
-          "🔑 Client ID:",
-          process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID
-        );
+        // console.log("🗺️ [NaverMapContainer] 지도 초기화 시작");
+        // console.log(
+        //   "🔑 Client ID:",
+        //   process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID
+        // );
         console.log("🌐 Naver API 상태:", !!window.naver?.maps);
 
         if (!window.naver?.maps) {
@@ -60,22 +60,44 @@ export default function NaverMapContainer({
           scaleControl: showControls,
           logoControl: false,
           zoomControl: showControls,
+          copyrightControl: false,
           mapDataControl: false,
         });
 
         setMap(naverMap);
         setIsLoaded(true);
-        console.log("✅ [NaverMapContainer] 지도 초기화 완료");
+
+        // 네이버 지도 컨트롤 요소들의 z-index 조정
+        setTimeout(() => {
+          const mapElement = mapRef.current;
+          if (mapElement) {
+            // 모든 네이버 지도 컨트롤 요소들의 z-index를 낮춤
+            const controls = mapElement.querySelectorAll(
+              '[class*="naver"], [class*="control"], .gmnoprint'
+            );
+            controls.forEach((control) => {
+              if (control instanceof HTMLElement) {
+                control.style.zIndex = "100";
+              }
+            });
+
+            // 지도 컨테이너 자체의 z-index도 설정
+            mapElement.style.position = "relative";
+            mapElement.style.zIndex = "1";
+          }
+        }, 100);
+
+        // console.log("✅ [NaverMapContainer] 지도 초기화 완료");/
       } catch (err) {
-        console.error("❌ [NaverMapContainer] 지도 초기화 오류:", err);
+        // console.error("❌ [NaverMapContainer] 지도 초기화 오류:", err);
         setError("지도 초기화 중 오류가 발생했습니다.");
       }
     };
 
-    console.log("⏳ [NaverMapContainer] 네이버 지도 API 로딩 상태 확인");
-    console.log("window", window);
-    console.log("window.naver", window.naver);
-    console.log("window.naver.map", window.naver?.maps);
+    // console.log("⏳ [NaverMapContainer] 네이버 지도 API 로딩 상태 확인");
+    // console.log("window", window);
+    // console.log("window.naver", window.naver);
+    // console.log("window.naver.map", window.naver?.maps);
 
     if (window.naver?.maps) {
       initMap();
@@ -247,7 +269,7 @@ export default function NaverMapContainer({
   if (error) {
     return (
       <div
-        className='flex items-center justify-center border border-gray-600 rounded-lg bg-basic-black-gray'
+        className='flex justify-center items-center rounded-lg border border-gray-600 bg-basic-black-gray'
         style={{ height }}
       >
         <div className='text-center'>
@@ -261,11 +283,11 @@ export default function NaverMapContainer({
   if (isLoaded) {
     // return (
     //   // <div
-    //   //   className='flex items-center justify-center border border-gray-600 rounded-lg bg-basic-black-gray'
+    //   //   className='flex justify-center items-center rounded-lg border border-gray-600 bg-basic-black-gray'
     //   //   style={{ height }}
     //   // >
     //   //   <div className='text-center'>
-    //   //     <div className='w-8 h-8 mb-2 border-2 rounded-full animate-spin border-basic-blue border-t-transparent'></div>
+    //   //     <div className='mb-2 w-8 h-8 rounded-full border-2 animate-spin border-basic-blue border-t-transparent'></div>
     //   //     <p className='text-gray-400'>지도 로딩 중...</p>
     //   //   </div>
     //   // </div>
@@ -275,8 +297,8 @@ export default function NaverMapContainer({
   return (
     <div
       ref={mapRef}
-      className='w-full overflow-hidden border border-gray-600 rounded-lg'
-      style={{ height }}
+      className='overflow-hidden relative w-full rounded-lg border border-gray-600'
+      style={{ height, zIndex: 1 }}
     />
   );
 }

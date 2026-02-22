@@ -1022,10 +1022,10 @@ export async function getDeletedAttendanceRecords(
 /**
  * 크루 모임 장소 인터페이스
  */
-import { 
-  CrewLocation, 
-  CrewLocationCreateData, 
-  CrewLocationUpdateData 
+import {
+  CrewLocation,
+  CrewLocationCreateData,
+  CrewLocationUpdateData,
 } from "../types/crew-locations";
 
 interface GetCrewLocationsReturn {
@@ -1058,7 +1058,9 @@ export async function getCrewLocations(
       query = query.eq("is_active", true);
     }
 
-    const { data, error } = await query.order("created_at", { ascending: false });
+    const { data, error } = await query.order("created_at", {
+      ascending: false,
+    });
 
     if (error) {
       console.error("크루 활동장소 조회 오류:", error);
@@ -1188,14 +1190,33 @@ export async function updateCrewLocation(
 export async function deleteCrewLocation(locationId: number) {
   try {
     const supabase = await createClient();
+    console.log("📡 삭제 요청 받음");
+    console.log("📡 요청 데이터:", locationId);
 
-    const { data, error } = await supabase
+    // 먼저 해당 location이 존재하는지 확인
+    const { data: existingLocation, error: checkError } = await supabase
+      .schema("attendance")
+      .from("crew_locations")
+      .select("id, name")
+      .eq("id", locationId)
+      .single();
+
+    console.log("📡 존재하는 활동장소:", existingLocation);
+    console.log("📡 존재하는 활동장소 오류:", checkError);
+
+    if (checkError || !existingLocation) {
+      return {
+        success: false,
+        error: new Error("삭제할 활동장소를 찾을 수 없습니다."),
+      };
+    }
+
+    // 삭제 실행
+    const { error } = await supabase
       .schema("attendance")
       .from("crew_locations")
       .delete()
-      .eq("id", locationId)
-      .select()
-      .single();
+      .eq("id", locationId);
 
     if (error) {
       //console.error("크루 모임 장소 삭제 오류:", error);
@@ -1571,14 +1592,14 @@ export async function getSpecificMonthStats(
   }
 }
 
-// Note: 기존 getCrewLocations, createCrewLocation, updateCrewLocation 함수들을 
+// Note: 기존 getCrewLocations, createCrewLocation, updateCrewLocation 함수들을
 // 새로운 타입 시스템과 통합하여 개선합니다.
 
 /**
  * 크루의 위치 기반 출석 설정을 토글합니다.
  */
 export async function toggleLocationBasedAttendance(
-  crewId: string, 
+  crewId: string,
   locationBasedAttendance: boolean
 ): Promise<{
   success: boolean;
@@ -1590,9 +1611,9 @@ export async function toggleLocationBasedAttendance(
     const { error } = await supabase
       .schema("attendance")
       .from("crews")
-      .update({ 
+      .update({
         location_based_attendance: locationBasedAttendance,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq("id", crewId);
 

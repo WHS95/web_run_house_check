@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useCallback } from "react";
-import { CrewLocation } from "@/lib/types/crew-locations";
+import { CrewLocation } from "@/lib/validators/crewLocationSchema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MoreVertical, CheckCircle, XCircle } from "lucide-react";

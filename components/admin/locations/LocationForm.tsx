@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CrewLocation, CrewLocationForm } from "@/lib/types/crew-locations";
+import { CrewLocation, CrewLocationForm } from "@/lib/validators/crewLocationSchema";
 import { NaverMapPosition } from "@/lib/types/naver-maps";
 import NaverMapContainer from "@/components/map/NaverMapContainer";
 import AddressSearch from "@/components/map/AddressSearch";
@@ -12,14 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import {
   MapPin,
   Save,
@@ -384,35 +377,15 @@ export default function LocationForm({
       </CardContent>
 
       {/* 삭제 확인 모달 */}
-      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <DialogContent className='border-gray-600 bg-basic-black-gray'>
-          <DialogHeader>
-            <DialogTitle className='text-white'>장소 삭제</DialogTitle>
-            <DialogDescription className='text-gray-400'>
-              <span className='font-medium text-red-400'>
-                이 작업은 되돌릴 수 없습니다.
-              </span>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setShowDeleteConfirm(false)}
-              disabled={loading}
-              className='text-white bg-basic-black border-basic-black hover:bg-basic-black/20'
-            >
-              취소
-            </Button>
-            <Button
-              onClick={handleDeleteConfirm}
-              disabled={loading}
-              className='text-white bg-basic-black'
-            >
-              {loading ? "삭제 중..." : "삭제"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        onConfirm={handleDeleteConfirm}
+        title="장소 삭제"
+        description="이 작업은 되돌릴 수 없습니다."
+        itemName={initialData?.name}
+        loading={loading}
+      />
     </Card>
   );
 }

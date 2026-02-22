@@ -24,18 +24,8 @@ import { haptic } from "@/lib/haptic";
 import PopupNotification, {
   NotificationType,
 } from "@/components/molecules/common/PopupNotification";
-
-interface CrewMember {
-  id: string;
-  first_name: string | null;
-  email: string | null;
-  phone: string | null;
-  birth_year: number | null;
-  profile_image_url: string | null;
-  role_id: number | null; // user_roles 테이블의 role_id (2: ADMIN, 3: USER)
-  is_crew_verified: boolean;
-  created_at: string;
-}
+import { useCrewMemberContext } from "@/contexts/CrewMemberContext";
+import { CrewMember } from "@/lib/validators/crewMemberSchema";
 
 interface AdminCrewMembersManagementProps {
   crewId: string;
@@ -44,12 +34,20 @@ interface AdminCrewMembersManagementProps {
 export default function AdminCrewMembersManagement({
   crewId,
 }: AdminCrewMembersManagementProps) {
-  const [members, setMembers] = useState<CrewMember[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  // 전역 상태 사용
+  const { state, actions } = useCrewMemberContext();
+  const { members, searchTerm, sortBy, sortOrder, loading, error } = state;
+  const {
+    setMembers,
+    updateMember,
+    removeMember,
+    setLoading,
+    setError,
+    setSearchTerm,
+    setSort,
+  } = actions;
+
   const [statusFilter, setStatusFilter] = useState("전체");
-  const [sortBy, setSortBy] = useState("name");
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
@@ -70,7 +68,7 @@ export default function AdminCrewMembersManagement({
         type,
       });
     },
-    []
+    [],
   );
 
   // 알림 닫기
@@ -81,7 +79,7 @@ export default function AdminCrewMembersManagement({
   // 멤버 목록 조회
   const fetchMembers = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       const response = await fetch(`/api/admin/crew-members?crewId=${crewId}`);
       const result = await response.json();
 
@@ -97,7 +95,7 @@ export default function AdminCrewMembersManagement({
       haptic.error();
       showNotification("멤버 조회 중 오류가 발생했습니다.", "error");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }, [crewId, showNotification]);
 
@@ -124,13 +122,13 @@ export default function AdminCrewMembersManagement({
           await fetchMembers(); // 목록 새로고침
           showNotification(
             result.message || "권한이 성공적으로 변경되었습니다.",
-            "success"
+            "success",
           );
         } else {
           haptic.error();
           showNotification(
             result.error || "권한 변경에 실패했습니다.",
-            "error"
+            "error",
           );
         }
       } catch (error) {
@@ -142,7 +140,7 @@ export default function AdminCrewMembersManagement({
         setIsUpdating(null);
       }
     },
-    [crewId, fetchMembers, actionLoading, showNotification]
+    [crewId, fetchMembers, actionLoading, showNotification],
   );
 
   // 정렬 함수
@@ -155,14 +153,10 @@ export default function AdminCrewMembersManagement({
           return sortOrder === "asc"
             ? aName.localeCompare(bName)
             : bName.localeCompare(aName);
-        case "joinDate":
+        case "created_at":
           const aDate = new Date(a.created_at).getTime();
           const bDate = new Date(b.created_at).getTime();
           return sortOrder === "desc" ? bDate - aDate : aDate - bDate;
-        case "role":
-          const aRole = a.role_id || 3;
-          const bRole = b.role_id || 3;
-          return sortOrder === "asc" ? aRole - bRole : bRole - aRole;
         default:
           return 0;
       }
@@ -186,10 +180,10 @@ export default function AdminCrewMembersManagement({
   const getStatusCounts = () => {
     const total = searchFilteredMembers.length;
     const admin = searchFilteredMembers.filter(
-      (member) => member.role_id === 2
+      (member) => member.is_admin,
     ).length;
     const user = searchFilteredMembers.filter(
-      (member) => member.role_id === 3 || member.role_id === null
+      (member) => !member.is_admin,
     ).length;
 
     return {
@@ -204,22 +198,25 @@ export default function AdminCrewMembersManagement({
   // 최종 필터링 및 정렬된 멤버 목록
   const filteredMembers = sortMembers(
     searchFilteredMembers.filter((member) => {
-      const isAdmin = member.role_id === 2;
       const matchesStatus =
         statusFilter === "전체" ||
-        (statusFilter === "운영진" && isAdmin) ||
-        (statusFilter === "멤버" && !isAdmin);
+        (statusFilter === "운영진" && member.is_admin) ||
+        (statusFilter === "멤버" && !member.is_admin);
 
       return matchesStatus;
-    })
+    }),
   );
 
   const handleSort = (newSortBy: string) => {
+    const typedSortBy = newSortBy as
+      | "name"
+      | "attendance_rate"
+      | "last_attendance"
+      | "created_at";
     if (sortBy === newSortBy) {
-      setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+      setSort(typedSortBy, sortOrder === "desc" ? "asc" : "desc");
     } else {
-      setSortBy(newSortBy);
-      setSortOrder("asc");
+      setSort(typedSortBy, "asc");
     }
   };
 
@@ -239,10 +236,12 @@ export default function AdminCrewMembersManagement({
     switch (sortBy) {
       case "name":
         return `이름 ${sortOrder === "desc" ? "↓" : "↑"}`;
-      case "joinDate":
+      case "created_at":
         return `가입 ${sortOrder === "desc" ? "↓" : "↑"}`;
-      case "role":
-        return `권한 ${sortOrder === "desc" ? "↓" : "↑"}`;
+      case "attendance_rate":
+        return `출석률 ${sortOrder === "desc" ? "↓" : "↑"}`;
+      case "last_attendance":
+        return `최근출석 ${sortOrder === "desc" ? "↓" : "↑"}`;
       default:
         return "정렬";
     }
@@ -260,13 +259,11 @@ export default function AdminCrewMembersManagement({
     const date = new Date(dateString);
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}.${String(date.getDate()).padStart(2, "0")}`;
   };
 
-  const getRoleBadge = (roleId: number | null) => {
-    const isAdmin = roleId === 2;
-
+  const getRoleBadge = (isAdmin: boolean) => {
     if (isAdmin) {
       return (
         <div className='flex items-center'>
@@ -289,7 +286,7 @@ export default function AdminCrewMembersManagement({
     fetchMembers();
   }, [fetchMembers]);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className='space-y-[3vh] animate-pulse'>
         {Array.from({ length: 5 }).map((_, i) => (
@@ -425,7 +422,7 @@ export default function AdminCrewMembersManagement({
         <div className='space-y-3 max-h-[60vh] overflow-y-auto'>
           {filteredMembers.map((member) => {
             const isExpanded = expandedUsers.has(member.id);
-            const isAdmin = member.role_id === 2;
+            const isAdmin = member.is_admin;
 
             return (
               <Card key={member.id} className='border-0 bg-basic-black-gray'>
@@ -439,7 +436,7 @@ export default function AdminCrewMembersManagement({
                             <h3 className='text-base font-semibold text-white sm:text-lg'>
                               {getUserDisplayName(member)}
                             </h3>
-                            {getRoleBadge(member.role_id)}
+                            {getRoleBadge(member.is_admin)}
                           </div>
                         </div>
 
@@ -482,8 +479,8 @@ export default function AdminCrewMembersManagement({
                                 {isUpdating === member.id
                                   ? "처리 중..."
                                   : isAdmin
-                                  ? "운영진 권한 해제"
-                                  : "운영진  승격"}
+                                    ? "운영진 권한 해제"
+                                    : "운영진  승격"}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -512,16 +509,7 @@ export default function AdminCrewMembersManagement({
                             {formatDate(member.created_at)}
                           </span>
                         </div>
-                        {member.birth_year && (
-                          <div className='flex justify-between'>
-                            <span className='font-bold text-white'>
-                              출생연도
-                            </span>
-                            <span className='text-right'>
-                              {member.birth_year}
-                            </span>
-                          </div>
-                        )}
+
                         <div className='flex justify-between'>
                           <span className='font-bold text-white'>권한</span>
                           <span className='text-right'>

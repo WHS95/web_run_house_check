@@ -1,7 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-// import Image from "next/image"; // Image 컴포넌트 제거
-import { FaRegUserCircle } from "react-icons/fa"; // react-icons import 추가
+import { FaRegUserCircle } from "react-icons/fa";
 
 interface HeaderProps {
   title?: string;
@@ -9,30 +10,69 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
   const mypageLink = "/mypage";
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleScroll = useCallback(() => {
+    setIsScrolled(window.scrollY > 44);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
   return (
-    <header className='fixed top-0 left-0 right-0 z-50 w-full bg-basic-black border-b border-gray-800/20'>
-      <div className='pt-safe'>
-        <div className='flex items-center justify-between w-full px-3 py-4'>
-          <div className='flex items-center justify-between w-full mx-auto'>
-            <div>
-              <h1 className='text-2xl font-bold tracking-wider text-white black-han-sans-regular'>
-                {title}
-              </h1>
-            </div>
-            <div className='flex items-center gap-3 text-white'>
-              <Link
-                href={mypageLink}
-                className='p-2 transition-colors rounded-lg cursor-pointer hover:bg-white/10'
+    <>
+      {/* iOS 네비게이션 바 (스크롤 시 축소 상태) */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-200 ${
+          isScrolled
+            ? "bg-ios-elevated/72 backdrop-blur-[20px] border-b border-ios-separator"
+            : "bg-transparent"
+        }`}
+      >
+        <div className='pt-safe'>
+          <div className='flex items-center justify-between w-full px-4 h-11'>
+            <div className='flex items-center justify-between w-full'>
+              {/* 축소 상태: 타이틀이 중앙에 표시 */}
+              <div
+                className={`transition-opacity duration-200 ${
+                  isScrolled ? "opacity-100" : "opacity-0"
+                }`}
               >
-                <div className='relative w-6 h-6'>
-                  <FaRegUserCircle size={24} />
-                </div>
-              </Link>
+                <h1 className='text-ios-headline text-ios-label'>{title}</h1>
+              </div>
+              <div className='flex items-center gap-3'>
+                <Link
+                  href={mypageLink}
+                  className='p-2 rounded-full transition-colors active:bg-ios-elevated-3'
+                >
+                  <div className='relative w-6 h-6 text-ios-accent'>
+                    <FaRegUserCircle size={24} />
+                  </div>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+      </header>
+
+      {/* Large Title (스크롤 전 표시) */}
+      <div className='pt-safe'>
+        <div className='h-11' />
+        <div
+          className={`px-4 pb-2 transition-opacity duration-200 ${
+            isScrolled ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          <h1 className='text-ios-large-title text-ios-label black-han-sans-regular tracking-wider'>
+            {title}
+          </h1>
+        </div>
       </div>
-    </header>
+    </>
   );
 };
 

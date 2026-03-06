@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
       <header
         className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-200 ${
           isScrolled
-            ? "bg-ios-elevated/72 backdrop-blur-[20px] border-b border-ios-separator"
+            ? "bg-rh-bg-surface/72 backdrop-blur-[20px] border-b border-rh-border"
             : "bg-transparent"
         }`}
       >
@@ -42,14 +42,14 @@ const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
                   isScrolled ? "opacity-100" : "opacity-0"
                 }`}
               >
-                <h1 className='text-ios-headline text-ios-label'>{title}</h1>
+                <h1 className='text-[18px] font-semibold text-white'>{title}</h1>
               </div>
               <div className='flex items-center gap-3'>
                 <Link
                   href={mypageLink}
-                  className='p-2 rounded-full transition-colors active:bg-ios-elevated-3'
+                  className='p-2 rounded-full transition-colors active:bg-rh-bg-muted'
                 >
-                  <div className='relative w-6 h-6 text-ios-accent'>
+                  <div className='relative w-6 h-6 text-rh-accent'>
                     <FaRegUserCircle size={24} />
                   </div>
                 </Link>
@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
             isScrolled ? "opacity-0" : "opacity-100"
           }`}
         >
-          <h1 className='text-ios-large-title text-ios-label black-han-sans-regular tracking-wider'>
+          <h1 className='text-rh-hero text-white black-han-sans-regular tracking-wider'>
             {title}
           </h1>
         </div>

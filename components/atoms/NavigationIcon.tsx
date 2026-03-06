@@ -33,7 +33,7 @@ const NavigationIcon: React.FC<NavigationIconProps> = ({
     <IconComponent
       size={size}
       className={`transition-colors duration-200 ${
-        isActive ? "text-white" : "text-gray-400"
+        isActive ? "text-rh-accent" : "text-rh-text-muted"
       }`}
     />
   );

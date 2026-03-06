@@ -21,15 +21,15 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 }) => {
   return (
     <header
-      className={`flex relative z-50 items-center h-11 border-b border-ios-separator ${
-        backgroundColor || "bg-ios-elevated/72 backdrop-blur-[20px]"
+      className={`flex relative z-50 items-center h-14 border-b border-rh-border ${
+        backgroundColor || "bg-rh-bg-surface/72 backdrop-blur-[20px]"
       }`}
     >
       {/* 뒤로가기 버튼 */}
       {backLink && (
         <Link
           href={backLink}
-          className='flex items-center pl-2 pr-1 h-full text-ios-accent active:opacity-70 transition-opacity'
+          className='flex items-center pl-2 pr-1 h-full text-rh-accent active:opacity-70 transition-opacity'
         >
           <FiChevronLeft size={24} />
         </Link>
@@ -37,7 +37,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 
       {/* 타이틀 (중앙) */}
       <div className='flex-1 px-2'>
-        <h1 className='text-ios-headline text-ios-label truncate'>{title}</h1>
+        <h1 className='text-[18px] font-semibold text-white truncate'>{title}</h1>
       </div>
 
       {/* 우측 액션 */}

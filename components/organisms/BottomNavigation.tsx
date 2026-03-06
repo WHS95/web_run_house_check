@@ -106,7 +106,7 @@ const BottomNavigation: React.FC = () => {
 
   return (
     <nav className='ios-tab-bar'>
-      <div className='flex items-center justify-around h-[49px] max-w-md mx-auto'>
+      <div className='flex items-center justify-around h-16 max-w-md mx-auto pt-2'>
         {navigationItems.map((item) => (
           <div key={item.type} className='relative'>
             {/* 숨겨진 프리페치 링크 */}

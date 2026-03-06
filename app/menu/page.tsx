@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 import dynamic from "next/dynamic";
+import { getFCMToken } from "@/lib/firebase/client";
 
 // 동적 로딩으로 번들 크기 최적화
 const PageHeader = dynamic(
@@ -84,6 +85,16 @@ export default function MenuPage() {
       // 햅틱 피드백
       if (typeof window !== "undefined" && window.navigator.vibrate) {
         window.navigator.vibrate([50, 100, 50]);
+      }
+
+      // FCM 토큰 비활성화
+      const fcmToken = await getFCMToken();
+      if (fcmToken) {
+        await fetch("/api/push/token", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: fcmToken }),
+        }).catch(() => {});
       }
 
       // Supabase 세션 종료

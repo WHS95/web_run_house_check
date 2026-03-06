@@ -17,6 +17,7 @@ const MemberDetailTemplate = dynamic(
 // ⚡ 타입 정의
 interface UserProfileForMyPage {
   firstName: string | null;
+  crewId: string | null;
   birthYear: number | null;
   joinDate: string | null;
   rankName: string | null;
@@ -166,6 +167,7 @@ export default function MyPage() {
         // 에러 발생 시 기본값 설정
         setUserProfile({
           firstName: "사용자",
+          crewId: null,
           email: null,
           birthYear: null,
           joinDate: null,

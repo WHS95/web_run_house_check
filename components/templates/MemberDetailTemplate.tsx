@@ -1,13 +1,14 @@
 'use client';
 
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
 import { FiSettings } from 'react-icons/fi';
+import { Bell, BellOff } from 'lucide-react';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import MemberProfileInfo from '@/components/organisms/manager/memberDetail/MemberProfileInfo';
 import MemberActivityHistory from '@/components/organisms/manager/memberDetail/MemberActivityHistory';
-// import ActivityContributionGraph from '@/components/molecules/ActivityContributionGraph';
 import ActivitySummaryCard from '@/components/molecules/ActivitySummaryCard';
+import { usePushNotification } from '@/hooks/usePushNotification';
 
 interface Activity {
     type: 'attendance' | 'create_meeting';
@@ -18,6 +19,7 @@ interface Activity {
 
 interface UserProfileForMyPage {
     firstName: string | null;
+    crewId: string | null;
     birthYear: number | null;
     joinDate: string | null;
     rankName: string | null;
@@ -63,6 +65,9 @@ const AdminButton = memo(() => (
 AdminButton.displayName = 'AdminButton';
 
 const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, activityData, userId }) => {
+    const { isSupported, permission, requestPermission } =
+        usePushNotification({ crewId: userProfile?.crewId ?? null });
+
     const displayName = useMemo(() => {
         if (!userProfile?.firstName) return '사용자';
         return userProfile.birthYear 
@@ -108,10 +113,44 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                 
                 {/* 활동 내역 */}
                 <div className="bg-rh-bg-surface rounded-[1rem] p-[3vw] mb-[2vh]">
-                    <MemberActivityHistory 
+                    <MemberActivityHistory
                         activities={activityData.activities}
                     />
                 </div>
+
+                {/* 알림 설정 */}
+                {isSupported && (
+                    <div className="bg-rh-bg-surface rounded-[1rem] p-[4vw] mb-[2vh]">
+                        <h3 className="text-rh-title3 font-semibold text-white mb-3">알림 설정</h3>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                {permission === "granted" ? (
+                                    <Bell className="h-5 w-5 text-rh-accent" />
+                                ) : (
+                                    <BellOff className="h-5 w-5 text-rh-text-tertiary" />
+                                )}
+                                <div>
+                                    <p className="text-rh-body text-white">푸시 알림</p>
+                                    <p className="text-rh-caption text-rh-text-secondary">
+                                        {permission === "granted"
+                                            ? "알림이 켜져 있습니다"
+                                            : permission === "denied"
+                                            ? "브라우저 설정에서 알림을 허용해주세요"
+                                            : "출석·공지 알림을 받을 수 있어요"}
+                                    </p>
+                                </div>
+                            </div>
+                            {permission !== "granted" && permission !== "denied" && (
+                                <button
+                                    onClick={requestPermission}
+                                    className="rounded-rh-md bg-rh-accent px-4 py-2 text-rh-caption font-semibold text-white"
+                                >
+                                    알림 켜기
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

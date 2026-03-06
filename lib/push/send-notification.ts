@@ -1,12 +1,18 @@
 import { messaging } from "@/lib/firebase/admin";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { NotificationPayload } from "./types";
 
-// 서비스 역할 클라이언트 (RLS 우회)
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// 서비스 역할 클라이언트 (RLS 우회) — 지연 초기화
+let _supabaseAdmin: SupabaseClient | null = null;
+function getSupabaseAdmin() {
+    if (!_supabaseAdmin) {
+        _supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+    }
+    return _supabaseAdmin;
+}
 
 /**
  * 범용 알림 발송 함수
@@ -23,6 +29,7 @@ export async function sendNotification(
 ): Promise<void> {
     try {
         // 1. 대상 토큰 조회
+        const supabaseAdmin = getSupabaseAdmin();
         let query = supabaseAdmin
             .schema("attendance")
             .from("user_push_tokens")

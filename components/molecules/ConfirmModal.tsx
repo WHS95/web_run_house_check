@@ -36,7 +36,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     <div className='fixed inset-0 z-50 flex items-center justify-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 bg-basic-black/50 backdrop-blur-sm'
+        className='absolute inset-0 bg-rh-bg-primary/50 backdrop-blur-sm'
         onClick={onClose}
       />
 
@@ -74,7 +74,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
               className={`flex-1 py-4 text-base font-medium rounded-2xl ${
                 variant === "destructive"
                   ? "bg-red-600 hover:bg-red-700 text-white"
-                  : "bg-basic-black hover:bg-gray-800 text-white"
+                  : "bg-rh-bg-primary hover:bg-gray-800 text-white"
               }`}
             >
               {confirmText}

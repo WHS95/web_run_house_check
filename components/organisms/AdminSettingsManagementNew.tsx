@@ -55,13 +55,13 @@ export default function AdminSettingsManagementNew({
         <InviteCodeProvider initialInviteCodes={initialInviteCodes}>
           <AdminPageContainer>
         {/* 탭 네비게이션 */}
-        <div className='sticky top-4 z-30 p-2 rounded-lg shadow-sm bg-basic-black-gray lg:top-6'>
-          <div className='flex p-1 rounded-lg bg-basic-gray/30'>
+        <div className='sticky top-4 z-30 p-2 rounded-lg shadow-sm bg-rh-bg-surface lg:top-6'>
+          <div className='flex p-1 rounded-lg bg-rh-bg-muted/30'>
             <button
               onClick={() => handleTabChange("locations")}
               className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                 activeTab === "locations"
-                  ? "bg-basic-blue text-white shadow-sm"
+                  ? "bg-rh-accent text-white shadow-sm"
                   : "text-gray-400 hover:text-white"
               }`}
             >
@@ -72,7 +72,7 @@ export default function AdminSettingsManagementNew({
               onClick={() => handleTabChange("members")}
               className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                 activeTab === "members"
-                  ? "bg-basic-blue text-white shadow-sm"
+                  ? "bg-rh-accent text-white shadow-sm"
                   : "text-gray-400 hover:text-white"
               }`}
             >
@@ -83,7 +83,7 @@ export default function AdminSettingsManagementNew({
               onClick={() => handleTabChange("invites")}
               className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                 activeTab === "invites"
-                  ? "bg-basic-blue text-white shadow-sm"
+                  ? "bg-rh-accent text-white shadow-sm"
                   : "text-gray-400 hover:text-white"
               }`}
             >

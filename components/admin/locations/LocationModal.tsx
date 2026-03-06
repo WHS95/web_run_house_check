@@ -74,7 +74,7 @@ function LocationModal({
   if (mode === "delete") {
     return (
       <AlertDialog open={isOpen} onOpenChange={onClose}>
-        <AlertDialogContent className='border-gray-600 bg-basic-black-gray'>
+        <AlertDialogContent className='border-gray-600 bg-rh-bg-surface'>
           <AlertDialogHeader>
             <AlertDialogTitle className='flex gap-2 items-center text-white'>
               <AlertTriangle className='w-5 h-5 text-red-400' />
@@ -122,7 +122,7 @@ function LocationModal({
   }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='max-w-4xl max-h-[90vh] overflow-auto bg-basic-black-gray border-gray-600'>
+      <DialogContent className='max-w-4xl max-h-[90vh] overflow-auto bg-rh-bg-surface border-gray-600'>
         <div className='max-h-[calc(90vh-120px)] overflow-auto'>
           <LocationForm
             initialData={location}

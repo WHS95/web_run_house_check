@@ -34,7 +34,7 @@ const LocationItem = memo(function LocationItem({
 
   return (
     <Card
-      className={`flex justify-between items-center border-gray-600 transition-all cursor-pointer bg-basic-black-gray hover:border-basic-blue/50`}
+      className={`flex justify-between items-center border-gray-600 transition-all cursor-pointer bg-rh-bg-surface hover:border-rh-accent/50`}
       onClick={handleSelect}
     >
       <CardContent>
@@ -54,7 +54,7 @@ const LocationItem = memo(function LocationItem({
         variant='ghost'
         size='sm'
         onClick={handleEdit}
-        className='flex-shrink-0 text-gray-400 hover:text-white hover:bg-basic-blue/20'
+        className='flex-shrink-0 text-gray-400 hover:text-white hover:bg-rh-accent-hover/20'
       >
         <MoreVertical className='w-4 h-4' />
       </Button>
@@ -85,7 +85,7 @@ function LocationList({
     return (
       <div>
         {[1, 2, 3].map((i) => (
-          <Card key={i} className='border-gray-600 bg-basic-black-gray'>
+          <Card key={i} className='border-gray-600 bg-rh-bg-surface'>
             <CardContent className='p-1'>
               <div className='animate-pulse'>
                 <div className='mb-2 w-3/4 h-4 bg-gray-600 rounded'></div>
@@ -105,7 +105,7 @@ function LocationList({
 
   if (locations.length === 0) {
     return (
-      <Card className='border-gray-600 bg-basic-black-gray'>
+      <Card className='border-gray-600 bg-rh-bg-surface'>
         <CardContent className='p-8 text-center'>
           <h3 className='mb-2 text-lg font-medium text-white'>
             등록된 활동장소가 없습니다

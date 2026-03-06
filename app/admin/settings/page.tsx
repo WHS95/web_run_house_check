@@ -8,45 +8,45 @@ import { getCrewLocations, getCrewById } from "@/lib/supabase/admin";
 // iOS 스타일 로딩 스켈레톤 컴포넌트
 function SettingsLoadingSkeleton() {
   return (
-    <div className='flex flex-col h-full bg-basic-black'>
+    <div className='flex flex-col h-full bg-rh-bg-primary'>
       <div className='flex-1 px-[4vw] py-[3vh] pb-[20vh] space-y-[3vh] overflow-y-auto animate-pulse'>
         {/* 탭 네비게이션 스켈레톤 */}
-        <div className='bg-basic-black-gray rounded-[0.75rem] p-[1vw] shadow-sm border border-basic-gray'>
-          <div className='flex rounded-[0.5rem] bg-basic-gray/30 p-[0.5vw]'>
-            <div className='flex-1 py-[2vh] px-[4vw] bg-basic-gray rounded-[0.5rem]'></div>
-            <div className='flex-1 py-[2vh] px-[4vw] bg-basic-gray rounded-[0.5rem] ml-[1vw]'></div>
+        <div className='bg-rh-bg-surface rounded-[0.75rem] p-[1vw] shadow-sm border border-rh-border'>
+          <div className='flex rounded-[0.5rem] bg-rh-bg-muted/30 p-[0.5vw]'>
+            <div className='flex-1 py-[2vh] px-[4vw] bg-rh-bg-muted rounded-[0.5rem]'></div>
+            <div className='flex-1 py-[2vh] px-[4vw] bg-rh-bg-muted rounded-[0.5rem] ml-[1vw]'></div>
           </div>
         </div>
 
         {/* 컨텐츠 스켈레톤 */}
-        <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm border border-basic-gray'>
-          <div className='p-[4vw] border-b border-basic-gray'>
+        <div className='bg-rh-bg-surface rounded-[0.75rem] shadow-sm border border-rh-border'>
+          <div className='p-[4vw] border-b border-rh-border'>
             <div className='flex justify-between items-center'>
               <div className='flex items-center space-x-[2vw]'>
-                <div className='w-[1.25rem] h-[1.25rem] bg-basic-gray rounded'></div>
-                <div className='w-[20vw] h-[1.125rem] bg-basic-gray rounded'></div>
-                <div className='w-[8vw] h-[1.5rem] bg-basic-gray rounded-full'></div>
+                <div className='w-[1.25rem] h-[1.25rem] bg-rh-bg-muted rounded'></div>
+                <div className='w-[20vw] h-[1.125rem] bg-rh-bg-muted rounded'></div>
+                <div className='w-[8vw] h-[1.5rem] bg-rh-bg-muted rounded-full'></div>
               </div>
-              <div className='w-[20vw] h-[3vh] bg-basic-gray rounded-[0.75rem]'></div>
+              <div className='w-[20vw] h-[3vh] bg-rh-bg-muted rounded-[0.75rem]'></div>
             </div>
           </div>
 
           <div className='p-[4vw] space-y-[3vh]'>
             {/* 검색 스켈레톤 */}
-            <div className='w-full h-[6vh] bg-basic-gray rounded-[0.75rem]'></div>
+            <div className='w-full h-[6vh] bg-rh-bg-muted rounded-[0.75rem]'></div>
 
             {/* 목록 스켈레톤 */}
             <div className='space-y-[2vh]'>
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className='bg-basic-gray/20 rounded-[0.75rem] p-[4vw]'
+                  className='bg-rh-bg-muted/20 rounded-[0.75rem] p-[4vw]'
                 >
                   <div className='flex justify-between items-center'>
-                    <div className='w-[40vw] h-[1rem] bg-basic-gray rounded'></div>
+                    <div className='w-[40vw] h-[1rem] bg-rh-bg-muted rounded'></div>
                     <div className='flex space-x-[1vw]'>
-                      <div className='w-[3rem] h-[3rem] bg-basic-gray rounded-[0.5rem]'></div>
-                      <div className='w-[3rem] h-[3rem] bg-basic-gray rounded-[0.5rem]'></div>
+                      <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-[0.5rem]'></div>
+                      <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-[0.5rem]'></div>
                     </div>
                   </div>
                 </div>
@@ -113,8 +113,8 @@ export default function AdminSettingsPage() {
 
   if (error) {
     return (
-      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
-        <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-red-500/30'>
+      <div className='flex justify-center items-center min-h-screen bg-rh-bg-primary'>
+        <div className='p-6 text-center rounded-lg border shadow-sm bg-rh-bg-surface border-red-500/30'>
           <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
           <p className='text-gray-300'>{error}</p>
         </div>

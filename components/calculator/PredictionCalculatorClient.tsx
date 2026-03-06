@@ -125,7 +125,7 @@ export default function PredictionCalculatorClient() {
             value={recordedDistance}
             onChange={(e) => setRecordedDistance(e.target.value)}
             placeholder='예: 10.5'
-            className='text-white bg-basic-black-gray border-basic-gray'
+            className='text-white bg-rh-bg-surface border-rh-border'
           />
         </div>
 
@@ -194,14 +194,14 @@ export default function PredictionCalculatorClient() {
             value={targetDistance}
             onChange={(e) => setTargetDistance(e.target.value)}
             placeholder='예: 21.1'
-            className='text-white bg-basic-black-gray border-basic-gray'
+            className='text-white bg-rh-bg-surface border-rh-border'
           />
         </div>
 
         <Button
           onClick={handleCalculate}
           disabled={!isFormValid()}
-          className='w-full text-white bg-basic-blue hover:bg-basic-blue/80 disabled:opacity-50 disabled:cursor-not-allowed'
+          className='w-full text-white bg-rh-accent hover:bg-rh-accent-hover/80 disabled:opacity-50 disabled:cursor-not-allowed'
         >
           계산하기
         </Button>

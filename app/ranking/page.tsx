@@ -7,7 +7,7 @@ const UltraFastRankingTemplate = nextDynamic(
   () => import("@/components/templates/UltraFastRankingTemplate"),
   {
     loading: () => (
-      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
+      <div className='flex justify-center items-center min-h-screen bg-rh-bg-primary'>
         <LoadingSpinner size='sm' color='white' />
       </div>
     ),
@@ -27,25 +27,25 @@ export const metadata = {
 
 // ⚡ 고성능 로딩 폴백 컴포넌트
 const RankingPageFallback = React.memo(() => (
-  <div className='min-h-screen bg-basic-black'>
+  <div className='min-h-screen bg-rh-bg-primary'>
     <div className='pt-safe'>
       <div className='flex justify-between items-center px-4 py-4 w-full border-b border-gray-500'>
-        <div className='w-16 h-6 rounded animate-pulse bg-basic-black'></div>
-        <div className='w-6 h-6 rounded animate-pulse bg-basic-black'></div>
+        <div className='w-16 h-6 rounded animate-pulse bg-rh-bg-primary'></div>
+        <div className='w-6 h-6 rounded animate-pulse bg-rh-bg-primary'></div>
       </div>
     </div>
 
     {/* 랭킹 정보 스켈레톤 */}
     <div className='px-4 pt-6'>
-      <div className='p-4 mb-6 rounded-2xl animate-pulse bg-basic-black'>
-        <div className='mb-2 w-32 h-4 rounded bg-basic-black'></div>
-        <div className='w-20 h-8 rounded bg-basic-black'></div>
+      <div className='p-4 mb-6 rounded-2xl animate-pulse bg-rh-bg-primary'>
+        <div className='mb-2 w-32 h-4 rounded bg-rh-bg-primary'></div>
+        <div className='w-20 h-8 rounded bg-rh-bg-primary'></div>
       </div>
 
       {/* 탭 스켈레톤 */}
       <div className='flex mb-6 space-x-2'>
-        <div className='w-20 h-10 rounded-xl animate-pulse bg-basic-black'></div>
-        <div className='w-20 h-10 rounded-xl animate-pulse bg-basic-black'></div>
+        <div className='w-20 h-10 rounded-xl animate-pulse bg-rh-bg-primary'></div>
+        <div className='w-20 h-10 rounded-xl animate-pulse bg-rh-bg-primary'></div>
       </div>
 
       {/* 리스트 스켈레톤 */}
@@ -55,12 +55,12 @@ const RankingPageFallback = React.memo(() => (
             key={index}
             className='flex items-center p-3 space-x-3 animate-pulse'
           >
-            <div className='w-8 h-8 rounded-full bg-basic-black'></div>
+            <div className='w-8 h-8 rounded-full bg-rh-bg-primary'></div>
             <div className='flex-1'>
-              <div className='mb-1 w-24 h-4 rounded bg-basic-black'></div>
-              <div className='w-16 h-3 rounded bg-basic-black'></div>
+              <div className='mb-1 w-24 h-4 rounded bg-rh-bg-primary'></div>
+              <div className='w-16 h-3 rounded bg-rh-bg-primary'></div>
             </div>
-            <div className='w-12 h-4 rounded bg-basic-black'></div>
+            <div className='w-12 h-4 rounded bg-rh-bg-primary'></div>
           </div>
         ))}
       </div>

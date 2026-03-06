@@ -41,7 +41,7 @@ interface AdminDashboardProps {
 const renderChangeIndicator = (change: number | null) => {
   if (change === null) {
     return (
-      <div className='flex items-center px-3 py-1 text-xs rounded-full bg-basic-gray'>
+      <div className='flex items-center px-3 py-1 text-xs rounded-full bg-rh-bg-muted'>
         <span className='font-medium text-white'>-</span>
       </div>
     );
@@ -54,10 +54,10 @@ const renderChangeIndicator = (change: number | null) => {
     <div
       className={`flex items-center px-3 py-1 rounded-full text-xs ${
         isPositive
-          ? "bg-basic-blue"
+          ? "bg-rh-accent"
           : isNegative
-          ? "bg-basic-black"
-          : "bg-basic-gray"
+          ? "bg-rh-bg-primary"
+          : "bg-rh-bg-muted"
       }`}
     >
       {isPositive && <TrendingUp className='mr-1 w-2 h-2 text-white' />}
@@ -79,17 +79,17 @@ export default function AdminDashboard({
   selectedMonth,
 }: AdminDashboardProps) {
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-screen bg-rh-bg-primary'>
       <div className='overflow-y-auto flex-1 pb-20'>
         <div className='px-4 py-4 mx-auto max-w-lg'>
           {/* iOS 스타일 기본 통계 섹션 */}
           <div className='mb-3 space-y-6'>
             <div className='grid grid-cols-3 gap-4'>
               {/* 총 회원수 */}
-              <Card className='rounded-2xl shadow-sm bg-basic-black-gray'>
+              <Card className='rounded-2xl shadow-sm bg-rh-bg-surface'>
                 <CardContent className='p-2'>
                   <div className='flex flex-col items-center space-y-3 text-center'>
-                    <div className='flex justify-center items-center w-5 h-5 rounded-2xl bg-basic-blue'>
+                    <div className='flex justify-center items-center w-5 h-5 rounded-2xl bg-rh-accent'>
                       <Users className='w-4 h-3 text-white' />
                     </div>
                     <div>
@@ -103,10 +103,10 @@ export default function AdminDashboard({
               </Card>
 
               {/* 오늘 모임 */}
-              <Card className='rounded-2xl shadow-sm bg-basic-black-gray'>
+              <Card className='rounded-2xl shadow-sm bg-rh-bg-surface'>
                 <CardContent className='p-2'>
                   <div className='flex flex-col items-center space-y-3 text-center'>
-                    <div className='flex justify-center items-center w-5 h-5 rounded-2xl bg-basic-blue'>
+                    <div className='flex justify-center items-center w-5 h-5 rounded-2xl bg-rh-accent'>
                       <Calendar className='w-4 h-3 text-white' />
                     </div>
                     <div>
@@ -122,10 +122,10 @@ export default function AdminDashboard({
               </Card>
 
               {/* 오늘 출석 */}
-              <Card className='rounded-2xl shadow-sm bg-basic-black-gray'>
+              <Card className='rounded-2xl shadow-sm bg-rh-bg-surface'>
                 <CardContent className='p-2'>
                   <div className='flex flex-col items-center space-y-3 text-center'>
-                    <div className='flex justify-center items-center w-5 h-5 rounded-2xl bg-basic-blue'>
+                    <div className='flex justify-center items-center w-5 h-5 rounded-2xl bg-rh-accent'>
                       <UserCheck className='w-3 h-3 text-white' />
                     </div>
                     <div>
@@ -151,7 +151,7 @@ export default function AdminDashboard({
 
             <div className='space-y-3'>
               {/* 모임 건수 */}
-              <Card className='rounded-2xl shadow-sm bg-basic-black-gray'>
+              <Card className='rounded-2xl shadow-sm bg-rh-bg-surface'>
                 <CardContent className='px-4 py-2'>
                   <div className='flex justify-between items-start'>
                     <div>
@@ -176,7 +176,7 @@ export default function AdminDashboard({
               </Card>
 
               {/* 모임 참여 횟수 */}
-              <Card className='rounded-2xl shadow-sm bg-basic-black-gray'>
+              <Card className='rounded-2xl shadow-sm bg-rh-bg-surface'>
                 <CardContent className='px-4 py-2'>
                   <div className='flex justify-between items-start'>
                     <div>
@@ -203,7 +203,7 @@ export default function AdminDashboard({
               </Card>
 
               {/* 참여 크루원 수 */}
-              <Card className='rounded-2xl shadow-sm bg-basic-black-gray'>
+              <Card className='rounded-2xl shadow-sm bg-rh-bg-surface'>
                 <CardContent className='px-4 py-2'>
                   <div className='flex justify-between items-start'>
                     <div>
@@ -230,7 +230,7 @@ export default function AdminDashboard({
               </Card>
 
               {/* 모임개설 크루원 */}
-              <Card className='rounded-2xl shadow-sm bg-basic-black-gray'>
+              <Card className='rounded-2xl shadow-sm bg-rh-bg-surface'>
                 <CardContent className='px-4 py-2'>
                   <div className='flex justify-between items-start'>
                     <div>
@@ -255,7 +255,7 @@ export default function AdminDashboard({
               </Card>
 
               {/* 신규 가입 인원 */}
-              <Card className='rounded-2xl shadow-sm bg-basic-black-gray'>
+              <Card className='rounded-2xl shadow-sm bg-rh-bg-surface'>
                 <CardContent className='px-4 py-2'>
                   <div className='flex justify-between items-start'>
                     <div>

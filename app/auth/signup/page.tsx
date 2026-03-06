@@ -58,10 +58,10 @@ const InputField = memo<InputFieldProps>(
         onChange={onChange}
         placeholder={placeholder}
         readOnly={readOnly}
-        className={`w-full p-3 border-0 rounded-md text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-basic-blue ${
+        className={`w-full p-3 border-0 rounded-md text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-rh-accent ${
           readOnly
-            ? "text-gray-300 opacity-60 cursor-not-allowed bg-basic-gray"
-            : "bg-basic-black-gray"
+            ? "text-gray-300 opacity-60 cursor-not-allowed bg-rh-bg-muted"
+            : "bg-rh-bg-surface"
         }`}
       />
       {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
@@ -105,9 +105,9 @@ const CrewCodeVerification = memo<CrewCodeVerificationProps>(
 
     const inputClassName = useMemo(() => {
       const baseClass =
-        "flex-1 p-3 border-0 rounded-md bg-basic-black-gray text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-basic-blue";
+        "flex-1 p-3 border-0 rounded-md bg-rh-bg-surface text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-rh-accent";
       const disabledClass =
-        "opacity-60 cursor-not-allowed bg-basic-gray text-gray-300";
+        "opacity-60 cursor-not-allowed bg-rh-bg-muted text-gray-300";
       return `${baseClass} ${
         isCrewCodeVerifying || crewCodeVerified ? disabledClass : ""
       }`;
@@ -134,7 +134,7 @@ const CrewCodeVerification = memo<CrewCodeVerificationProps>(
             type='button'
             onClick={onVerifyCrewCode}
             disabled={isButtonDisabled}
-            className='px-4 py-3 text-sm font-medium text-white rounded-md border-0 bg-basic-blue hover:bg-basic-blue/80 focus:outline-none focus:ring-2 focus:ring-basic-blue disabled:bg-basic-gray disabled:text-gray-400 disabled:cursor-not-allowed'
+            className='px-4 py-3 text-sm font-medium text-white rounded-md border-0 bg-rh-accent hover:bg-rh-accent-hover/80 focus:outline-none focus:ring-2 focus:ring-rh-accent disabled:bg-rh-bg-muted disabled:text-gray-400 disabled:cursor-not-allowed'
           >
             {buttonText}
           </button>
@@ -208,12 +208,12 @@ const SubmitButton = memo<SubmitButtonProps>(
     }, [isSubmitting, isDisabled]);
 
     return (
-      <div className='flex-shrink-0 p-4 border-t bg-basic-black border-basic-gray'>
+      <div className='flex-shrink-0 p-4 border-t bg-rh-bg-primary border-rh-border'>
         <button
           type='submit'
           onClick={onSubmit}
           disabled={isDisabled}
-          className='px-4 py-3 w-full text-sm font-medium text-white rounded-md bg-basic-blue hover:bg-basic-blue/80 focus:outline-none focus:ring-2 focus:ring-basic-blue disabled:bg-basic-gray disabled:text-gray-400 disabled:cursor-not-allowed'
+          className='px-4 py-3 w-full text-sm font-medium text-white rounded-md bg-rh-accent hover:bg-rh-accent-hover/80 focus:outline-none focus:ring-2 focus:ring-rh-accent disabled:bg-rh-bg-muted disabled:text-gray-400 disabled:cursor-not-allowed'
         >
           {buttonText}
         </button>
@@ -425,7 +425,7 @@ export default function SignupPage() {
   }, [handleSubmit, onFormSubmit]);
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-screen bg-rh-bg-primary'>
       <PopupNotification
         isVisible={isNotificationVisible}
         message={notificationMessage}
@@ -435,18 +435,18 @@ export default function SignupPage() {
       />
 
       {/* ⚡ 헤더 - 메모이제이션됨 */}
-      <div className='flex-shrink-0 border-b bg-basic-black-gray border-basic-gray'>
+      <div className='flex-shrink-0 border-b bg-rh-bg-surface border-rh-border'>
         <PageHeader
           title='회원가입'
           backLink='/auth/login'
           iconColor='white'
-          borderColor='border-basic-gray'
-          backgroundColor='bg-basic-black-gray'
+          borderColor='border-rh-border'
+          backgroundColor='bg-rh-bg-surface'
         />
       </div>
 
       {/* ⚡ 폼 영역 - 스크롤 가능 */}
-      <div className='overflow-y-auto flex-1 bg-basic-black'>
+      <div className='overflow-y-auto flex-1 bg-rh-bg-primary'>
         <div className='px-4 py-6'>
           <form onSubmit={handleSubmit(onFormSubmit)} className='space-y-4'>
             {/* ⚡ 개별 입력 필드들 */}
@@ -483,7 +483,7 @@ export default function SignupPage() {
             />
 
             {/* 구분선 */}
-            <div className='my-6 border-t border-basic-gray'></div>
+            <div className='my-6 border-t border-rh-border'></div>
 
             {/* ⚡ 크루 코드 검증 */}
             <CrewCodeVerification
@@ -498,7 +498,7 @@ export default function SignupPage() {
             />
 
             {/* 구분선 */}
-            <div className='my-6 border-t border-basic-gray'></div>
+            <div className='my-6 border-t border-rh-border'></div>
 
             {/* ⚡ 동의 항목들 */}
             <ConsentAgreement

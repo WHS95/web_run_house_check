@@ -16,8 +16,8 @@ const AttendanceButton: React.FC<AttendanceButtonProps> = ({
       className={`w-full py-3 rounded-md text-white font-semibold transition-colors duration-200 
         ${
           disabled
-            ? "bg-basic-black cursor-not-allowed"
-            : "bg-basic-blue hover:bg-blue-700"
+            ? "bg-rh-bg-primary cursor-not-allowed"
+            : "bg-rh-accent hover:bg-blue-700"
         }
       `}
     >

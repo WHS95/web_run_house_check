@@ -14,14 +14,14 @@ export default function AdminLayoutWrapper({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className='flex h-screen bg-basic-black'>
+    <div className='flex h-screen bg-rh-bg-primary'>
       {/* 사이드바 */}
       <AdminSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* 메인 콘텐츠 */}
       <div className='flex flex-col flex-1 lg:ml-64 min-h-screen'>
         {/* 헤더 - 모바일에서만 표시 */}
-        <div className='sticky top-0 z-20 border-b bg-basic-black-gray border-basic-gray lg:hidden'>
+        <div className='sticky top-0 z-20 border-b bg-rh-bg-surface border-rh-border lg:hidden'>
           <div className='flex justify-between items-center p-4'>
             <button
               onClick={() => setSidebarOpen(true)}
@@ -30,7 +30,7 @@ export default function AdminLayoutWrapper({
               <Menu className='w-6 h-6' />
             </button>
             <div className='flex items-center space-x-2'>
-              <Shield className='w-5 h-5 text-basic-blue' />
+              <Shield className='w-5 h-5 text-rh-accent' />
               <span className='font-medium text-white'>크루 관리자</span>
             </div>
             <div className='w-6 h-6' /> {/* 균형을 위한 공간 */}

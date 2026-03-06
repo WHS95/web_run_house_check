@@ -87,7 +87,7 @@ export default async function HomePage() {
   return (
     <Suspense
       fallback={
-        <div className='flex items-center justify-center min-h-screen bg-basic-black'>
+        <div className='flex items-center justify-center min-h-screen bg-rh-bg-primary'>
           <div className='flex space-x-2'>
             <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
             <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>

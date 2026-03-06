@@ -164,7 +164,7 @@ export default function PaceCalculatorClient() {
             className={cn(
               "flex-1 px-3 py-2 text-sm rounded-md transition-colors",
               mode === tab.id
-                ? "bg-basic-blue text-white"
+                ? "bg-rh-accent text-white"
                 : "hover:bg-muted text-white"
             )}
           >
@@ -282,7 +282,7 @@ export default function PaceCalculatorClient() {
 
         <Button
           onClick={handleCalculate}
-          className='w-full text-white bg-basic-blue hover:bg-basic-blue/80'
+          className='w-full text-white bg-rh-accent hover:bg-rh-accent-hover/80'
         >
           계산하기
         </Button>

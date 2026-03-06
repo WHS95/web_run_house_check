@@ -255,13 +255,13 @@ export default function BulkAttendanceManagement({
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className='bg-basic-black-gray rounded-[0.75rem] p-[4vw]'
+            className='bg-rh-bg-surface rounded-[0.75rem] p-[4vw]'
           >
             <div className='flex items-center space-x-[3vw]'>
-              <div className='w-[3rem] h-[3rem] bg-basic-gray rounded-full'></div>
+              <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
               <div className='flex-1 space-y-[1vh]'>
-                <div className='h-[1rem] bg-basic-gray rounded w-[30vw]'></div>
-                <div className='h-[0.875rem] bg-basic-gray rounded w-[50vw]'></div>
+                <div className='h-[1rem] bg-rh-bg-muted rounded w-[30vw]'></div>
+                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-[50vw]'></div>
               </div>
             </div>
           </div>
@@ -273,14 +273,14 @@ export default function BulkAttendanceManagement({
   return (
     <div className='space-y-6'>
       {/* 헤더 */}
-      <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
-        <div className='p-[4vw] border-b border-basic-gray'>
+      <div className='bg-rh-bg-surface rounded-[0.75rem] shadow-sm overflow-hidden'>
+        <div className='p-[4vw] border-b border-rh-border'>
           <div className='flex items-center space-x-[2vw]'>
-            <UserPlus className='w-[1.25rem] h-[1.25rem] text-basic-blue' />
+            <UserPlus className='w-[1.25rem] h-[1.25rem] text-rh-accent' />
             <span className='text-[1.125rem] font-bold text-white'>
               출석 관리
             </span>
-            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-basic-gray rounded-full text-[0.75rem] font-medium text-gray-300'>
+            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-rh-bg-muted rounded-full text-[0.75rem] font-medium text-gray-300'>
               {selectedUsers.size}명 선택됨
             </div>
           </div>
@@ -300,8 +300,8 @@ export default function BulkAttendanceManagement({
                 onChange={(e) =>
                   handleAttendanceDataChange("date", e.target.value)
                 }
-                className='w-full text-white border-0 bg-basic-black placeholder:text-gray-400'
-                //  className='justify-between w-full text-white border-0 bg-basic-black'
+                className='w-full text-white border-0 bg-rh-bg-primary placeholder:text-gray-400'
+                //  className='justify-between w-full text-white border-0 bg-rh-bg-primary'
               />
             </div>
 
@@ -316,7 +316,7 @@ export default function BulkAttendanceManagement({
                 onChange={(e) =>
                   handleAttendanceDataChange("time", e.target.value)
                 }
-                className='text-white border-0 bg-basic-black placeholder:text-gray-400'
+                className='text-white border-0 bg-rh-bg-primary placeholder:text-gray-400'
               />
             </div>
 
@@ -329,7 +329,7 @@ export default function BulkAttendanceManagement({
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant='outline'
-                    className='justify-between w-full text-white border-0 bg-basic-black'
+                    className='justify-between w-full text-white border-0 bg-rh-bg-primary'
                   >
                     {locations.find(
                       (l) => l.id.toString() === attendanceData.location
@@ -337,7 +337,7 @@ export default function BulkAttendanceManagement({
                     <MapPin className='w-4 h-4' />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className='w-full border-0 bg-basic-black-gray'>
+                <DropdownMenuContent className='w-full border-0 bg-rh-bg-surface'>
                   {locations.map((location) => (
                     <DropdownMenuItem
                       key={location.id}
@@ -347,7 +347,7 @@ export default function BulkAttendanceManagement({
                           location.id.toString()
                         )
                       }
-                      className='text-white hover:bg-basic-gray'
+                      className='text-white hover:bg-rh-bg-muted'
                     >
                       {location.name}
                     </DropdownMenuItem>
@@ -361,7 +361,7 @@ export default function BulkAttendanceManagement({
           <Button
             onClick={handleBulkAttendance}
             disabled={isSubmitting || selectedUsers.size === 0}
-            className='w-full bg-basic-blue hover:bg-basic-blue/80 disabled:bg-basic-gray'
+            className='w-full bg-rh-accent hover:bg-rh-accent-hover/80 disabled:bg-rh-bg-muted'
           >
             {isSubmitting ? (
               <>
@@ -379,8 +379,8 @@ export default function BulkAttendanceManagement({
       </div>
 
       {/* 사용자 검색 및 선택 */}
-      <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
-        <div className='p-[4vw] border-b border-basic-gray'>
+      <div className='bg-rh-bg-surface rounded-[0.75rem] shadow-sm overflow-hidden'>
+        <div className='p-[4vw] border-b border-rh-border'>
           <div className='flex items-center space-x-[2vw]'>
             {/* <Users className='w-[1.25rem] h-[1.25rem] text-white' /> */}
             <span className='text-[1.125rem] font-bold text-white'>크루원</span>
@@ -395,7 +395,7 @@ export default function BulkAttendanceManagement({
               placeholder='이름, 이메일, 전화번호, 출생연도로 검색'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className='pl-10 text-white border-0 bg-basic-black placeholder:text-gray-400'
+              className='pl-10 text-white border-0 bg-rh-bg-primary placeholder:text-gray-400'
             />
           </div>
 
@@ -405,7 +405,7 @@ export default function BulkAttendanceManagement({
               variant='outline'
               size='sm'
               onClick={toggleAllUsers}
-              className='text-white border-0 bg-basic-black-gray hover:bg-basic-gray'
+              className='text-white border-0 bg-rh-bg-surface hover:bg-rh-bg-muted'
             >
               {selectedUsers.size === filteredUsers.length ? (
                 <>
@@ -432,8 +432,8 @@ export default function BulkAttendanceManagement({
                 onClick={() => toggleUserSelection(user.id)}
                 className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                   selectedUsers.has(user.id)
-                    ? "bg-basic-blue/20 border-basic-blue"
-                    : "bg-basic-black border-basic-gray hover:bg-basic-gray/20"
+                    ? "bg-rh-accent/20 border-rh-accent"
+                    : "bg-rh-bg-primary border-rh-border hover:bg-rh-bg-muted/20"
                 }`}
               >
                 <div className='flex justify-between items-center'>
@@ -442,7 +442,7 @@ export default function BulkAttendanceManagement({
                       <div
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                           selectedUsers.has(user.id)
-                            ? "bg-basic-blue border-basic-blue"
+                            ? "bg-rh-accent border-rh-accent"
                             : "border-gray-400"
                         }`}
                       >
@@ -456,7 +456,7 @@ export default function BulkAttendanceManagement({
                             {user.first_name}
                           </h4>
                           {user.birth_year && (
-                            <span className='px-2 py-1 text-xs font-medium text-gray-300 rounded-full bg-basic-gray'>
+                            <span className='px-2 py-1 text-xs font-medium text-gray-300 rounded-full bg-rh-bg-muted'>
                               {user.birth_year}
                             </span>
                           )}

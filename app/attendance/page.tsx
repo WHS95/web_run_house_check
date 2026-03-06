@@ -61,18 +61,18 @@ async function getAttendanceFormData() {
 
 // 로딩 폴백 컴포넌트
 const AttendancePageFallback = () => (
-  <div className='min-h-screen bg-basic-black'>
+  <div className='min-h-screen bg-rh-bg-primary'>
     <div className='pt-safe'>
       <div className='flex items-center justify-between w-full px-[4vw] py-[2vh] border-b border-gray-300'>
-        <div className='w-[20vw] h-[1.5rem] rounded animate-pulse bg-basic-black-gray'></div>
-        <div className='w-[1.5rem] h-[1.5rem] rounded animate-pulse bg-basic-black-gray'></div>
+        <div className='w-[20vw] h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
+        <div className='w-[1.5rem] h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
       </div>
     </div>
     <div className='px-[4vw] pt-[3vh] space-y-[3vh]'>
       {Array.from({ length: 5 }).map((_, index) => (
         <div key={index} className='animate-pulse'>
-          <div className='mb-[1.5vh] w-[24vw] h-[1rem] rounded bg-basic-black-gray'></div>
-          <div className='h-[6vh] rounded-xl bg-basic-black-gray'></div>
+          <div className='mb-[1.5vh] w-[24vw] h-[1rem] rounded bg-rh-bg-surface'></div>
+          <div className='h-[6vh] rounded-xl bg-rh-bg-surface'></div>
         </div>
       ))}
     </div>

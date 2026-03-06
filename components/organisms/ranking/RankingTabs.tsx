@@ -27,7 +27,7 @@ const RankingTabs: React.FC<RankingTabsProps> = ({
   }
 
   return (
-    <div className='flex p-[0.25rem] mb-[3vh] rounded-lg bg-basic-black-gray'>
+    <div className='flex p-[0.25rem] mb-[3vh] rounded-lg bg-rh-bg-surface'>
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -35,7 +35,7 @@ const RankingTabs: React.FC<RankingTabsProps> = ({
           className={`flex-1 py-[1vh] rounded-md text-[0.875rem] font-medium transition-all duration-200 
             ${
               activeTabId === tab.id
-                ? "bg-white text-basic-black-gray shadow-lg font-semibold transform scale-[1.02]"
+                ? "bg-white text-rh-bg-surface shadow-lg font-semibold transform scale-[1.02]"
                 : "text-white/50 hover:text-white/80 hover:bg-white/5"
             }
           `}

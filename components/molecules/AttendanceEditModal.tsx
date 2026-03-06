@@ -148,7 +148,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
     <div className='flex fixed inset-0 z-50 justify-center items-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 backdrop-blur-sm bg-basic-black/50'
+        className='absolute inset-0 backdrop-blur-sm bg-rh-bg-primary/50'
         onClick={onClose}
       />
 
@@ -182,7 +182,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     checkInTime: formatInputToDateTime(e.target.value),
                   })
                 }
-                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rh-accent'
               />
             </div>
 
@@ -199,7 +199,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     setFormData({ ...formData, location: e.target.value })
                   }
                   onFocus={() => setShowLocationDropdown(true)}
-                  className='p-3 pr-10 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                  className='p-3 pr-10 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rh-accent'
                   placeholder='모임 장소를 입력하세요'
                 />
                 <button
@@ -259,7 +259,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     name='isHost'
                     checked={formData.isHost}
                     onChange={() => setFormData({ ...formData, isHost: true })}
-                    className='mr-2 text-basic-blue focus:ring-basic-blue'
+                    className='mr-2 text-rh-accent focus:ring-rh-accent'
                   />
                   <span className='text-sm text-gray-700'>벙주</span>
                 </label>
@@ -269,7 +269,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     name='isHost'
                     checked={!formData.isHost}
                     onChange={() => setFormData({ ...formData, isHost: false })}
-                    className='mr-2 text-basic-blue focus:ring-basic-blue'
+                    className='mr-2 text-rh-accent focus:ring-rh-accent'
                   />
                   <span className='text-sm text-gray-700'>일반 참여자</span>
                 </label>
@@ -289,7 +289,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
             </Button>
             <Button
               onClick={handleSave}
-              className='flex-1 py-3 text-white bg-basic-blue hover:bg-blue-600'
+              className='flex-1 py-3 text-white bg-rh-accent hover:bg-blue-600'
               disabled={isLoading}
             >
               {isLoading ? "저장 중..." : "저장"}

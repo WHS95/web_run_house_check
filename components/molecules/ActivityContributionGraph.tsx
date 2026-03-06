@@ -21,7 +21,7 @@ const Legend = memo(() => (
       <div className='w-[0.625rem] h-[0.625rem] bg-gray-100 rounded-sm'></div>
       <div className='w-[0.625rem] h-[0.625rem] bg-blue-200 rounded-sm'></div>
       <div className='w-[0.625rem] h-[0.625rem] bg-blue-400 rounded-sm'></div>
-      <div className='w-[0.625rem] h-[0.625rem] bg-basic-blue rounded-sm'></div>
+      <div className='w-[0.625rem] h-[0.625rem] bg-rh-accent rounded-sm'></div>
     </div>
     <span>많음</span>
   </div>
@@ -87,7 +87,7 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
         ).length;
 
         if (hasCreatedMeeting) {
-          return "bg-basic-blue";
+          return "bg-rh-accent";
         } else if (attendanceCount >= 2) {
           return "bg-blue-400";
         } else if (attendanceCount === 1) {
@@ -200,7 +200,7 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
     }, [weeks, activityMap, today, getActivityColor, getTooltipMessage]);
 
     return (
-      <div className='p-[2vw] mt-[3vh] rounded-lg bg-basic-black-gray'>
+      <div className='p-[2vw] mt-[3vh] rounded-lg bg-rh-bg-surface'>
         {/* 상단 월 라벨 */}
         <div className='flex mb-[0.5vh] ml-[4vw]'>
           {monthLabels.map((monthLabel, index) => {

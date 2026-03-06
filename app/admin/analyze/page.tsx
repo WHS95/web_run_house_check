@@ -55,13 +55,13 @@ async function getDayParticipationAnalysis(
 
   if (!activeMembers || activeMembers.length === 0) {
     const dayInfo = [
-      { name: "일요일", color: "bg-basic-black-gray" },
-      { name: "월요일", color: "bg-basic-black-gray" },
-      { name: "화요일", color: "bg-basic-black-gray" },
-      { name: "수요일", color: "bg-basic-black-gray" },
-      { name: "목요일", color: "bg-basic-black-gray" },
-      { name: "금요일", color: "bg-basic-black-gray" },
-      { name: "토요일", color: "bg-basic-black-gray" },
+      { name: "일요일", color: "bg-rh-bg-surface" },
+      { name: "월요일", color: "bg-rh-bg-surface" },
+      { name: "화요일", color: "bg-rh-bg-surface" },
+      { name: "수요일", color: "bg-rh-bg-surface" },
+      { name: "목요일", color: "bg-rh-bg-surface" },
+      { name: "금요일", color: "bg-rh-bg-surface" },
+      { name: "토요일", color: "bg-rh-bg-surface" },
     ];
 
     return Array.from({ length: 7 }, (_, index) => ({
@@ -118,13 +118,13 @@ async function getDayParticipationAnalysis(
   });
 
   const dayInfo = [
-    { name: "일요일", color: "bg-basic-blue" },
-    { name: "월요일", color: "bg-basic-blue" },
-    { name: "화요일", color: "bg-basic-blue" },
-    { name: "수요일", color: "bg-basic-blue" },
-    { name: "목요일", color: "bg-basic-blue" },
-    { name: "금요일", color: "bg-basic-blue" },
-    { name: "토요일", color: "bg-basic-blue" },
+    { name: "일요일", color: "bg-rh-accent" },
+    { name: "월요일", color: "bg-rh-accent" },
+    { name: "화요일", color: "bg-rh-accent" },
+    { name: "수요일", color: "bg-rh-accent" },
+    { name: "목요일", color: "bg-rh-accent" },
+    { name: "금요일", color: "bg-rh-accent" },
+    { name: "토요일", color: "bg-rh-accent" },
   ];
 
   const result: DayParticipationData[] = Array.from(
@@ -220,7 +220,7 @@ async function getLocationParticipationAnalysis(
 
   const generateColor = (locationName: string, index: number) => {
     const colors = [
-      "bg-basic-blue",
+      "bg-rh-accent",
       "bg-blue-500",
       "bg-green-500",
       "bg-yellow-500",
@@ -381,35 +381,35 @@ function AnalyzeLoadingSkeleton() {
   return (
     <AdminPageContainer>
       {/* 헤더 스켈레톤 */}
-      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-basic-black py-4'>
+      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-rh-bg-primary py-4'>
         <div>
-          <div className='w-24 h-6 rounded animate-pulse bg-basic-gray'></div>
-          <div className='mt-1 w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
+          <div className='w-24 h-6 rounded animate-pulse bg-rh-bg-muted'></div>
+          <div className='mt-1 w-32 h-4 rounded animate-pulse bg-rh-bg-muted/70'></div>
         </div>
         <div className='flex space-x-2'>
-          <div className='w-20 h-8 rounded animate-pulse bg-basic-gray'></div>
-          <div className='w-16 h-8 rounded animate-pulse bg-basic-gray'></div>
+          <div className='w-20 h-8 rounded animate-pulse bg-rh-bg-muted'></div>
+          <div className='w-16 h-8 rounded animate-pulse bg-rh-bg-muted'></div>
         </div>
       </div>
 
       {/* 차트 스켈레톤 */}
       <div className='space-y-6'>
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className='p-6 rounded-lg border bg-basic-black-gray border-basic-gray'>
+          <div key={index} className='p-6 rounded-lg border bg-rh-bg-surface border-rh-border'>
             <div className='mb-6'>
-              <div className='mb-2 w-48 h-6 rounded animate-pulse bg-basic-gray'></div>
-              <div className='w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
+              <div className='mb-2 w-48 h-6 rounded animate-pulse bg-rh-bg-muted'></div>
+              <div className='w-32 h-4 rounded animate-pulse bg-rh-bg-muted/70'></div>
             </div>
 
             {/* 차트 아이템들 스켈레톤 */}
             <div className='space-y-3'>
               {Array.from({ length: 7 }).map((_, i) => (
                 <div key={i} className='flex items-center py-3 space-x-4'>
-                  <div className='w-12 h-4 rounded animate-pulse bg-basic-gray'></div>
-                  <div className='w-3 h-3 rounded-full animate-pulse bg-basic-gray'></div>
-                  <div className='w-16 h-4 rounded animate-pulse bg-basic-gray'></div>
-                  <div className='flex-1 h-2 rounded animate-pulse bg-basic-gray max-w-32'></div>
-                  <div className='w-16 h-4 rounded animate-pulse bg-basic-gray'></div>
+                  <div className='w-12 h-4 rounded animate-pulse bg-rh-bg-muted'></div>
+                  <div className='w-3 h-3 rounded-full animate-pulse bg-rh-bg-muted'></div>
+                  <div className='w-16 h-4 rounded animate-pulse bg-rh-bg-muted'></div>
+                  <div className='flex-1 h-2 rounded animate-pulse bg-rh-bg-muted max-w-32'></div>
+                  <div className='w-16 h-4 rounded animate-pulse bg-rh-bg-muted'></div>
                 </div>
               ))}
             </div>
@@ -493,7 +493,7 @@ export default function AnalyzePage() {
     return (
       <AdminPageContainer>
         <div className='flex justify-center items-center min-h-64'>
-          <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-red-500/30'>
+          <div className='p-6 text-center rounded-lg border shadow-sm bg-rh-bg-surface border-red-500/30'>
             <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
             <p className='text-gray-300'>{error}</p>
           </div>
@@ -506,7 +506,7 @@ export default function AnalyzePage() {
     return (
       <AdminPageContainer>
         <div className='flex justify-center items-center min-h-64'>
-          <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-basic-gray'>
+          <div className='p-6 text-center rounded-lg border shadow-sm bg-rh-bg-surface border-rh-border'>
             <h3 className='mb-2 text-lg font-semibold text-white'>데이터 없음</h3>
             <p className='text-gray-300'>분석할 데이터가 없습니다.</p>
           </div>
@@ -518,7 +518,7 @@ export default function AnalyzePage() {
   return (
     <AdminPageContainer>
       {/* 헤더 */}
-      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-basic-black py-4'>
+      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-rh-bg-primary py-4'>
         <div>
           <h1 className='text-xl font-bold text-white'>통계</h1>
         </div>
@@ -531,7 +531,7 @@ export default function AnalyzePage() {
               <Button
                 variant='outline'
                 size='sm'
-                className='text-white bg-basic-black-gray border-basic-gray hover:bg-basic-gray min-w-20'
+                className='text-white bg-rh-bg-surface border-rh-border hover:bg-rh-bg-muted min-w-20'
               >
                 {selectedYear}년
                 <ChevronDown className='ml-1 w-4 h-4' />
@@ -539,14 +539,14 @@ export default function AnalyzePage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align='end'
-              className='bg-basic-black-gray border-basic-gray'
+              className='bg-rh-bg-surface border-rh-border'
             >
               {yearOptions.map((year) => (
                 <DropdownMenuItem
                   key={year}
                   onClick={() => setSelectedYear(year)}
-                  className={`text-white hover:bg-basic-gray ${
-                    selectedYear === year ? "bg-basic-blue" : ""
+                  className={`text-white hover:bg-rh-bg-muted ${
+                    selectedYear === year ? "bg-rh-accent" : ""
                   }`}
                 >
                   {year}년
@@ -561,7 +561,7 @@ export default function AnalyzePage() {
               <Button
                 variant='outline'
                 size='sm'
-                className='text-white bg-basic-black-gray border-basic-gray hover:bg-basic-gray min-w-16'
+                className='text-white bg-rh-bg-surface border-rh-border hover:bg-rh-bg-muted min-w-16'
               >
                 {selectedMonth}월
                 <ChevronDown className='ml-1 w-4 h-4' />
@@ -569,14 +569,14 @@ export default function AnalyzePage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align='end'
-              className='bg-basic-black-gray border-basic-gray'
+              className='bg-rh-bg-surface border-rh-border'
             >
               {monthOptions.map((month) => (
                 <DropdownMenuItem
                   key={month}
                   onClick={() => setSelectedMonth(month)}
-                  className={`text-white hover:bg-basic-gray ${
-                    selectedMonth === month ? "bg-basic-blue" : ""
+                  className={`text-white hover:bg-rh-bg-muted ${
+                    selectedMonth === month ? "bg-rh-accent" : ""
                   }`}
                 >
                   {month}월

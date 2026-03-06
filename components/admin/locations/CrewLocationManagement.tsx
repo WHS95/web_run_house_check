@@ -257,10 +257,10 @@ function CrewLocationManagement({
   return (
     <div className='space-y-6'>
       {/* 위치 기반 출석 설정 */}
-      <Card className='border-gray-600 bg-basic-black-gray'>
+      <Card className='border-gray-600 bg-rh-bg-surface'>
         <CardHeader>
           <CardTitle className='flex gap-2 items-center text-white'>
-            <Settings className='w-5 h-5 text-basic-blue' />
+            <Settings className='w-5 h-5 text-rh-accent' />
             위치 기반 출석 설정
           </CardTitle>
         </CardHeader>
@@ -277,23 +277,23 @@ function CrewLocationManagement({
               checked={isLocationBasedEnabled}
               onCheckedChange={handleLocationBasedToggle}
               disabled={loading}
-              className='data-[state=checked]:bg-basic-blue'
+              className='data-[state=checked]:bg-rh-accent'
             />
           </div>
         </CardContent>
       </Card>
 
       {/* 활동장소 관리 */}
-      <Card className='border-gray-600 bg-basic-black-gray'>
+      <Card className='border-gray-600 bg-rh-bg-surface'>
         <CardHeader>
           <div className='flex justify-between items-center'>
             <CardTitle className='flex gap-2 items-center text-white'>
-              <MapPin className='w-5 h-5 text-basic-blue' />
+              <MapPin className='w-5 h-5 text-rh-accent' />
               장소
             </CardTitle>
             <Button
               onClick={() => openModal("add")}
-              className='text-white bg-basic-blue hover:bg-basic-blue/80'
+              className='text-white bg-rh-accent hover:bg-rh-accent-hover/80'
               disabled={loading}
             >
               <Plus className='w-2 h-2' />

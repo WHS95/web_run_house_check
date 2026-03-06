@@ -9,7 +9,7 @@ const LoginTemplate: React.FC = () => {
     const error = searchParams.get('error');
 
     return (
-        <div className='min-h-screen flex flex-col items-center justify-around px-4 py-8 bg-basic-black'>
+        <div className='min-h-screen flex flex-col items-center justify-around px-4 py-8 bg-rh-bg-primary'>
             {/* 로고 및 텍스트 블록 */}
             <div className='text-center text-white'>
                 <img src="/logo.png" alt="로고" className="w-32 h-auto mx-auto mb-6 sm:w-36" /> 

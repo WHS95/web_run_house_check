@@ -112,13 +112,13 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
       <>
         <div className='mb-4'>
           {/* 전체 동의 */}
-          <div className='pb-4 mb-4 border-b border-basic-gray'>
+          <div className='pb-4 mb-4 border-b border-rh-border'>
             <label className='flex items-center cursor-pointer'>
               <input
                 type='checkbox'
                 checked={allAgreed}
                 onChange={handleAllAgreementClick}
-                className='w-5 h-5 text-basic-blue bg-basic-black-gray border-basic-gray rounded focus:ring-basic-blue focus:ring-2'
+                className='w-5 h-5 text-rh-accent bg-rh-bg-surface border-rh-border rounded focus:ring-rh-accent focus:ring-2'
               />
               <span className='ml-3 text-base font-semibold text-white'>
                 전체동의
@@ -135,10 +135,10 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
                   type='checkbox'
                   checked={termsOfService}
                   onChange={handleTermsOfServiceChange}
-                  className='w-4 h-4 text-basic-blue bg-basic-black-gray border-basic-gray rounded focus:ring-basic-blue focus:ring-2'
+                  className='w-4 h-4 text-rh-accent bg-rh-bg-surface border-rh-border rounded focus:ring-rh-accent focus:ring-2'
                 />
                 <div className='ml-3'>
-                  <span className='text-sm font-medium text-basic-blue'>
+                  <span className='text-sm font-medium text-rh-accent'>
                     필수
                   </span>
                   <span className='ml-2 text-sm text-white'>
@@ -162,10 +162,10 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
                   type='checkbox'
                   checked={privacyConsent}
                   onChange={handlePrivacyConsentChange}
-                  className='w-4 h-4 text-basic-blue bg-basic-black-gray border-basic-gray rounded focus:ring-basic-blue focus:ring-2'
+                  className='w-4 h-4 text-rh-accent bg-rh-bg-surface border-rh-border rounded focus:ring-rh-accent focus:ring-2'
                 />
                 <div className='ml-3'>
-                  <span className='text-sm font-medium text-basic-blue'>
+                  <span className='text-sm font-medium text-rh-accent'>
                     필수
                   </span>
                   <span className='ml-2 text-sm text-white'>

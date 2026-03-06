@@ -79,7 +79,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
 
       {/* 드롭다운 메뉴 */}
       {isOpen && (
-        <div className='absolute top-full left-0 right-0 mt-[1vh] bg-basic-gray rounded-[1rem] shadow-lg z-50 max-h-[50vh] overflow-hidden'>
+        <div className='absolute top-full left-0 right-0 mt-[1vh] bg-rh-bg-muted rounded-[1rem] shadow-lg z-50 max-h-[50vh] overflow-hidden'>
           <div className='p-[4vw]'>
             {/* 년도 선택 섹션 */}
             <div className='mb-[3vh]'>
@@ -91,7 +91,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
                     onClick={() => handleYearMonthSelect(year, selectedMonth)}
                     className={`py-[1.5vh] text-center rounded-[0.5rem] text-[0.875rem] font-medium transition-colors ${
                       year === selectedYear
-                        ? "bg-white text-basic-black"
+                        ? "bg-white text-rh-text-inverted"
                         : "text-gray-300 hover:text-white hover:bg-gray-600"
                     }`}
                   >
@@ -113,7 +113,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
                     }
                     className={`py-[1.5vh] text-center rounded-[0.5rem] text-[0.875rem] font-medium transition-colors ${
                       month.value === selectedMonth
-                        ? "bg-white text-basic-black"
+                        ? "bg-white text-rh-text-inverted"
                         : "text-gray-300 hover:text-white hover:bg-gray-600"
                     }`}
                   >

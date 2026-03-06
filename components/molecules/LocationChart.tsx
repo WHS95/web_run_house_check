@@ -49,7 +49,7 @@ export default function LocationChart({
   month,
 }: LocationChartProps) {
   return (
-    <div className='p-6 rounded-lg shadow-sm bg-basic-black-gray'>
+    <div className='p-6 rounded-lg shadow-sm bg-rh-bg-surface'>
       <div className='mb-6'>
         <h3 className='mb-1 text-lg font-semibold text-white'>{title}</h3>
       </div>

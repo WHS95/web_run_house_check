@@ -126,7 +126,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                                                             <p className="text-white font-extrabold text-3xl mb-2">
                                                                 {myRanking.name} 
                                                             </p>
-                                                            <p className="text-basic-blue font-extrabold text-3xl mb-2">
+                                                            <p className="text-rh-accent font-extrabold text-3xl mb-2">
                                                               나의 랭킹 {myRanking.rank}위
                                                             </p>
                                                         </div>
@@ -143,7 +143,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                                                 })()}
                                                 <button
                                                     onClick={handleSwipeToRanking}
-                                                    className="mt-6 px-6 py-3 bg-basic-blue hover:bg-basic-blue/80 text-white rounded-xl text-base font-semibold transition-colors"
+                                                    className="mt-6 px-6 py-3 bg-rh-accent hover:bg-rh-accent-hover/80 text-white rounded-xl text-base font-semibold transition-colors"
                                                 >
                                                     전체 랭킹 보기
                                                 </button>

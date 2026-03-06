@@ -40,9 +40,9 @@ interface MemberDetailTemplateProps {
 }
 
 const ErrorState = memo(() => (
-    <div className="h-screen bg-basic-black flex flex-col">
+    <div className="h-screen bg-rh-bg-primary flex flex-col">
         <div className="flex-shrink-0">
-            <PageHeader title="내 정보" iconColor="white" borderColor="gray-300" backgroundColor="bg-basic-black-gray" />
+            <PageHeader title="내 정보" iconColor="white" borderColor="gray-300" backgroundColor="bg-rh-bg-surface" />
         </div>
         <div className="flex-1 flex items-center justify-center">
             <p className="text-gray-600">사용자 정보를 불러올 수 없습니다.</p>
@@ -85,8 +85,8 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
     }
 
     return (
-        <div className="flex flex-col h-screen bg-basic-black">
-            <div className="fixed top-0 left-0 right-0 z-10 bg-basic-black-gray">
+        <div className="flex flex-col h-screen bg-rh-bg-primary">
+            <div className="fixed top-0 left-0 right-0 z-10 bg-rh-bg-surface">
                 <PageHeader 
                     title="내 정보" 
                     iconColor="white" 
@@ -102,12 +102,12 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                 {userId && (
                     <ActivitySummaryCard 
                         userId={userId}
-                        className="bg-basic-black-gray rounded-[1rem] p-[6vw] mb-[4vh]"
+                        className="bg-rh-bg-surface rounded-[1rem] p-[6vw] mb-[4vh]"
                     />
                 )}
                 
                 {/* 활동 내역 */}
-                <div className="bg-basic-black-gray rounded-[1rem] p-[3vw] mb-[2vh]">
+                <div className="bg-rh-bg-surface rounded-[1rem] p-[3vw] mb-[2vh]">
                     <MemberActivityHistory 
                         activities={activityData.activities}
                     />

@@ -51,7 +51,7 @@ const PopupNotification = memo<PopupNotificationProps>(
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className='flex fixed inset-0 z-50 justify-center items-center p-4 bg-opacity-30 bg-basic-black'
+            className='flex fixed inset-0 z-50 justify-center items-center p-4 bg-opacity-30 bg-rh-bg-primary'
           >
             <motion.div
               initial={{ scale: 0.5, opacity: 0, y: 50 }}

@@ -24,7 +24,7 @@ export default function AdminPageContainer({
   };
 
   return (
-    <div className='min-h-screen bg-basic-black'>
+    <div className='min-h-screen bg-rh-bg-primary'>
       <div className={`p-4 lg:p-6 space-y-6 ${maxWidthClasses[maxWidth]} mx-auto ${className}`}>
         {children}
       </div>

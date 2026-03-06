@@ -106,14 +106,14 @@ export default function AdminSidebar({
       {/* 사이드바 */}
       <div
         className={`
-        fixed lg:fixed inset-y-0 left-0 z-50 w-64 bg-basic-black-gray border-r border-basic-gray transform transition-transform duration-300 ease-in-out
+        fixed lg:fixed inset-y-0 left-0 z-50 w-64 bg-rh-bg-surface border-r border-rh-border transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
         {/* 사이드바 헤더 */}
-        <div className='flex justify-between items-center p-4 border-b border-basic-gray'>
+        <div className='flex justify-between items-center p-4 border-b border-rh-border'>
           <div className='flex items-center space-x-3'>
-            <Shield className='w-6 h-6 text-basic-blue' />
+            <Shield className='w-6 h-6 text-rh-accent' />
             <div>
               <h1 className='text-lg font-semibold text-white'>크루 관리자</h1>
               <p className='text-xs text-gray-400'>
@@ -146,8 +146,8 @@ export default function AdminSidebar({
                     w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-left transition-colors
                     ${
                       isActive
-                        ? "text-white bg-basic-blue"
-                        : "text-gray-300 hover:bg-basic-black hover:text-white"
+                        ? "text-white bg-rh-accent"
+                        : "text-gray-300 hover:bg-rh-bg-primary hover:text-white"
                     }
                   `}
                 >
@@ -165,7 +165,7 @@ export default function AdminSidebar({
         </nav>
 
         {/* 사이드바 푸터 */}
-        <div className='absolute right-0 bottom-0 left-0 p-4 border-t border-basic-gray'>
+        <div className='absolute right-0 bottom-0 left-0 p-4 border-t border-rh-border'>
           <div className='text-xs text-center text-gray-500'>
             RunHouse Admin
             <br />

@@ -28,7 +28,7 @@ export default function MemberAttendanceStatusChart({
   } = data;
 
   return (
-    <div className='p-6 rounded-lg  shadow-sm bg-basic-black-gray'>
+    <div className='p-6 rounded-lg  shadow-sm bg-rh-bg-surface'>
       <div className='mb-6'>
         <h3 className='mb-1 text-lg font-semibold text-white'>{title}</h3>
         {/* <p className='text-sm text-gray-500'>
@@ -65,13 +65,13 @@ export default function MemberAttendanceStatusChart({
             <div>
               <div className='flex justify-between items-center mb-2'>
                 <span className='text-sm font-medium text-white'>출석율</span>
-                <span className='text-sm font-bold text-basic-blue'>
+                <span className='text-sm font-bold text-rh-accent'>
                   {attendanceRate}%
                 </span>
               </div>
               <div className='overflow-hidden w-full h-3 bg-gray-200 rounded-full'>
                 <div
-                  className='h-full bg-basic-blue transition-all duration-300 ease-out'
+                  className='h-full bg-rh-accent transition-all duration-300 ease-out'
                   style={{ width: `${attendanceRate}%` }}
                 ></div>
               </div>

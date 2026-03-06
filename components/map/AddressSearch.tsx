@@ -143,12 +143,12 @@ export default function AddressSearch({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           placeholder={placeholder}
-          className='flex-1 text-white placeholder-gray-400 border-gray-600 bg-basic-black-gray focus:border-basic-blue'
+          className='flex-1 text-white placeholder-gray-400 border-gray-600 bg-rh-bg-surface focus:border-rh-accent'
         />
         <Button
           onClick={handleSearch}
           disabled={loading || !searchQuery.trim()}
-          className='text-white bg-basic-blue hover:bg-basic-blue/80'
+          className='text-white bg-rh-accent hover:bg-rh-accent-hover/80'
         >
           {loading ? (
             <Loader2 className='w-4 h-4 animate-spin' />
@@ -160,11 +160,11 @@ export default function AddressSearch({
 
       {/* 검색 결과 / 검색 기록 드롭다운 */}
       {isOpen && (
-        <Card className='absolute left-0 right-0 z-50 mt-1 border-gray-600 shadow-lg top-full bg-basic-black-gray'>
+        <Card className='absolute left-0 right-0 z-50 mt-1 border-gray-600 shadow-lg top-full bg-rh-bg-surface'>
           <CardContent className='p-0'>
             {loading && (
               <div className='p-4 text-center'>
-                <Loader2 className='w-5 h-5 mx-auto mb-2 animate-spin text-basic-blue' />
+                <Loader2 className='w-5 h-5 mx-auto mb-2 animate-spin text-rh-accent' />
                 <p className='text-sm text-gray-400'>주소 검색 중...</p>
               </div>
             )}
@@ -189,10 +189,10 @@ export default function AddressSearch({
                   <button
                     key={index}
                     onClick={() => handleResultSelect(result)}
-                    className='w-full p-3 text-left transition-colors hover:bg-basic-black'
+                    className='w-full p-3 text-left transition-colors hover:bg-rh-bg-primary'
                   >
                     <div className='flex items-start gap-3'>
-                      <MapPin className='flex-shrink-0 w-4 h-4 mt-1 text-basic-blue' />
+                      <MapPin className='flex-shrink-0 w-4 h-4 mt-1 text-rh-accent' />
                       <div className='flex-1 min-w-0'>
                         <p className='text-sm font-medium text-white truncate'>
                           {result.roadAddress || result.address}
@@ -237,7 +237,7 @@ export default function AddressSearch({
                   <button
                     key={index}
                     onClick={() => handleHistorySelect(historyItem)}
-                    className='w-full p-3 text-left transition-colors hover:bg-basic-black'
+                    className='w-full p-3 text-left transition-colors hover:bg-rh-bg-primary'
                   >
                     <div className='flex items-center gap-3'>
                       <Search className='flex-shrink-0 w-4 h-4 text-gray-400' />

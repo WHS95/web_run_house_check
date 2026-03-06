@@ -14,7 +14,7 @@ export default function TermsOfServiceModal({
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 bg-basic-black'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 bg-rh-bg-primary'>
       <div className='bg-white rounded-lg max-w-md w-full mx-4 max-h-[80vh] overflow-hidden'>
         {/* 헤더 */}
         <div className='flex items-center justify-between p-4 border-b border-gray-200'>
@@ -168,7 +168,7 @@ export default function TermsOfServiceModal({
         <div className='p-4 border-t border-gray-200'>
           <button
             onClick={onClose}
-            className='w-full px-4 py-2 text-white rounded-md bg-primary-blue bg-basic-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary-blue'
+            className='w-full px-4 py-2 text-white rounded-md bg-primary-blue bg-rh-accent hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary-blue'
           >
             확인
           </button>

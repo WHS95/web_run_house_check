@@ -182,14 +182,14 @@ export default function NaverMapContainer({
         icon: {
           content: `
             <div class="relative">
-              <div class="w-8 h-8 bg-basic-blue rounded-full border-2 border-white shadow-lg flex items-center justify-center ${
-                isSelected ? "ring-2 ring-basic-blue ring-offset-2" : ""
+              <div class="w-8 h-8 bg-rh-accent rounded-full border-2 border-white shadow-lg flex items-center justify-center ${
+                isSelected ? "ring-2 ring-rh-accent ring-offset-2" : ""
               }">
                 <div class="w-3 h-3 bg-white rounded-full"></div>
               </div>
               ${
                 isSelected
-                  ? '<div class="absolute -bottom-1 left-1/2 w-0 h-0 border-t-4 border-r-2 border-l-2 border-transparent transform -translate-x-1/2 border-t-basic-blue"></div>'
+                  ? '<div class="absolute -bottom-1 left-1/2 w-0 h-0 border-t-4 border-r-2 border-l-2 border-transparent transform -translate-x-1/2 border-t-rh-accent"></div>'
                   : ""
               }
             </div>
@@ -269,7 +269,7 @@ export default function NaverMapContainer({
   if (error) {
     return (
       <div
-        className='flex justify-center items-center rounded-lg border border-gray-600 bg-basic-black-gray'
+        className='flex justify-center items-center rounded-lg border border-gray-600 bg-rh-bg-surface'
         style={{ height }}
       >
         <div className='text-center'>
@@ -283,11 +283,11 @@ export default function NaverMapContainer({
   if (isLoaded) {
     // return (
     //   // <div
-    //   //   className='flex justify-center items-center rounded-lg border border-gray-600 bg-basic-black-gray'
+    //   //   className='flex justify-center items-center rounded-lg border border-gray-600 bg-rh-bg-surface'
     //   //   style={{ height }}
     //   // >
     //   //   <div className='text-center'>
-    //   //     <div className='mb-2 w-8 h-8 rounded-full border-2 animate-spin border-basic-blue border-t-transparent'></div>
+    //   //     <div className='mb-2 w-8 h-8 rounded-full border-2 animate-spin border-rh-accent border-t-transparent'></div>
     //   //     <p className='text-gray-400'>지도 로딩 중...</p>
     //   //   </div>
     //   // </div>

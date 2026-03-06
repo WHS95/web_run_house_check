@@ -63,8 +63,8 @@ export default function CalculatorPage() {
   }, [router]);
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black main-content'>
-      <div className='fixed top-0 left-0 right-0 z-10 bg-basic-black-gray'>
+    <div className='flex flex-col h-screen bg-rh-bg-primary main-content'>
+      <div className='fixed top-0 left-0 right-0 z-10 bg-rh-bg-surface'>
         <PageHeader
           title='러닝 계산기'
           iconColor='white'
@@ -73,18 +73,18 @@ export default function CalculatorPage() {
       </div>
 
       <div className='flex-1 overflow-y-auto px-2 py-2 pt-[80px]'>
-        <div className='bg-basic-black'>
+        <div className='bg-rh-bg-primary'>
           {calculatorItems.map((item, index) => (
             <button
               key={index}
               onClick={() => router.push(item.href)}
               onMouseEnter={() => router.prefetch(item.href)}
               onFocus={() => router.prefetch(item.href)}
-              className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-basic-black-gray'
+              className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-rh-bg-surface'
             >
               <div className='flex items-center gap-3'>
                 <div className='text-left'>
-                  <div className='font-extrabold text-basic-blue'>
+                  <div className='font-extrabold text-rh-accent'>
                     {item.title}
                   </div>
                   <div className='text-sm text-white'>{item.description}</div>

@@ -267,8 +267,8 @@ export default function AdminCrewMembersManagement({
     if (isAdmin) {
       return (
         <div className='flex items-center'>
-          <Crown className='w-4 h-4 text-basic-blue mr-1.5' />
-          <span className='font-medium text-basic-blue'>운영진</span>
+          <Crown className='w-4 h-4 text-rh-accent mr-1.5' />
+          <span className='font-medium text-rh-accent'>운영진</span>
         </div>
       );
     } else {
@@ -292,13 +292,13 @@ export default function AdminCrewMembersManagement({
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className='bg-basic-black-gray rounded-[0.75rem] p-[4vw]'
+            className='bg-rh-bg-surface rounded-[0.75rem] p-[4vw]'
           >
             <div className='flex items-center space-x-[3vw]'>
-              <div className='w-[3rem] h-[3rem] bg-basic-gray rounded-full'></div>
+              <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
               <div className='flex-1 space-y-[1vh]'>
-                <div className='h-[1rem] bg-basic-gray rounded w-[30vw]'></div>
-                <div className='h-[0.875rem] bg-basic-gray rounded w-[50vw]'></div>
+                <div className='h-[1rem] bg-rh-bg-muted rounded w-[30vw]'></div>
+                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-[50vw]'></div>
               </div>
             </div>
           </div>
@@ -308,16 +308,16 @@ export default function AdminCrewMembersManagement({
   }
 
   return (
-    <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
+    <div className='bg-rh-bg-surface rounded-[0.75rem] shadow-sm overflow-hidden'>
       {/* 헤더 */}
-      <div className='p-[4vw] border-b border-basic-gray'>
+      <div className='p-[4vw] border-b border-rh-border'>
         <div className='flex justify-between items-center'>
           <div className='flex items-center space-x-[2vw]'>
             <Users className='w-[1.25rem] h-[1.25rem] text-white' />
             <span className='text-[1.125rem] font-bold text-white'>
               운영진 관리
             </span>
-            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-basic-black rounded-full text-[0.75rem] font-medium text-white'>
+            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-rh-bg-primary rounded-full text-[0.75rem] font-medium text-white'>
               {members.length}명
             </div>
           </div>
@@ -332,7 +332,7 @@ export default function AdminCrewMembersManagement({
             placeholder='이름 또는 이메일로 검색'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='pl-10 text-white rounded-lg border-0 bg-basic-black placeholder:text-gray-400'
+            className='pl-10 text-white rounded-lg border-0 bg-rh-bg-primary placeholder:text-gray-400'
           />
         </div>
 
@@ -345,7 +345,7 @@ export default function AdminCrewMembersManagement({
                 <Button
                   variant='outline'
                   size='sm'
-                  className='text-white rounded-full border-0 bg-basic-black-gray'
+                  className='text-white rounded-full border-0 bg-rh-bg-surface'
                 >
                   <ChevronDown className='mr-1 w-4 h-4' />
                   {statusFilter}
@@ -356,14 +356,14 @@ export default function AdminCrewMembersManagement({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='start'
-                className='border-0 bg-basic-black-gray'
+                className='border-0 bg-rh-bg-surface'
               >
                 {["전체", "운영진", "멤버"].map((status) => (
                   <DropdownMenuItem
                     key={status}
                     onClick={() => setStatusFilter(status)}
-                    className={`text-white hover:bg-basic-gray ${
-                      statusFilter === status ? "bg-basic-blue font-medium" : ""
+                    className={`text-white hover:bg-rh-bg-muted ${
+                      statusFilter === status ? "bg-rh-accent font-medium" : ""
                     }`}
                   >
                     <div className='flex justify-between items-center w-full'>
@@ -385,7 +385,7 @@ export default function AdminCrewMembersManagement({
                 <Button
                   variant='outline'
                   size='sm'
-                  className='text-white rounded-full border-0 bg-basic-black-gray'
+                  className='text-white rounded-full border-0 bg-rh-bg-surface'
                 >
                   <ArrowUpDown className='mr-1 w-4 h-4' />
                   {getSortLabel()}
@@ -393,23 +393,23 @@ export default function AdminCrewMembersManagement({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='end'
-                className='border-0 bg-basic-black-gray'
+                className='border-0 bg-rh-bg-surface'
               >
                 <DropdownMenuItem
                   onClick={() => handleSort("name")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   이름
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSort("joinDate")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   가입일
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSort("role")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   권한
                 </DropdownMenuItem>
@@ -425,7 +425,7 @@ export default function AdminCrewMembersManagement({
             const isAdmin = member.is_admin;
 
             return (
-              <Card key={member.id} className='border-0 bg-basic-black-gray'>
+              <Card key={member.id} className='border-0 bg-rh-bg-surface'>
                 <CardContent className='px-3 py-2'>
                   {/* 메인 멤버 정보 */}
                   <div className='flex justify-between items-center'>
@@ -467,14 +467,14 @@ export default function AdminCrewMembersManagement({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align='end'
-                              className='border-0 bg-basic-black-gray'
+                              className='border-0 bg-rh-bg-surface'
                             >
                               <DropdownMenuItem
                                 onClick={() =>
                                   handleToggleAdmin(member.id, !isAdmin)
                                 }
                                 disabled={isUpdating === member.id}
-                                className='text-white hover:bg-basic-gray'
+                                className='text-white hover:bg-rh-bg-muted'
                               >
                                 {isUpdating === member.id
                                   ? "처리 중..."
@@ -495,7 +495,7 @@ export default function AdminCrewMembersManagement({
                       isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <div className='pt-3 mt-3 border-t border-basic-gray'>
+                    <div className='pt-3 mt-3 border-t border-rh-border'>
                       <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
                         <div className='flex justify-between'>
                           <span className='font-bold text-white'>연락처</span>

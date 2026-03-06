@@ -69,7 +69,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
         {Array.from({ length: 3 }).map((_, index) => (
           <div
             key={index}
-            className='bg-basic-black-gray rounded-[1rem] p-[4vw] animate-pulse'
+            className='bg-rh-bg-surface rounded-[1rem] p-[4vw] animate-pulse'
           >
             <div className='h-[1.5rem] bg-gray-600 rounded mb-[2vh]'></div>
             <div className='grid grid-cols-3 gap-[2vw]'>
@@ -117,7 +117,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
   return (
     <div className='space-y-[2vh]'>
       {stats.map((stat, index) => (
-        <div key={index} className='bg-basic-black-gray rounded-[1rem] p-[4vw]'>
+        <div key={index} className='bg-rh-bg-surface rounded-[1rem] p-[4vw]'>
           <div className='flex items-center justify-between mb-[2vh]'>
             <h3 className='text-white font-medium text-[1rem]'>
               {stat.period_label}

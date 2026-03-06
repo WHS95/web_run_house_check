@@ -124,15 +124,15 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
       case 'error':
         return 'border-red-500/30';
       default:
-        return 'border-basic-gray';
+        return 'border-rh-border';
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className={`mx-4 p-6 max-w-sm text-center bg-basic-black-gray rounded-2xl border shadow-sm ${getStatusColor()}`}>
+      <div className={`mx-4 p-6 max-w-sm text-center bg-rh-bg-surface rounded-2xl border shadow-sm ${getStatusColor()}`}>
         {/* 아이콘 */}
-        <div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 bg-basic-gray/20 rounded-full">
+        <div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 bg-rh-bg-muted/20 rounded-full">
           {getStatusIcon()}
         </div>
 
@@ -146,7 +146,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
 
         {/* 활동장소 목록 (실패한 경우에만 표시) */}
         {verificationStatus === 'failed' && crewLocations.length > 0 && (
-          <div className="mb-4 p-3 text-left bg-basic-black/50 rounded-lg">
+          <div className="mb-4 p-3 text-left bg-rh-bg-primary/50 rounded-lg">
             <h4 className="mb-2 text-xs font-medium text-gray-400 uppercase">등록된 활동장소</h4>
             <div className="space-y-1">
               {crewLocations.map((location) => (
@@ -164,7 +164,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
           {verificationStatus === 'checking' ? (
             <button
               disabled
-              className="flex-1 py-3 font-medium text-gray-400 rounded-lg cursor-not-allowed bg-basic-gray/50"
+              className="flex-1 py-3 font-medium text-gray-400 rounded-lg cursor-not-allowed bg-rh-bg-muted/50"
             >
               확인 중...
             </button>
@@ -172,14 +172,14 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
             <>
               <button
                 onClick={onClose}
-                className="flex-1 py-3 font-medium text-gray-300 rounded-lg border border-basic-gray hover:bg-basic-gray/20"
+                className="flex-1 py-3 font-medium text-gray-300 rounded-lg border border-rh-border hover:bg-rh-bg-muted/20"
               >
                 닫기
               </button>
               {(verificationStatus === 'failed' || verificationStatus === 'error') && (
                 <button
                   onClick={handleLocationCheck}
-                  className="flex-1 py-3 font-medium text-white rounded-lg bg-basic-blue hover:bg-blue-600"
+                  className="flex-1 py-3 font-medium text-white rounded-lg bg-rh-accent hover:bg-blue-600"
                 >
                   다시 시도
                 </button>

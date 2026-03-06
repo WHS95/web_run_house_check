@@ -150,7 +150,7 @@ export default function MasterAdminPage() {
   }, []);
 
   return (
-    <div className='flex min-h-screen text-white bg-basic-black'>
+    <div className='flex min-h-screen text-white bg-rh-bg-primary'>
       {/* 사이드바 오버레이 (모바일) */}
       {sidebarOpen && (
         <div
@@ -162,14 +162,14 @@ export default function MasterAdminPage() {
       {/* 사이드바 */}
       <div
         className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-basic-black-gray border-r border-basic-gray transform transition-transform duration-300 ease-in-out
+        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-rh-bg-surface border-r border-rh-border transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
         {/* 사이드바 헤더 */}
-        <div className='flex justify-between items-center p-4 border-b border-basic-gray'>
+        <div className='flex justify-between items-center p-4 border-b border-rh-border'>
           <div className='flex items-center space-x-3'>
-            <Shield className='w-6 h-6 text-basic-blue' />
+            <Shield className='w-6 h-6 text-rh-accent' />
             <div>
               <h1 className='text-lg font-semibold'>마스터 관리자</h1>
               <p className='text-xs text-gray-400'>SUPER ADMIN</p>
@@ -197,8 +197,8 @@ export default function MasterAdminPage() {
                   w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-left transition-colors
                   ${
                     isActive
-                      ? "text-white bg-basic-blue"
-                      : "text-gray-300 hover:bg-basic-black hover:text-white"
+                      ? "text-white bg-rh-accent"
+                      : "text-gray-300 hover:bg-rh-bg-primary hover:text-white"
                   }
                 `}
               >
@@ -215,7 +215,7 @@ export default function MasterAdminPage() {
         </nav>
 
         {/* 사이드바 푸터 */}
-        <div className='absolute right-0 bottom-0 left-0 p-4 border-t border-basic-gray'>
+        <div className='absolute right-0 bottom-0 left-0 p-4 border-t border-rh-border'>
           <div className='text-xs text-center text-gray-500'>
             RunHouse Master Admin
             <br />
@@ -227,7 +227,7 @@ export default function MasterAdminPage() {
       {/* 메인 콘텐츠 */}
       <div className='flex flex-col flex-1 min-h-screen'>
         {/* 모바일 헤더 */}
-        <div className='p-4 border-b lg:hidden bg-basic-black-gray border-basic-gray'>
+        <div className='p-4 border-b lg:hidden bg-rh-bg-surface border-rh-border'>
           <div className='flex justify-between items-center'>
             <button
               onClick={() => setSidebarOpen(true)}
@@ -236,7 +236,7 @@ export default function MasterAdminPage() {
               <Menu className='w-6 h-6' />
             </button>
             <div className='flex items-center space-x-2'>
-              <Shield className='w-5 h-5 text-basic-blue' />
+              <Shield className='w-5 h-5 text-rh-accent' />
               <span className='font-medium'>마스터 관리자</span>
             </div>
             <div className='w-6 h-6' /> {/* 균형을 위한 공간 */}

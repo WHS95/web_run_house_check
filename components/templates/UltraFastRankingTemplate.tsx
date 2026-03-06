@@ -258,14 +258,14 @@ const UltraFastRankingTemplate = () => {
   );
 
   return (
-    <div className="h-screen bg-basic-black text-white flex flex-col overflow-hidden relative">
+    <div className="h-screen bg-rh-bg-primary text-white flex flex-col overflow-hidden relative">
       {/* ⚡ 헤더 - 상단 고정 */}
-      <div className="fixed top-0 left-0 right-0 bg-basic-black-gray z-30 pt-safe shadow-sm">
-        <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-basic-black-gray" />
+      <div className="fixed top-0 left-0 right-0 bg-rh-bg-surface z-30 pt-safe shadow-sm">
+        <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-surface" />
       </div>
 
       {/* ⚡ RankingInfo- 고정 */}
-      <div className="fixed top-[7vh] left-0 right-0 bg-basic-black z-20">
+      <div className="fixed top-[7vh] left-0 right-0 bg-rh-bg-primary z-20">
         <div className="px-[2vw] pb-[2vh]">
           <div className="mb-[3vh] mt-[3vh] flex items-center justify-between">
             <button 
@@ -312,7 +312,7 @@ const UltraFastRankingTemplate = () => {
       </div>
 
       {/* ⚡ 고정된 랭킹 리스트 헤더 */}
-      <div className="fixed top-[32vh] left-0 right-0 bg-basic-black z-10 border-gray-200">
+      <div className="fixed top-[32vh] left-0 right-0 bg-rh-bg-primary z-10 border-gray-200">
         <RankingListHeader 
           headers={[
             '등수', 
@@ -324,7 +324,7 @@ const UltraFastRankingTemplate = () => {
       </div>
       
       {/* ⚡ 스크롤 가능한 랭킹 리스트 영역 */}
-      <div className="absolute top-[37vh] left-0 right-0 bottom-0 bg-basic-black text-black hw-accelerated">
+      <div className="absolute top-[37vh] left-0 right-0 bottom-0 bg-rh-bg-primary text-black hw-accelerated">
         {/* ⚡ 데이터 또는 로딩 스피너 표시 */}
         <div className="h-full overflow-y-auto native-scroll">
           {isDataLoading ? (

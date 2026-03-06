@@ -87,7 +87,7 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({
   if (isLoading) {
     return (
       <div
-        className={`bg-basic-black-gray rounded-[1rem] p-[6vw] ${className}`}
+        className={`bg-rh-bg-surface rounded-[1rem] p-[6vw] ${className}`}
       >
         <div className='animate-pulse'>
           <div className='flex items-center justify-between mb-[4vh]'>
@@ -111,7 +111,7 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({
   if (error || !stats) {
     return (
       <div
-        className={`text-center bg-basic-black-gray rounded-[1rem] p-[6vw] ${className}`}
+        className={`text-center bg-rh-bg-surface rounded-[1rem] p-[6vw] ${className}`}
       >
         <p className='text-gray-400 text-[0.875rem] mb-[2vh]'>
           {error || "통계를 불러올 수 없습니다."}
@@ -129,7 +129,7 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({
   const totalActivities = stats.attendance_count + stats.meetings_created_count;
 
   return (
-    <div className={`bg-basic-black-gray rounded-[1rem] p-[6vw] ${className}`}>
+    <div className={`bg-rh-bg-surface rounded-[1rem] p-[6vw] ${className}`}>
       {/* 헤더 - 월 선택기 */}
       <div className='mb-[6vh]'>
         <MonthYearPicker

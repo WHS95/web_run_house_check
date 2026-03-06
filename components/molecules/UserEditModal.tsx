@@ -51,7 +51,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
     <div className='flex fixed inset-0 z-50 justify-center items-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 backdrop-blur-sm bg-basic-black/50'
+        className='absolute inset-0 backdrop-blur-sm bg-rh-bg-primary/50'
         onClick={onClose}
       />
 
@@ -76,7 +76,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, first_name: e.target.value })
                 }
-                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rh-accent'
                 placeholder='이름을 입력하세요'
               />
             </div>
@@ -92,7 +92,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rh-accent'
                 placeholder='010-0000-0000'
               />
             </div>
@@ -111,7 +111,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                     birth_year: parseInt(e.target.value),
                   })
                 }
-                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rh-accent'
                 placeholder='1990'
                 min='1950'
                 max={new Date().getFullYear()}
@@ -144,7 +144,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
             </Button>
             <Button
               onClick={handleSave}
-              className='flex-1 py-3 text-white bg-basic-blue hover:bg-blue-600'
+              className='flex-1 py-3 text-white bg-rh-accent hover:bg-blue-600'
               disabled={isLoading}
             >
               {isLoading ? "저장 중..." : "저장"}

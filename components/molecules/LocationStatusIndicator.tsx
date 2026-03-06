@@ -293,7 +293,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
             <button
               onClick={handleRefresh}
               disabled={isChecking}
-              className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-basic-gray/20 disabled:opacity-50"
+              className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-rh-bg-muted/20 disabled:opacity-50"
               title="다시 확인"
             >
               <RefreshCw className={`w-4 h-4 ${isChecking ? 'animate-spin' : ''}`} />
@@ -304,7 +304,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
             <button
               onClick={handleRequestPermission}
               disabled={isChecking}
-              className="px-3 py-1 text-xs font-medium text-white bg-basic-blue rounded-md hover:bg-blue-600 disabled:opacity-50"
+              className="px-3 py-1 text-xs font-medium text-white bg-rh-accent rounded-md hover:bg-blue-600 disabled:opacity-50"
             >
               권한 허용
             </button>

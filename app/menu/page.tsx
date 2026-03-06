@@ -104,8 +104,8 @@ export default function MenuPage() {
   }, [supabase, router]);
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black main-content'>
-      <div className='fixed top-0 left-0 right-0 z-10 bg-basic-black-gray'>
+    <div className='flex flex-col h-screen bg-rh-bg-primary main-content'>
+      <div className='fixed top-0 left-0 right-0 z-10 bg-rh-bg-surface'>
         <PageHeader
           title='러닝 계산기'
           iconColor='white'
@@ -115,7 +115,7 @@ export default function MenuPage() {
 
       {/* 메뉴 리스트 */}
       <div className='flex-1 overflow-y-auto px-2 py-2 pt-[80px]'>
-        <div className='bg-basic-black'>
+        <div className='bg-rh-bg-primary'>
           {/* 계산기 메뉴들 */}
           {menuItems.map((item, index) => {
             const IconComponent = item.icon;
@@ -123,14 +123,14 @@ export default function MenuPage() {
               <button
                 key={index}
                 onClick={() => handleItemClick(item)}
-                className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-basic-black-gray'
+                className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-rh-bg-surface'
               >
                 <div className='flex items-center gap-3'>
-                  <div className='flex items-center justify-center w-10 h-10 rounded-full bg-basic-black-gray'>
+                  <div className='flex items-center justify-center w-10 h-10 rounded-full bg-rh-bg-surface'>
                     <IconComponent size={20} className='text-white' />
                   </div>
                   <div className='text-left'>
-                    <div className='font-extrabold text-basic-blue'>
+                    <div className='font-extrabold text-rh-accent'>
                       {item.title}
                     </div>
                     <div className='text-sm text-white'>{item.description}</div>

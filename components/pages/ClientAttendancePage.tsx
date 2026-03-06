@@ -316,13 +316,13 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   // 에러 상태 처리
   if (error) {
     return (
-      <div className='flex flex-col justify-center items-center h-screen bg-basic-black'>
+      <div className='flex flex-col justify-center items-center h-screen bg-rh-bg-primary'>
         <div className='p-4 text-center text-white'>
           <h2 className='mb-4 text-xl font-bold'>오류가 발생했습니다</h2>
           <p className='mb-4'>{error}</p>
           <button
             onClick={() => router.push("/")}
-            className='px-4 py-2 text-white rounded bg-basic-blue'
+            className='px-4 py-2 text-white rounded bg-rh-accent'
           >
             홈으로 돌아가기
           </button>
@@ -334,14 +334,14 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   // 초기 데이터가 없는 경우
   if (!initialFormData) {
     return (
-      <div className='flex justify-center items-center h-screen bg-basic-black'>
+      <div className='flex justify-center items-center h-screen bg-rh-bg-primary'>
         <LoadingSpinner size='sm' color='white' />
       </div>
     );
   }
 
   return (
-    <div className='flex overflow-hidden relative flex-col h-screen bg-basic-black'>
+    <div className='flex overflow-hidden relative flex-col h-screen bg-rh-bg-primary'>
       {/* 헤더 */}
       <div className='fixed top-0 right-0 left-0 z-50'>
         <PageHeader
@@ -359,7 +359,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
             <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
               이름
             </label>
-            <div className='h-[6vh] bg-basic-black-gray rounded-xl flex items-center px-[2vw]'>
+            <div className='h-[6vh] bg-rh-bg-surface rounded-xl flex items-center px-[2vw]'>
               <span className='font-medium text-white'>{formData.name}</span>
             </div>
           </div>
@@ -375,7 +375,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                   type='date'
                   value={formData.date}
                   onChange={(e) => handleFormChange("date", e.target.value)}
-                  className='text-white ios-date-input bg-basic-black-gray'
+                  className='text-white ios-date-input bg-rh-bg-surface'
                 />
                 <div className='absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none'>
                   <AiOutlineCalendar className='w-[1.25rem] h-[1.25rem] text-gray-400' />
@@ -385,7 +385,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 <select
                   value={formData.time}
                   onChange={(e) => handleFormChange("time", e.target.value)}
-                  className='text-white ios-select bg-basic-black-gray'
+                  className='text-white ios-select bg-rh-bg-surface'
                 >
                   {availableTimeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -409,7 +409,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
               <select
                 value={formData.location}
                 onChange={(e) => handleFormChange("location", e.target.value)}
-                className='text-white ios-select bg-basic-black-gray'
+                className='text-white ios-select bg-rh-bg-surface'
               >
                 {initialFormData!.locationOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -434,7 +434,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 onChange={(e) =>
                   handleFormChange("exerciseType", e.target.value)
                 }
-                className='text-white ios-select bg-basic-black-gray'
+                className='text-white ios-select bg-rh-bg-surface'
               >
                 {initialFormData!.exerciseOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -495,7 +495,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
             (userStatus && !userStatus.isActive) ||
             (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-basic-blue hover:bg-blue-600"
+              : "bg-rh-accent hover:bg-blue-600"
           }`}
           style={{ WebkitTapHighlightColor: "transparent" }}
         >

@@ -10,7 +10,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ isVisible }) => {
   if (!isVisible) return null;
 
   return (
-    <div className='fixed inset-0 z-[9999] bg-basic-black flex flex-col items-center justify-center splash-screen'>
+    <div className='fixed inset-0 z-[9999] bg-rh-bg-primary flex flex-col items-center justify-center splash-screen'>
       {/* 로고 및 텍스트 블록 */}
       <div className='text-center text-white'>
         <img

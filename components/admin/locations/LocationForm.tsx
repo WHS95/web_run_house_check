@@ -235,7 +235,7 @@ export default function LocationForm({
   };
 
   return (
-    <Card className='border-gray-600 bg-basic-black-gray'>
+    <Card className='border-gray-600 bg-rh-bg-surface'>
       <CardContent>
         <form onSubmit={handleSubmit} className='space-y-6'>
           {/* 활동장소 이름 */}
@@ -248,7 +248,7 @@ export default function LocationForm({
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               placeholder='예: 한강공원 정기런닝 장소'
-              className='placeholder-gray-400 text-white border-gray-600 bg-basic-black focus:border-basic-blue'
+              className='placeholder-gray-400 text-white border-gray-600 bg-rh-bg-primary focus:border-rh-accent'
             />
             {errors.name && (
               <p className='text-sm text-red-400'>{errors.name}</p>
@@ -265,7 +265,7 @@ export default function LocationForm({
           </div>
           {/* 좌표 및 주소 정보 */}
           {formData.latitude !== 0 && formData.longitude !== 0 && (
-            <div className='p-3 rounded-lg border border-gray-600 bg-basic-black'>
+            <div className='p-3 rounded-lg border border-gray-600 bg-rh-bg-primary'>
               <div className='flex justify-between items-center mb-2'>
                 <Label className='text-sm text-white'>선택된 위치 정보</Label>
               </div>
@@ -285,7 +285,7 @@ export default function LocationForm({
                 )}
 
                 {reverseGeocoding && (
-                  <div className='text-basic-blue'>주소 정보 가져오는 중</div>
+                  <div className='text-rh-accent'>주소 정보 가져오는 중</div>
                 )}
               </div>
             </div>
@@ -333,7 +333,7 @@ export default function LocationForm({
                   variant='outline'
                   onClick={() => setShowDeleteConfirm(true)}
                   disabled={loading}
-                  className='text-white bg-basic-black border-basic-black hover:bg-basic-black/20'
+                  className='text-white bg-rh-bg-primary border-rh-border hover:bg-rh-bg-primary/20'
                 >
                   <Trash2 className='mr-2 w-4 h-4 text-red-400' />
                   장소 삭제
@@ -347,7 +347,7 @@ export default function LocationForm({
             <Button
               type='submit'
               disabled={loading}
-              className='flex-1 text-white bg-basic-blue hover:bg-basic-blue/80'
+              className='flex-1 text-white bg-rh-accent hover:bg-rh-accent-hover/80'
             >
               {loading ? (
                 <div className='flex gap-2 items-center'>
@@ -367,7 +367,7 @@ export default function LocationForm({
               variant='outline'
               onClick={onCancel}
               disabled={loading}
-              className='flex-1 text-white bg-basic-black border-basic-black hover:bg-basic-black/20'
+              className='flex-1 text-white bg-rh-bg-primary border-rh-border hover:bg-rh-bg-primary/20'
             >
               <X className='mr-2 w-4 h-4 text-white' />
               취소

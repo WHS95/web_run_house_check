@@ -58,7 +58,7 @@ export default function AdminBottomNavigation() {
 
   return (
     <>
-      <div className='fixed right-0 bottom-0 left-0 z-50 border-t bg-basic-black-gray border-basic-gray safe-area-pb'>
+      <div className='fixed right-0 bottom-0 left-0 z-50 border-t bg-rh-bg-surface border-rh-border safe-area-pb'>
         <div className='flex justify-around items-center px-2 py-2'>
           {navigationItems.map((item) => {
             const isActive =
@@ -89,17 +89,17 @@ export default function AdminBottomNavigation() {
                 <Button
                   variant='ghost'
                   className={`w-full h-auto flex flex-col items-center justify-center py-2 px-1 rounded-xl ${
-                    isActive ? "text-basic-blue" : "text-gray-400"
+                    isActive ? "text-rh-accent" : "text-gray-400"
                   }`}
                 >
                   <item.icon
                     className={`h-5 w-5 mb-1 ${
-                      isActive ? "text-basic-blue" : "text-gray-400"
+                      isActive ? "text-rh-accent" : "text-gray-400"
                     }`}
                   />
                   <span
                     className={`text-xs font-medium ${
-                      isActive ? "text-basic-blue" : "text-gray-400"
+                      isActive ? "text-rh-accent" : "text-gray-400"
                     }`}
                   >
                     {item.name}

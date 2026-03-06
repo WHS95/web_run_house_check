@@ -242,7 +242,7 @@ export default function AdminUserManagement({
     // status가 'ACTIVE' 또는 null이면 활성, 'SUSPENDED'면 비활성
     const isActive = status === "ACTIVE" || status === null;
     return (
-      <Badge className='text-white bg-basic-gray'>
+      <Badge className='text-white bg-rh-bg-muted'>
         {isActive ? "활성" : "비활성"}
       </Badge>
     );
@@ -280,9 +280,9 @@ export default function AdminUserManagement({
   };
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black'>
+    <div className='flex flex-col h-screen bg-rh-bg-primary'>
       {/* 검색 및 필터 - 고정 */}
-      <div className='sticky top-[10px] z-10 bg-basic-black px-4 py-4 space-y-4 '>
+      <div className='sticky top-[10px] z-10 bg-rh-bg-primary px-4 py-4 space-y-4 '>
         {/* 검색 */}
         <div className='relative'>
           <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
@@ -290,7 +290,7 @@ export default function AdminUserManagement({
             placeholder='이름, 전화번호 또는 이메일로 검색'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='pl-10 text-white rounded-lg border-0 bg-basic-black-gray placeholder:text-gray-400'
+            className='pl-10 text-white rounded-lg border-0 bg-rh-bg-surface placeholder:text-gray-400'
           />
         </div>
 
@@ -303,7 +303,7 @@ export default function AdminUserManagement({
                 <Button
                   variant='outline'
                   size='sm'
-                  className='text-white rounded-full border-0 bg-basic-black-gray'
+                  className='text-white rounded-full border-0 bg-rh-bg-surface'
                 >
                   <ChevronDown className='mr-1 w-4 h-4' />
                   {statusFilter}
@@ -314,14 +314,14 @@ export default function AdminUserManagement({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='start'
-                className='border-0 bg-basic-black-gray'
+                className='border-0 bg-rh-bg-surface'
               >
                 {["전체", "활성", "비활성"].map((status) => (
                   <DropdownMenuItem
                     key={status}
                     onClick={() => setStatusFilter(status)}
-                    className={`text-white hover:bg-basic-gray ${
-                      statusFilter === status ? "bg-basic-blue font-medium" : ""
+                    className={`text-white hover:bg-rh-bg-muted ${
+                      statusFilter === status ? "bg-rh-accent font-medium" : ""
                     }`}
                   >
                     <div className='flex justify-between items-center w-full'>
@@ -343,7 +343,7 @@ export default function AdminUserManagement({
                 <Button
                   variant='outline'
                   size='sm'
-                  className='text-white rounded-full border-0 bg-basic-black-gray'
+                  className='text-white rounded-full border-0 bg-rh-bg-surface'
                 >
                   <ArrowUpDown className='mr-1 w-4 h-4' />
                   {getSortLabel()}
@@ -351,23 +351,23 @@ export default function AdminUserManagement({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='end'
-                className='border-0 bg-basic-black-gray'
+                className='border-0 bg-rh-bg-surface'
               >
                 <DropdownMenuItem
                   onClick={() => handleSort("lastAttendance")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   참석
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSort("joinDate")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   가입
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSort("name")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   이름
                 </DropdownMenuItem>
@@ -384,7 +384,7 @@ export default function AdminUserManagement({
             const isExpanded = expandedUsers.has(user.id);
 
             return (
-              <Card key={user.id} className='border-0 bg-basic-black-gray'>
+              <Card key={user.id} className='border-0 bg-rh-bg-surface'>
                 <CardContent className='px-3 py-2'>
                   {/* 메인 사용자 정보 */}
                   <div className='flex justify-between items-center'>
@@ -406,7 +406,7 @@ export default function AdminUserManagement({
                               user.last_attendance_date &&
                               new Date(user.last_attendance_date) >
                                 new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-                                ? "text-basic-blue"
+                                ? "text-rh-accent"
                                 : user.last_attendance_date &&
                                   new Date(user.last_attendance_date) >
                                     new Date(
@@ -445,11 +445,11 @@ export default function AdminUserManagement({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align='end'
-                              className='border-0 bg-basic-black-gray'
+                              className='border-0 bg-rh-bg-surface'
                             >
                               <DropdownMenuItem
                                 onClick={() => handleEditUser(user)}
-                                className='text-white hover:bg-basic-gray'
+                                className='text-white hover:bg-rh-bg-muted'
                               >
                                 <Edit className='mr-2 w-4 h-4' />
                                 정보 수정
@@ -457,7 +457,7 @@ export default function AdminUserManagement({
                               <DropdownMenuItem
                                 onClick={() => handleToggleUserStatus(user.id)}
                                 disabled={isUpdating === user.id}
-                                className='text-white hover:bg-basic-gray'
+                                className='text-white hover:bg-rh-bg-muted'
                               >
                                 {isUpdating === user.id
                                   ? "처리 중..."
@@ -479,7 +479,7 @@ export default function AdminUserManagement({
                       isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <div className='pt-3 mt-3 border-t border-basic-gray'>
+                    <div className='pt-3 mt-3 border-t border-rh-border'>
                       <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
                         <div className='flex justify-between'>
                           <span className='text-white'>연락처</span>

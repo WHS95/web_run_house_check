@@ -11,10 +11,10 @@ function AdminDashboardSkeleton() {
   return (
     <AdminPageContainer maxWidth="lg">
       {/* 헤더 스켈레톤 */}
-      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-basic-black py-4'>
+      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-rh-bg-primary py-4'>
         <div className='flex items-center space-x-3'>
-          <div className='w-24 h-6 bg-basic-gray rounded-lg animate-pulse'></div>
-          <div className='w-20 h-6 bg-basic-gray rounded-lg animate-pulse'></div>
+          <div className='w-24 h-6 bg-rh-bg-muted rounded-lg animate-pulse'></div>
+          <div className='w-20 h-6 bg-rh-bg-muted rounded-lg animate-pulse'></div>
         </div>
       </div>
 
@@ -24,13 +24,13 @@ function AdminDashboardSkeleton() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className='p-4 bg-basic-black-gray rounded-2xl border border-basic-gray/30 shadow-sm'
+              className='p-4 bg-rh-bg-surface rounded-2xl border border-rh-border/30 shadow-sm'
             >
               <div className='flex flex-col items-center space-y-3 text-center'>
-                <div className='w-10 h-10 bg-basic-gray rounded-xl animate-pulse'></div>
+                <div className='w-10 h-10 bg-rh-bg-muted rounded-xl animate-pulse'></div>
                 <div>
-                  <div className='w-12 h-3 bg-basic-gray rounded animate-pulse'></div>
-                  <div className='mt-2 w-16 h-6 bg-basic-gray rounded animate-pulse'></div>
+                  <div className='w-12 h-3 bg-rh-bg-muted rounded animate-pulse'></div>
+                  <div className='mt-2 w-16 h-6 bg-rh-bg-muted rounded animate-pulse'></div>
                 </div>
               </div>
             </div>
@@ -41,22 +41,22 @@ function AdminDashboardSkeleton() {
       {/* 이달 현황 스켈레톤 */}
       <div className='mt-8'>
         <div className='flex items-center mb-4 space-x-2'>
-          <div className='w-6 h-6 bg-basic-gray rounded-full animate-pulse'></div>
-          <div className='w-24 h-6 bg-basic-gray rounded-lg animate-pulse'></div>
+          <div className='w-6 h-6 bg-rh-bg-muted rounded-full animate-pulse'></div>
+          <div className='w-24 h-6 bg-rh-bg-muted rounded-lg animate-pulse'></div>
         </div>
 
         <div className='space-y-3'>
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className='p-4 bg-basic-black-gray rounded-2xl border border-basic-gray/30 shadow-sm'
+              className='p-4 bg-rh-bg-surface rounded-2xl border border-rh-border/30 shadow-sm'
             >
               <div className='flex justify-between items-center'>
                 <div>
-                  <div className='w-20 h-4 bg-basic-gray rounded animate-pulse'></div>
-                  <div className='mt-2 w-16 h-6 bg-basic-gray rounded animate-pulse'></div>
+                  <div className='w-20 h-4 bg-rh-bg-muted rounded animate-pulse'></div>
+                  <div className='mt-2 w-16 h-6 bg-rh-bg-muted rounded animate-pulse'></div>
                 </div>
-                <div className='w-12 h-6 bg-basic-gray rounded animate-pulse'></div>
+                <div className='w-12 h-6 bg-rh-bg-muted rounded animate-pulse'></div>
               </div>
             </div>
           ))}
@@ -115,7 +115,7 @@ export default function AdminPage() {
     return (
       <AdminPageContainer maxWidth="lg">
         <div className='flex justify-center items-center min-h-64'>
-          <div className='p-6 mx-4 max-w-sm text-center bg-basic-black-gray rounded-2xl border border-red-500/30 shadow-sm'>
+          <div className='p-6 mx-4 max-w-sm text-center bg-rh-bg-surface rounded-2xl border border-red-500/30 shadow-sm'>
             <div className='flex justify-center items-center mx-auto mb-4 w-16 h-16 bg-red-500/20 rounded-full'>
               <svg
                 className='w-8 h-8 text-red-400'
@@ -153,19 +153,19 @@ export default function AdminPage() {
   return (
     <AdminPageContainer maxWidth="lg">
       {/* 헤더 */}
-      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-basic-black py-4'>
+      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-rh-bg-primary py-4'>
         {/* 년도/월 선택 드롭다운 */}
         <div className='flex items-center space-x-3'>
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className='px-4 py-2 text-sm bg-basic-black-gray text-white rounded-2xl border border-basic-gray shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-basic-blue focus:border-transparent'
+            className='px-4 py-2 text-sm bg-rh-bg-surface text-white rounded-2xl border border-rh-border shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rh-accent focus:border-transparent'
           >
             {yearOptions.map((year) => (
               <option
                 key={year}
                 value={year}
-                className='bg-basic-black-gray text-white'
+                className='bg-rh-bg-surface text-white'
               >
                 {year}년
               </option>
@@ -175,13 +175,13 @@ export default function AdminPage() {
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-            className='px-4 py-2 text-sm bg-basic-black-gray text-white rounded-2xl border border-basic-gray shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-basic-blue focus:border-transparent'
+            className='px-4 py-2 text-sm bg-rh-bg-surface text-white rounded-2xl border border-rh-border shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rh-accent focus:border-transparent'
           >
             {monthOptions.map((month) => (
               <option
                 key={month}
                 value={month}
-                className='bg-basic-black-gray text-white'
+                className='bg-rh-bg-surface text-white'
               >
                 {month}월
               </option>

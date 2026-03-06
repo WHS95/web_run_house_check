@@ -53,7 +53,7 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
   };
 
   return (
-    <div className='flex overflow-y-auto justify-between items-center px-[4vw] pb-[1.5vh] border-b border-basic-gray'>
+    <div className='flex overflow-y-auto justify-between items-center px-[4vw] pb-[1.5vh] border-b border-rh-border'>
       <div className='w-1/6 flex items-center justify-center h-[2rem]'>
         <span
           className={`text-center text-white ${

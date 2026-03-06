@@ -49,6 +49,7 @@ async function getInitialHomeData() {
       return {
         pageData: {
           userName: user.user_metadata?.full_name || user.email || "사용자",
+          crewId: null,
           crewName: null,
           noticeText: null,
         },
@@ -63,6 +64,7 @@ async function getInitialHomeData() {
     return {
       pageData: {
         userName: "사용자",
+        crewId: null,
         crewName: null,
         noticeText: null,
       },

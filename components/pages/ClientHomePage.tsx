@@ -10,6 +10,7 @@ import { haptic } from "@/lib/haptic";
 
 interface HomePageData {
   userName: string;
+  crewId: string | null;
   crewName: string | null;
   noticeText: string | null;
 }
@@ -67,6 +68,7 @@ const ClientHomePage: React.FC<ClientHomePageProps> = ({ initialData }) => {
     <>
       <EnhancedHomeTemplate
         username={pageData.userName}
+        crewId={pageData.crewId}
         crewName={pageData.crewName}
         rankName='Beginer' // 기본값으로 고정
         noticeText={pageData.noticeText}

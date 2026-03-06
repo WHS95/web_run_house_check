@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import Header from '../organisms/Header';
 import Hero from '../organisms/Hero';
 import NoticeBar from '../molecules/NoticeBar';
+import PushPermissionBanner from '../molecules/PushPermissionBanner';
 import RankingCard from '../molecules/RankingCard';
 import AttendanceCard from '../molecules/AttendanceCard';
+import { usePushNotification } from '@/hooks/usePushNotification';
 
 interface RankingData {
     selectedYear: number;
@@ -23,6 +25,7 @@ interface RankingData {
 
 interface EnhancedHomeTemplateProps {
     username: string | null;
+    crewId: string | null;
     rankName: string | null;
     crewName: string | null;
     noticeText: string | null;
@@ -30,11 +33,14 @@ interface EnhancedHomeTemplateProps {
 
 const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     username,
+    crewId,
     rankName,
     crewName,
     noticeText,
 }) => {
     const router = useRouter();
+    const { shouldShowBanner, requestPermission, dismissBanner } =
+        usePushNotification({ crewId });
     const [rankingData, setRankingData] = useState<RankingData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -92,6 +98,13 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                     <NoticeBar noticeText={noticeText} />
                 </div>
             )}
+
+            {/* 🔔 알림 유도 배너 */}
+            <PushPermissionBanner
+                show={shouldShowBanner}
+                onAllow={requestPermission}
+                onDismiss={dismissBanner}
+            />
 
             {/* 📱 Hero 영역 - 공지사항 아래에 위치 */}
             <div className="relative min-h-screen">

@@ -93,11 +93,6 @@ module.exports = {
             error: "var(--rh-status-error)",
           },
         },
-        /* 레거시 별칭 -> 신규 토큰 매핑 (점진적 제거 예정) */
-        "basic-blue": "var(--rh-accent)",
-        "basic-gray": "var(--rh-bg-muted)",
-        "basic-black": "var(--rh-bg-primary)",
-        "basic-black-gray": "var(--rh-bg-surface)",
       },
       fontSize: {
         "rh-hero": ["2rem", { lineHeight: "1.2", fontWeight: "700" }],
@@ -108,77 +103,6 @@ module.exports = {
         "rh-caption": ["0.75rem", { lineHeight: "1.4", fontWeight: "400" }],
         "rh-label": ["0.6875rem", { lineHeight: "1.4", fontWeight: "500" }],
         "rh-small": ["0.625rem", { lineHeight: "1.4", fontWeight: "600" }],
-        /* 기존 ios-* 유지 (점진적 제거) */
-        "ios-large-title": [
-          "2.125rem",
-          {
-            lineHeight: "1.2",
-            fontWeight: "700",
-          },
-        ],
-        "ios-title-1": [
-          "1.75rem",
-          {
-            lineHeight: "1.2",
-            fontWeight: "700",
-          },
-        ],
-        "ios-title-2": [
-          "1.375rem",
-          {
-            lineHeight: "1.3",
-            fontWeight: "700",
-          },
-        ],
-        "ios-title-3": [
-          "1.25rem",
-          {
-            lineHeight: "1.3",
-            fontWeight: "600",
-          },
-        ],
-        "ios-headline": [
-          "1.0625rem",
-          {
-            lineHeight: "1.4",
-            fontWeight: "600",
-          },
-        ],
-        "ios-body": [
-          "1.0625rem",
-          {
-            lineHeight: "1.4",
-            fontWeight: "400",
-          },
-        ],
-        "ios-callout": [
-          "1rem",
-          {
-            lineHeight: "1.4",
-            fontWeight: "400",
-          },
-        ],
-        "ios-subhead": [
-          "0.9375rem",
-          {
-            lineHeight: "1.4",
-            fontWeight: "400",
-          },
-        ],
-        "ios-footnote": [
-          "0.8125rem",
-          {
-            lineHeight: "1.4",
-            fontWeight: "400",
-          },
-        ],
-        "ios-caption": [
-          "0.75rem",
-          {
-            lineHeight: "1.4",
-            fontWeight: "400",
-          },
-        ],
       },
       borderRadius: {
         xl: "1.375rem",
@@ -328,14 +252,6 @@ module.exports = {
         "rh-xl": "16px",
         "rh-2xl": "24px",
         "rh-3xl": "32px",
-        /* 기존 ios-* 유지 (점진적 제거) */
-        "ios-xs": "0.25rem",
-        "ios-sm": "0.5rem",
-        "ios-md": "1rem",
-        "ios-lg": "1.25rem",
-        "ios-xl": "2rem",
-        "ios-2xl": "2.75rem",
-        "ios-touch": "2.75rem",
         18: "4.5rem",
         22: "5.5rem",
         26: "6.5rem",

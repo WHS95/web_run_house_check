@@ -27,81 +27,86 @@
 
 @layer base {
     :root {
-        /* === iOS Design System Tokens === */
+        /* === RunHouse Design System Tokens (.pen 기준) === */
 
-        /* Background Layers (Apple Dark) */
-        --ios-system-bg: #000000;
-        --ios-grouped-bg: #000000;
-        --ios-elevated-bg: #1C1C1E;
-        --ios-elevated-bg-2: #2C2C2E;
-        --ios-elevated-bg-3: #3A3A3C;
+        /* Background */
+        --rh-bg-primary: #1D2530;
+        --rh-bg-inset: #1A2029;
+        --rh-bg-surface: #2B3644;
+        --rh-bg-muted: #4C525E;
+        --rh-bg-accent: #669FF2;
 
-        /* Accent System (Monochromatic Blue) */
-        --ios-accent: #669ff2;
-        --ios-accent-strong: #3D7FE8;
-        --ios-accent-light: #99BFF7;
-        --ios-accent-muted: #6B84A8;
-        --ios-accent-dim: #4B5F7A;
-        --ios-accent-subtle: #3D4655;
+        /* Accent */
+        --rh-accent: #669FF2;
+        --rh-accent-hover: #5A8FE0;
 
-        /* Labels */
-        --ios-label-primary: #FFFFFF;
-        --ios-label-secondary: rgba(235, 235, 245, 0.6);
-        --ios-label-tertiary: rgba(235, 235, 245, 0.3);
+        /* Border */
+        --rh-border: #374151;
+        --rh-border-subtle: #1A2029;
+        --rh-divider: #2B3644;
 
-        /* Separator & Overlay */
-        --ios-separator: rgba(84, 84, 88, 0.65);
-        --ios-overlay: rgba(0, 0, 0, 0.4);
+        /* Text */
+        --rh-text-primary: #FFFFFF;
+        --rh-text-secondary: #94A3B8;
+        --rh-text-tertiary: #64748B;
+        --rh-text-muted: #475569;
+        --rh-text-inverted: #1D2530;
 
-        /* Typography Scale (iOS Dynamic Type) */
-        --text-large-title: 2.125rem;
-        --text-title-1: 1.75rem;
-        --text-title-2: 1.375rem;
-        --text-title-3: 1.25rem;
-        --text-headline: 1.0625rem;
-        --text-body: 1.0625rem;
-        --text-callout: 1rem;
-        --text-subhead: 0.9375rem;
-        --text-footnote: 0.8125rem;
-        --text-caption: 0.75rem;
+        /* Status */
+        --rh-status-success: #4ADE80;
+        --rh-status-warning: #FBBF24;
+        --rh-status-error: #F87171;
+
+        /* Typography (px) */
+        --rh-text-hero: 32px;
+        --rh-text-title1: 24px;
+        --rh-text-title2: 20px;
+        --rh-text-title3: 16px;
+        --rh-text-body: 14px;
+        --rh-text-caption: 12px;
+        --rh-text-label: 11px;
+        --rh-text-small: 10px;
 
         /* Spacing */
-        --space-xs: 0.25rem;
-        --space-sm: 0.5rem;
-        --space-md: 1rem;
-        --space-lg: 1.25rem;
-        --space-xl: 2rem;
-        --space-2xl: 2.75rem;
+        --rh-spacing-xs: 2px;
+        --rh-spacing-sm: 4px;
+        --rh-spacing-md: 8px;
+        --rh-spacing-lg: 12px;
+        --rh-spacing-xl: 16px;
+        --rh-spacing-2xl: 24px;
+        --rh-spacing-3xl: 32px;
 
         /* Radius */
-        --radius-sm: 0.5rem;
-        --radius-md: 0.75rem;
-        --radius-lg: 1rem;
-        --radius-xl: 1.375rem;
+        --rh-radius-xs: 4px;
+        --rh-radius-sm: 6px;
+        --rh-radius-md: 8px;
+        --rh-radius-lg: 12px;
+        --rh-radius-xl: 16px;
+        --rh-radius-full: 100px;
 
-        /* === shadcn/ui 호환 (iOS Dark 매핑) === */
-        --background: 0 0% 0%;
+        /* === shadcn/ui 호환 (RunHouse 토큰 매핑) === */
+        --background: 213 24% 15%;
         --foreground: 0 0% 100%;
-        --card: 240 3.3% 11.4%;
+        --card: 213 22% 22%;
         --card-foreground: 0 0% 100%;
-        --popover: 240 2% 17.6%;
+        --popover: 213 22% 22%;
         --popover-foreground: 0 0% 100%;
         --primary: 216 84% 67%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 240 2% 17.6%;
+        --secondary: 213 22% 22%;
         --secondary-foreground: 0 0% 100%;
-        --muted: 240 2% 17.6%;
-        --muted-foreground: 240 3% 56%;
+        --muted: 216 10% 33%;
+        --muted-foreground: 215 16% 47%;
         --accent: 216 84% 67%;
         --accent-foreground: 0 0% 100%;
-        --destructive: 214 24% 39%;
+        --destructive: 0 86% 71%;
         --destructive-foreground: 0 0% 100%;
-        --border: 240 2% 22%;
-        --input: 240 2% 17.6%;
+        --border: 218 19% 27%;
+        --input: 213 22% 22%;
         --ring: 216 84% 67%;
-        --radius: 0.75rem;
+        --radius: 0.5rem;
 
-        /* Chart (모노크로매틱 블루 계열) */
+        /* Chart */
         --chart-1: 216 84% 67%;
         --chart-2: 216 70% 55%;
         --chart-3: 216 60% 45%;
@@ -109,13 +114,13 @@
         --chart-5: 216 40% 25%;
 
         /* Sidebar */
-        --sidebar-background: 0 0% 0%;
+        --sidebar-background: 213 24% 15%;
         --sidebar-foreground: 0 0% 100%;
         --sidebar-primary: 216 84% 67%;
         --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 240 3.3% 11.4%;
+        --sidebar-accent: 213 22% 22%;
         --sidebar-accent-foreground: 0 0% 100%;
-        --sidebar-border: 240 2% 22%;
+        --sidebar-border: 218 19% 27%;
         --sidebar-ring: 216 84% 67%;
 
         /* Safe Area */
@@ -127,32 +132,32 @@
 
     /* 다크 모드 (기본과 동일 - 다크 퍼스트 앱) */
     .dark {
-        --background: 0 0% 0%;
+        --background: 213 24% 15%;
         --foreground: 0 0% 100%;
-        --card: 240 3.3% 11.4%;
+        --card: 213 22% 22%;
         --card-foreground: 0 0% 100%;
-        --popover: 240 2% 17.6%;
+        --popover: 213 22% 22%;
         --popover-foreground: 0 0% 100%;
         --primary: 216 84% 67%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 240 2% 17.6%;
+        --secondary: 213 22% 22%;
         --secondary-foreground: 0 0% 100%;
-        --muted: 240 2% 17.6%;
-        --muted-foreground: 240 3% 56%;
+        --muted: 216 10% 33%;
+        --muted-foreground: 215 16% 47%;
         --accent: 216 84% 67%;
         --accent-foreground: 0 0% 100%;
-        --destructive: 214 24% 39%;
+        --destructive: 0 86% 71%;
         --destructive-foreground: 0 0% 100%;
-        --border: 240 2% 22%;
-        --input: 240 2% 17.6%;
+        --border: 218 19% 27%;
+        --input: 213 22% 22%;
         --ring: 216 84% 67%;
-        --sidebar-background: 0 0% 0%;
+        --sidebar-background: 213 24% 15%;
         --sidebar-foreground: 0 0% 100%;
         --sidebar-primary: 216 84% 67%;
         --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 240 3.3% 11.4%;
+        --sidebar-accent: 213 22% 22%;
         --sidebar-accent-foreground: 0 0% 100%;
-        --sidebar-border: 240 2% 22%;
+        --sidebar-border: 218 19% 27%;
         --sidebar-ring: 216 84% 67%;
     }
 
@@ -201,7 +206,7 @@
         -webkit-touch-callout: none;
         height: 100%;
         overflow-x: hidden;
-        background-color: #000000;
+        background-color: #1D2530;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeSpeed;
@@ -227,8 +232,8 @@
     /* === iOS Grouped Inset List === */
     .ios-grouped-list {
         @apply overflow-hidden;
-        border-radius: var(--radius-md);
-        background-color: var(--ios-elevated-bg);
+        border-radius: var(--rh-radius-lg);
+        background-color: var(--rh-bg-surface);
     }
 
     .ios-grouped-list-item {
@@ -239,29 +244,29 @@
     }
 
     .ios-grouped-list-item:active {
-        background-color: var(--ios-elevated-bg-3);
+        background-color: var(--rh-bg-muted);
     }
 
     /* 리스트 아이템 구분선 (아이콘 뒤 들여쓰기) */
     .ios-grouped-list-separator {
-        border-top: 0.5px solid var(--ios-separator);
+        border-top: 0.5px solid var(--rh-border);
         margin-left: 52px;
     }
 
     /* 섹션 헤더 */
     .ios-section-header {
-        font-size: var(--text-footnote);
-        color: var(--ios-label-secondary);
-        padding: var(--space-sm) var(--space-md);
+        font-size: var(--rh-text-caption);
+        color: var(--rh-text-secondary);
+        padding: var(--rh-spacing-sm) var(--rh-spacing-md);
         text-transform: uppercase;
         letter-spacing: 0.02em;
     }
 
     /* 섹션 푸터 */
     .ios-section-footer {
-        font-size: var(--text-footnote);
-        color: var(--ios-label-tertiary);
-        padding: var(--space-sm) var(--space-md);
+        font-size: var(--rh-text-caption);
+        color: var(--rh-text-tertiary);
+        padding: var(--rh-spacing-sm) var(--rh-spacing-md);
     }
 
     /* === iOS 네비게이션 바 === */
@@ -271,7 +276,7 @@
         background-color: rgba(28, 28, 30, 0.72);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border-bottom: 0.5px solid var(--ios-separator);
+        border-bottom: 0.5px solid var(--rh-border);
     }
 
     /* === iOS 탭 바 === */
@@ -280,35 +285,35 @@
         background-color: rgba(28, 28, 30, 0.72);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border-top: 0.5px solid var(--ios-separator);
+        border-top: 0.5px solid var(--rh-border);
     }
 
     /* === iOS 카드 === */
     .ios-card {
         @apply p-4;
-        border-radius: var(--radius-md);
-        background-color: var(--ios-elevated-bg);
+        border-radius: var(--rh-radius-lg);
+        background-color: var(--rh-bg-surface);
     }
 
     /* === iOS 입력 필드 === */
     .ios-input {
         @apply px-4 py-3;
-        border-radius: var(--radius-md);
-        background-color: var(--ios-elevated-bg-2);
-        color: var(--ios-label-primary);
-        font-size: var(--text-body);
+        border-radius: var(--rh-radius-md);
+        background-color: var(--rh-bg-surface);
+        color: var(--rh-text-primary);
+        font-size: var(--rh-text-body);
         border: none;
         outline: none;
         transition: box-shadow 0.2s ease;
     }
 
     .ios-input:focus {
-        box-shadow: 0 0 0 1px var(--ios-accent),
+        box-shadow: 0 0 0 1px var(--rh-accent),
             0 0 0 4px rgba(102, 159, 242, 0.1);
     }
 
     .ios-input::placeholder {
-        color: var(--ios-label-tertiary);
+        color: var(--rh-text-tertiary);
     }
 
     .ios-input:disabled {
@@ -318,9 +323,9 @@
     /* === iOS 버튼 === */
     .ios-button {
         @apply px-4 font-semibold;
-        border-radius: var(--radius-md);
+        border-radius: var(--rh-radius-lg);
         height: 44px;
-        font-size: var(--text-body);
+        font-size: var(--rh-text-body);
         transition: all 0.2s ease;
     }
 
@@ -334,9 +339,9 @@
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
-        border-radius: var(--radius-md);
+        border-radius: var(--rh-radius-md);
         padding: 0.75rem 1rem;
-        font-size: var(--text-body);
+        font-size: var(--rh-text-body);
         line-height: 1.5;
         width: 100%;
         height: 44px;
@@ -345,8 +350,8 @@
         position: relative;
         text-align: left;
         color-scheme: dark;
-        color: var(--ios-label-primary);
-        background-color: var(--ios-elevated-bg-2);
+        color: var(--rh-text-primary);
+        background-color: var(--rh-bg-surface);
         font-family: -apple-system, BlinkMacSystemFont,
             'Apple SD Gothic Neo', 'SF Pro Text',
             system-ui, sans-serif;
@@ -356,7 +361,7 @@
     }
 
     .ios-date-input:focus {
-        box-shadow: 0 0 0 1px var(--ios-accent),
+        box-shadow: 0 0 0 1px var(--rh-accent),
             0 0 0 4px rgba(102, 159, 242, 0.1);
     }
 
@@ -399,7 +404,7 @@
     .ios-date-input::-webkit-datetime-edit-text {
         text-align: left;
         padding: 0 2px;
-        color: var(--ios-label-secondary);
+        color: var(--rh-text-secondary);
     }
 
     .ios-date-input::-webkit-datetime-edit-month-field,
@@ -407,7 +412,7 @@
     .ios-date-input::-webkit-datetime-edit-year-field {
         text-align: left;
         padding: 0 1px;
-        color: var(--ios-label-primary);
+        color: var(--rh-text-primary);
         font-weight: 500;
     }
 
@@ -419,7 +424,7 @@
     }
 
     .ios-date-input:invalid {
-        color: var(--ios-label-tertiary);
+        color: var(--rh-text-tertiary);
     }
 
     /* === iOS Select === */
@@ -428,21 +433,21 @@
         -moz-appearance: none;
         appearance: none;
         background-image: none;
-        border-radius: var(--radius-md);
+        border-radius: var(--rh-radius-md);
         padding: 0.75rem 1rem;
         padding-right: 2.5rem;
-        font-size: var(--text-body);
+        font-size: var(--rh-text-body);
         line-height: 1.5;
         width: 100%;
         height: 44px;
         outline: none;
         transition: all 0.2s ease;
-        color: var(--ios-label-primary);
-        background-color: var(--ios-elevated-bg-2);
+        color: var(--rh-text-primary);
+        background-color: var(--rh-bg-surface);
     }
 
     .ios-select:focus {
-        box-shadow: 0 0 0 1px var(--ios-accent),
+        box-shadow: 0 0 0 1px var(--rh-accent),
             0 0 0 4px rgba(102, 159, 242, 0.1);
     }
 
@@ -576,7 +581,7 @@
 
 /* 앱 시작 시 깜빡임 방지 */
 html, body {
-    background-color: #000000 !important;
+    background-color: #1D2530 !important;
     overflow-x: hidden;
 }
 

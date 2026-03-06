@@ -75,14 +75,14 @@ export function SelectTrigger({
     <button
       type='button'
       className={cn(
-        "flex justify-between items-center px-4 py-3 w-full h-11 text-ios-body bg-ios-elevated-2 text-ios-label rounded-md focus:outline-none focus:shadow-[0_0_0_1px_#669ff2,0_0_0_4px_rgba(102,159,242,0.1)] disabled:cursor-not-allowed disabled:opacity-40",
+        "flex justify-between items-center px-4 py-3 w-full h-12 text-rh-body bg-rh-bg-surface text-rh-text-primary rounded-rh-md border border-rh-border focus:outline-none focus:shadow-[0_0_0_1px_var(--rh-accent),0_0_0_4px_rgba(102,159,242,0.1)] disabled:cursor-not-allowed disabled:opacity-40",
         className,
       )}
       onClick={() => context.setOpen(!context.open)}
       {...props}
     >
       {children}
-      <ChevronDown className='w-4 h-4 text-ios-label-tertiary' />
+      <ChevronDown className='w-4 h-4 text-rh-text-tertiary' />
     </button>
   );
 }
@@ -113,7 +113,7 @@ export function SelectContent({
   return (
     <div
       className={cn(
-        "overflow-auto absolute top-full z-50 mt-1 w-full max-h-60 rounded-md bg-ios-elevated-2 text-ios-label border border-ios-separator animate-scale-in",
+        "overflow-auto absolute top-full z-50 mt-1 w-full max-h-60 rounded-rh-md bg-rh-bg-surface text-rh-text-primary border border-rh-border animate-scale-in",
         className,
       )}
       {...props}
@@ -140,8 +140,8 @@ export function SelectItem({
   return (
     <div
       className={cn(
-        "relative flex w-full cursor-default select-none items-center min-h-[44px] pl-4 pr-8 text-ios-body outline-none active:bg-ios-elevated-3 transition-colors",
-        isSelected && "text-ios-accent font-semibold",
+        "relative flex w-full cursor-default select-none items-center min-h-[44px] pl-4 pr-8 text-rh-body outline-none active:bg-rh-bg-muted transition-colors",
+        isSelected && "text-rh-accent font-semibold",
         className,
       )}
       onClick={() => context.onValueChange?.(value)}
@@ -149,7 +149,7 @@ export function SelectItem({
     >
       {children}
       {isSelected && (
-        <span className='absolute right-4 text-ios-accent'>✓</span>
+        <span className='absolute right-4 text-rh-accent'>✓</span>
       )}
     </div>
   );

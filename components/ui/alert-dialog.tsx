@@ -60,7 +60,7 @@ const AlertDialogContent = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "grid w-[270px] gap-4 rounded-lg bg-ios-elevated-2 p-6 backdrop-blur-[40px] animate-ios-alert-in",
+      "grid w-[300px] gap-5 rounded-[16px] bg-rh-bg-surface p-6 backdrop-blur-[40px] animate-ios-alert-in",
       className,
     )}
     onClick={(e) => e.stopPropagation()}
@@ -102,7 +102,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h2
     ref={ref}
-    className={cn("text-ios-title-3 text-ios-label text-center", className)}
+    className={cn("text-rh-title3 font-semibold text-white text-center", className)}
     {...props}
   />
 ));
@@ -115,7 +115,7 @@ const AlertDialogDescription = React.forwardRef<
   <p
     ref={ref}
     className={cn(
-      "text-ios-body text-ios-label-secondary text-center",
+      "text-rh-body text-rh-text-secondary text-center",
       className,
     )}
     {...props}
@@ -131,7 +131,7 @@ const AlertDialogAction = React.forwardRef<
     ref={ref}
     variant='ghost'
     className={cn(
-      "h-11 text-ios-body font-semibold text-ios-accent",
+      "h-11 text-rh-body font-semibold text-rh-accent",
       className,
     )}
     {...props}
@@ -149,7 +149,7 @@ const AlertDialogCancel = React.forwardRef<
     ref={ref}
     variant='ghost'
     className={cn(
-      "h-11 text-ios-body font-normal text-ios-accent mt-2 sm:mt-0",
+      "h-11 text-rh-body font-normal text-rh-accent mt-2 sm:mt-0",
       className,
     )}
     {...props}

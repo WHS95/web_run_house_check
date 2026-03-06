@@ -38,13 +38,13 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-[270px] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg bg-ios-elevated-2 p-6 backdrop-blur-[40px] duration-200 data-[state=open]:animate-ios-alert-in data-[state=closed]:animate-ios-alert-out",
+        "fixed left-[50%] top-[50%] z-50 grid w-[300px] translate-x-[-50%] translate-y-[-50%] gap-5 rounded-[16px] bg-rh-bg-surface p-6 backdrop-blur-[40px] duration-200 data-[state=open]:animate-ios-alert-in data-[state=closed]:animate-ios-alert-out",
         className,
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className='absolute right-4 top-4 rounded-full p-1 text-ios-label-secondary transition-opacity hover:text-ios-label active:opacity-70 focus:outline-none'>
+      <DialogPrimitive.Close className='absolute right-4 top-4 rounded-full p-1 text-rh-text-secondary transition-opacity hover:text-rh-text-primary active:opacity-70 focus:outline-none'>
         <X className='w-4 h-4' />
         <span className='sr-only'>닫기</span>
       </DialogPrimitive.Close>
@@ -85,7 +85,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-ios-title-3 tracking-tight leading-none text-ios-label",
+      "text-rh-title3 font-semibold tracking-tight leading-none text-white",
       className,
     )}
     {...props}
@@ -99,7 +99,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-ios-body text-ios-label-secondary", className)}
+    className={cn("text-rh-body text-rh-text-secondary", className)}
     {...props}
   />
 ));

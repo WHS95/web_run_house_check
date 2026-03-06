@@ -31,16 +31,16 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  "fixed z-50 gap-4 bg-ios-elevated p-6 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out",
+  "fixed z-50 gap-4 bg-rh-bg-surface p-6 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out",
   {
     variants: {
       side: {
-        top: "inset-x-0 top-0 border-b border-ios-separator data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+        top: "inset-x-0 top-0 border-b border-rh-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
         bottom:
-          "inset-x-0 bottom-0 rounded-t-xl border-t border-ios-separator data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r border-ios-separator data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+          "inset-x-0 bottom-0 rounded-t-[16px] border-t border-rh-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom px-6 pt-4 pb-8",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r border-rh-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
         right:
-          "inset-y-0 right-0 h-full w-3/4 border-l border-ios-separator data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+          "inset-y-0 right-0 h-full w-3/4 border-l border-rh-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
       },
     },
     defaultVariants: {
@@ -67,9 +67,9 @@ const SheetContent = React.forwardRef<
     >
       {/* iOS 드래그 핸들 (bottom sheet일 때) */}
       {side === "bottom" && (
-        <div className='mx-auto mt-0 mb-4 h-[5px] w-9 rounded-full bg-ios-elevated-3' />
+        <div className='mx-auto mt-0 mb-4 h-[5px] w-9 rounded-full bg-rh-bg-muted' />
       )}
-      <SheetPrimitive.Close className='absolute right-4 top-4 rounded-full p-1 text-ios-label-secondary transition-opacity hover:text-ios-label active:opacity-70 focus:outline-none'>
+      <SheetPrimitive.Close className='absolute right-4 top-4 rounded-full p-1 text-rh-text-secondary transition-opacity hover:text-rh-text-primary active:opacity-70 focus:outline-none'>
         <X className='h-4 w-4' />
         <span className='sr-only'>닫기</span>
       </SheetPrimitive.Close>
@@ -113,7 +113,7 @@ const SheetTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
     ref={ref}
-    className={cn("text-ios-headline text-ios-label", className)}
+    className={cn("text-rh-title3 font-semibold text-white", className)}
     {...props}
   />
 ));
@@ -125,7 +125,7 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}
-    className={cn("text-ios-subhead text-ios-label-secondary", className)}
+    className={cn("text-rh-body text-rh-text-secondary", className)}
     {...props}
   />
 ));

@@ -33,13 +33,13 @@ const DrawerContent = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-xl bg-ios-elevated border-t border-ios-separator animate-ios-sheet-up",
+      "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-xl bg-rh-bg-surface border-t border-rh-border animate-ios-sheet-up",
       className,
     )}
     {...props}
   >
     {/* iOS 드래그 핸들 */}
-    <div className='mx-auto mt-2 mb-0 h-[5px] w-9 rounded-full bg-ios-elevated-3' />
+    <div className='mx-auto mt-2 mb-0 h-[5px] w-9 rounded-full bg-rh-bg-muted' />
     {children}
   </div>
 ));
@@ -71,7 +71,7 @@ const DrawerTitle = React.forwardRef<
   <h2
     ref={ref}
     className={cn(
-      "text-ios-headline text-ios-label leading-none tracking-tight",
+      "text-rh-title3 font-semibold text-rh-text-primary leading-none tracking-tight",
       className,
     )}
     {...props}
@@ -85,7 +85,7 @@ const DrawerDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-ios-subhead text-ios-label-secondary", className)}
+    className={cn("text-rh-body text-rh-text-secondary", className)}
     {...props}
   />
 ));

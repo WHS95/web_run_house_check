@@ -52,12 +52,12 @@ export default function AdminBottomNav() {
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center justify-center gap-0.5 transition-colors active:opacity-70 ${
-                item.isActive ? "text-ios-accent" : "text-ios-label-tertiary"
+                item.isActive ? "text-rh-accent" : "text-rh-text-tertiary"
               }`}
             >
               <Icon size={22} />
               <span
-                className={`text-ios-caption ${
+                className={`text-rh-caption ${
                   item.isActive ? "font-semibold" : ""
                 }`}
               >

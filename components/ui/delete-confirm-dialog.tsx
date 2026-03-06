@@ -39,17 +39,17 @@ export function DeleteConfirmDialog({
   /* iOS Action Sheet 스타일 컨텐츠 */
   const content = (
     <div className='space-y-4 text-center'>
-      <div className='flex justify-center items-center mx-auto w-12 h-12 bg-ios-accent-dim/20 rounded-full'>
-        <Trash2 className='w-6 h-6 text-ios-accent-dim' />
+      <div className='flex justify-center items-center mx-auto w-12 h-12 bg-rh-status-error/20 rounded-full'>
+        <Trash2 className='w-6 h-6 text-rh-accent-dim' />
       </div>
       <div className='space-y-2'>
-        <h3 className='text-ios-title-3 text-ios-label'>{title}</h3>
+        <h3 className='text-rh-title3 font-semibold text-rh-text-primary'>{title}</h3>
         {itemName && (
-          <p className='text-ios-body text-ios-label-secondary'>
+          <p className='text-rh-body text-rh-text-secondary'>
             &ldquo;{itemName}&rdquo;을(를) 삭제하시겠습니까?
           </p>
         )}
-        <p className='text-ios-subhead text-ios-accent-dim font-medium'>
+        <p className='text-rh-body text-rh-accent-dim font-medium'>
           {description}
         </p>
       </div>
@@ -62,7 +62,7 @@ export function DeleteConfirmDialog({
       <Button
         onClick={handleConfirm}
         disabled={loading}
-        className='w-full bg-ios-accent-dim text-white hover:bg-ios-accent-dim/80'
+        className='w-full bg-rh-status-error text-white hover:bg-rh-status-error/80'
       >
         {loading ? "삭제 중..." : "삭제"}
       </Button>
@@ -70,7 +70,7 @@ export function DeleteConfirmDialog({
         variant='ghost'
         onClick={() => onOpenChange(false)}
         disabled={loading}
-        className='w-full text-ios-accent font-semibold'
+        className='w-full text-rh-accent font-semibold'
       >
         취소
       </Button>
@@ -85,7 +85,7 @@ export function DeleteConfirmDialog({
           className='fixed inset-0 bg-black/40 backdrop-blur-sm animate-fade-in'
           onClick={() => onOpenChange(false)}
         />
-        <div className='relative z-[10000] w-[270px] bg-ios-elevated-2 rounded-lg backdrop-blur-[40px] animate-ios-alert-in'>
+        <div className='relative z-[10000] w-[270px] bg-rh-bg-surface rounded-lg backdrop-blur-[40px] animate-ios-alert-in'>
           <div className='sr-only'>
             <h2>{title}</h2>
             <p>{description}</p>
@@ -106,9 +106,9 @@ export function DeleteConfirmDialog({
         className='fixed inset-0 bg-black/40 backdrop-blur-sm animate-fade-in'
         onClick={() => onOpenChange(false)}
       />
-      <div className='fixed inset-x-0 bottom-0 z-[10000] flex h-auto flex-col rounded-t-xl bg-ios-elevated border-t border-ios-separator animate-ios-sheet-up'>
+      <div className='fixed inset-x-0 bottom-0 z-[10000] flex h-auto flex-col rounded-t-xl bg-rh-bg-surface border-t border-rh-border animate-ios-sheet-up'>
         {/* iOS 드래그 핸들 */}
-        <div className='mx-auto mt-2 h-[5px] w-9 rounded-full bg-ios-elevated-3' />
+        <div className='mx-auto mt-2 h-[5px] w-9 rounded-full bg-rh-bg-muted' />
         <div className='sr-only'>
           <h2>{title}</h2>
           <p>{description}</p>

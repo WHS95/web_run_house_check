@@ -62,38 +62,53 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        /* 레거시 별칭 (iOS 토큰 매핑) */
-        "basic-blue": "#669ff2",
-        "basic-gray": "#3A3A3C",
-        "basic-black": "#000000",
-        "basic-black-gray": "#1C1C1E",
-        /* iOS Design Tokens */
-        ios: {
-          "system-bg": "#000000",
-          "grouped-bg": "#000000",
-          elevated: {
-            DEFAULT: "#1C1C1E",
-            2: "#2C2C2E",
-            3: "#3A3A3C",
+        /* RunHouse Design Tokens */
+        rh: {
+          bg: {
+            primary: "var(--rh-bg-primary)",
+            inset: "var(--rh-bg-inset)",
+            surface: "var(--rh-bg-surface)",
+            muted: "var(--rh-bg-muted)",
+            accent: "var(--rh-accent)",
           },
           accent: {
-            DEFAULT: "#669ff2",
-            strong: "#3D7FE8",
-            light: "#99BFF7",
-            muted: "#6B84A8",
-            dim: "#4B5F7A",
-            subtle: "#3D4655",
+            DEFAULT: "var(--rh-accent)",
+            hover: "var(--rh-accent-hover)",
           },
-          label: {
-            DEFAULT: "#FFFFFF",
-            secondary: "rgba(235, 235, 245, 0.6)",
-            tertiary: "rgba(235, 235, 245, 0.3)",
+          border: {
+            DEFAULT: "var(--rh-border)",
+            subtle: "var(--rh-border-subtle)",
           },
-          separator: "rgba(84, 84, 88, 0.65)",
-          overlay: "rgba(0, 0, 0, 0.4)",
+          divider: "var(--rh-divider)",
+          text: {
+            primary: "var(--rh-text-primary)",
+            secondary: "var(--rh-text-secondary)",
+            tertiary: "var(--rh-text-tertiary)",
+            muted: "var(--rh-text-muted)",
+            inverted: "var(--rh-text-inverted)",
+          },
+          status: {
+            success: "var(--rh-status-success)",
+            warning: "var(--rh-status-warning)",
+            error: "var(--rh-status-error)",
+          },
         },
+        /* 레거시 별칭 -> 신규 토큰 매핑 (점진적 제거 예정) */
+        "basic-blue": "var(--rh-accent)",
+        "basic-gray": "var(--rh-bg-muted)",
+        "basic-black": "var(--rh-bg-primary)",
+        "basic-black-gray": "var(--rh-bg-surface)",
       },
       fontSize: {
+        "rh-hero": ["2rem", { lineHeight: "1.2", fontWeight: "700" }],
+        "rh-title1": ["1.5rem", { lineHeight: "1.2", fontWeight: "700" }],
+        "rh-title2": ["1.25rem", { lineHeight: "1.3", fontWeight: "600" }],
+        "rh-title3": ["1rem", { lineHeight: "1.3", fontWeight: "600" }],
+        "rh-body": ["0.875rem", { lineHeight: "1.5", fontWeight: "400" }],
+        "rh-caption": ["0.75rem", { lineHeight: "1.4", fontWeight: "400" }],
+        "rh-label": ["0.6875rem", { lineHeight: "1.4", fontWeight: "500" }],
+        "rh-small": ["0.625rem", { lineHeight: "1.4", fontWeight: "600" }],
+        /* 기존 ios-* 유지 (점진적 제거) */
         "ios-large-title": [
           "2.125rem",
           {
@@ -170,6 +185,12 @@ module.exports = {
         lg: "1rem",
         md: "0.75rem",
         sm: "0.5rem",
+        "rh-xs": "4px",
+        "rh-sm": "6px",
+        "rh-md": "8px",
+        "rh-lg": "12px",
+        "rh-xl": "16px",
+        "rh-full": "100px",
       },
       keyframes: {
         "accordion-down": {
@@ -300,6 +321,14 @@ module.exports = {
         "safe-area-pt": "env(safe-area-inset-top)",
         "safe-area-pl": "env(safe-area-inset-left)",
         "safe-area-pr": "env(safe-area-inset-right)",
+        "rh-xs": "2px",
+        "rh-sm": "4px",
+        "rh-md": "8px",
+        "rh-lg": "12px",
+        "rh-xl": "16px",
+        "rh-2xl": "24px",
+        "rh-3xl": "32px",
+        /* 기존 ios-* 유지 (점진적 제거) */
         "ios-xs": "0.25rem",
         "ios-sm": "0.5rem",
         "ios-md": "1rem",

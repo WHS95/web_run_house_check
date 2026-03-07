@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, MapPin, Loader2 } from "lucide-react";
+import SectionLabel from "@/components/atoms/SectionLabel";
 
 interface SearchResult {
   address: string;
@@ -181,9 +182,7 @@ export default function AddressSearch({
             {!loading && !error && searchResults.length > 0 && (
               <div>
                 <div className='p-2 border-b border-rh-border'>
-                  <p className='text-xs font-medium text-rh-text-secondary uppercase'>
-                    검색 결과
-                  </p>
+                  <SectionLabel>검색 결과</SectionLabel>
                 </div>
                 {searchResults.map((result, index) => (
                   <button
@@ -229,9 +228,7 @@ export default function AddressSearch({
             {!loading && !error && !searchQuery && searchHistory.length > 0 && (
               <div>
                 <div className='p-2 border-b border-rh-border'>
-                  <p className='text-xs font-medium text-rh-text-secondary uppercase'>
-                    최근 검색
-                  </p>
+                  <SectionLabel>최근 검색</SectionLabel>
                 </div>
                 {searchHistory.map((historyItem, index) => (
                   <button

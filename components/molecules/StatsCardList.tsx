@@ -15,7 +15,7 @@ interface StatsCardListProps {
 
 const StatsCardList = ({ items }: StatsCardListProps) => {
   return (
-    <div className='bg-rh-bg-primary rounded-lg mx-4 mt-4 p-4 shadow'>
+    <div className='bg-rh-bg-primary rounded-rh-lg mx-4 mt-4 p-4 shadow'>
       {items.map((item, index) => (
         <StatCard
           key={index}

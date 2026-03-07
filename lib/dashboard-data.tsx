@@ -40,7 +40,7 @@ export const getStatsCardsData = (): StatsCardData[] => [
     icon: <Users size={20} className='text-white' />,
     title: "총 크루원",
     value: "240명",
-    bgColor: "bg-blue-900",
+    bgColor: "bg-rh-bg-surface",
   },
   {
     icon: <Calendar size={20} className='text-white' />,

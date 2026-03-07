@@ -5,6 +5,7 @@ import { MapPin, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { validateUserLocation, formatDistance } from '@/lib/utils/distance';
 import { haptic } from '@/lib/haptic';
+import SectionLabel from '@/components/atoms/SectionLabel';
 
 interface LocationVerificationModalProps {
   isOpen: boolean;
@@ -149,7 +150,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
         {/* 활동장소 목록 (실패한 경우에만 표시) */}
         {verificationStatus === 'failed' && crewLocations.length > 0 && (
           <div className="mb-4 p-3 text-left bg-rh-bg-primary/50 rounded-lg">
-            <h4 className="mb-2 text-xs font-medium text-rh-text-secondary uppercase">등록된 활동장소</h4>
+            <SectionLabel className="mb-2">등록된 활동장소</SectionLabel>
             <div className="space-y-1">
               {crewLocations.map((location) => (
                 <div key={location.id} className="flex items-center text-sm text-white">

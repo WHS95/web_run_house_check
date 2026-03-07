@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,20 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 { success: false, message: "인증이 필요합니다." },
                 { status: 401 }
+            );
+        }
+
+        // Rate limit 체크
+        const rateLimitResult = rateLimit({
+            key: `push-token:${user.id}`,
+            limit: 20,
+            windowMs: 60_000,
+        });
+
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { success: false, message: "요청이 너무 많습니다." },
+                { status: 429 }
             );
         }
 

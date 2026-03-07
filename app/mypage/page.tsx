@@ -43,28 +43,28 @@ interface ActivityData {
 // ⚡ 로딩 스켈레톤 컴포넌트
 const MyPageSkeleton = React.memo(() => (
   <div className='flex flex-col h-screen bg-rh-bg-primary'>
-    <div className='flex-shrink-0 h-[10vh] bg-rh-bg-surface border-b border-rh-border animate-pulse'>
+    <div className='flex-shrink-0 h-20 bg-rh-bg-surface border-b border-rh-border animate-pulse'>
       <div className='flex justify-center items-center h-full'>
-        <div className='w-[20vw] h-[1.5rem] rounded bg-rh-bg-surface'></div>
+        <div className='w-20 h-[1.5rem] rounded bg-rh-bg-surface'></div>
       </div>
     </div>
-    <div className='flex-1 p-[4vw] space-y-[3vh] animate-pulse'>
+    <div className='flex-1 p-4 space-y-3 animate-pulse'>
       {/* 프로필 영역 */}
-      <div className='flex items-center space-x-[2vw]'>
+      <div className='flex items-center space-x-2'>
         <div className='w-[4rem] h-[4rem] rounded-full bg-rh-bg-surface'></div>
-        <div className='flex-1 space-y-[1vh]'>
-          <div className='w-[32vw] h-[1.5rem] rounded bg-rh-bg-surface'></div>
-          <div className='w-[24vw] h-[1rem] rounded bg-rh-bg-surface'></div>
+        <div className='flex-1 space-y-1'>
+          <div className='w-[128px] h-[1.5rem] rounded bg-rh-bg-surface'></div>
+          <div className='w-24 h-[1rem] rounded bg-rh-bg-surface'></div>
         </div>
       </div>
 
       {/* 활동 그래프 영역 */}
-      <div className='h-[20vh] rounded-lg bg-rh-bg-surface'></div>
+      <div className='h-[160px] rounded-lg bg-rh-bg-surface'></div>
 
       {/* 활동 내역 영역 */}
-      <div className='space-y-[1.5vh]'>
+      <div className='space-y-1.5'>
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className='h-[8vh] bg-rh-bg-muted rounded-lg'></div>
+          <div key={index} className='h-16 bg-rh-bg-muted rounded-lg'></div>
         ))}
       </div>
     </div>

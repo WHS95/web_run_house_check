@@ -63,16 +63,16 @@ async function getAttendanceFormData() {
 const AttendancePageFallback = () => (
   <div className='min-h-screen bg-rh-bg-primary'>
     <div className='pt-safe'>
-      <div className='flex items-center justify-between w-full px-[4vw] py-[2vh] border-b border-rh-border'>
-        <div className='w-[20vw] h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
+      <div className='flex items-center justify-between w-full px-4 py-4 border-b border-rh-border'>
+        <div className='w-20 h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
         <div className='w-[1.5rem] h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
       </div>
     </div>
-    <div className='px-[4vw] pt-[3vh] space-y-[3vh]'>
+    <div className='px-4 pt-6 space-y-3'>
       {Array.from({ length: 5 }).map((_, index) => (
         <div key={index} className='animate-pulse'>
-          <div className='mb-[1.5vh] w-[24vw] h-[1rem] rounded bg-rh-bg-surface'></div>
-          <div className='h-[6vh] rounded-xl bg-rh-bg-surface'></div>
+          <div className='mb-3 w-24 h-[1rem] rounded bg-rh-bg-surface'></div>
+          <div className='h-12 rounded-xl bg-rh-bg-surface'></div>
         </div>
       ))}
     </div>

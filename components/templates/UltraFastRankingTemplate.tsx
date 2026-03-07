@@ -265,12 +265,12 @@ const UltraFastRankingTemplate = () => {
       </div>
 
       {/* ⚡ RankingInfo- 고정 */}
-      <div className="fixed top-[7vh] left-0 right-0 bg-rh-bg-primary z-20">
-        <div className="px-[2vw] pb-[2vh]">
-          <div className="mb-[3vh] mt-[3vh] flex items-center justify-between">
+      <div className="fixed top-14 left-0 right-0 bg-rh-bg-primary z-20">
+        <div className="px-2 pb-4">
+          <div className="mb-6 mt-6 flex items-center justify-between">
             <button 
               onClick={handlePrevMonth} 
-              className={`p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
+              className={`p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
                 isDataLoading 
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-white/10'
@@ -290,7 +290,7 @@ const UltraFastRankingTemplate = () => {
             
             <button 
               onClick={handleNextMonth} 
-              className={`p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
+              className={`p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated ${
                 isDataLoading 
                   ? 'opacity-50 cursor-not-allowed' 
                   : 'hover:bg-white/10'
@@ -337,13 +337,13 @@ const UltraFastRankingTemplate = () => {
           ) : (
             <div className="h-full flex items-center justify-center pb-safe">
               <div className="text-center">
-                <div className="mb-[2vh] text-rh-text-secondary">
+                <div className="mb-4 text-rh-text-secondary">
                   <svg className="w-[4rem] h-[4rem] mx-auto opacity-50" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <p className="text-rh-text-tertiary text-[1.125rem] font-medium">해당 월의 출석 데이터가 없습니다</p>
-                <p className="text-rh-text-secondary text-[0.875rem] mt-[1vh]">다른 월을 확인해보세요</p>
+                <p className="text-rh-text-secondary text-[0.875rem] mt-2">다른 월을 확인해보세요</p>
               </div>
             </div>
           )}

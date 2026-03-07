@@ -79,17 +79,17 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
 
       {/* 드롭다운 메뉴 */}
       {isOpen && (
-        <div className='absolute top-full left-0 right-0 mt-[1vh] bg-rh-bg-muted rounded-[1rem] shadow-lg z-50 max-h-[50vh] overflow-hidden'>
-          <div className='p-[4vw]'>
+        <div className='absolute top-full left-0 right-0 mt-2 bg-rh-bg-muted rounded-rh-xl shadow-lg z-50 max-h-[50vh] overflow-hidden'>
+          <div className='p-4'>
             {/* 년도 선택 섹션 */}
-            <div className='mb-[3vh]'>
-              <h3 className='text-white text-[0.875rem] mb-[2vh]'>년</h3>
-              <div className='grid grid-cols-5 gap-[2vw]'>
+            <div className='mb-6'>
+              <h3 className='text-white text-[0.875rem] mb-4'>년</h3>
+              <div className='grid grid-cols-5 gap-2'>
                 {years.map((year) => (
                   <button
                     key={year}
                     onClick={() => handleYearMonthSelect(year, selectedMonth)}
-                    className={`py-[1.5vh] text-center rounded-[0.5rem] text-[0.875rem] font-medium transition-colors ${
+                    className={`py-1.5 text-center rounded-rh-md text-[0.875rem] font-medium transition-colors ${
                       year === selectedYear
                         ? "bg-white text-rh-text-inverted"
                         : "text-rh-text-secondary hover:text-white hover:bg-rh-bg-surface"
@@ -103,15 +103,15 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
 
             {/* 월 선택 섹션 */}
             <div>
-              <h3 className='text-rh-text-secondary text-[0.875rem] mb-[2vh]'>월</h3>
-              <div className='grid grid-cols-4 gap-[2vw]'>
+              <h3 className='text-rh-text-secondary text-[0.875rem] mb-4'>월</h3>
+              <div className='grid grid-cols-4 gap-2'>
                 {months.map((month) => (
                   <button
                     key={month.value}
                     onClick={() =>
                       handleYearMonthSelect(selectedYear, month.value)
                     }
-                    className={`py-[1.5vh] text-center rounded-[0.5rem] text-[0.875rem] font-medium transition-colors ${
+                    className={`py-1.5 text-center rounded-rh-md text-[0.875rem] font-medium transition-colors ${
                       month.value === selectedMonth
                         ? "bg-white text-rh-text-inverted"
                         : "text-rh-text-secondary hover:text-white hover:bg-rh-bg-surface"

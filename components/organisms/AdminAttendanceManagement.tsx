@@ -575,28 +575,28 @@ export default function AdminAttendanceManagement({
     <div className='flex flex-col h-screen bg-rh-bg-primary'>
       {/* 탭 네비게이션 */}
       <div className='flex-shrink-0 px-4 pt-4'>
-        <div className='bg-rh-bg-surface rounded-[0.75rem] p-[1vw] shadow-sm'>
-          <div className='flex rounded-[0.5rem] bg-rh-bg-muted/30 p-[0.5vw]'>
+        <div className='bg-rh-bg-surface rounded-rh-lg p-1 shadow-sm'>
+          <div className='flex rounded-rh-md bg-rh-bg-muted/30 p-0.5'>
             <button
               onClick={() => setActiveTab("calendar")}
-              className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
+              className={`flex-1 py-4 px-2 rounded-rh-md text-[0.875rem] font-medium transition-all ${
                 activeTab === "calendar"
                   ? "bg-rh-accent text-white shadow-sm"
                   : "text-rh-text-secondary hover:text-white"
               }`}
             >
-              <Calendar className='w-[1rem] h-[1rem] mr-[1vw] inline' />
+              <Calendar className='w-[1rem] h-[1rem] mr-1 inline' />
               달력
             </button>
             <button
               onClick={() => setActiveTab("manage")}
-              className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
+              className={`flex-1 py-4 px-2 rounded-rh-md text-[0.875rem] font-medium transition-all ${
                 activeTab === "manage"
                   ? "bg-rh-accent text-white shadow-sm"
                   : "text-rh-text-secondary hover:text-white"
               }`}
             >
-              <UserPlus className='w-[1rem] h-[1rem] mr-[1vw] inline' />
+              <UserPlus className='w-[1rem] h-[1rem] mr-1 inline' />
               관리
             </button>
           </div>

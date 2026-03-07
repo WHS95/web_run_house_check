@@ -372,7 +372,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       </div>
 
       {/* 메인 콘텐츠 */}
-      <div className='flex-1 overflow-y-auto native-scroll pt-[10vh] pb-[40vh] px-[4vw]'>
+      <div className='flex-1 overflow-y-auto native-scroll pt-20 pb-40 px-4'>
         {/* 오프라인 상태 배너 */}
         {!isOnline && (
           <div className="mb-3 flex items-center gap-2 rounded-rh-md bg-rh-status-warning/20 px-3 py-2">
@@ -394,23 +394,23 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           </div>
         )}
 
-        <div className='space-y-[3vh]'>
+        <div className='space-y-3'>
           {/* 이름 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               이름
             </label>
-            <div className='h-[6vh] bg-rh-bg-surface rounded-xl flex items-center px-[2vw]'>
+            <div className='h-12 bg-rh-bg-surface rounded-xl flex items-center px-2'>
               <span className='font-medium text-white'>{formData.name}</span>
             </div>
           </div>
 
           {/* 참여일시 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               참여일시
             </label>
-            <div className='space-y-[1.5vh]'>
+            <div className='space-y-1.5'>
               <div className='relative'>
                 <input
                   type='date'
@@ -418,7 +418,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                   onChange={(e) => handleFormChange("date", e.target.value)}
                   className='text-white ios-date-input bg-rh-bg-surface'
                 />
-                <div className='absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none'>
+                <div className='absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none'>
                   <AiOutlineCalendar className='w-[1.25rem] h-[1.25rem] text-rh-text-secondary' />
                 </div>
               </div>
@@ -434,7 +434,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                     </option>
                   ))}
                 </select>
-                <div className='absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none'>
+                <div className='absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none'>
                   <IoChevronDown className='w-[1.25rem] h-[1.25rem] text-rh-text-secondary' />
                 </div>
               </div>
@@ -443,7 +443,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
           {/* 장소 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               참여 장소
             </label>
             <div className='relative'>
@@ -466,7 +466,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
           {/* 운동 종류 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               운동 종류
             </label>
             <div className='relative'>
@@ -491,10 +491,10 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
           {/* 개설자 여부 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               개설자 여부
             </label>
-            <div className='flex space-x-[2vw]'>
+            <div className='flex space-x-2'>
               {HOST_OPTIONS.map((option) => (
                 <label
                   key={option.value}
@@ -506,7 +506,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                     value={option.value}
                     checked={formData.isHost === option.value}
                     onChange={(e) => handleFormChange("isHost", e.target.value)}
-                    className='mr-[1vw] text-blue-500 focus:ring-blue-500'
+                    className='mr-1 text-blue-500 focus:ring-blue-500'
                   />
                   <span className='text-white'>{option.label}</span>
                 </label>
@@ -531,7 +531,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
             (userStatus && !userStatus.isActive) ||
             (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
           }
-          className={`mt-[2vh] p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-[7vh] font-bold text-white ${
+          className={`mt-4 p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-14 font-bold text-white ${
             isSubmitting || 
             (userStatus && !userStatus.isActive) ||
             (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
@@ -541,19 +541,19 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           style={{ WebkitTapHighlightColor: "transparent" }}
         >
           {isSubmitting ? (
-            <div className='flex items-center justify-center space-x-[1vw]'>
+            <div className='flex items-center justify-center space-x-1'>
               <LoadingSpinner size='sm' color='white' />
               <span>처리 중...</span>
             </div>
           ) : userStatus && !userStatus.isActive ? (
             "출석 불가"
           ) : initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation ? (
-            <div className='flex items-center justify-center space-x-[1vw]'>
+            <div className='flex items-center justify-center space-x-1'>
               <MapPin className="w-4 h-4" />
               <span>위치 확인 필요</span>
             </div>
           ) : initialFormData?.crewInfo?.location_based_attendance ? (
-            <div className='flex items-center justify-center space-x-[1vw]'>
+            <div className='flex items-center justify-center space-x-1'>
               <MapPin className="w-4 h-4" />
               <span>위치 확인 후 출석</span>
             </div>

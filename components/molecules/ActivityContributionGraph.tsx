@@ -15,7 +15,7 @@ interface ActivityContributionGraphProps {
 
 // ⚡ 범례 컴포넌트 (메모이제이션)
 const Legend = memo(() => (
-  <div className='flex items-center space-x-[1vw] text-[0.75rem] text-rh-text-tertiary'>
+  <div className='flex items-center space-x-1 text-[0.75rem] text-rh-text-tertiary'>
     <span>적음</span>
     <div className='flex space-x-1'>
       <div className='w-[0.625rem] h-[0.625rem] bg-rh-bg-surface rounded-sm'></div>
@@ -200,9 +200,9 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
     }, [weeks, activityMap, today, getActivityColor, getTooltipMessage]);
 
     return (
-      <div className='p-[2vw] mt-[3vh] rounded-lg bg-rh-bg-surface'>
+      <div className='p-2 mt-6 rounded-lg bg-rh-bg-surface'>
         {/* 상단 월 라벨 */}
-        <div className='flex mb-[0.5vh] ml-[4vw]'>
+        <div className='flex mb-0.5 ml-4'>
           {monthLabels.map((monthLabel, index) => {
             const nextLabelIndex =
               index < monthLabels.length - 1
@@ -220,9 +220,9 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
             );
           })}
         </div>
-        <div className='flex mb-[1.5vh]'>
+        <div className='flex mb-3'>
           {/* 좌측 요일 라벨 */}
-          <div className='flex flex-col items-end w-[1.5rem] mr-[1vw] space-y-[0.25vh] text-[0.75rem] text-rh-text-secondary'>
+          <div className='flex flex-col items-end w-[1.5rem] mr-1 space-y-0.5 text-[0.75rem] text-rh-text-secondary'>
             <div className='flex items-center h-[0.75rem]'>일</div>
             <div className='flex items-center h-[0.75rem]'>월</div>
             <div className='flex items-center h-[0.75rem]'>화</div>

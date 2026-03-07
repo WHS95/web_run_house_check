@@ -264,14 +264,14 @@ export default function AdminInviteCodesManagement({
 
   if (isLoading) {
     return (
-      <div className='bg-rh-bg-surface rounded-[0.75rem] shadow-sm overflow-hidden'>
-        <div className='p-[4vw] space-y-[3vh] animate-pulse'>
-          <div className='bg-rh-bg-muted/20 rounded-[0.75rem] p-[4vw]'>
-            <div className='flex items-center space-x-[3vw]'>
+      <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
+        <div className='p-4 space-y-3 animate-pulse'>
+          <div className='bg-rh-bg-muted/20 rounded-rh-lg p-4'>
+            <div className='flex items-center space-x-3'>
               <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
-              <div className='flex-1 space-y-[1vh]'>
-                <div className='h-[1rem] bg-rh-bg-muted rounded w-[30vw]'></div>
-                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-[50vw]'></div>
+              <div className='flex-1 space-y-1'>
+                <div className='h-[1rem] bg-rh-bg-muted rounded w-[120px]'></div>
+                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-1/2'></div>
               </div>
             </div>
           </div>
@@ -281,11 +281,11 @@ export default function AdminInviteCodesManagement({
   }
 
   return (
-    <div className='bg-rh-bg-surface rounded-[0.75rem] shadow-sm overflow-hidden'>
+    <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
       {/* 헤더 */}
-      <div className='p-[4vw] border-b border-rh-border'>
+      <div className='p-4 border-b border-rh-border'>
         <div className='flex justify-between items-center'>
-          <div className='flex items-center space-x-[2vw]'>
+          <div className='flex items-center space-x-2'>
             <Ticket className='w-[1.25rem] h-[1.25rem] text-rh-accent' />
             <span className='text-[1.125rem] font-bold text-white'>
               초대코드 관리
@@ -297,7 +297,7 @@ export default function AdminInviteCodesManagement({
                 haptic.light();
                 setIsEditing(true);
               }}
-              className='px-[3vw] py-[3vw] bg-rh-accent hover:bg-rh-accent-hover/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
+              className='px-3 py-3 bg-rh-accent hover:bg-rh-accent-hover/80 text-white rounded-rh-lg text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
               disabled={isEditing}
             >
               <Plus className='w-[1rem] h-[1rem]' />
@@ -306,12 +306,12 @@ export default function AdminInviteCodesManagement({
         </div>
       </div>
 
-      <div className='p-[4vw] space-y-[3vh]'>
+      <div className='p-4 space-y-3'>
         {/* 초대코드 생성/수정 폼 */}
         {isEditing && (
-          <div className='border border-rh-accent bg-rh-accent/20 rounded-[0.75rem] p-[4vw] space-y-[2vh]'>
+          <div className='border border-rh-accent bg-rh-accent/20 rounded-rh-lg p-4 space-y-2'>
             <div>
-              <label className='block mb-[1vh] text-[0.875rem] font-medium text-white'>
+              <label className='block mb-2 text-[0.875rem] font-medium text-white'>
                 초대코드 *
               </label>
               <div className='flex space-x-2'>
@@ -346,7 +346,7 @@ export default function AdminInviteCodesManagement({
               </p>
             </div>
             {/* <div>
-              <label className='block mb-[1vh] text-[0.875rem] font-medium text-white'>
+              <label className='block mb-2 text-[0.875rem] font-medium text-white'>
                 설명 (선택사항)
               </label>
               <Input
@@ -359,7 +359,7 @@ export default function AdminInviteCodesManagement({
                 className='text-white border-0 bg-rh-bg-surface placeholder:text-rh-text-secondary'
               />
             </div> */}
-            <div className='flex space-x-[2vw]'>
+            <div className='flex space-x-2'>
               <Button
                 onClick={handleCreateInviteCode}
                 disabled={

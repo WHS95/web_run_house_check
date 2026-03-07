@@ -100,7 +100,7 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                 />
             </div>
             
-            <div className="flex-1 overflow-y-auto px-rh-xl pt-[10vh] pb-0 space-y-5">
+            <div className="flex-1 overflow-y-auto px-rh-xl pt-20 pb-0 space-y-5">
                 <MemberProfileInfo {...profileProps} />
                 
                 {/* NRC 스타일 이번 달 요약 카드 */}

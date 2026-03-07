@@ -87,18 +87,18 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({
   if (isLoading) {
     return (
       <div
-        className={`bg-rh-bg-surface rounded-[1rem] p-[6vw] ${className}`}
+        className={`bg-rh-bg-surface rounded-rh-xl p-6 ${className}`}
       >
         <div className='animate-pulse'>
-          <div className='flex items-center justify-between mb-[4vh]'>
-            <div className='h-[1.5rem] bg-rh-bg-surface rounded w-[40vw]'></div>
-            <div className='h-[1rem] bg-rh-bg-surface rounded w-[4vw]'></div>
+          <div className='flex items-center justify-between mb-8'>
+            <div className='h-[1.5rem] bg-rh-bg-surface rounded w-[160px]'></div>
+            <div className='h-[1rem] bg-rh-bg-surface rounded w-4'></div>
           </div>
-          <div className='h-[6rem] bg-rh-bg-surface rounded mb-[4vh]'></div>
-          <div className='grid grid-cols-3 gap-[4vw]'>
+          <div className='h-[6rem] bg-rh-bg-surface rounded mb-8'></div>
+          <div className='grid grid-cols-3 gap-4'>
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className='text-center'>
-                <div className='h-[2rem] bg-rh-bg-surface rounded mb-[1vh]'></div>
+                <div className='h-[2rem] bg-rh-bg-surface rounded mb-2'></div>
                 <div className='h-[1rem] bg-rh-bg-surface rounded'></div>
               </div>
             ))}
@@ -111,14 +111,14 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({
   if (error || !stats) {
     return (
       <div
-        className={`text-center bg-rh-bg-surface rounded-[1rem] p-[6vw] ${className}`}
+        className={`text-center bg-rh-bg-surface rounded-rh-xl p-6 ${className}`}
       >
-        <p className='text-rh-text-secondary text-[0.875rem] mb-[2vh]'>
+        <p className='text-rh-text-secondary text-[0.875rem] mb-4'>
           {error || "통계를 불러올 수 없습니다."}
         </p>
         <button
           onClick={loadMonthStats}
-          className='px-[4vw] py-[1vh] bg-blue-600 text-white rounded-[0.5rem] text-[0.875rem] hover:bg-blue-700 transition-colors'
+          className='px-4 py-2 bg-blue-600 text-white rounded-rh-md text-[0.875rem] hover:bg-blue-700 transition-colors'
         >
           다시 시도
         </button>
@@ -129,7 +129,7 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({
   const totalActivities = stats.attendance_count + stats.meetings_created_count;
 
   return (
-    <div className={`bg-rh-bg-surface rounded-[1rem] p-[6vw] ${className}`}>
+    <div className={`bg-rh-bg-surface rounded-rh-xl p-6 ${className}`}>
       {/* 헤더 - 월 선택기 */}
       <div className='mb-5'>
         <MonthYearPicker
@@ -141,7 +141,7 @@ const ActivitySummaryCard: React.FC<ActivitySummaryCardProps> = ({
 
       {/* 메인 숫자 - NRC 스타일 큰 숫자 */}
       <div className='mb-5'>
-        <div className='text-white text-[4rem] font-bold leading-none mb-[1vh]'>
+        <div className='text-white text-[4rem] font-bold leading-none mb-2'>
           {totalActivities}
         </div>
         <div className='text-rh-text-secondary text-[0.875rem]'>총 활동</div>

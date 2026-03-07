@@ -9,44 +9,44 @@ import { getCrewLocations, getCrewById } from "@/lib/supabase/admin";
 function SettingsLoadingSkeleton() {
   return (
     <div className='flex flex-col h-full bg-rh-bg-primary'>
-      <div className='flex-1 px-[4vw] py-[3vh] pb-[20vh] space-y-[3vh] overflow-y-auto animate-pulse'>
+      <div className='flex-1 px-4 py-6 pb-40 space-y-3 overflow-y-auto animate-pulse'>
         {/* 탭 네비게이션 스켈레톤 */}
-        <div className='bg-rh-bg-surface rounded-[0.75rem] p-[1vw] shadow-sm border border-rh-border'>
-          <div className='flex rounded-[0.5rem] bg-rh-bg-muted/30 p-[0.5vw]'>
-            <div className='flex-1 py-[2vh] px-[4vw] bg-rh-bg-muted rounded-[0.5rem]'></div>
-            <div className='flex-1 py-[2vh] px-[4vw] bg-rh-bg-muted rounded-[0.5rem] ml-[1vw]'></div>
+        <div className='bg-rh-bg-surface rounded-rh-lg p-1 shadow-sm border border-rh-border'>
+          <div className='flex rounded-rh-md bg-rh-bg-muted/30 p-0.5'>
+            <div className='flex-1 py-4 px-4 bg-rh-bg-muted rounded-rh-md'></div>
+            <div className='flex-1 py-4 px-4 bg-rh-bg-muted rounded-rh-md ml-1'></div>
           </div>
         </div>
 
         {/* 컨텐츠 스켈레톤 */}
-        <div className='bg-rh-bg-surface rounded-[0.75rem] shadow-sm border border-rh-border'>
-          <div className='p-[4vw] border-b border-rh-border'>
+        <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm border border-rh-border'>
+          <div className='p-4 border-b border-rh-border'>
             <div className='flex justify-between items-center'>
-              <div className='flex items-center space-x-[2vw]'>
+              <div className='flex items-center space-x-2'>
                 <div className='w-[1.25rem] h-[1.25rem] bg-rh-bg-muted rounded'></div>
-                <div className='w-[20vw] h-[1.125rem] bg-rh-bg-muted rounded'></div>
-                <div className='w-[8vw] h-[1.5rem] bg-rh-bg-muted rounded-full'></div>
+                <div className='w-20 h-[1.125rem] bg-rh-bg-muted rounded'></div>
+                <div className='w-8 h-[1.5rem] bg-rh-bg-muted rounded-full'></div>
               </div>
-              <div className='w-[20vw] h-[3vh] bg-rh-bg-muted rounded-[0.75rem]'></div>
+              <div className='w-20 h-6 bg-rh-bg-muted rounded-rh-lg'></div>
             </div>
           </div>
 
-          <div className='p-[4vw] space-y-[3vh]'>
+          <div className='p-4 space-y-3'>
             {/* 검색 스켈레톤 */}
-            <div className='w-full h-[6vh] bg-rh-bg-muted rounded-[0.75rem]'></div>
+            <div className='w-full h-12 bg-rh-bg-muted rounded-rh-lg'></div>
 
             {/* 목록 스켈레톤 */}
-            <div className='space-y-[2vh]'>
+            <div className='space-y-2'>
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className='bg-rh-bg-muted/20 rounded-[0.75rem] p-[4vw]'
+                  className='bg-rh-bg-muted/20 rounded-rh-lg p-4'
                 >
                   <div className='flex justify-between items-center'>
-                    <div className='w-[40vw] h-[1rem] bg-rh-bg-muted rounded'></div>
-                    <div className='flex space-x-[1vw]'>
-                      <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-[0.5rem]'></div>
-                      <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-[0.5rem]'></div>
+                    <div className='w-[160px] h-[1rem] bg-rh-bg-muted rounded'></div>
+                    <div className='flex space-x-1'>
+                      <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-rh-md'></div>
+                      <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-rh-md'></div>
                     </div>
                   </div>
                 </div>

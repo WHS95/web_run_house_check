@@ -68,7 +68,7 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
   const relativeTime = getRelativeTime(date);
 
   return (
-    <div className='relative flex items-start pb-[1vh] space-x-[1.5vw]'>
+    <div className='relative flex items-start pb-2 space-x-1.5'>
       {/* 타임라인 */}
       <div className='relative flex flex-col items-center'>
         {/* 아이콘 */}
@@ -82,13 +82,13 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
         </div>
 
         {/* 연결선 (마지막 아이템이 아닌 경우) */}
-        {!isLast && <div className='w-[0.125rem] h-[2vh] bg-rh-bg-surface mt-[0.25vh]'></div>}
+        {!isLast && <div className='w-[0.125rem] h-4 bg-rh-bg-surface mt-0.5'></div>}
       </div>
 
       {/* 콘텐츠 */}
       <div className='flex-1 min-w-0'>
         {/* 간소화된 정보 */}
-        <div className='flex items-center space-x-[1vw] text-[0.875rem] text-rh-text-secondary'>
+        <div className='flex items-center space-x-1 text-[0.875rem] text-rh-text-secondary'>
           <span className='font-medium'>{location}</span>
           <span className='text-rh-text-tertiary'>•</span>
           <span>{exerciseType}</span>

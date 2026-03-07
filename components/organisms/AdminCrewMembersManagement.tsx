@@ -288,17 +288,17 @@ export default function AdminCrewMembersManagement({
 
   if (loading) {
     return (
-      <div className='space-y-[3vh] animate-pulse'>
+      <div className='space-y-3 animate-pulse'>
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className='bg-rh-bg-surface rounded-[0.75rem] p-[4vw]'
+            className='bg-rh-bg-surface rounded-rh-lg p-4'
           >
-            <div className='flex items-center space-x-[3vw]'>
+            <div className='flex items-center space-x-3'>
               <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
-              <div className='flex-1 space-y-[1vh]'>
-                <div className='h-[1rem] bg-rh-bg-muted rounded w-[30vw]'></div>
-                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-[50vw]'></div>
+              <div className='flex-1 space-y-1'>
+                <div className='h-[1rem] bg-rh-bg-muted rounded w-[120px]'></div>
+                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-1/2'></div>
               </div>
             </div>
           </div>
@@ -308,23 +308,23 @@ export default function AdminCrewMembersManagement({
   }
 
   return (
-    <div className='bg-rh-bg-surface rounded-[0.75rem] shadow-sm overflow-hidden'>
+    <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
       {/* 헤더 */}
-      <div className='p-[4vw] border-b border-rh-border'>
+      <div className='p-4 border-b border-rh-border'>
         <div className='flex justify-between items-center'>
-          <div className='flex items-center space-x-[2vw]'>
+          <div className='flex items-center space-x-2'>
             <Users className='w-[1.25rem] h-[1.25rem] text-white' />
             <span className='text-[1.125rem] font-bold text-white'>
               운영진 관리
             </span>
-            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-rh-bg-primary rounded-full text-[0.75rem] font-medium text-white'>
+            <div className='ml-1 px-2 py-0.5 bg-rh-bg-primary rounded-full text-[0.75rem] font-medium text-white'>
               {members.length}명
             </div>
           </div>
         </div>
       </div>
 
-      <div className='p-[4vw] space-y-[3vh]'>
+      <div className='p-4 space-y-3'>
         {/* 검색 */}
         <div className='relative'>
           <Search className='absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2' />

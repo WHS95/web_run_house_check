@@ -327,7 +327,7 @@ export default function AdminInviteCodesManagement({
                       setEditData({ ...editData, inviteCode: value });
                     }
                   }}
-                  className='font-mono text-white border-0 bg-rh-bg-surface placeholder:text-gray-400'
+                  className='font-mono text-white border-0 bg-rh-bg-surface placeholder:text-rh-text-secondary'
                   maxLength={7}
                 />
                 <Button
@@ -341,7 +341,7 @@ export default function AdminInviteCodesManagement({
                   <Shuffle className='w-4 h-4' />
                 </Button>
               </div>
-              <p className='mt-1 text-xs text-gray-400'>
+              <p className='mt-1 text-xs text-rh-text-secondary'>
                 영문 대문자와 숫자만 사용 가능 (정확히 7자리)
               </p>
             </div>
@@ -356,7 +356,7 @@ export default function AdminInviteCodesManagement({
                 onChange={(e) =>
                   setEditData({ ...editData, description: e.target.value })
                 }
-                className='text-white border-0 bg-rh-bg-surface placeholder:text-gray-400'
+                className='text-white border-0 bg-rh-bg-surface placeholder:text-rh-text-secondary'
               />
             </div> */}
             <div className='flex space-x-[2vw]'>
@@ -396,18 +396,18 @@ export default function AdminInviteCodesManagement({
                   </div>
 
                   {inviteCode.description && (
-                    <p className='mb-3 text-sm text-gray-300'>
+                    <p className='mb-3 text-sm text-rh-text-secondary'>
                       {inviteCode.description}
                     </p>
                   )}
 
-                  {/* <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
+                  {/* <div className='grid grid-cols-1 gap-3 text-sm text-rh-text-secondary sm:grid-cols-2'>
                     <div className='flex items-center space-x-2'>
-                      <Calendar className='w-4 h-4 text-gray-400' />
+                      <Calendar className='w-4 h-4 text-rh-text-secondary' />
                       <span>생성: {formatDate(inviteCode.created_at)}</span>
                     </div>
                     <div className='flex items-center space-x-2'>
-                      <Calendar className='w-4 h-4 text-gray-400' />
+                      <Calendar className='w-4 h-4 text-rh-text-secondary' />
                       <span>수정: {formatDate(inviteCode.updated_at)}</span>
                     </div>
                   </div> */}
@@ -447,11 +447,11 @@ export default function AdminInviteCodesManagement({
         {/* 초대코드가 없을 때 */}
         {!inviteCode && !isEditing && (
           <div className='py-8 text-center'>
-            <Ticket className='mx-auto mb-4 w-16 h-16 text-gray-500' />
-            <p className='mb-2 text-lg font-medium text-gray-300'>
+            <Ticket className='mx-auto mb-4 w-16 h-16 text-rh-text-tertiary' />
+            <p className='mb-2 text-lg font-medium text-rh-text-secondary'>
               등록된 초대코드가 없습니다
             </p>
-            <p className='mb-4 text-gray-400'>
+            <p className='mb-4 text-rh-text-secondary'>
               크루 초대를 위한 코드를 생성해보세요
             </p>
             <Button

@@ -132,7 +132,7 @@ export default function AdminPage() {
               </svg>
             </div>
             <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
-            <p className='text-sm text-gray-300'>{error}</p>
+            <p className='text-sm text-rh-text-secondary'>{error}</p>
           </div>
         </div>
       </AdminPageContainer>

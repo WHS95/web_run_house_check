@@ -143,7 +143,7 @@ export default function AddressSearch({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           placeholder={placeholder}
-          className='flex-1 text-white placeholder-gray-400 border-gray-600 bg-rh-bg-surface focus:border-rh-accent'
+          className='flex-1 text-white placeholder-rh-text-secondary border-rh-border bg-rh-bg-surface focus:border-rh-accent'
         />
         <Button
           onClick={handleSearch}
@@ -160,12 +160,12 @@ export default function AddressSearch({
 
       {/* 검색 결과 / 검색 기록 드롭다운 */}
       {isOpen && (
-        <Card className='absolute left-0 right-0 z-50 mt-1 border-gray-600 shadow-lg top-full bg-rh-bg-surface'>
+        <Card className='absolute left-0 right-0 z-50 mt-1 border-rh-border shadow-lg top-full bg-rh-bg-surface'>
           <CardContent className='p-0'>
             {loading && (
               <div className='p-4 text-center'>
                 <Loader2 className='w-5 h-5 mx-auto mb-2 animate-spin text-rh-accent' />
-                <p className='text-sm text-gray-400'>주소 검색 중...</p>
+                <p className='text-sm text-rh-text-secondary'>주소 검색 중...</p>
               </div>
             )}
 
@@ -174,14 +174,14 @@ export default function AddressSearch({
                 <p className='text-sm text-red-400'>
                   검색 중 오류가 발생했습니다
                 </p>
-                <p className='mt-1 text-xs text-gray-500'>{error}</p>
+                <p className='mt-1 text-xs text-rh-text-tertiary'>{error}</p>
               </div>
             )}
 
             {!loading && !error && searchResults.length > 0 && (
               <div>
-                <div className='p-2 border-b border-gray-600'>
-                  <p className='text-xs font-medium text-gray-400 uppercase'>
+                <div className='p-2 border-b border-rh-border'>
+                  <p className='text-xs font-medium text-rh-text-secondary uppercase'>
                     검색 결과
                   </p>
                 </div>
@@ -199,11 +199,11 @@ export default function AddressSearch({
                         </p>
                         {result.roadAddress &&
                           result.address !== result.roadAddress && (
-                            <p className='mt-1 text-xs text-gray-400'>
+                            <p className='mt-1 text-xs text-rh-text-secondary'>
                               지번: {result.address}
                             </p>
                           )}
-                        <p className='mt-1 text-xs text-gray-500'>
+                        <p className='mt-1 text-xs text-rh-text-tertiary'>
                           좌표: {result.position.lat.toFixed(6)},{" "}
                           {result.position.lng.toFixed(6)}
                         </p>
@@ -219,8 +219,8 @@ export default function AddressSearch({
               searchResults.length === 0 &&
               searchQuery && (
                 <div className='p-4 text-center'>
-                  <p className='text-sm text-gray-400'>검색 결과가 없습니다</p>
-                  <p className='mt-1 text-xs text-gray-500'>
+                  <p className='text-sm text-rh-text-secondary'>검색 결과가 없습니다</p>
+                  <p className='mt-1 text-xs text-rh-text-tertiary'>
                     다른 키워드로 검색해보세요
                   </p>
                 </div>
@@ -228,8 +228,8 @@ export default function AddressSearch({
 
             {!loading && !error && !searchQuery && searchHistory.length > 0 && (
               <div>
-                <div className='p-2 border-b border-gray-600'>
-                  <p className='text-xs font-medium text-gray-400 uppercase'>
+                <div className='p-2 border-b border-rh-border'>
+                  <p className='text-xs font-medium text-rh-text-secondary uppercase'>
                     최근 검색
                   </p>
                 </div>
@@ -240,8 +240,8 @@ export default function AddressSearch({
                     className='w-full p-3 text-left transition-colors hover:bg-rh-bg-primary'
                   >
                     <div className='flex items-center gap-3'>
-                      <Search className='flex-shrink-0 w-4 h-4 text-gray-400' />
-                      <span className='text-sm text-gray-300 truncate'>
+                      <Search className='flex-shrink-0 w-4 h-4 text-rh-text-secondary' />
+                      <span className='text-sm text-rh-text-secondary truncate'>
                         {historyItem}
                       </span>
                     </div>

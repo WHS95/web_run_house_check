@@ -22,6 +22,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import RadiusSlider from "./RadiusSlider";
 
 interface LocationFormProps {
   initialData?: CrewLocation | null;
@@ -48,6 +49,7 @@ export default function LocationForm({
     latitude: 0,
     longitude: 0,
     address: "",
+    allowed_radius: 50,
   });
 
   const [mapCenter, setMapCenter] = useState<NaverMapPosition>({
@@ -73,6 +75,7 @@ export default function LocationForm({
         latitude: initialData.latitude,
         longitude: initialData.longitude,
         address: "",
+        allowed_radius: initialData.allowed_radius || 50,
       });
 
       setIsActive(initialData.is_active);
@@ -195,6 +198,7 @@ export default function LocationForm({
         description: formData.description?.trim() || undefined,
         latitude: formData.latitude,
         longitude: formData.longitude,
+        allowed_radius: formData.allowed_radius,
       });
     } catch (error) {
       console.error("활동장소 저장 오류:", error);
@@ -235,7 +239,7 @@ export default function LocationForm({
   };
 
   return (
-    <Card className='border-gray-600 bg-rh-bg-surface'>
+    <Card className='border-rh-border bg-rh-bg-surface'>
       <CardContent>
         <form onSubmit={handleSubmit} className='space-y-6'>
           {/* 활동장소 이름 */}
@@ -248,7 +252,7 @@ export default function LocationForm({
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               placeholder='예: 한강공원 정기런닝 장소'
-              className='placeholder-gray-400 text-white border-gray-600 bg-rh-bg-primary focus:border-rh-accent'
+              className='placeholder-rh-text-secondary text-white border-rh-border bg-rh-bg-primary focus:border-rh-accent'
             />
             {errors.name && (
               <p className='text-sm text-red-400'>{errors.name}</p>
@@ -265,20 +269,20 @@ export default function LocationForm({
           </div>
           {/* 좌표 및 주소 정보 */}
           {formData.latitude !== 0 && formData.longitude !== 0 && (
-            <div className='p-3 rounded-lg border border-gray-600 bg-rh-bg-primary'>
+            <div className='p-3 rounded-lg border border-rh-border bg-rh-bg-primary'>
               <div className='flex justify-between items-center mb-2'>
                 <Label className='text-sm text-white'>선택된 위치 정보</Label>
               </div>
 
               <div className='space-y-2 text-sm'>
-                <div className='text-gray-300'>
+                <div className='text-rh-text-secondary'>
                   <span className='font-medium text-white'>좌표:</span>{" "}
                   {formData.latitude?.toFixed(6)},{" "}
                   {formData.longitude?.toFixed(6)}
                 </div>
 
                 {formData.address && (
-                  <div className='text-gray-300'>
+                  <div className='text-rh-text-secondary'>
                     <span className='font-medium text-white'>주소:</span>{" "}
                     {formData.address}
                   </div>
@@ -321,6 +325,16 @@ export default function LocationForm({
             {errors.position && (
               <p className='text-sm text-red-400'>{errors.position}</p>
             )}
+          </div>
+
+          {/* 허용 반경 슬라이더 */}
+          <div className='space-y-2'>
+            <RadiusSlider
+              value={formData.allowed_radius}
+              onChange={(radius) =>
+                setFormData((prev) => ({ ...prev, allowed_radius: radius }))
+              }
+            />
           </div>
 
           {/* 편집 모드 전용 컨트롤 */}
@@ -399,7 +413,7 @@ onClick={() =>
   handleReverseGeocode(formData.latitude, formData.longitude)
 }
 disabled={reverseGeocoding}
-className='text-xs text-gray-400 border-gray-600 hover:bg-gray-600/20'
+className='text-xs text-rh-text-secondary border-rh-border hover:bg-rh-bg-muted/20'
 >
 {reverseGeocoding ? (
   <RefreshCw className='mr-1 w-3 h-3 animate-spin' />

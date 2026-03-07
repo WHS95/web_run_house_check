@@ -29,7 +29,7 @@ export const metadata = {
 const RankingPageFallback = React.memo(() => (
   <div className='min-h-screen bg-rh-bg-primary'>
     <div className='pt-safe'>
-      <div className='flex justify-between items-center px-4 py-4 w-full border-b border-gray-500'>
+      <div className='flex justify-between items-center px-4 py-4 w-full border-b border-rh-border'>
         <div className='w-16 h-6 rounded animate-pulse bg-rh-bg-primary'></div>
         <div className='w-6 h-6 rounded animate-pulse bg-rh-bg-primary'></div>
       </div>

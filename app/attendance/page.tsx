@@ -63,7 +63,7 @@ async function getAttendanceFormData() {
 const AttendancePageFallback = () => (
   <div className='min-h-screen bg-rh-bg-primary'>
     <div className='pt-safe'>
-      <div className='flex items-center justify-between w-full px-[4vw] py-[2vh] border-b border-gray-300'>
+      <div className='flex items-center justify-between w-full px-[4vw] py-[2vh] border-b border-rh-border'>
         <div className='w-[20vw] h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
         <div className='w-[1.5rem] h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
       </div>

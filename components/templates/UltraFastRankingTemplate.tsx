@@ -35,12 +35,12 @@ const RankingListSkeleton = React.memo(() => (
   <div className="pb-safe space-y-2">
     {Array.from({ length: 8 }).map((_, index) => (
       <div key={index} className="flex items-center p-4 animate-pulse">
-        <div className="w-8 h-6 bg-gray-200 rounded mr-4"></div>
-        <div className="w-10 h-10 bg-gray-200 rounded-full mr-4"></div>
+        <div className="w-8 h-6 bg-rh-bg-muted rounded mr-4"></div>
+        <div className="w-10 h-10 bg-rh-bg-muted rounded-full mr-4"></div>
         <div className="flex-1">
-          <div className="h-4 bg-gray-200 rounded w-20 mb-1"></div>
+          <div className="h-4 bg-rh-bg-muted rounded w-20 mb-1"></div>
         </div>
-        <div className="w-12 h-4 bg-gray-200 rounded"></div>
+        <div className="w-12 h-4 bg-rh-bg-muted rounded"></div>
       </div>
     ))}
   </div>
@@ -312,7 +312,7 @@ const UltraFastRankingTemplate = () => {
       </div>
 
       {/* ⚡ 고정된 랭킹 리스트 헤더 */}
-      <div className="fixed top-[32vh] left-0 right-0 bg-rh-bg-primary z-10 border-gray-200">
+      <div className="fixed top-[32vh] left-0 right-0 bg-rh-bg-primary z-10 border-rh-border">
         <RankingListHeader 
           headers={[
             '등수', 
@@ -337,13 +337,13 @@ const UltraFastRankingTemplate = () => {
           ) : (
             <div className="h-full flex items-center justify-center pb-safe">
               <div className="text-center">
-                <div className="mb-[2vh] text-gray-400">
+                <div className="mb-[2vh] text-rh-text-secondary">
                   <svg className="w-[4rem] h-[4rem] mx-auto opacity-50" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <p className="text-gray-500 text-[1.125rem] font-medium">해당 월의 출석 데이터가 없습니다</p>
-                <p className="text-gray-400 text-[0.875rem] mt-[1vh]">다른 월을 확인해보세요</p>
+                <p className="text-rh-text-tertiary text-[1.125rem] font-medium">해당 월의 출석 데이터가 없습니다</p>
+                <p className="text-rh-text-secondary text-[0.875rem] mt-[1vh]">다른 월을 확인해보세요</p>
               </div>
             </div>
           )}

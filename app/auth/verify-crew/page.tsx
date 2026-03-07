@@ -43,10 +43,10 @@ export default async function VerifyCrewPage() {
   }
 
   return (
-    <div className='flex flex-col justify-center items-center p-4 min-h-screen bg-gray-50'>
+    <div className='flex flex-col justify-center items-center p-4 min-h-screen bg-rh-bg-primary'>
       <div className='space-y-8 w-full max-w-md'>
         <div className='text-center'>
-          <p className='mt-2 text-sm text-gray-500'>
+          <p className='mt-2 text-sm text-rh-text-tertiary'>
             크루 인증을 완료하여 런하우스 서비스를 이용하세요.
           </p>
         </div>

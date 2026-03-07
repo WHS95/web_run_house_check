@@ -34,7 +34,7 @@ const LocationItem = memo(function LocationItem({
 
   return (
     <Card
-      className={`flex justify-between items-center border-gray-600 transition-all cursor-pointer bg-rh-bg-surface hover:border-rh-accent/50`}
+      className={`flex justify-between items-center border-rh-border transition-all cursor-pointer bg-rh-bg-surface hover:border-rh-accent/50`}
       onClick={handleSelect}
     >
       <CardContent>
@@ -54,7 +54,7 @@ const LocationItem = memo(function LocationItem({
         variant='ghost'
         size='sm'
         onClick={handleEdit}
-        className='flex-shrink-0 text-gray-400 hover:text-white hover:bg-rh-accent-hover/20'
+        className='flex-shrink-0 text-rh-text-secondary hover:text-white hover:bg-rh-accent-hover/20'
       >
         <MoreVertical className='w-4 h-4' />
       </Button>
@@ -85,15 +85,15 @@ function LocationList({
     return (
       <div>
         {[1, 2, 3].map((i) => (
-          <Card key={i} className='border-gray-600 bg-rh-bg-surface'>
+          <Card key={i} className='border-rh-border bg-rh-bg-surface'>
             <CardContent className='p-1'>
               <div className='animate-pulse'>
-                <div className='mb-2 w-3/4 h-4 bg-gray-600 rounded'></div>
-                <div className='mb-3 w-1/2 h-3 bg-gray-700 rounded'></div>
+                <div className='mb-2 w-3/4 h-4 bg-rh-bg-surface rounded'></div>
+                <div className='mb-3 w-1/2 h-3 bg-rh-bg-surface rounded'></div>
                 <div className='flex space-x-2'>
-                  <div className='w-16 h-8 bg-gray-600 rounded'></div>
-                  <div className='w-16 h-8 bg-gray-600 rounded'></div>
-                  <div className='w-16 h-8 bg-gray-600 rounded'></div>
+                  <div className='w-16 h-8 bg-rh-bg-surface rounded'></div>
+                  <div className='w-16 h-8 bg-rh-bg-surface rounded'></div>
+                  <div className='w-16 h-8 bg-rh-bg-surface rounded'></div>
                 </div>
               </div>
             </CardContent>
@@ -105,12 +105,12 @@ function LocationList({
 
   if (locations.length === 0) {
     return (
-      <Card className='border-gray-600 bg-rh-bg-surface'>
+      <Card className='border-rh-border bg-rh-bg-surface'>
         <CardContent className='p-8 text-center'>
           <h3 className='mb-2 text-lg font-medium text-white'>
             등록된 활동장소가 없습니다
           </h3>
-          <p className='text-gray-400'>새 활동장소를 추가하여 시작해보세요</p>
+          <p className='text-rh-text-secondary'>새 활동장소를 추가하여 시작해보세요</p>
         </CardContent>
       </Card>
     );

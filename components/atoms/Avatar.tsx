@@ -16,7 +16,7 @@ const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <div
-      className='relative rounded-full overflow-hidden bg-gray-100'
+      className='relative rounded-full overflow-hidden bg-rh-bg-surface'
       style={{ width: dimension, height: dimension }}
     >
       {src ? (
@@ -29,7 +29,7 @@ const Avatar: React.FC<AvatarProps> = ({
         />
       ) : (
         <svg
-          className='h-full w-full text-gray-300'
+          className='h-full w-full text-rh-text-secondary'
           fill='currentColor'
           viewBox='0 0 24 24'
         >

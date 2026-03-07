@@ -156,21 +156,21 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
       <div className='relative p-8 mx-4 w-full max-w-md bg-white rounded-3xl shadow-2xl'>
         <div className='text-center'>
           {/* 제목 */}
-          <h2 className='mb-6 text-xl font-bold text-gray-900'>
+          <h2 className='mb-6 text-xl font-bold text-rh-text-inverted'>
             출석 정보 수정
           </h2>
 
           {/* 사용자 정보 (읽기 전용) */}
-          <div className='p-4 mb-6 bg-gray-50 rounded-lg'>
-            <p className='font-medium text-gray-900'>{attendance.userName}</p>
-            <p className='text-xs text-gray-500'>{attendance.exerciseType}</p>
+          <div className='p-4 mb-6 bg-rh-bg-surface rounded-lg'>
+            <p className='font-medium text-rh-text-inverted'>{attendance.userName}</p>
+            <p className='text-xs text-rh-text-tertiary'>{attendance.exerciseType}</p>
           </div>
 
           {/* 폼 */}
           <div className='space-y-4 text-left'>
             {/* 참여시간 */}
             <div>
-              <label className='block mb-2 text-sm font-medium text-gray-700'>
+              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
                 참여시간
               </label>
               <input
@@ -182,13 +182,13 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     checkInTime: formatInputToDateTime(e.target.value),
                   })
                 }
-                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rh-accent'
+                className='p-3 w-full rounded-lg border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent'
               />
             </div>
 
             {/* 장소 */}
             <div className='relative location-dropdown-container'>
-              <label className='block mb-2 text-sm font-medium text-gray-700'>
+              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
                 장소
               </label>
               <div className='relative'>
@@ -199,13 +199,13 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     setFormData({ ...formData, location: e.target.value })
                   }
                   onFocus={() => setShowLocationDropdown(true)}
-                  className='p-3 pr-10 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rh-accent'
+                  className='p-3 pr-10 w-full rounded-lg border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent'
                   placeholder='모임 장소를 입력하세요'
                 />
                 <button
                   type='button'
                   onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-                  className='absolute right-3 top-1/2 text-gray-400 transform -translate-y-1/2 hover:text-gray-600'
+                  className='absolute right-3 top-1/2 text-rh-text-secondary transform -translate-y-1/2 hover:text-rh-text-muted'
                 >
                   <svg
                     className='w-5 h-5'
@@ -225,7 +225,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
 
               {/* 드롭다운 메뉴 */}
               {showLocationDropdown && (
-                <div className='overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-gray-300 shadow-lg'>
+                <div className='overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-rh-border shadow-lg'>
                   {locations.length > 0 && (
                     <>
                       {locations.map((location) => (
@@ -233,14 +233,14 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                           key={location.id}
                           type='button'
                           onClick={() => handleLocationSelect(location)}
-                          className='px-3 py-3 w-full text-left border-b border-gray-100 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none last:border-b-0'
+                          className='px-3 py-3 w-full text-left border-b border-rh-border hover:bg-rh-bg-surface focus:bg-rh-bg-surface focus:outline-none last:border-b-0'
                         >
-                          <div className='font-medium text-gray-900'>
+                          <div className='font-medium text-rh-text-inverted'>
                             {location.name}
                           </div>
                         </button>
                       ))}
-                      <div className='border-t border-gray-200'></div>
+                      <div className='border-t border-rh-border'></div>
                     </>
                   )}
                 </div>
@@ -249,7 +249,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
 
             {/* 벙주여부 */}
             <div>
-              <label className='block mb-2 text-sm font-medium text-gray-700'>
+              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
                 벙주여부
               </label>
               <div className='flex items-center space-x-4'>
@@ -261,7 +261,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     onChange={() => setFormData({ ...formData, isHost: true })}
                     className='mr-2 text-rh-accent focus:ring-rh-accent'
                   />
-                  <span className='text-sm text-gray-700'>벙주</span>
+                  <span className='text-sm text-rh-text-muted'>벙주</span>
                 </label>
                 <label className='flex items-center'>
                   <input
@@ -271,7 +271,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
                     onChange={() => setFormData({ ...formData, isHost: false })}
                     className='mr-2 text-rh-accent focus:ring-rh-accent'
                   />
-                  <span className='text-sm text-gray-700'>일반 참여자</span>
+                  <span className='text-sm text-rh-text-muted'>일반 참여자</span>
                 </label>
               </div>
             </div>
@@ -282,7 +282,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
             <Button
               onClick={onClose}
               variant='outline'
-              className='flex-1 py-3 text-gray-600 border-gray-300 hover:bg-gray-50'
+              className='flex-1 py-3 text-rh-text-muted border-rh-border hover:bg-rh-bg-surface'
               disabled={isLoading}
             >
               취소

@@ -82,17 +82,17 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
         </div>
 
         {/* 연결선 (마지막 아이템이 아닌 경우) */}
-        {!isLast && <div className='w-[0.125rem] h-[2vh] bg-gray-600 mt-[0.25vh]'></div>}
+        {!isLast && <div className='w-[0.125rem] h-[2vh] bg-rh-bg-surface mt-[0.25vh]'></div>}
       </div>
 
       {/* 콘텐츠 */}
       <div className='flex-1 min-w-0'>
         {/* 간소화된 정보 */}
-        <div className='flex items-center space-x-[1vw] text-[0.875rem] text-gray-300'>
+        <div className='flex items-center space-x-[1vw] text-[0.875rem] text-rh-text-secondary'>
           <span className='font-medium'>{location}</span>
-          <span className='text-gray-500'>•</span>
+          <span className='text-rh-text-tertiary'>•</span>
           <span>{exerciseType}</span>
-          <span className='text-gray-500'>•</span>
+          <span className='text-rh-text-tertiary'>•</span>
           <span className='text-[0.75rem]'>{relativeTime}</span>
         </div>
       </div>

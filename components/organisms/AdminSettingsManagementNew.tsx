@@ -63,7 +63,7 @@ export default function AdminSettingsManagementNew({
               className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                 activeTab === "locations"
                   ? "bg-rh-accent text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-rh-text-secondary hover:text-white"
               }`}
             >
               <MapPin className='w-4 h-4' />
@@ -74,7 +74,7 @@ export default function AdminSettingsManagementNew({
               className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                 activeTab === "members"
                   ? "bg-rh-accent text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-rh-text-secondary hover:text-white"
               }`}
             >
               <Users className='w-4 h-4' />
@@ -85,7 +85,7 @@ export default function AdminSettingsManagementNew({
               className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                 activeTab === "invites"
                   ? "bg-rh-accent text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-rh-text-secondary hover:text-white"
               }`}
             >
               <Ticket className='w-4 h-4' />
@@ -96,7 +96,7 @@ export default function AdminSettingsManagementNew({
               className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                 activeTab === "notices"
                   ? "bg-rh-accent text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-rh-text-secondary hover:text-white"
               }`}
             >
               <Megaphone className='w-4 h-4' />

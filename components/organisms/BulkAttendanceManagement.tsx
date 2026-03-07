@@ -280,7 +280,7 @@ export default function BulkAttendanceManagement({
             <span className='text-[1.125rem] font-bold text-white'>
               출석 관리
             </span>
-            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-rh-bg-muted rounded-full text-[0.75rem] font-medium text-gray-300'>
+            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-rh-bg-muted rounded-full text-[0.75rem] font-medium text-rh-text-secondary'>
               {selectedUsers.size}명 선택됨
             </div>
           </div>
@@ -300,7 +300,7 @@ export default function BulkAttendanceManagement({
                 onChange={(e) =>
                   handleAttendanceDataChange("date", e.target.value)
                 }
-                className='w-full text-white border-0 bg-rh-bg-primary placeholder:text-gray-400'
+                className='w-full text-white border-0 bg-rh-bg-primary placeholder:text-rh-text-secondary'
                 //  className='justify-between w-full text-white border-0 bg-rh-bg-primary'
               />
             </div>
@@ -316,7 +316,7 @@ export default function BulkAttendanceManagement({
                 onChange={(e) =>
                   handleAttendanceDataChange("time", e.target.value)
                 }
-                className='text-white border-0 bg-rh-bg-primary placeholder:text-gray-400'
+                className='text-white border-0 bg-rh-bg-primary placeholder:text-rh-text-secondary'
               />
             </div>
 
@@ -390,12 +390,12 @@ export default function BulkAttendanceManagement({
         <div className='p-[4vw] space-y-[3vh]'>
           {/* 검색 */}
           <div className='relative'>
-            <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
+            <Search className='absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2' />
             <Input
               placeholder='이름, 이메일, 전화번호, 출생연도로 검색'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className='pl-10 text-white border-0 bg-rh-bg-primary placeholder:text-gray-400'
+              className='pl-10 text-white border-0 bg-rh-bg-primary placeholder:text-rh-text-secondary'
             />
           </div>
 
@@ -419,7 +419,7 @@ export default function BulkAttendanceManagement({
                 </>
               )}
             </Button>
-            <span className='text-sm text-gray-400'>
+            <span className='text-sm text-rh-text-secondary'>
               {filteredUsers.length}명 중 {selectedUsers.size}명 선택
             </span>
           </div>
@@ -443,7 +443,7 @@ export default function BulkAttendanceManagement({
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                           selectedUsers.has(user.id)
                             ? "bg-rh-accent border-rh-accent"
-                            : "border-gray-400"
+                            : "border-rh-border"
                         }`}
                       >
                         {selectedUsers.has(user.id) && (
@@ -456,16 +456,16 @@ export default function BulkAttendanceManagement({
                             {user.first_name}
                           </h4>
                           {user.birth_year && (
-                            <span className='px-2 py-1 text-xs font-medium text-gray-300 rounded-full bg-rh-bg-muted'>
+                            <span className='px-2 py-1 text-xs font-medium text-rh-text-secondary rounded-full bg-rh-bg-muted'>
                               {user.birth_year}
                             </span>
                           )}
                         </div>
-                        {/* <p className='text-sm text-gray-300'>
+                        {/* <p className='text-sm text-rh-text-secondary'>
                           {user.email || user.phone || "연락처 없음"}
                         </p> */}
                         {/* {user.birth_year && (
-                          <p className='text-xs text-gray-400'>
+                          <p className='text-xs text-rh-text-secondary'>
                             {user.birth_year}년생
                           </p>
                         )} */}
@@ -479,13 +479,13 @@ export default function BulkAttendanceManagement({
 
           {filteredUsers.length === 0 && (
             <div className='py-8 text-center'>
-              <Users className='mx-auto mb-4 w-16 h-16 text-gray-500' />
-              <p className='mb-2 text-lg font-medium text-gray-300'>
+              <Users className='mx-auto mb-4 w-16 h-16 text-rh-text-tertiary' />
+              <p className='mb-2 text-lg font-medium text-rh-text-secondary'>
                 {searchTerm
                   ? "검색 결과가 없습니다"
                   : "등록된 사용자가 없습니다"}
               </p>
-              <p className='text-gray-400'>
+              <p className='text-rh-text-secondary'>
                 {searchTerm
                   ? "다른 검색어를 시도해보세요"
                   : "사용자가 등록되면 여기에 표시됩니다"}

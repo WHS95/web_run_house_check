@@ -66,7 +66,7 @@ export default function CrewCreateButton() {
             ></div>
 
             <div className='relative bg-white rounded-lg max-w-md w-full mx-auto p-6 shadow-xl'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+              <h3 className='text-lg font-medium text-rh-text-inverted mb-4'>
                 새 크루 생성
               </h3>
 
@@ -74,7 +74,7 @@ export default function CrewCreateButton() {
                 <div className='mb-4'>
                   <label
                     htmlFor='name'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-rh-text-muted mb-1'
                   >
                     크루 이름 *
                   </label>
@@ -83,7 +83,7 @@ export default function CrewCreateButton() {
                     id='name'
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+                    className='w-full px-3 py-2 border border-rh-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                     placeholder='예: Tan-Cheon Running Crew'
                     required
                   />
@@ -92,7 +92,7 @@ export default function CrewCreateButton() {
                 <div className='mb-4'>
                   <label
                     htmlFor='description'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-rh-text-muted mb-1'
                   >
                     설명 (선택)
                   </label>
@@ -101,7 +101,7 @@ export default function CrewCreateButton() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
-                    className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+                    className='w-full px-3 py-2 border border-rh-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                     placeholder='크루에 대한 간략한 설명'
                   />
                 </div>
@@ -116,7 +116,7 @@ export default function CrewCreateButton() {
                   <button
                     type='button'
                     onClick={() => setIsModalOpen(false)}
-                    className='px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                    className='px-4 py-2 border border-rh-border rounded-md shadow-sm text-sm font-medium text-rh-text-muted bg-white hover:bg-rh-bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
                     disabled={isLoading}
                   >
                     취소

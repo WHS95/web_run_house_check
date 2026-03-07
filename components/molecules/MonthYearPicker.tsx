@@ -72,7 +72,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
       >
         <span>{formatDisplayText()}</span>
         <FiChevronDown
-          className={`w-[1rem] h-[1rem] text-gray-400 transition-transform ${
+          className={`w-[1rem] h-[1rem] text-rh-text-secondary transition-transform ${
             isOpen ? "rotate-180" : ""}`}
         />
       </button>
@@ -92,7 +92,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
                     className={`py-[1.5vh] text-center rounded-[0.5rem] text-[0.875rem] font-medium transition-colors ${
                       year === selectedYear
                         ? "bg-white text-rh-text-inverted"
-                        : "text-gray-300 hover:text-white hover:bg-gray-600"
+                        : "text-rh-text-secondary hover:text-white hover:bg-rh-bg-surface"
                     }`}
                   >
                     {year}
@@ -103,7 +103,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
 
             {/* 월 선택 섹션 */}
             <div>
-              <h3 className='text-gray-400 text-[0.875rem] mb-[2vh]'>월</h3>
+              <h3 className='text-rh-text-secondary text-[0.875rem] mb-[2vh]'>월</h3>
               <div className='grid grid-cols-4 gap-[2vw]'>
                 {months.map((month) => (
                   <button
@@ -114,7 +114,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
                     className={`py-[1.5vh] text-center rounded-[0.5rem] text-[0.875rem] font-medium transition-colors ${
                       month.value === selectedMonth
                         ? "bg-white text-rh-text-inverted"
-                        : "text-gray-300 hover:text-white hover:bg-gray-600"
+                        : "text-rh-text-secondary hover:text-white hover:bg-rh-bg-surface"
                     }`}
                   >
                     {month.label}

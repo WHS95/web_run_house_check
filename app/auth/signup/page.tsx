@@ -58,9 +58,9 @@ const InputField = memo<InputFieldProps>(
         onChange={onChange}
         placeholder={placeholder}
         readOnly={readOnly}
-        className={`w-full p-3 border-0 rounded-md text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-rh-accent ${
+        className={`w-full p-3 border-0 rounded-md text-sm text-white placeholder:text-rh-text-secondary focus:outline-none focus:ring-2 focus:ring-rh-accent ${
           readOnly
-            ? "text-gray-300 opacity-60 cursor-not-allowed bg-rh-bg-muted"
+            ? "text-rh-text-secondary opacity-60 cursor-not-allowed bg-rh-bg-muted"
             : "bg-rh-bg-surface"
         }`}
       />
@@ -105,9 +105,9 @@ const CrewCodeVerification = memo<CrewCodeVerificationProps>(
 
     const inputClassName = useMemo(() => {
       const baseClass =
-        "flex-1 p-3 border-0 rounded-md bg-rh-bg-surface text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-rh-accent";
+        "flex-1 p-3 border-0 rounded-md bg-rh-bg-surface text-sm text-white placeholder:text-rh-text-secondary focus:outline-none focus:ring-2 focus:ring-rh-accent";
       const disabledClass =
-        "opacity-60 cursor-not-allowed bg-rh-bg-muted text-gray-300";
+        "opacity-60 cursor-not-allowed bg-rh-bg-muted text-rh-text-secondary";
       return `${baseClass} ${
         isCrewCodeVerifying || crewCodeVerified ? disabledClass : ""
       }`;
@@ -134,7 +134,7 @@ const CrewCodeVerification = memo<CrewCodeVerificationProps>(
             type='button'
             onClick={onVerifyCrewCode}
             disabled={isButtonDisabled}
-            className='px-4 py-3 text-sm font-medium text-white rounded-md border-0 bg-rh-accent hover:bg-rh-accent-hover/80 focus:outline-none focus:ring-2 focus:ring-rh-accent disabled:bg-rh-bg-muted disabled:text-gray-400 disabled:cursor-not-allowed'
+            className='px-4 py-3 text-sm font-medium text-white rounded-md border-0 bg-rh-accent hover:bg-rh-accent-hover/80 focus:outline-none focus:ring-2 focus:ring-rh-accent disabled:bg-rh-bg-muted disabled:text-rh-text-secondary disabled:cursor-not-allowed'
           >
             {buttonText}
           </button>
@@ -213,7 +213,7 @@ const SubmitButton = memo<SubmitButtonProps>(
           type='submit'
           onClick={onSubmit}
           disabled={isDisabled}
-          className='px-4 py-3 w-full text-sm font-medium text-white rounded-md bg-rh-accent hover:bg-rh-accent-hover/80 focus:outline-none focus:ring-2 focus:ring-rh-accent disabled:bg-rh-bg-muted disabled:text-gray-400 disabled:cursor-not-allowed'
+          className='px-4 py-3 w-full text-sm font-medium text-white rounded-md bg-rh-accent hover:bg-rh-accent-hover/80 focus:outline-none focus:ring-2 focus:ring-rh-accent disabled:bg-rh-bg-muted disabled:text-rh-text-secondary disabled:cursor-not-allowed'
         >
           {buttonText}
         </button>

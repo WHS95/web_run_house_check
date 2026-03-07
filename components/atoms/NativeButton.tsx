@@ -56,7 +56,7 @@ const NativeButton: React.FC<NativeButtonProps> = ({
   const variantClasses = {
     primary: "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500",
     secondary:
-      "bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500",
+      "bg-rh-bg-surface text-rh-text-inverted hover:bg-rh-bg-muted focus:ring-rh-border",
     danger: "bg-red-500 text-white hover:bg-red-600 focus:ring-red-500",
     success: "bg-green-500 text-white hover:bg-green-600 focus:ring-green-500",
   };

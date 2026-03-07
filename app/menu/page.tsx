@@ -120,7 +120,7 @@ export default function MenuPage() {
         <PageHeader
           title='러닝 계산기'
           iconColor='white'
-          borderColor='gray-300'
+          borderColor='rh-border'
         />
       </div>
 
@@ -147,13 +147,13 @@ export default function MenuPage() {
                     <div className='text-sm text-white'>{item.description}</div>
                   </div>
                 </div>
-                <ChevronRight size={20} className='text-gray-400' />
+                <ChevronRight size={20} className='text-rh-text-secondary' />
               </button>
             );
           })}
 
           {/* 구분선 */}
-          <div className='my-4 border-t border-gray-600'></div>
+          <div className='my-4 border-t border-rh-border'></div>
 
           {/* 로그아웃 버튼 */}
           <button
@@ -166,7 +166,7 @@ export default function MenuPage() {
               </div>
               <div className='text-left'>
                 <div className='font-extrabold text-red-500'>로그아웃</div>
-                <div className='text-sm text-gray-400'>계정에서 로그아웃</div>
+                <div className='text-sm text-rh-text-secondary'>계정에서 로그아웃</div>
               </div>
             </div>
           </button>

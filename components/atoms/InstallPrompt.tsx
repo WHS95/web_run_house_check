@@ -76,7 +76,7 @@ export default function InstallPrompt() {
           </button>
           <button
             onClick={handleInstallClick}
-            className='px-3 py-1 text-sm text-blue-600 bg-white rounded hover:bg-gray-100'
+            className='px-3 py-1 text-sm text-blue-600 bg-white rounded hover:bg-rh-bg-surface'
           >
             설치
           </button>

@@ -285,12 +285,12 @@ export default function AdminUserManagement({
       <div className='sticky top-[10px] z-10 bg-rh-bg-primary px-4 py-4 space-y-4 '>
         {/* 검색 */}
         <div className='relative'>
-          <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
+          <Search className='absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2' />
           <Input
             placeholder='이름, 전화번호 또는 이메일로 검색'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='pl-10 text-white rounded-lg border-0 bg-rh-bg-surface placeholder:text-gray-400'
+            className='pl-10 text-white rounded-lg border-0 bg-rh-bg-surface placeholder:text-rh-text-secondary'
           />
         </div>
 
@@ -307,7 +307,7 @@ export default function AdminUserManagement({
                 >
                   <ChevronDown className='mr-1 w-4 h-4' />
                   {statusFilter}
-                  <span className='ml-2 text-gray-400'>
+                  <span className='ml-2 text-rh-text-secondary'>
                     {statusCounts[statusFilter as keyof typeof statusCounts]}
                   </span>
                 </Button>
@@ -326,7 +326,7 @@ export default function AdminUserManagement({
                   >
                     <div className='flex justify-between items-center w-full'>
                       <span>{status}</span>
-                      <span className='ml-2 text-gray-400'>
+                      <span className='ml-2 text-rh-text-secondary'>
                         {statusCounts[status as keyof typeof statusCounts]}
                       </span>
                     </div>
@@ -480,7 +480,7 @@ export default function AdminUserManagement({
                     }`}
                   >
                     <div className='pt-3 mt-3 border-t border-rh-border'>
-                      <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
+                      <div className='grid grid-cols-1 gap-3 text-sm text-rh-text-secondary sm:grid-cols-2'>
                         <div className='flex justify-between'>
                           <span className='text-white'>연락처</span>
                           <span className='text-right break-all'>
@@ -520,7 +520,7 @@ export default function AdminUserManagement({
 
         {filteredUsers.length === 0 && (
           <div className='py-8 text-center'>
-            <p className='text-gray-400'>검색 결과가 없습니다.</p>
+            <p className='text-rh-text-secondary'>검색 결과가 없습니다.</p>
           </div>
         )}
       </div>

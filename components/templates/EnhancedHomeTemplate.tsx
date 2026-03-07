@@ -9,6 +9,8 @@ import PushPermissionBanner from '../molecules/PushPermissionBanner';
 import RankingCard from '../molecules/RankingCard';
 import AttendanceCard from '../molecules/AttendanceCard';
 import { usePushNotification } from '@/hooks/usePushNotification';
+import { useOfflineAttendance } from '@/hooks/useOfflineAttendance';
+import { CloudUpload } from 'lucide-react';
 
 interface RankingData {
     selectedYear: number;
@@ -41,6 +43,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     const router = useRouter();
     const { shouldShowBanner, requestPermission, dismissBanner } =
         usePushNotification({ crewId });
+    const { queueCount, isOnline, isFlushing } = useOfflineAttendance();
     const [rankingData, setRankingData] = useState<RankingData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -106,6 +109,27 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                 onDismiss={dismissBanner}
             />
 
+            {/* 오프라인 출석 대기 배너 */}
+            {queueCount > 0 && (
+                <div className="fixed top-32 left-0 right-0 z-30 px-4">
+                    <div className="flex items-center gap-3 rounded-rh-lg bg-rh-bg-surface p-3 border border-rh-border">
+                        <CloudUpload className="h-5 w-5 text-rh-accent" />
+                        <div>
+                            <p className="text-rh-body text-white">
+                                오프라인 출석 {queueCount}건 대기 중
+                            </p>
+                            <p className="text-rh-caption text-rh-text-tertiary">
+                                {isOnline
+                                    ? isFlushing
+                                        ? "전송 중..."
+                                        : "곧 자동 전송됩니다"
+                                    : "네트워크 연결 시 자동 전송"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* 📱 Hero 영역 - 공지사항 아래에 위치 */}
             <div className="relative min-h-screen">
                 {/* Hero 배경 - 가운데 정렬 */}
@@ -163,7 +187,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                                             </div>
                                         ) : (
                                             <div className="text-center py-10">
-                                                <p className="text-gray-400 text-lg">
+                                                <p className="text-rh-text-secondary text-lg">
                                                     랭킹 정보를 불러올 수 없어요
                                                 </p>
                                             </div>

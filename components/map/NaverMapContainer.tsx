@@ -269,12 +269,12 @@ export default function NaverMapContainer({
   if (error) {
     return (
       <div
-        className='flex justify-center items-center rounded-lg border border-gray-600 bg-rh-bg-surface'
+        className='flex justify-center items-center rounded-lg border border-rh-border bg-rh-bg-surface'
         style={{ height }}
       >
         <div className='text-center'>
           <p className='mb-2 text-red-400'>지도 로딩 실패</p>
-          <p className='text-sm text-gray-400'>{error}</p>
+          <p className='text-sm text-rh-text-secondary'>{error}</p>
         </div>
       </div>
     );
@@ -283,12 +283,12 @@ export default function NaverMapContainer({
   if (isLoaded) {
     // return (
     //   // <div
-    //   //   className='flex justify-center items-center rounded-lg border border-gray-600 bg-rh-bg-surface'
+    //   //   className='flex justify-center items-center rounded-lg border border-rh-border bg-rh-bg-surface'
     //   //   style={{ height }}
     //   // >
     //   //   <div className='text-center'>
     //   //     <div className='mb-2 w-8 h-8 rounded-full border-2 animate-spin border-rh-accent border-t-transparent'></div>
-    //   //     <p className='text-gray-400'>지도 로딩 중...</p>
+    //   //     <p className='text-rh-text-secondary'>지도 로딩 중...</p>
     //   //   </div>
     //   // </div>
     // );
@@ -297,7 +297,7 @@ export default function NaverMapContainer({
   return (
     <div
       ref={mapRef}
-      className='overflow-hidden relative w-full rounded-lg border border-gray-600'
+      className='overflow-hidden relative w-full rounded-lg border border-rh-border'
       style={{ height, zIndex: 1 }}
     />
   );

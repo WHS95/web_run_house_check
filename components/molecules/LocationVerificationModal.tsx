@@ -15,6 +15,7 @@ interface LocationVerificationModalProps {
     name: string;
     latitude: number | null;
     longitude: number | null;
+    allowed_radius?: number;
   }>;
   allowedRadius?: number;
 }
@@ -55,6 +56,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
           name: loc.name,
           latitude: loc.latitude!,
           longitude: loc.longitude!,
+          allowedRadius: loc.allowed_radius || allowedRadius,
         }));
 
       // 유효한 활동장소가 없는 경우
@@ -110,7 +112,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
       case 'error':
         return <AlertCircle className="w-8 h-8 text-red-500" />;
       default:
-        return <MapPin className="w-8 h-8 text-gray-500" />;
+        return <MapPin className="w-8 h-8 text-rh-text-tertiary" />;
     }
   };
 
@@ -140,18 +142,18 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
         <h3 className="mb-2 text-lg font-semibold text-white">위치 확인</h3>
 
         {/* 메시지 */}
-        <p className="mb-4 text-sm text-gray-300 whitespace-pre-line">
+        <p className="mb-4 text-sm text-rh-text-secondary whitespace-pre-line">
           {verificationMessage}
         </p>
 
         {/* 활동장소 목록 (실패한 경우에만 표시) */}
         {verificationStatus === 'failed' && crewLocations.length > 0 && (
           <div className="mb-4 p-3 text-left bg-rh-bg-primary/50 rounded-lg">
-            <h4 className="mb-2 text-xs font-medium text-gray-400 uppercase">등록된 활동장소</h4>
+            <h4 className="mb-2 text-xs font-medium text-rh-text-secondary uppercase">등록된 활동장소</h4>
             <div className="space-y-1">
               {crewLocations.map((location) => (
                 <div key={location.id} className="flex items-center text-sm text-white">
-                  <MapPin className="mr-2 w-3 h-3 text-gray-400" />
+                  <MapPin className="mr-2 w-3 h-3 text-rh-text-secondary" />
                   {location.name}
                 </div>
               ))}
@@ -164,7 +166,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
           {verificationStatus === 'checking' ? (
             <button
               disabled
-              className="flex-1 py-3 font-medium text-gray-400 rounded-lg cursor-not-allowed bg-rh-bg-muted/50"
+              className="flex-1 py-3 font-medium text-rh-text-secondary rounded-lg cursor-not-allowed bg-rh-bg-muted/50"
             >
               확인 중...
             </button>
@@ -172,7 +174,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
             <>
               <button
                 onClick={onClose}
-                className="flex-1 py-3 font-medium text-gray-300 rounded-lg border border-rh-border hover:bg-rh-bg-muted/20"
+                className="flex-1 py-3 font-medium text-rh-text-secondary rounded-lg border border-rh-border hover:bg-rh-bg-muted/20"
               >
                 닫기
               </button>

@@ -257,7 +257,7 @@ function CrewLocationManagement({
   return (
     <div className='space-y-6'>
       {/* 위치 기반 출석 설정 */}
-      <Card className='border-gray-600 bg-rh-bg-surface'>
+      <Card className='border-rh-border bg-rh-bg-surface'>
         <CardHeader>
           <CardTitle className='flex gap-2 items-center text-white'>
             <Settings className='w-5 h-5 text-rh-accent' />
@@ -267,7 +267,7 @@ function CrewLocationManagement({
         <CardContent>
           <div className='flex justify-between items-center'>
             <div className='space-y-1'>
-              <p className='text-sm text-gray-400'>
+              <p className='text-sm text-rh-text-secondary'>
                 등록된 주소의 위경도 기준
                 <br />약 300m 이내에서 출석 가능
               </p>
@@ -284,7 +284,7 @@ function CrewLocationManagement({
       </Card>
 
       {/* 활동장소 관리 */}
-      <Card className='border-gray-600 bg-rh-bg-surface'>
+      <Card className='border-rh-border bg-rh-bg-surface'>
         <CardHeader>
           <div className='flex justify-between items-center'>
             <CardTitle className='flex gap-2 items-center text-white'>

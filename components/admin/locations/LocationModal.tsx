@@ -74,13 +74,13 @@ function LocationModal({
   if (mode === "delete") {
     return (
       <AlertDialog open={isOpen} onOpenChange={onClose}>
-        <AlertDialogContent className='border-gray-600 bg-rh-bg-surface'>
+        <AlertDialogContent className='border-rh-border bg-rh-bg-surface'>
           <AlertDialogHeader>
             <AlertDialogTitle className='flex gap-2 items-center text-white'>
               <AlertTriangle className='w-5 h-5 text-red-400' />
               활동장소 삭제 확인
             </AlertDialogTitle>
-            <AlertDialogDescription className='text-gray-300'>
+            <AlertDialogDescription className='text-rh-text-secondary'>
               {location && (
                 <>
                   <strong className='text-white'>
@@ -96,7 +96,7 @@ function LocationModal({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className='text-white border-gray-600 hover:bg-gray-600/20'
+              className='text-white border-rh-border hover:bg-rh-bg-muted/20'
               disabled={loading}
             >
               취소
@@ -122,7 +122,7 @@ function LocationModal({
   }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='max-w-4xl max-h-[90vh] overflow-auto bg-rh-bg-surface border-gray-600'>
+      <DialogContent className='max-w-4xl max-h-[90vh] overflow-auto bg-rh-bg-surface border-rh-border'>
         <div className='max-h-[calc(90vh-120px)] overflow-auto'>
           <LocationForm
             initialData={location}

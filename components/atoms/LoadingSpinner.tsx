@@ -22,7 +22,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   const colorClasses = {
     white: "bg-white",
     blue: "bg-rh-accent",
-    gray: "bg-gray-400",
+    gray: "bg-rh-bg-muted",
     red: "bg-red-400",
   };
 

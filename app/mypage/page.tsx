@@ -43,7 +43,7 @@ interface ActivityData {
 // ⚡ 로딩 스켈레톤 컴포넌트
 const MyPageSkeleton = React.memo(() => (
   <div className='flex flex-col h-screen bg-rh-bg-primary'>
-    <div className='flex-shrink-0 h-[10vh] bg-rh-bg-surface border-b border-gray-200 animate-pulse'>
+    <div className='flex-shrink-0 h-[10vh] bg-rh-bg-surface border-b border-rh-border animate-pulse'>
       <div className='flex justify-center items-center h-full'>
         <div className='w-[20vw] h-[1.5rem] rounded bg-rh-bg-surface'></div>
       </div>
@@ -64,7 +64,7 @@ const MyPageSkeleton = React.memo(() => (
       {/* 활동 내역 영역 */}
       <div className='space-y-[1.5vh]'>
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className='h-[8vh] bg-gray-200 rounded-lg'></div>
+          <div key={index} className='h-[8vh] bg-rh-bg-muted rounded-lg'></div>
         ))}
       </div>
     </div>

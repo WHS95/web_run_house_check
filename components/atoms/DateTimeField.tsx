@@ -59,13 +59,13 @@ const DateTimeField: React.FC<DateTimeFieldProps> = ({
 
   return (
     <div className='mb-6'>
-      <label className='block mb-3 text-sm font-semibold text-gray-800'>
+      <label className='block mb-3 text-sm font-semibold text-rh-text-inverted'>
         {label}
       </label>
       <div className='space-y-3'>
         {/* 날짜 선택 카드 */}
         <div className='relative'>
-          <div className='relative transition-all duration-200 bg-white border border-gray-200 shadow-sm rounded-xl hover:shadow-md focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500'>
+          <div className='relative transition-all duration-200 bg-white border border-rh-border shadow-sm rounded-xl hover:shadow-md focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500'>
             <div className='flex items-center p-4'>
               <CalendarDays className='flex-shrink-0 w-5 h-5 mr-3 text-blue-500' />
               <input
@@ -73,7 +73,7 @@ const DateTimeField: React.FC<DateTimeFieldProps> = ({
                 name={`${name}-date`}
                 value={dateValue}
                 onChange={onDateChange}
-                className='w-full text-sm font-medium text-gray-700 bg-transparent border-none focus:outline-none appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden'
+                className='w-full text-sm font-medium text-rh-text-muted bg-transparent border-none focus:outline-none appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden'
               />
             </div>
           </div>
@@ -81,7 +81,7 @@ const DateTimeField: React.FC<DateTimeFieldProps> = ({
 
         {/* 시간 선택 카드 - 시와 분을 분리 */}
         <div className='relative'>
-          <div className='relative transition-all duration-200 bg-white border border-gray-200 shadow-sm rounded-xl hover:shadow-md focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500'>
+          <div className='relative transition-all duration-200 bg-white border border-rh-border shadow-sm rounded-xl hover:shadow-md focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500'>
             <div className='flex items-center p-4'>
               <Clock className='flex-shrink-0 w-5 h-5 mr-3 text-green-500' />
 
@@ -92,7 +92,7 @@ const DateTimeField: React.FC<DateTimeFieldProps> = ({
                   onChange={(e) =>
                     handleTimeComponentChange("hour", e.target.value)
                   }
-                  className='flex-1 text-sm font-medium text-gray-700 bg-transparent border-none appearance-none cursor-pointer focus:outline-none'
+                  className='flex-1 text-sm font-medium text-rh-text-muted bg-transparent border-none appearance-none cursor-pointer focus:outline-none'
                 >
                   {hourOptions.map((h) => (
                     <option key={h} value={h}>
@@ -101,7 +101,7 @@ const DateTimeField: React.FC<DateTimeFieldProps> = ({
                   ))}
                 </select>
 
-                <span className='text-sm font-medium text-gray-500'>:</span>
+                <span className='text-sm font-medium text-rh-text-tertiary'>:</span>
 
                 {/* 분 선택 */}
                 <select
@@ -109,7 +109,7 @@ const DateTimeField: React.FC<DateTimeFieldProps> = ({
                   onChange={(e) =>
                     handleTimeComponentChange("minute", e.target.value)
                   }
-                  className='flex-1 text-sm font-medium text-gray-700 bg-transparent border-none appearance-none cursor-pointer focus:outline-none'
+                  className='flex-1 text-sm font-medium text-rh-text-muted bg-transparent border-none appearance-none cursor-pointer focus:outline-none'
                 >
                   {minuteOptions.map((m) => (
                     <option key={m} value={m}>
@@ -120,7 +120,7 @@ const DateTimeField: React.FC<DateTimeFieldProps> = ({
               </div>
 
               <svg
-                className='flex-shrink-0 w-4 h-4 ml-2 text-gray-400 pointer-events-none'
+                className='flex-shrink-0 w-4 h-4 ml-2 text-rh-text-secondary pointer-events-none'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'

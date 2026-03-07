@@ -45,10 +45,10 @@ export default function UnverifiedUserModal({
               />
             </svg>
           </div>
-          <h3 className='text-lg font-medium text-gray-900'>
+          <h3 className='text-lg font-medium text-rh-text-inverted'>
             크루 인증이 필요합니다
           </h3>
-          <p className='mt-2 text-sm text-gray-500'>
+          <p className='mt-2 text-sm text-rh-text-tertiary'>
             런하우스 서비스를 이용하기 위해서는 크루 인증이 필요합니다. 크루
             관리자에게 초대 코드를 받아 인증을 완료해주세요.
           </p>
@@ -58,7 +58,7 @@ export default function UnverifiedUserModal({
           <button
             type='button'
             onClick={handleClose}
-            className='py-2 px-4 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='py-2 px-4 bg-white border border-rh-border rounded-md shadow-sm text-sm font-medium text-rh-text-muted hover:bg-rh-bg-muted focus:outline-none focus:ring-2 focus:ring-blue-500'
           >
             나중에 하기
           </button>

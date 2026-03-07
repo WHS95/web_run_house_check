@@ -180,7 +180,7 @@ export default function InviteCodeManagement({
         <Key className="w-6 h-6 text-rh-accent" />
         <div>
           <h1 className="text-xl font-semibold text-white">초대 코드 관리</h1>
-          <p className="text-sm text-gray-300">크루 초대 코드를 생성하고 관리합니다.</p>
+          <p className="text-sm text-rh-text-secondary">크루 초대 코드를 생성하고 관리합니다.</p>
         </div>
       </div>
 
@@ -194,7 +194,7 @@ export default function InviteCodeManagement({
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-rh-text-secondary mb-2">
               크루 선택 *
             </label>
             <select
@@ -212,14 +212,14 @@ export default function InviteCodeManagement({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-rh-text-secondary mb-2">
               코드 설명
             </label>
             <Input
               placeholder="예: 신규 멤버용 초대 코드"
               value={newInviteCode.description}
               onChange={(e) => setNewInviteCode(prev => ({ ...prev, description: e.target.value }))}
-              className="bg-rh-bg-primary border-rh-border text-white placeholder:text-gray-400"
+              className="bg-rh-bg-primary border-rh-border text-white placeholder:text-rh-text-secondary"
             />
           </div>
 
@@ -243,8 +243,8 @@ export default function InviteCodeManagement({
         {inviteCodes.length === 0 ? (
           <Card className="bg-rh-bg-surface border-rh-border">
             <CardContent className="py-8 text-center">
-              <Key className="w-12 h-12 text-gray-500 mx-auto mb-2" />
-              <p className="text-gray-400">생성된 초대 코드가 없습니다.</p>
+              <Key className="w-12 h-12 text-rh-text-tertiary mx-auto mb-2" />
+              <p className="text-rh-text-secondary">생성된 초대 코드가 없습니다.</p>
             </CardContent>
           </Card>
         ) : (
@@ -259,7 +259,7 @@ export default function InviteCodeManagement({
                         <h4 className="font-medium text-white">
                           {code.crew_name || `크루 ID: ${code.crew_id.slice(0, 8)}...`}
                         </h4>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-rh-text-tertiary mt-1">
                           생성일: {new Date(code.created_at).toLocaleDateString('ko-KR')}
                         </p>
                       </div>
@@ -277,7 +277,7 @@ export default function InviteCodeManagement({
                           size="sm"
                           variant="ghost"
                           onClick={() => startEditing(code)}
-                          className="text-gray-400 hover:text-white p-1"
+                          className="text-rh-text-secondary hover:text-white p-1"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -288,37 +288,37 @@ export default function InviteCodeManagement({
                     {editingCode === code.id ? (
                       <div className="space-y-3 p-3 bg-rh-bg-primary rounded-lg border border-rh-border">
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-xs font-medium text-rh-text-secondary mb-1">
                             초대 코드 *
                           </label>
                           <Input
                             placeholder="초대 코드"
                             value={editForm.invite_code}
                             onChange={(e) => setEditForm(prev => ({ ...prev, invite_code: e.target.value }))}
-                            className="bg-rh-bg-surface border-rh-border text-white placeholder:text-gray-400 text-sm font-mono"
+                            className="bg-rh-bg-surface border-rh-border text-white placeholder:text-rh-text-secondary text-sm font-mono"
                           />
                         </div>
                         
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-xs font-medium text-rh-text-secondary mb-1">
                             설명
                           </label>
                           <Input
                             placeholder="코드 설명"
                             value={editForm.description}
                             onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
-                            className="bg-rh-bg-surface border-rh-border text-white placeholder:text-gray-400 text-sm"
+                            className="bg-rh-bg-surface border-rh-border text-white placeholder:text-rh-text-secondary text-sm"
                           />
                         </div>
                         
                         <div className="flex items-center space-x-3">
                           <button
                             onClick={() => setEditForm(prev => ({ ...prev, is_active: !prev.is_active }))}
-                            className="flex items-center space-x-2 text-sm text-gray-300 hover:text-white"
+                            className="flex items-center space-x-2 text-sm text-rh-text-secondary hover:text-white"
                           >
                             {editForm.is_active ? 
                               <ToggleRight className="w-5 h-5 text-green-500" /> : 
-                              <ToggleLeft className="w-5 h-5 text-gray-500" />
+                              <ToggleLeft className="w-5 h-5 text-rh-text-tertiary" />
                             }
                             <span>{editForm.is_active ? "활성" : "비활성"}</span>
                           </button>
@@ -338,7 +338,7 @@ export default function InviteCodeManagement({
                             size="sm"
                             variant="ghost"
                             onClick={cancelEditing}
-                            className="text-gray-400 hover:text-white"
+                            className="text-rh-text-secondary hover:text-white"
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -348,7 +348,7 @@ export default function InviteCodeManagement({
                       <>
                         {/* 설명 */}
                         {code.description && (
-                          <p className="text-sm text-gray-300">{code.description}</p>
+                          <p className="text-sm text-rh-text-secondary">{code.description}</p>
                         )}
 
                         {/* 초대 코드 */}
@@ -360,7 +360,7 @@ export default function InviteCodeManagement({
                             size="sm"
                             variant="ghost"
                             onClick={() => toggleCodeVisibility(code.id)}
-                            className="text-gray-400 hover:text-white"
+                            className="text-rh-text-secondary hover:text-white"
                           >
                             {visibleCodes.has(code.id) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </Button>
@@ -368,7 +368,7 @@ export default function InviteCodeManagement({
                             size="sm"
                             variant="ghost"
                             onClick={() => copyToClipboard(code.invite_code)}
-                            className="text-gray-400 hover:text-white"
+                            className="text-rh-text-secondary hover:text-white"
                           >
                             <Copy className="w-4 h-4" />
                           </Button>

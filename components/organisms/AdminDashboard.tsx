@@ -167,7 +167,7 @@ export default function AdminDashboard({
                     </div>
                     <div className='flex flex-col items-end space-y-2'>
                       {renderChangeIndicator(stats.monthlyMeetingCountChange)}
-                      <p className='text-xs text-gray-400'>
+                      <p className='text-xs text-rh-text-secondary'>
                         지난달: {stats.lastMonthMeetingCount}건
                       </p>
                     </div>
@@ -194,7 +194,7 @@ export default function AdminDashboard({
                       {renderChangeIndicator(
                         stats.monthlyParticipationCountChange
                       )}
-                      <p className='text-xs text-gray-400'>
+                      <p className='text-xs text-rh-text-secondary'>
                         지난달: {stats.lastMonthParticipationCount}건
                       </p>
                     </div>
@@ -221,7 +221,7 @@ export default function AdminDashboard({
                       {renderChangeIndicator(
                         stats.monthlyParticipantCountChange
                       )}
-                      <p className='text-xs text-gray-400'>
+                      <p className='text-xs text-rh-text-secondary'>
                         지난달: {stats.lastMonthParticipantCount}명
                       </p>
                     </div>
@@ -246,7 +246,7 @@ export default function AdminDashboard({
                     </div>
                     <div className='flex flex-col items-end space-y-2'>
                       {renderChangeIndicator(stats.monthlyHostCountChange)}
-                      <p className='text-xs text-gray-400'>
+                      <p className='text-xs text-rh-text-secondary'>
                         지난달: {stats.lastMonthHostCount}명
                       </p>
                     </div>
@@ -271,7 +271,7 @@ export default function AdminDashboard({
                     </div>
                     <div className='flex flex-col items-end space-y-2'>
                       {renderChangeIndicator(stats.newMembersThisMonthChange)}
-                      <p className='text-xs text-gray-400'>
+                      <p className='text-xs text-rh-text-secondary'>
                         지난달: {stats.lastMonthNewMembers}명
                       </p>
                     </div>

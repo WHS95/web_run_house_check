@@ -106,7 +106,7 @@ export default function AdminUserPage() {
             <h2 className='mb-2 text-lg font-semibold text-white'>
               데이터를 불러올 수 없습니다
             </h2>
-            <p className='text-gray-300'>{error}</p>
+            <p className='text-rh-text-secondary'>{error}</p>
           </div>
         </div>
       </AdminPageContainer>

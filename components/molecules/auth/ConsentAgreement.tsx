@@ -149,7 +149,7 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
               <button
                 type='button'
                 onClick={openTermsModal}
-                className='text-gray-400 hover:text-gray-300'
+                className='text-rh-text-secondary hover:text-rh-text-secondary'
               >
                 <ChevronRightIcon />
               </button>
@@ -176,7 +176,7 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
               <button
                 type='button'
                 onClick={openPrivacyModal}
-                className='text-gray-400 hover:text-gray-300'
+                className='text-rh-text-secondary hover:text-rh-text-secondary'
               >
                 <ChevronRightIcon />
               </button>

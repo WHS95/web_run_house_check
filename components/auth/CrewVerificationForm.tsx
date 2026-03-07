@@ -85,10 +85,10 @@ export default function CrewVerificationForm({
             </svg>
             크루 인증이 완료되었습니다!
           </div>
-          <p className='mb-4 text-gray-600'>
+          <p className='mb-4 text-rh-text-muted'>
             런하우스 서비스를 이용하실 수 있습니다.
           </p>
-          <p className='text-sm text-gray-500'>
+          <p className='text-sm text-rh-text-tertiary'>
             잠시 후 메인 페이지로 이동합니다...
           </p>
         </div>
@@ -97,14 +97,14 @@ export default function CrewVerificationForm({
           <div className='mb-6'>
             <label
               htmlFor='inviteCode'
-              className='block mb-2 text-sm font-medium text-gray-700'
+              className='block mb-2 text-sm font-medium text-rh-text-muted'
             >
               크루 초대 코드
             </label>
             <input
               type='text'
               id='inviteCode'
-              className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-4 py-2 border border-rh-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='7자리 코드 입력'
               value={inviteCode}
               onChange={(e) =>
@@ -115,7 +115,7 @@ export default function CrewVerificationForm({
               autoComplete='off'
               required
             />
-            <p className='mt-1 text-sm text-gray-500'>
+            <p className='mt-1 text-sm text-rh-text-tertiary'>
               크루 관리자에게 받은 7자리 초대 코드를 입력하세요.
             </p>
           </div>
@@ -131,7 +131,7 @@ export default function CrewVerificationForm({
               <button
                 type='button'
                 onClick={onCancel}
-                className='flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-transparent rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500'
+                className='flex-1 px-4 py-2 text-sm font-medium text-rh-text-muted bg-rh-bg-surface border border-transparent rounded-md hover:bg-rh-bg-muted focus:outline-none focus:ring-2 focus:ring-rh-accent'
                 disabled={isLoading}
               >
                 취소

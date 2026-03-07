@@ -29,7 +29,7 @@ const InputField: React.FC<InputFieldProps> = ({
         disabled={disabled}
         className={`w-full p-3 border border-[#EAEAF3] rounded-md bg-[#F8F8FD] text-sm placeholder-black/60 focus:outline-none focus:ring-1 focus:ring-primary-blue ${
           disabled
-            ? "opacity-60 cursor-not-allowed bg-gray-200 text-gray-700 border-gray-300"
+            ? "opacity-60 cursor-not-allowed bg-rh-bg-muted text-rh-text-muted border-rh-border"
             : ""
         }`}
       />

@@ -274,8 +274,8 @@ export default function AdminCrewMembersManagement({
     } else {
       return (
         <div className='flex items-center'>
-          <Users className='w-4 h-4 text-gray-400 mr-1.5' />
-          <span className='text-gray-300'>멤버</span>
+          <Users className='w-4 h-4 text-rh-text-secondary mr-1.5' />
+          <span className='text-rh-text-secondary'>멤버</span>
         </div>
       );
     }
@@ -327,12 +327,12 @@ export default function AdminCrewMembersManagement({
       <div className='p-[4vw] space-y-[3vh]'>
         {/* 검색 */}
         <div className='relative'>
-          <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
+          <Search className='absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2' />
           <Input
             placeholder='이름 또는 이메일로 검색'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='pl-10 text-white rounded-lg border-0 bg-rh-bg-primary placeholder:text-gray-400'
+            className='pl-10 text-white rounded-lg border-0 bg-rh-bg-primary placeholder:text-rh-text-secondary'
           />
         </div>
 
@@ -349,7 +349,7 @@ export default function AdminCrewMembersManagement({
                 >
                   <ChevronDown className='mr-1 w-4 h-4' />
                   {statusFilter}
-                  <span className='ml-2 text-gray-400'>
+                  <span className='ml-2 text-rh-text-secondary'>
                     {statusCounts[statusFilter as keyof typeof statusCounts]}
                   </span>
                 </Button>
@@ -368,7 +368,7 @@ export default function AdminCrewMembersManagement({
                   >
                     <div className='flex justify-between items-center w-full'>
                       <span>{status}</span>
-                      <span className='ml-2 text-gray-400'>
+                      <span className='ml-2 text-rh-text-secondary'>
                         {statusCounts[status as keyof typeof statusCounts]}
                       </span>
                     </div>
@@ -496,7 +496,7 @@ export default function AdminCrewMembersManagement({
                     }`}
                   >
                     <div className='pt-3 mt-3 border-t border-rh-border'>
-                      <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
+                      <div className='grid grid-cols-1 gap-3 text-sm text-rh-text-secondary sm:grid-cols-2'>
                         <div className='flex justify-between'>
                           <span className='font-bold text-white'>연락처</span>
                           <span className='text-right break-all'>
@@ -527,11 +527,11 @@ export default function AdminCrewMembersManagement({
 
         {filteredMembers.length === 0 && (
           <div className='py-8 text-center'>
-            <Users className='mx-auto mb-4 w-16 h-16 text-gray-500' />
-            <p className='mb-2 text-lg font-medium text-gray-300'>
+            <Users className='mx-auto mb-4 w-16 h-16 text-rh-text-tertiary' />
+            <p className='mb-2 text-lg font-medium text-rh-text-secondary'>
               {searchTerm ? "검색 결과가 없습니다" : "등록된 멤버가 없습니다"}
             </p>
-            <p className='text-gray-400'>
+            <p className='text-rh-text-secondary'>
               {searchTerm
                 ? "다른 검색어를 시도해보세요"
                 : "새로운 멤버가 가입하면 여기에 표시됩니다"}

@@ -11,8 +11,9 @@ import LocationStatusIndicator from "@/components/molecules/LocationStatusIndica
 import { haptic } from "@/lib/haptic";
 import { AiOutlineCalendar } from "react-icons/ai";
 import { IoChevronDown } from "react-icons/io5";
-import { MapPin } from "lucide-react";
+import { MapPin, WifiOff, CloudUpload } from "lucide-react";
 import LoadingSpinner from "../atoms/LoadingSpinner";
+import { useOfflineAttendance } from "@/hooks/useOfflineAttendance";
 
 const HOST_OPTIONS = [
   { value: "예", label: "예" },
@@ -132,6 +133,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   error,
 }) => {
   const router = useRouter();
+  const { isOnline, queueCount, enqueue, isFlushing } = useOfflineAttendance();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
@@ -236,6 +238,24 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         attendanceTimestamp: attendanceDateTime.toISOString(),
       };
 
+      // 오프라인 상태: 큐에 저장
+      if (!isOnline) {
+        await enqueue({
+          userId: submissionData.userId!,
+          crewId: submissionData.crewId,
+          locationId: Number(submissionData.locationId),
+          exerciseTypeId: Number(submissionData.exerciseTypeId),
+          isHost: submissionData.isHost,
+          attendanceTimestamp: submissionData.attendanceTimestamp,
+        });
+        haptic.success();
+        setNotificationType("success");
+        setNotificationMessage("오프라인 출석이 저장되었습니다. 연결 시 자동 전송됩니다.");
+        setIsSubmitting(false);
+        setShowNotification(true);
+        return;
+      }
+
       const response = await fetch("/api/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -263,7 +283,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       setIsSubmitting(false);
       setShowNotification(true);
     }
-  }, [formData, initialFormData, userId]);
+  }, [formData, initialFormData, userId, isOnline, enqueue]);
 
   const handleSubmit = useCallback(async () => {
     if (isSubmitting || !userId) return;
@@ -347,12 +367,33 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         <PageHeader
           title='출석 체크'
           iconColor='white'
-          borderColor='gray-500'
+          borderColor='rh-border'
         />
       </div>
 
       {/* 메인 콘텐츠 */}
       <div className='flex-1 overflow-y-auto native-scroll pt-[10vh] pb-[40vh] px-[4vw]'>
+        {/* 오프라인 상태 배너 */}
+        {!isOnline && (
+          <div className="mb-3 flex items-center gap-2 rounded-rh-md bg-rh-status-warning/20 px-3 py-2">
+            <WifiOff className="h-4 w-4 text-rh-status-warning" />
+            <span className="text-rh-caption text-rh-status-warning">
+              오프라인 상태 · 출석 시 자동 저장됩니다
+            </span>
+          </div>
+        )}
+
+        {queueCount > 0 && isOnline && (
+          <div className="mb-3 flex items-center gap-2 rounded-rh-md bg-rh-accent/20 px-3 py-2">
+            <CloudUpload className="h-4 w-4 text-rh-accent" />
+            <span className="text-rh-caption text-rh-accent">
+              {isFlushing
+                ? "대기 중인 출석을 전송하고 있습니다..."
+                : `대기 중인 출석 ${queueCount}건`}
+            </span>
+          </div>
+        )}
+
         <div className='space-y-[3vh]'>
           {/* 이름 */}
           <div>
@@ -378,7 +419,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                   className='text-white ios-date-input bg-rh-bg-surface'
                 />
                 <div className='absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none'>
-                  <AiOutlineCalendar className='w-[1.25rem] h-[1.25rem] text-gray-400' />
+                  <AiOutlineCalendar className='w-[1.25rem] h-[1.25rem] text-rh-text-secondary' />
                 </div>
               </div>
               <div className='relative'>
@@ -394,7 +435,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                   ))}
                 </select>
                 <div className='absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none'>
-                  <IoChevronDown className='w-[1.25rem] h-[1.25rem] text-gray-400' />
+                  <IoChevronDown className='w-[1.25rem] h-[1.25rem] text-rh-text-secondary' />
                 </div>
               </div>
             </div>
@@ -418,7 +459,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 ))}
               </select>
               <div className='flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none'>
-                <IoChevronDown className='w-5 h-5 text-gray-400' />
+                <IoChevronDown className='w-5 h-5 text-rh-text-secondary' />
               </div>
             </div>
           </div>
@@ -443,7 +484,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 ))}
               </select>
               <div className='flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none'>
-                <IoChevronDown className='w-5 h-5 text-gray-400' />
+                <IoChevronDown className='w-5 h-5 text-rh-text-secondary' />
               </div>
             </div>
           </div>
@@ -494,7 +535,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
             isSubmitting || 
             (userStatus && !userStatus.isActive) ||
             (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
-              ? "bg-gray-400 cursor-not-allowed"
+              ? "bg-rh-bg-muted cursor-not-allowed"
               : "bg-rh-accent hover:bg-blue-600"
           }`}
           style={{ WebkitTapHighlightColor: "transparent" }}

@@ -157,23 +157,23 @@ export default function SearchableSelect({
                     ${
                       disabled
                         ? "opacity-50 cursor-not-allowed"
-                        : "hover:border-gray-400 focus:border-rh-accent focus:outline-none"
+                        : "hover:border-rh-border focus:border-rh-accent focus:outline-none"
                     }
                     ${isOpen ? "border-rh-accent" : ""}`}
       >
-        <span className={selectedOption ? "text-white" : "text-gray-400"}>
+        <span className={selectedOption ? "text-white" : "text-rh-text-secondary"}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
 
         <div className='flex items-center space-x-2'>
           {selectedOption && !disabled && (
             <X
-              className='w-4 h-4 text-gray-400 transition-colors hover:text-white'
+              className='w-4 h-4 text-rh-text-secondary transition-colors hover:text-white'
               onClick={handleClear}
             />
           )}
           <ChevronDown
-            className={`w-4 h-4 text-gray-400 transition-transform ${
+            className={`w-4 h-4 text-rh-text-secondary transition-transform ${
               isOpen ? "rotate-180" : ""}`}
           />
         </div>
@@ -185,7 +185,7 @@ export default function SearchableSelect({
           {/* 검색 입력 */}
           <div className='p-3 border-b border-rh-border'>
             <div className='relative'>
-              <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
+              <Search className='absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2' />
               <input
                 ref={searchInputRef}
                 type='text'
@@ -195,7 +195,7 @@ export default function SearchableSelect({
                   setHighlightedIndex(0);
                 }}
                 placeholder='크루 검색...'
-                className='py-2 pr-3 pl-10 w-full text-white rounded border bg-rh-bg-primary border-rh-border placeholder:text-gray-400 focus:border-rh-accent focus:outline-none'
+                className='py-2 pr-3 pl-10 w-full text-white rounded border bg-rh-bg-primary border-rh-border placeholder:text-rh-text-secondary focus:border-rh-accent focus:outline-none'
               />
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function SearchableSelect({
             style={{ maxHeight }}
           >
             {filteredOptions.length === 0 ? (
-              <div className='p-3 text-center text-gray-400'>
+              <div className='p-3 text-center text-rh-text-secondary'>
                 {searchTerm ? "검색 결과가 없습니다" : "옵션이 없습니다"}
               </div>
             ) : (
@@ -221,7 +221,7 @@ export default function SearchableSelect({
                                         ${
                                           index === highlightedIndex
                                             ? "bg-rh-accent text-white"
-                                            : "text-gray-300 hover:bg-rh-bg-muted hover:text-white"
+                                            : "text-rh-text-secondary hover:bg-rh-bg-muted hover:text-white"
                                         }
                                         ${
                                           option.value === value

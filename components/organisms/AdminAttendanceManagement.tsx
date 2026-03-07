@@ -582,7 +582,7 @@ export default function AdminAttendanceManagement({
               className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
                 activeTab === "calendar"
                   ? "bg-rh-accent text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-rh-text-secondary hover:text-white"
               }`}
             >
               <Calendar className='w-[1rem] h-[1rem] mr-[1vw] inline' />
@@ -593,7 +593,7 @@ export default function AdminAttendanceManagement({
               className={`flex-1 py-[2vh] px-[2vw] rounded-[0.5rem] text-[0.875rem] font-medium transition-all ${
                 activeTab === "manage"
                   ? "bg-rh-accent text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-rh-text-secondary hover:text-white"
               }`}
             >
               <UserPlus className='w-[1rem] h-[1rem] mr-[1vw] inline' />
@@ -639,7 +639,7 @@ export default function AdminAttendanceManagement({
                   {dayNames.map((day) => (
                     <div
                       key={day}
-                      className='py-2 text-xs font-medium text-center text-gray-400'
+                      className='py-2 text-xs font-medium text-center text-rh-text-secondary'
                     >
                       {day}
                     </div>
@@ -669,10 +669,10 @@ export default function AdminAttendanceManagement({
                         relative h-10 w-full text-sm rounded-lg transition-colors flex flex-col items-center justify-center
                         ${
                           !isCurrentMonth
-                            ? "text-gray-500 cursor-not-allowed"
+                            ? "text-rh-text-tertiary cursor-not-allowed"
                             : attendanceInfo.hasAttendance
                             ? "text-white hover:bg-rh-accent-hover/20 cursor-pointer"
-                            : "text-gray-500 cursor-not-allowed"
+                            : "text-rh-text-tertiary cursor-not-allowed"
                         }
                         ${
                           isSelected
@@ -701,7 +701,7 @@ export default function AdminAttendanceManagement({
                 </div>
 
                 {/* 범례 */}
-                <div className='flex justify-center items-center mt-4 text-xs text-gray-400'>
+                <div className='flex justify-center items-center mt-4 text-xs text-rh-text-secondary'>
                   <div className='flex items-center space-x-1'>
                     <div className='w-1.5 h-1.5 bg-rh-accent rounded-full'></div>
                     <span>출석 기록 (숫자: 출석자 수)</span>
@@ -720,7 +720,7 @@ export default function AdminAttendanceManagement({
                       color='blue'
                       className='mx-auto mb-2'
                     />
-                    <p className='text-sm text-gray-400'>
+                    <p className='text-sm text-rh-text-secondary'>
                       출석 정보를 불러오는 중...
                     </p>
                   </div>
@@ -749,13 +749,13 @@ export default function AdminAttendanceManagement({
                           <p className='text-2xl font-bold text-rh-accent'>
                             {groupedMeetings.length}
                           </p>
-                          <p className='text-xs text-gray-400'>모임 건수</p>
+                          <p className='text-xs text-rh-text-secondary'>모임 건수</p>
                         </div>
                         <div className='text-center'>
                           <p className='text-2xl font-bold text-green-400'>
                             {selectedDateDetails.length}
                           </p>
-                          <p className='text-xs text-gray-400'>출석 건수</p>
+                          <p className='text-xs text-rh-text-secondary'>출석 건수</p>
                         </div>
                       </div>
                     </div>
@@ -764,12 +764,12 @@ export default function AdminAttendanceManagement({
 
                 {/* 검색 */}
                 <div className='relative'>
-                  <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
+                  <Search className='absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2' />
                   <Input
                     placeholder='이름 또는 장소로 검색'
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className='pl-10 text-white rounded-lg border-0 bg-rh-bg-surface placeholder:text-gray-400'
+                    className='pl-10 text-white rounded-lg border-0 bg-rh-bg-surface placeholder:text-rh-text-secondary'
                   />
                 </div>
 
@@ -809,8 +809,8 @@ export default function AdminAttendanceManagement({
                             </span>
                           </div>
                           <div className='flex items-center space-x-2'>
-                            <Clock className='w-4 h-4 text-gray-400' />
-                            <span className='text-sm text-gray-300'>
+                            <Clock className='w-4 h-4 text-rh-text-secondary' />
+                            <span className='text-sm text-rh-text-secondary'>
                               {meeting.time}
                             </span>
                           </div>
@@ -842,7 +842,7 @@ export default function AdminAttendanceManagement({
                                   </div>
                                   <div className='flex items-center space-x-1'>
                                     {getStatusIcon(record.status)}
-                                    <p className='text-sm text-gray-300'>
+                                    <p className='text-sm text-rh-text-secondary'>
                                       {new Date(
                                         record.checkInTime
                                       ).toLocaleTimeString("ko-KR", {
@@ -915,7 +915,7 @@ export default function AdminAttendanceManagement({
 
                   {groupedMeetings.length === 0 && (
                     <div className='py-8 text-center'>
-                      <p className='text-gray-400'>출석 기록이 없습니다.</p>
+                      <p className='text-rh-text-secondary'>출석 기록이 없습니다.</p>
                     </div>
                   )}
                 </div>
@@ -926,15 +926,15 @@ export default function AdminAttendanceManagement({
             {!selectedDate && !isLoading && (
               <Card className='border-0 bg-rh-bg-surface'>
                 <CardContent className='p-4'>
-                  <div className='text-center text-gray-400'>
-                    <Calendar className='mx-auto mb-2 w-8 h-8 text-gray-500' />
+                  <div className='text-center text-rh-text-secondary'>
+                    <Calendar className='mx-auto mb-2 w-8 h-8 text-rh-text-tertiary' />
                     <p className='text-sm'>
                       달력에서 파란색 점과 숫자가 있는 날짜를 클릭하면
                     </p>
                     <p className='text-sm'>
                       해당 날짜의 출석 기록을 확인할 수 있습니다.
                     </p>
-                    <p className='mt-2 text-xs text-gray-500'>
+                    <p className='mt-2 text-xs text-rh-text-tertiary'>
                       숫자는 해당 날짜의 총 출석자 수입니다.
                     </p>
                   </div>

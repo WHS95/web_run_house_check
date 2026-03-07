@@ -9,13 +9,13 @@ const PredictionCalculatorClient = dynamic(
     loading: () => (
       <div className='space-y-6'>
         <div className='p-4 text-sm rounded-lg bg-accent/50'>
-          <div className='h-16 bg-gray-700 rounded animate-pulse' />
+          <div className='h-16 bg-rh-bg-surface rounded animate-pulse' />
         </div>
         <div className='space-y-4'>
-          <div className='h-16 bg-gray-700 rounded animate-pulse' />
-          <div className='h-24 bg-gray-700 rounded animate-pulse' />
-          <div className='h-16 bg-gray-700 rounded animate-pulse' />
-          <div className='h-12 bg-gray-700 rounded animate-pulse' />
+          <div className='h-16 bg-rh-bg-surface rounded animate-pulse' />
+          <div className='h-24 bg-rh-bg-surface rounded animate-pulse' />
+          <div className='h-16 bg-rh-bg-surface rounded animate-pulse' />
+          <div className='h-12 bg-rh-bg-surface rounded animate-pulse' />
         </div>
       </div>
     ),

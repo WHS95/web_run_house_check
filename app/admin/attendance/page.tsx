@@ -108,7 +108,7 @@ export default function AttendancePage() {
         <div className='flex justify-center items-center min-h-64'>
           <div className='p-6 text-center rounded-lg border shadow-sm bg-rh-bg-surface border-red-500/30'>
             <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
-            <p className='text-gray-300'>{error}</p>
+            <p className='text-rh-text-secondary'>{error}</p>
           </div>
         </div>
       </AdminPageContainer>

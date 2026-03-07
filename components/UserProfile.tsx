@@ -48,21 +48,21 @@ export default function UserProfile() {
 
       <div className='space-y-4'>
         <div>
-          <p className='text-gray-600'>사용자 ID:</p>
+          <p className='text-rh-text-muted'>사용자 ID:</p>
           <p className='font-medium'>{user.id}</p>
         </div>
 
         {user.email && (
           <div>
-            <p className='text-gray-600'>이메일:</p>
+            <p className='text-rh-text-muted'>이메일:</p>
             <p className='font-medium'>{user.email}</p>
           </div>
         )}
 
         {user.user_metadata && (
           <div>
-            <p className='text-gray-600'>사용자 메타데이터:</p>
-            <pre className='p-2 overflow-auto text-sm bg-gray-100 rounded max-h-60'>
+            <p className='text-rh-text-muted'>사용자 메타데이터:</p>
+            <pre className='p-2 overflow-auto text-sm bg-rh-bg-surface rounded max-h-60'>
               {JSON.stringify(user.user_metadata, null, 2)}
             </pre>
           </div>
@@ -70,8 +70,8 @@ export default function UserProfile() {
 
         {user.app_metadata && (
           <div>
-            <p className='text-gray-600'>앱 메타데이터:</p>
-            <pre className='p-2 overflow-auto text-sm bg-gray-100 rounded max-h-60'>
+            <p className='text-rh-text-muted'>앱 메타데이터:</p>
+            <pre className='p-2 overflow-auto text-sm bg-rh-bg-surface rounded max-h-60'>
               {JSON.stringify(user.app_metadata, null, 2)}
             </pre>
           </div>
@@ -79,7 +79,7 @@ export default function UserProfile() {
 
         {user.last_sign_in_at && (
           <div>
-            <p className='text-gray-600'>마지막 로그인:</p>
+            <p className='text-rh-text-muted'>마지막 로그인:</p>
             <p className='font-medium'>
               {new Date(user.last_sign_in_at).toLocaleString("ko-KR")}
             </p>
@@ -88,7 +88,7 @@ export default function UserProfile() {
 
         {user.created_at && (
           <div>
-            <p className='text-gray-600'>생성일:</p>
+            <p className='text-rh-text-muted'>생성일:</p>
             <p className='font-medium'>
               {new Date(user.created_at).toLocaleString("ko-KR")}
             </p>

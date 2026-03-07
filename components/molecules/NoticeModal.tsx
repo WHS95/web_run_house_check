@@ -32,17 +32,17 @@ const NoticeModal: React.FC<NoticeModalProps> = ({
       <div className='relative w-full max-w-sm p-8 mx-4 bg-white shadow-2xl rounded-3xl'>
         <div className='text-center'>
           {/* 제목 */}
-          <h2 className='mb-6 text-xl font-bold text-gray-900'>{title}</h2>
+          <h2 className='mb-6 text-xl font-bold text-rh-text-inverted'>{title}</h2>
 
           {/* 내용 */}
-          <p className='mb-8 leading-relaxed text-gray-600 whitespace-pre-line'>
+          <p className='mb-8 leading-relaxed text-rh-text-muted whitespace-pre-line'>
             {content}
           </p>
 
           {/* 완료 버튼 */}
           <Button
             onClick={onClose}
-            className='w-full py-4 text-lg font-medium text-white transition-colors bg-rh-bg-primary rounded-2xl hover:bg-gray-800'
+            className='w-full py-4 text-lg font-medium text-white transition-colors bg-rh-bg-primary rounded-2xl hover:bg-rh-bg-primary'
           >
             {buttonText}
           </Button>

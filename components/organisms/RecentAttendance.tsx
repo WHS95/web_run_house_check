@@ -131,7 +131,7 @@ const getExerciseTypeColor = (type: string) => {
     case "자전거":
       return "bg-amber-500";
     default:
-      return "bg-gray-500";
+      return "bg-rh-bg-muted";
   }
 };
 
@@ -172,10 +172,10 @@ export default function RecentAttendance() {
   const displayRecords = showAll ? attendanceData : initialRecords;
 
   return (
-    <div className='p-4 bg-gray-800 rounded-lg shadow-lg'>
+    <div className='p-4 bg-rh-bg-primary rounded-lg shadow-lg'>
       <div className='flex justify-between items-center mb-4'>
         <h2 className='text-xl font-semibold'>최근 24시간 출석 현황</h2>
-        <div className='flex items-center text-sm text-gray-400'>
+        <div className='flex items-center text-sm text-rh-text-secondary'>
           <Clock size={14} className='mr-1' />
           <span>현재 총 {attendanceData.length}명 출석</span>
         </div>
@@ -191,9 +191,9 @@ export default function RecentAttendance() {
             {displayRecords.map((record) => (
               <div
                 key={record.id}
-                className='flex items-center p-3 bg-gray-700 rounded-lg transition-colors hover:bg-gray-600'
+                className='flex items-center p-3 bg-rh-bg-surface rounded-lg transition-colors hover:bg-rh-bg-muted'
               >
-                <div className='flex justify-center items-center mr-4 w-10 h-10 text-white bg-gray-500 rounded-full'>
+                <div className='flex justify-center items-center mr-4 w-10 h-10 text-white bg-rh-bg-muted rounded-full'>
                   <User size={20} />
                 </div>
                 <div className='flex-1'>
@@ -207,12 +207,12 @@ export default function RecentAttendance() {
                       {record.exerciseType}
                     </span>
                   </div>
-                  <div className='flex items-center mt-1 text-sm text-gray-400'>
+                  <div className='flex items-center mt-1 text-sm text-rh-text-secondary'>
                     <MapPin size={14} className='mr-1' />
                     <span className='truncate'>{record.location}</span>
                   </div>
                 </div>
-                <div className='text-xs text-gray-400'>{record.timestamp}</div>
+                <div className='text-xs text-rh-text-secondary'>{record.timestamp}</div>
               </div>
             ))}
           </div>
@@ -220,7 +220,7 @@ export default function RecentAttendance() {
           {!showAll && remainingRecords.length > 0 && (
             <button
               onClick={() => setShowAll(true)}
-              className='flex justify-center items-center py-2 mt-4 w-full text-sm text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600'
+              className='flex justify-center items-center py-2 mt-4 w-full text-sm text-rh-text-secondary bg-rh-bg-surface rounded-lg hover:bg-rh-bg-muted'
             >
               더보기 ({remainingRecords.length}명)
             </button>
@@ -229,7 +229,7 @@ export default function RecentAttendance() {
           {showAll && (
             <button
               onClick={() => setShowAll(false)}
-              className='flex justify-center items-center py-2 mt-4 w-full text-sm text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600'
+              className='flex justify-center items-center py-2 mt-4 w-full text-sm text-rh-text-secondary bg-rh-bg-surface rounded-lg hover:bg-rh-bg-muted'
             >
               접기
             </button>

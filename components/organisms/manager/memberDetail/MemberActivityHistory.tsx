@@ -18,8 +18,8 @@ interface MemberActivityHistoryProps {
 // ⚡ 빈 상태 컴포넌트 (메모이제이션)
 const EmptyState = memo(() => (
   <div className='py-[4vh] text-center'>
-    <GitCommit className='w-[2rem] h-[2rem] mx-auto mb-[1vh] text-gray-500' />
-    <p className='text-[0.875rem] font-medium text-gray-400'>
+    <GitCommit className='w-[2rem] h-[2rem] mx-auto mb-[1vh] text-rh-text-tertiary' />
+    <p className='text-[0.875rem] font-medium text-rh-text-secondary'>
       최근 활동 내역이 없습니다
     </p>
   </div>

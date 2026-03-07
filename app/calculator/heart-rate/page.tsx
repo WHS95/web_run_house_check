@@ -5,7 +5,7 @@ const HeartRateCalculatorClient = dynamic(
   () => import("@/components/calculator/HeartRateCalculatorClient"),
   { 
     ssr: false, 
-    loading: () => <div className='h-96 bg-gray-700 rounded animate-pulse' /> 
+    loading: () => <div className='h-96 bg-rh-bg-surface rounded animate-pulse' /> 
   }
 );
 

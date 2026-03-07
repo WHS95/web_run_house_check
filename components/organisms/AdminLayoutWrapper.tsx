@@ -25,7 +25,7 @@ export default function AdminLayoutWrapper({
           <div className='flex justify-between items-center p-4'>
             <button
               onClick={() => setSidebarOpen(true)}
-              className='text-gray-400 hover:text-white'
+              className='text-rh-text-secondary hover:text-white'
             >
               <Menu className='w-6 h-6' />
             </button>

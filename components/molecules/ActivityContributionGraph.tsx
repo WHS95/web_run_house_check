@@ -15,10 +15,10 @@ interface ActivityContributionGraphProps {
 
 // ⚡ 범례 컴포넌트 (메모이제이션)
 const Legend = memo(() => (
-  <div className='flex items-center space-x-[1vw] text-[0.75rem] text-gray-500'>
+  <div className='flex items-center space-x-[1vw] text-[0.75rem] text-rh-text-tertiary'>
     <span>적음</span>
     <div className='flex space-x-1'>
-      <div className='w-[0.625rem] h-[0.625rem] bg-gray-100 rounded-sm'></div>
+      <div className='w-[0.625rem] h-[0.625rem] bg-rh-bg-surface rounded-sm'></div>
       <div className='w-[0.625rem] h-[0.625rem] bg-blue-200 rounded-sm'></div>
       <div className='w-[0.625rem] h-[0.625rem] bg-blue-400 rounded-sm'></div>
       <div className='w-[0.625rem] h-[0.625rem] bg-rh-accent rounded-sm'></div>
@@ -76,7 +76,7 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
     const getActivityColor = useMemo(() => {
       return (dayActivities: Activity[]) => {
         if (dayActivities.length === 0) {
-          return "bg-gray-100";
+          return "bg-rh-bg-surface";
         }
 
         const hasCreatedMeeting = dayActivities.some(
@@ -94,7 +94,7 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
           return "bg-blue-200";
         }
 
-        return "bg-gray-100";
+        return "bg-rh-bg-surface";
       };
     }, []);
 
@@ -183,13 +183,13 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
               <div
                 key={`${weekIndex}-${dayIndex}`}
                 className={`
-                w-3 h-3 rounded-sm border border-gray-200 transition-colors
+                w-3 h-3 rounded-sm border border-rh-border transition-colors
                 ${
                   isFuture
-                    ? "bg-gray-50 opacity-50"
+                    ? "bg-rh-bg-surface opacity-50"
                     : getActivityColor(dayActivities)
                 }
-                hover:ring-1 hover:ring-gray-400 hover:ring-opacity-50
+                hover:ring-1 hover:ring-rh-border hover:ring-opacity-50
               `}
                 title={getTooltipMessage(date, dayActivities)}
               />
@@ -212,7 +212,7 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
             return (
               <div
                 key={monthLabel.index}
-                className='text-[0.75rem] text-center text-gray-300'
+                className='text-[0.75rem] text-center text-rh-text-secondary'
                 style={{ width: `${Math.max(width, 32)}px` }}
               >
                 {monthLabel.label}
@@ -222,7 +222,7 @@ const ActivityContributionGraph = memo<ActivityContributionGraphProps>(
         </div>
         <div className='flex mb-[1.5vh]'>
           {/* 좌측 요일 라벨 */}
-          <div className='flex flex-col items-end w-[1.5rem] mr-[1vw] space-y-[0.25vh] text-[0.75rem] text-gray-300'>
+          <div className='flex flex-col items-end w-[1.5rem] mr-[1vw] space-y-[0.25vh] text-[0.75rem] text-rh-text-secondary'>
             <div className='flex items-center h-[0.75rem]'>일</div>
             <div className='flex items-center h-[0.75rem]'>월</div>
             <div className='flex items-center h-[0.75rem]'>화</div>

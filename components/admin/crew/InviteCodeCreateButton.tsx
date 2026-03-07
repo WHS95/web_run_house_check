@@ -113,10 +113,10 @@ export default function InviteCodeCreateButton({
             ></div>
 
             <div className='relative w-full max-w-md p-6 mx-auto bg-white rounded-lg shadow-xl'>
-              <h3 className='mb-2 text-lg font-medium text-gray-900'>
+              <h3 className='mb-2 text-lg font-medium text-rh-text-inverted'>
                 {crewName} 크루 초대 코드 생성
               </h3>
-              <p className='mb-4 text-sm text-gray-500'>
+              <p className='mb-4 text-sm text-rh-text-tertiary'>
                 새로운 크루 초대 코드를 생성합니다.
               </p>
 
@@ -156,7 +156,7 @@ export default function InviteCodeCreateButton({
                   <div className='mb-4'>
                     <label
                       htmlFor='description'
-                      className='block mb-1 text-sm font-medium text-gray-700'
+                      className='block mb-1 text-sm font-medium text-rh-text-muted'
                     >
                       설명 (선택)
                     </label>
@@ -165,7 +165,7 @@ export default function InviteCodeCreateButton({
                       id='description'
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+                      className='w-full px-3 py-2 border border-rh-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                       placeholder='초대 코드 용도 설명'
                     />
                   </div>
@@ -173,7 +173,7 @@ export default function InviteCodeCreateButton({
                   <div className='mb-4'>
                     <label
                       htmlFor='maxUses'
-                      className='block mb-1 text-sm font-medium text-gray-700'
+                      className='block mb-1 text-sm font-medium text-rh-text-muted'
                     >
                       최대 사용 횟수 (선택)
                     </label>
@@ -183,7 +183,7 @@ export default function InviteCodeCreateButton({
                       value={maxUses}
                       onChange={(e) => setMaxUses(e.target.value)}
                       min='1'
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+                      className='w-full px-3 py-2 border border-rh-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                       placeholder='무제한인 경우 비워두세요'
                     />
                   </div>
@@ -191,7 +191,7 @@ export default function InviteCodeCreateButton({
                   <div className='mb-4'>
                     <label
                       htmlFor='expiresAt'
-                      className='block mb-1 text-sm font-medium text-gray-700'
+                      className='block mb-1 text-sm font-medium text-rh-text-muted'
                     >
                       만료일 (선택)
                     </label>
@@ -201,9 +201,9 @@ export default function InviteCodeCreateButton({
                       value={expiresAt}
                       onChange={(e) => setExpiresAt(e.target.value)}
                       min={getTomorrowDate()}
-                      className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+                      className='w-full px-3 py-2 border border-rh-border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                     />
-                    <p className='mt-1 text-xs text-gray-500'>
+                    <p className='mt-1 text-xs text-rh-text-tertiary'>
                       비워두면 만료되지 않습니다.
                     </p>
                   </div>
@@ -218,7 +218,7 @@ export default function InviteCodeCreateButton({
                     <button
                       type='button'
                       onClick={handleClose}
-                      className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                      className='px-4 py-2 text-sm font-medium text-rh-text-muted bg-white border border-rh-border rounded-md shadow-sm hover:bg-rh-bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
                       disabled={isLoading}
                     >
                       취소

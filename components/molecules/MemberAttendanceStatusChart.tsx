@@ -31,7 +31,7 @@ export default function MemberAttendanceStatusChart({
     <div className='p-6 rounded-lg  shadow-sm bg-rh-bg-surface'>
       <div className='mb-6'>
         <h3 className='mb-1 text-lg font-semibold text-white'>{title}</h3>
-        {/* <p className='text-sm text-gray-500'>
+        {/* <p className='text-sm text-rh-text-tertiary'>
           {year}년 {month}월 멤버 출석 현황 분석
         </p> */}
       </div>
@@ -40,23 +40,23 @@ export default function MemberAttendanceStatusChart({
         <div className='space-y-6'>
           {/* 전체 현황 카드
           <div className='grid grid-cols-3 gap-4'>
-            <div className='p-4 text-center bg-gray-50 rounded-lg'>
-              <div className='text-2xl font-bold text-gray-900'>
+            <div className='p-4 text-center bg-rh-bg-surface rounded-lg'>
+              <div className='text-2xl font-bold text-rh-text-inverted'>
                 {totalActiveMembers}
               </div>
-              <div className='text-sm text-gray-500'>전체 인원</div>
+              <div className='text-sm text-rh-text-tertiary'>전체 인원</div>
             </div>
             <div className='p-4 text-center bg-blue-50 rounded-lg'>
               <div className='text-2xl font-bold text-blue-600'>
                 {attendedMembers}
               </div>
-              <div className='text-sm text-gray-500'>출석 인원</div>
+              <div className='text-sm text-rh-text-tertiary'>출석 인원</div>
             </div>
             <div className='p-4 text-center bg-red-50 rounded-lg'>
               <div className='text-2xl font-bold text-red-600'>
                 {absentMembers}
               </div>
-              <div className='text-sm text-gray-500'>유령회원</div>
+              <div className='text-sm text-rh-text-tertiary'>유령회원</div>
             </div>
           </div> */}
 
@@ -69,7 +69,7 @@ export default function MemberAttendanceStatusChart({
                   {attendanceRate}%
                 </span>
               </div>
-              <div className='overflow-hidden w-full h-3 bg-gray-200 rounded-full'>
+              <div className='overflow-hidden w-full h-3 bg-rh-bg-muted rounded-full'>
                 <div
                   className='h-full bg-rh-accent transition-all duration-300 ease-out'
                   style={{ width: `${attendanceRate}%` }}
@@ -84,14 +84,14 @@ export default function MemberAttendanceStatusChart({
             {/* 유령회원 비율 바
             <div>
               <div className='flex justify-between items-center mb-2'>
-                <span className='text-sm font-medium text-gray-700'>
+                <span className='text-sm font-medium text-rh-text-muted'>
                   유령회원 비율
                 </span>
                 <span className='text-sm font-bold text-red-600'>
                   {absentRate}%
                 </span>
               </div>
-              <div className='overflow-hidden w-full h-3 bg-gray-200 rounded-full'>
+              <div className='overflow-hidden w-full h-3 bg-rh-bg-muted rounded-full'>
                 <div
                   className='h-full bg-red-500 transition-all duration-300 ease-out'
                   style={{ width: `${absentRate}%` }}
@@ -101,8 +101,8 @@ export default function MemberAttendanceStatusChart({
           </div>
 
           {/* 해석 메시지
-          <div className='pt-4 border-t border-gray-100'>
-            <div className='text-sm text-gray-600'>
+          <div className='pt-4 border-t border-rh-border'>
+            <div className='text-sm text-rh-text-muted'>
               {attendanceRate >= 80 ? (
                 <div className='flex items-center space-x-2'>
                   <span className='text-green-500'>●</span>
@@ -128,7 +128,7 @@ export default function MemberAttendanceStatusChart({
           </div> */}
         </div>
       ) : (
-        <div className='py-8 text-center text-gray-500'>
+        <div className='py-8 text-center text-rh-text-tertiary'>
           <p>활성 멤버가 없습니다.</p>
         </div>
       )}

@@ -28,7 +28,7 @@ const NativeTabBar: React.FC<NativeTabBarProps> = ({ tabs }) => {
     <div
       className='
             fixed bottom-0 left-0 right-0 z-50
-            bg-white/95 backdrop-blur-md border-t border-gray-200
+            bg-white/95 backdrop-blur-md border-t border-rh-border
             safe-area-inset-bottom
         '
     >
@@ -47,11 +47,11 @@ const NativeTabBar: React.FC<NativeTabBarProps> = ({ tabs }) => {
                                     relative flex flex-col items-center justify-center
                                     flex-1 py-2 px-1 rounded-xl
                                     transition-all duration-200 ease-out
-                                    active:scale-95 active:bg-gray-100
+                                    active:scale-95 active:bg-rh-bg-surface
                                     ${
                                       isActive
                                         ? "text-blue-500"
-                                        : "text-gray-500"
+                                        : "text-rh-text-tertiary"
                                     }
                                 `}
                 style={{ WebkitTapHighlightColor: "transparent" }}

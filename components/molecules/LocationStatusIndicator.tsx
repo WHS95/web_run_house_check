@@ -13,6 +13,7 @@ interface LocationStatusIndicatorProps {
     name: string;
     latitude: number | null;
     longitude: number | null;
+    allowed_radius?: number;
   }>;
   allowedRadius?: number;
   onStatusChange?: (canAttend: boolean, message: string) => void;
@@ -95,6 +96,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
           name: loc.name,
           latitude: loc.latitude!,
           longitude: loc.longitude!,
+          allowedRadius: loc.allowed_radius || allowedRadius,
         }));
 
       if (validLocations.length === 0) {
@@ -171,9 +173,9 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
       case 'disabled':
         return {
           icon: Shield,
-          color: 'text-gray-400',
-          bgColor: 'bg-gray-500/10',
-          borderColor: 'border-gray-500/30',
+          color: 'text-rh-text-secondary',
+          bgColor: 'bg-rh-bg-muted/10',
+          borderColor: 'border-rh-border/30',
           title: '일반 출석',
         };
       case 'checking':
@@ -220,9 +222,9 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
       default:
         return {
           icon: AlertCircle,
-          color: 'text-gray-400',
-          bgColor: 'bg-gray-500/10',
-          borderColor: 'border-gray-500/30',
+          color: 'text-rh-text-secondary',
+          bgColor: 'bg-rh-bg-muted/10',
+          borderColor: 'border-rh-border/30',
           title: '상태 확인',
         };
     }
@@ -259,14 +261,14 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
             <h3 className={`font-medium ${config.color}`}>
               {config.title}
             </h3>
-            <p className="mt-1 text-sm text-gray-300">
+            <p className="mt-1 text-sm text-rh-text-secondary">
               {statusMessage}
             </p>
             
             {/* 권한 상태 상세 정보 */}
             {isLocationBasedAttendance && (
               <div className="mt-2 space-y-1">
-                <div className="flex items-center text-xs text-gray-400">
+                <div className="flex items-center text-xs text-rh-text-secondary">
                   <div className={`w-2 h-2 rounded-full mr-2 ${
                     permissionStatus === 'granted' ? 'bg-green-500' :
                     permissionStatus === 'denied' ? 'bg-red-500' : 'bg-yellow-500'
@@ -277,7 +279,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
                   }
                 </div>
                 {crewLocations.length > 0 && (
-                  <div className="flex items-center text-xs text-gray-400">
+                  <div className="flex items-center text-xs text-rh-text-secondary">
                     <MapPin className="w-3 h-3 mr-1" />
                     등록된 활동장소: {crewLocations.length}개
                   </div>
@@ -293,7 +295,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
             <button
               onClick={handleRefresh}
               disabled={isChecking}
-              className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-rh-bg-muted/20 disabled:opacity-50"
+              className="p-2 text-rh-text-secondary hover:text-white rounded-lg hover:bg-rh-bg-muted/20 disabled:opacity-50"
               title="다시 확인"
             >
               <RefreshCw className={`w-4 h-4 ${isChecking ? 'animate-spin' : ''}`} />

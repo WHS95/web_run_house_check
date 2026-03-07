@@ -47,6 +47,6 @@ export const getStatsCardsData = (): StatsCardData[] => [
     title: "오늘 출석자",
     subtitle: "2024/05/01(수)",
     value: "6명",
-    bgColor: "bg-gray-700",
+    bgColor: "bg-rh-bg-surface",
   },
 ];

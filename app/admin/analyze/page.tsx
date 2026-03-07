@@ -16,6 +16,28 @@ import {
 import { ChevronDown } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
+// 참여율에 따른 블루 그래디언트 색상 반환
+function getParticipationColor(rate: number, allRates: number[]): string {
+    const max = Math.max(...allRates, 1);
+    const ratio = rate / max;
+
+    const colors = [
+        "#2B5AA8",
+        "#3769B5",
+        "#4478C2",
+        "#5187CF",
+        "#5F96DC",
+        "#6DA5E8",
+        "#7AB4F5",
+    ];
+
+    const index = Math.min(
+        Math.floor(ratio * (colors.length - 1)),
+        colors.length - 1
+    );
+    return colors[index];
+}
+
 // 요일별 참여율 분석 데이터 조회
 async function getDayParticipationAnalysis(
   supabase: any,
@@ -54,23 +76,15 @@ async function getDayParticipationAnalysis(
   }
 
   if (!activeMembers || activeMembers.length === 0) {
-    const dayInfo = [
-      { name: "일요일", color: "bg-rh-bg-surface" },
-      { name: "월요일", color: "bg-rh-bg-surface" },
-      { name: "화요일", color: "bg-rh-bg-surface" },
-      { name: "수요일", color: "bg-rh-bg-surface" },
-      { name: "목요일", color: "bg-rh-bg-surface" },
-      { name: "금요일", color: "bg-rh-bg-surface" },
-      { name: "토요일", color: "bg-rh-bg-surface" },
-    ];
+    const dayNames = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
 
     return Array.from({ length: 7 }, (_, index) => ({
-      dayName: dayInfo[index].name,
+      dayName: dayNames[index],
       dayIndex: index,
       participationRate: 0,
       participantCount: 0,
       totalMembers: 0,
-      color: dayInfo[index].color,
+      color: "#2B5AA8",
     }));
   }
 
@@ -117,32 +131,26 @@ async function getDayParticipationAnalysis(
     }
   });
 
-  const dayInfo = [
-    { name: "일요일", color: "bg-rh-accent" },
-    { name: "월요일", color: "bg-rh-accent" },
-    { name: "화요일", color: "bg-rh-accent" },
-    { name: "수요일", color: "bg-rh-accent" },
-    { name: "목요일", color: "bg-rh-accent" },
-    { name: "금요일", color: "bg-rh-accent" },
-    { name: "토요일", color: "bg-rh-accent" },
-  ];
+  const dayNames = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+
+  // 먼저 참여율 계산
+  const rates = Array.from({ length: 7 }, (_, index) => {
+    const dayAttendanceCount = dayAttendanceCounts[index];
+    return totalAttendanceCount > 0
+      ? Math.round((dayAttendanceCount / totalAttendanceCount) * 100)
+      : 0;
+  });
 
   const result: DayParticipationData[] = Array.from(
     { length: 7 },
     (_, index) => {
-      const dayAttendanceCount = dayAttendanceCounts[index];
-      const participationRate =
-        totalAttendanceCount > 0
-          ? Math.round((dayAttendanceCount / totalAttendanceCount) * 100)
-          : 0;
-
       return {
-        dayName: dayInfo[index].name,
+        dayName: dayNames[index],
         dayIndex: index,
-        participationRate,
-        participantCount: dayAttendanceCount,
+        participationRate: rates[index],
+        participantCount: dayAttendanceCounts[index],
         totalMembers: totalAttendanceCount,
-        color: dayInfo[index].color,
+        color: getParticipationColor(rates[index], rates),
       };
     }
   );
@@ -495,7 +503,7 @@ export default function AnalyzePage() {
         <div className='flex justify-center items-center min-h-64'>
           <div className='p-6 text-center rounded-lg border shadow-sm bg-rh-bg-surface border-red-500/30'>
             <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
-            <p className='text-gray-300'>{error}</p>
+            <p className='text-rh-text-secondary'>{error}</p>
           </div>
         </div>
       </AdminPageContainer>
@@ -508,7 +516,7 @@ export default function AnalyzePage() {
         <div className='flex justify-center items-center min-h-64'>
           <div className='p-6 text-center rounded-lg border shadow-sm bg-rh-bg-surface border-rh-border'>
             <h3 className='mb-2 text-lg font-semibold text-white'>데이터 없음</h3>
-            <p className='text-gray-300'>분석할 데이터가 없습니다.</p>
+            <p className='text-rh-text-secondary'>분석할 데이터가 없습니다.</p>
           </div>
         </div>
       </AdminPageContainer>

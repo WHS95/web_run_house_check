@@ -44,10 +44,10 @@ interface MemberDetailTemplateProps {
 const ErrorState = memo(() => (
     <div className="h-screen bg-rh-bg-primary flex flex-col">
         <div className="flex-shrink-0">
-            <PageHeader title="내 정보" iconColor="white" borderColor="gray-300" backgroundColor="bg-rh-bg-surface" />
+            <PageHeader title="내 정보" iconColor="white" borderColor="rh-border" backgroundColor="bg-rh-bg-surface" />
         </div>
         <div className="flex-1 flex items-center justify-center">
-            <p className="text-gray-600">사용자 정보를 불러올 수 없습니다.</p>
+            <p className="text-rh-text-muted">사용자 정보를 불러올 수 없습니다.</p>
         </div>
     </div>
 ));
@@ -56,7 +56,7 @@ ErrorState.displayName = 'ErrorState';
 const AdminButton = memo(() => (
     <Link 
         href="/admin" 
-        className="flex items-center justify-center w-[2rem] h-[2rem] rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+        className="flex items-center justify-center w-[2rem] h-[2rem] rounded-full bg-rh-bg-surface hover:bg-rh-bg-muted transition-colors"
         title="크루관리"
     >
         <FiSettings size={18} color="black" />
@@ -95,24 +95,24 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                 <PageHeader 
                     title="내 정보" 
                     iconColor="white" 
-                    borderColor="gray-300"
+                    borderColor="rh-border"
                     rightAction={adminButton}
                 />
             </div>
             
-            <div className="flex-1 overflow-y-auto px-[4vw] py-[2vh] pt-[10vh]">
+            <div className="flex-1 overflow-y-auto px-rh-xl pt-[10vh] pb-0 space-y-5">
                 <MemberProfileInfo {...profileProps} />
                 
                 {/* NRC 스타일 이번 달 요약 카드 */}
                 {userId && (
                     <ActivitySummaryCard 
                         userId={userId}
-                        className="bg-rh-bg-surface rounded-[1rem] p-[6vw] mb-[4vh]"
+                        className="bg-rh-bg-surface rounded-rh-xl p-4"
                     />
                 )}
                 
                 {/* 활동 내역 */}
-                <div className="bg-rh-bg-surface rounded-[1rem] p-[3vw] mb-[2vh]">
+                <div className="bg-rh-bg-surface rounded-rh-xl p-4">
                     <MemberActivityHistory
                         activities={activityData.activities}
                     />
@@ -120,7 +120,7 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
 
                 {/* 알림 설정 */}
                 {isSupported && (
-                    <div className="bg-rh-bg-surface rounded-[1rem] p-[4vw] mb-[2vh]">
+                    <div className="bg-rh-bg-surface rounded-rh-xl p-4">
                         <h3 className="text-rh-title3 font-semibold text-white mb-3">알림 설정</h3>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">

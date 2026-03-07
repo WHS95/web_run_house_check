@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { MapPin, Users, Ticket } from "lucide-react";
+import { MapPin, Users, Ticket, Megaphone } from "lucide-react";
 import AdminCrewMembersManagement from "@/components/organisms/AdminCrewMembersManagement";
 import AdminInviteCodesManagement from "@/components/organisms/AdminInviteCodesManagement";
+import AdminNoticeManagement from "@/components/organisms/AdminNoticeManagement";
 import CrewLocationManagement from "@/components/admin/locations/CrewLocationManagement";
 import NaverMapLoader from "@/components/map/NaverMapLoader";
 
@@ -33,13 +34,13 @@ export default function AdminSettingsManagementNew({
 }: AdminSettingsManagementProps) {
   // 탭 상태
   const [activeTab, setActiveTab] = useState<
-    "locations" | "members" | "invites"
+    "locations" | "members" | "invites" | "notices"
   >("locations");
 
   const [localLocationBasedAttendance, setLocalLocationBasedAttendance] = useState(locationBasedAttendance);
 
   // 탭 변경 핸들러 최적화
-  const handleTabChange = useCallback((tab: "locations" | "members" | "invites") => {
+  const handleTabChange = useCallback((tab: "locations" | "members" | "invites" | "notices") => {
     haptic.light();
     setActiveTab(tab);
     
@@ -90,6 +91,17 @@ export default function AdminSettingsManagementNew({
               <Ticket className='w-4 h-4' />
               <span className='hidden sm:inline'>초대코드</span>
             </button>
+            <button
+              onClick={() => handleTabChange("notices")}
+              className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                activeTab === "notices"
+                  ? "bg-rh-accent text-white shadow-sm"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              <Megaphone className='w-4 h-4' />
+              <span className='hidden sm:inline'>공지</span>
+            </button>
           </div>
         </div>
 
@@ -111,6 +123,11 @@ export default function AdminSettingsManagementNew({
         {/* 초대코드 관리 */}
         {activeTab === "invites" && (
           <AdminInviteCodesManagement crewId={crewId} />
+        )}
+
+        {/* 공지 관리 */}
+        {activeTab === "notices" && (
+          <AdminNoticeManagement crewId={crewId} />
         )}
           </AdminPageContainer>
         </InviteCodeProvider>

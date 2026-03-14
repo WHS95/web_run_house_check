@@ -27,16 +27,16 @@ const RankingTabs: React.FC<RankingTabsProps> = ({
   }
 
   return (
-    <div className='flex p-[0.25rem] mb-6 rounded-lg bg-rh-bg-surface'>
+    <div className='flex h-10 p-1 gap-1 rounded-rh-md bg-rh-bg-surface'>
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => handleTabClick(tab.id)}
-          className={`flex-1 py-2 rounded-md text-[0.875rem] font-medium transition-all duration-200 
+          className={`flex-1 flex items-center justify-center rounded-rh-sm text-[13px] transition-colors duration-200
             ${
               activeTabId === tab.id
-                ? "bg-rh-accent text-white shadow-lg font-semibold"
-                : "text-rh-text-tertiary hover:text-white/80 hover:bg-white/5"
+                ? "bg-rh-accent text-white font-semibold"
+                : "text-rh-text-tertiary"
             }
           `}
         >

@@ -15,16 +15,13 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
     isCurrentUser,
 }) => {
     const isFirst = rank === 1;
-    const highlight = isCurrentUser && !isFirst;
 
     return (
         <div
-            className={`flex items-center px-4 rounded-rh-lg ${
+            className={`flex items-center gap-3 px-4 rounded-rh-lg ${
                 isFirst
                     ? "h-16 bg-gradient-to-r from-[#5B8FE0] to-[#7AB4F5]"
-                    : highlight
-                    ? "h-14 bg-rh-accent/10 border-l-2 border-rh-accent"
-                    : "h-14 bg-rh-bg-surface border-b border-rh-border"
+                    : "h-14 bg-rh-bg-surface"
             }`}
         >
             {/* 순위 */}
@@ -33,9 +30,7 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
                     className={`font-bold ${
                         isFirst
                             ? "text-xl text-white"
-                            : rank <= 3
-                            ? "text-base text-rh-text-secondary"
-                            : "text-sm text-rh-text-secondary"
+                            : "text-base text-rh-text-secondary"
                     }`}
                 >
                     {rank}
@@ -43,10 +38,10 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
             </div>
 
             {/* 이름 + 부가 정보 */}
-            <div className="flex-1 ml-3">
+            <div className="flex-1 flex flex-col gap-0.5">
                 <div className="flex items-center gap-1.5">
                     <span
-                        className={`text-sm font-${isFirst ? "semibold" : "medium"} text-white`}
+                        className={`text-sm ${isFirst ? "font-semibold" : "font-medium"} text-white`}
                     >
                         {name}
                     </span>

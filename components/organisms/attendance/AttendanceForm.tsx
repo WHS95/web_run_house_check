@@ -213,7 +213,7 @@ const AttendanceForm: React.FC<AttendanceFormProps> = React.memo(
         {showHostField && (
           <div>
             <RadioGroup
-              label='개설자 여부'
+              label='모임 개설자 입니다.'
               name='isHost'
               options={HOST_OPTIONS}
               selectedValue={formValues.isHost}

@@ -1,4 +1,5 @@
-const CACHE_NAME = "runhouse-v1";
+const CACHE_VERSION = "2";
+const CACHE_NAME = `runhouse-v${CACHE_VERSION}`;
 const urlsToCache = [
   "/",
   "/manifest.json",

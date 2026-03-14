@@ -28,8 +28,8 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
                     onClick={() => onTabChange(tab.id)}
                     className={`flex-1 py-1.5 rounded-rh-lg text-[0.875rem] font-medium transition-all duration-200 ${
                         activeTab === tab.id
-                            ? 'bg-white text-rh-text-inverted shadow-sm'
-                            : 'text-rh-text-secondary hover:text-rh-text-secondary'
+                            ? 'bg-rh-accent text-white shadow-sm'
+                            : 'text-rh-text-tertiary hover:text-rh-text-secondary'
                     }`}
                 >
                     {tab.label}

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { FiChevronLeft } from "react-icons/fi";
+import { ChevronLeft } from "lucide-react";
 
 interface PageHeaderProps {
   title: string;
@@ -31,7 +31,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           href={backLink}
           className='flex items-center pl-2 pr-1 h-full text-rh-accent active:opacity-70 transition-opacity'
         >
-          <FiChevronLeft size={24} />
+          <ChevronLeft size={24} />
         </Link>
       )}
 

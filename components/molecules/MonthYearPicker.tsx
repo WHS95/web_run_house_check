@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { FiChevronDown } from "react-icons/fi";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { ChevronDown } from "lucide-react";
 
 interface MonthYearPickerProps {
   selectedYear: number;
@@ -54,10 +54,13 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     };
   }, []);
 
-  const handleYearMonthSelect = (year: number, month: number) => {
-    onDateChange(year, month);
-    setIsOpen(false);
-  };
+  const handleYearMonthSelect = useCallback(
+    (year: number, month: number) => {
+      onDateChange(year, month);
+      setIsOpen(false);
+    },
+    [onDateChange]
+  );
 
   const formatDisplayText = () => {
     return `${selectedYear}년 ${selectedMonth}월`;
@@ -71,7 +74,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
         className='flex items-center justify-between w-full text-white text-[1.125rem] font-medium focus:outline-none'
       >
         <span>{formatDisplayText()}</span>
-        <FiChevronDown
+        <ChevronDown
           className={`w-[1rem] h-[1rem] text-rh-text-secondary transition-transform ${
             isOpen ? "rotate-180" : ""}`}
         />
@@ -91,7 +94,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
                     onClick={() => handleYearMonthSelect(year, selectedMonth)}
                     className={`py-1.5 text-center rounded-rh-md text-[0.875rem] font-medium transition-colors ${
                       year === selectedYear
-                        ? "bg-white text-rh-text-inverted"
+                        ? "bg-rh-accent text-white"
                         : "text-rh-text-secondary hover:text-white hover:bg-rh-bg-surface"
                     }`}
                   >
@@ -113,7 +116,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
                     }
                     className={`py-1.5 text-center rounded-rh-md text-[0.875rem] font-medium transition-colors ${
                       month.value === selectedMonth
-                        ? "bg-white text-rh-text-inverted"
+                        ? "bg-rh-accent text-white"
                         : "text-rh-text-secondary hover:text-white hover:bg-rh-bg-surface"
                     }`}
                   >

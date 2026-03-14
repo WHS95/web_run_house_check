@@ -53,11 +53,58 @@ async function getInitialHomeData() {
           crewName: null,
           noticeText: null,
         },
+        recentActivities: [],
       };
+    }
+
+    // 최근 출석 기록 조회 (크루 내 최근 10건)
+    const crewId = functionResult.data?.crewId;
+    let recentActivities: Array<{
+      id: string;
+      userName: string;
+      location: string;
+      exerciseType: string;
+      time: string;
+    }> = [];
+
+    if (crewId) {
+      const { data: records } = await supabase
+        .schema("attendance")
+        .from("attendance_records")
+        .select(`
+          id,
+          location,
+          attendance_timestamp,
+          exercise_type_id,
+          user:user_id ( first_name ),
+          exercise_type:exercise_type_id ( name )
+        `)
+        .eq("crew_id", crewId)
+        .is("deleted_at", null)
+        .order("attendance_timestamp", { ascending: false })
+        .limit(10);
+
+      if (records) {
+        recentActivities = records.map((r: Record<string, unknown>) => {
+          const ts = new Date(r.attendance_timestamp as string);
+          const hours = ts.getHours().toString().padStart(2, "0");
+          const minutes = ts.getMinutes().toString().padStart(2, "0");
+          const userObj = r.user as Record<string, string> | null;
+          const exerciseObj = r.exercise_type as Record<string, string> | null;
+          return {
+            id: r.id as string,
+            userName: userObj?.first_name ?? "멤버",
+            location: (r.location as string) ?? "",
+            exerciseType: exerciseObj?.name ?? "",
+            time: `${hours}:${minutes}`,
+          };
+        });
+      }
     }
 
     return {
       pageData: functionResult.data,
+      recentActivities,
     };
   } catch (error) {
     // 오류 발생 시 기본 데이터 반환
@@ -68,6 +115,7 @@ async function getInitialHomeData() {
         crewName: null,
         noticeText: null,
       },
+      recentActivities: [],
     };
   }
 }
@@ -98,7 +146,10 @@ export default async function HomePage() {
         </div>
       }
     >
-      <ClientHomePage initialData={initialData.pageData!} />
+      <ClientHomePage
+        initialData={initialData.pageData!}
+        recentActivities={initialData.recentActivities ?? []}
+      />
     </Suspense>
   );
 }

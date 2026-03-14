@@ -35,8 +35,8 @@ const RankingTabs: React.FC<RankingTabsProps> = ({
           className={`flex-1 py-2 rounded-md text-[0.875rem] font-medium transition-all duration-200 
             ${
               activeTabId === tab.id
-                ? "bg-white text-rh-bg-surface shadow-lg font-semibold transform scale-[1.02]"
-                : "text-white/50 hover:text-white/80 hover:bg-white/5"
+                ? "bg-rh-accent text-white shadow-lg font-semibold"
+                : "text-rh-text-tertiary hover:text-white/80 hover:bg-white/5"
             }
           `}
         >

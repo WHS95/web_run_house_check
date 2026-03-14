@@ -1,86 +1,54 @@
 import React, { Suspense } from "react";
 import nextDynamic from "next/dynamic";
 import LoadingSpinner from "@/components/atoms/LoadingSpinner";
+import { redirect } from "next/navigation";
+import { fetchRankingData } from "./actions";
 
-// ⚡ 성능 최적화: 컴포넌트 프리로딩
 const UltraFastRankingTemplate = nextDynamic(
-  () => import("@/components/templates/UltraFastRankingTemplate"),
-  {
-    loading: () => (
-      <div className='flex justify-center items-center min-h-screen bg-rh-bg-primary'>
-        <LoadingSpinner size='sm' color='white' />
-      </div>
-    ),
-    ssr: false, // 클라이언트 사이드에서만 렌더링 (최적화됨)
-  }
+    () => import("@/components/templates/UltraFastRankingTemplate"),
+    {
+        loading: () => (
+            <div className="flex justify-center items-center min-h-screen bg-rh-bg-primary">
+                <LoadingSpinner size="sm" color="white" />
+            </div>
+        ),
+        ssr: true,
+    }
 );
 
-// ⚡ 동적 렌더링 강제 (실시간 데이터)
 export const dynamic = "force-dynamic";
 
-// ⚡ 페이지 메타데이터 최적화
 export const metadata = {
-  title: "랭킹 | RUNHOUSE",
-  description: "RUNHOUSE 크루 랭킹 - 출석 및 개설 랭킹을 확인하세요",
-  keywords: "랭킹, 출석, 개설, 크루, RUNHOUSE",
+    title: "랭킹 | RUNHOUSE",
+    description: "RUNHOUSE 크루 랭킹 - 출석 및 개설 랭킹을 확인하세요",
 };
 
-// ⚡ 고성능 로딩 폴백 컴포넌트
-const RankingPageFallback = React.memo(() => (
-  <div className='min-h-screen bg-rh-bg-primary'>
-    <div className='pt-safe'>
-      <div className='flex justify-between items-center px-4 py-4 w-full border-b border-rh-border'>
-        <div className='w-16 h-6 rounded animate-pulse bg-rh-bg-primary'></div>
-        <div className='w-6 h-6 rounded animate-pulse bg-rh-bg-primary'></div>
-      </div>
-    </div>
-
-    {/* 랭킹 정보 스켈레톤 */}
-    <div className='px-4 pt-6'>
-      <div className='p-4 mb-6 rounded-2xl animate-pulse bg-rh-bg-primary'>
-        <div className='mb-2 w-32 h-4 rounded bg-rh-bg-primary'></div>
-        <div className='w-20 h-8 rounded bg-rh-bg-primary'></div>
-      </div>
-
-      {/* 탭 스켈레톤 */}
-      <div className='flex mb-6 space-x-2'>
-        <div className='w-20 h-10 rounded-xl animate-pulse bg-rh-bg-primary'></div>
-        <div className='w-20 h-10 rounded-xl animate-pulse bg-rh-bg-primary'></div>
-      </div>
-
-      {/* 리스트 스켈레톤 */}
-      <div className='space-y-3'>
-        {Array.from({ length: 8 }).map((_, index) => (
-          <div
-            key={index}
-            className='flex items-center p-3 space-x-3 animate-pulse'
-          >
-            <div className='w-8 h-8 rounded-full bg-rh-bg-primary'></div>
-            <div className='flex-1'>
-              <div className='mb-1 w-24 h-4 rounded bg-rh-bg-primary'></div>
-              <div className='w-16 h-3 rounded bg-rh-bg-primary'></div>
-            </div>
-            <div className='w-12 h-4 rounded bg-rh-bg-primary'></div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-));
-RankingPageFallback.displayName = "RankingPageFallback";
-
-// ⚡ 컴포넌트 프리로딩 (사용자가 페이지에 접근하기 전에 미리 로드)
-if (typeof window !== "undefined") {
-  // 페이지 로드 후 1초 뒤에 컴포넌트 프리로드
-  setTimeout(() => {
-    import("@/components/templates/UltraFastRankingTemplate");
-  }, 1000);
+interface RankingPageProps {
+    searchParams: Promise<{ year?: string; month?: string }>;
 }
 
-export default function RankingPage() {
-  return (
-    <Suspense fallback={<RankingPageFallback />}>
-      <UltraFastRankingTemplate />
-    </Suspense>
-  );
+export default async function RankingPage({ searchParams }: RankingPageProps) {
+    const params = await searchParams;
+    const now = new Date();
+    const year = parseInt(params.year || "") || now.getFullYear();
+    const month = parseInt(params.month || "") || now.getMonth() + 1;
+
+    const result = await fetchRankingData(year, month);
+
+    // 리다이렉트 처리
+    if (result.redirect) {
+        redirect(result.redirect);
+    }
+
+    return (
+        <Suspense
+            fallback={
+                <div className="flex justify-center items-center min-h-screen bg-rh-bg-primary">
+                    <LoadingSpinner size="sm" color="white" />
+                </div>
+            }
+        >
+            <UltraFastRankingTemplate initialData={result.data} />
+        </Suspense>
+    );
 }

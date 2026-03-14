@@ -1,12 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import {
-  HiOutlineHome,
-  HiOutlineUsers,
-  HiOutlineCalendarDays,
-  HiOutlineChatBubbleOvalLeftEllipsis,
-  HiOutlineChartBar,
-} from "react-icons/hi2";
+import { Home, Users, CalendarDays, MessageCircle, BarChart3 } from "lucide-react";
 
 interface NavItemProps {
   href: string;
@@ -40,15 +34,11 @@ const ManagerBottomNav: React.FC = () => {
   const currentPath = "/manager/members"; // 예시: 현재 경로
 
   const navItems = [
-    { href: "/manager", icon: HiOutlineHome, label: "홈" },
-    { href: "/manager/members", icon: HiOutlineUsers, label: "회원" },
-    { href: "/manager/attendance", icon: HiOutlineCalendarDays, label: "출석" },
-    {
-      href: "/manager/meetings",
-      icon: HiOutlineChatBubbleOvalLeftEllipsis,
-      label: "모임",
-    },
-    { href: "/manager/stats", icon: HiOutlineChartBar, label: "통계" },
+    { href: "/manager", icon: Home, label: "홈" },
+    { href: "/manager/members", icon: Users, label: "회원" },
+    { href: "/manager/attendance", icon: CalendarDays, label: "출석" },
+    { href: "/manager/meetings", icon: MessageCircle, label: "모임" },
+    { href: "/manager/stats", icon: BarChart3, label: "통계" },
   ];
 
   return (

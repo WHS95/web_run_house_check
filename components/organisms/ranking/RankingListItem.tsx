@@ -5,33 +5,25 @@ interface RankingListItemProps {
     rank: number;
     name: string;
     score: number;
+    isCurrentUser?: boolean;
 }
 
 const RankingListItem: React.FC<RankingListItemProps> = ({
     rank,
     name,
     score,
+    isCurrentUser,
 }) => {
     const isFirst = rank === 1;
-
-    const getRankDisplay = () => {
-        switch (rank) {
-            case 1:
-                return "1";
-            case 2:
-                return "2";
-            case 3:
-                return "3";
-            default:
-                return rank.toString();
-        }
-    };
+    const highlight = isCurrentUser && !isFirst;
 
     return (
         <div
             className={`flex items-center px-4 rounded-rh-lg ${
                 isFirst
                     ? "h-16 bg-gradient-to-r from-[#5B8FE0] to-[#7AB4F5]"
+                    : highlight
+                    ? "h-14 bg-rh-accent/10 border-l-2 border-rh-accent"
                     : "h-14 bg-rh-bg-surface border-b border-rh-border"
             }`}
         >
@@ -46,17 +38,24 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
                             : "text-sm text-rh-text-secondary"
                     }`}
                 >
-                    {getRankDisplay()}
+                    {rank}
                 </span>
             </div>
 
             {/* 이름 + 부가 정보 */}
             <div className="flex-1 ml-3">
-                <span
-                    className={`text-sm font-${isFirst ? "semibold" : "medium"} text-white`}
-                >
-                    {name}
-                </span>
+                <div className="flex items-center gap-1.5">
+                    <span
+                        className={`text-sm font-${isFirst ? "semibold" : "medium"} text-white`}
+                    >
+                        {name}
+                    </span>
+                    {isCurrentUser && (
+                        <span className="bg-rh-accent text-white text-[10px] rounded-full px-1.5 leading-4">
+                            나
+                        </span>
+                    )}
+                </div>
                 <p
                     className={`text-xs ${
                         isFirst ? "text-white/75" : "text-rh-text-tertiary"
@@ -74,4 +73,4 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
     );
 };
 
-export default RankingListItem;
+export default React.memo(RankingListItem);

@@ -8,6 +8,7 @@ export const CrewLocationSchema = z.object({
   description: z.string().optional(),
   latitude: z.number(),
   longitude: z.number(),
+  allowed_radius: z.number().min(30).max(500).default(50),
   is_active: z.boolean(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -19,6 +20,7 @@ export const CrewLocationFormSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
   address: z.string().optional(),
+  allowed_radius: z.number().min(30).max(500).default(50),
 });
 
 export const CrewLocationCreateSchema = z.object({
@@ -27,6 +29,7 @@ export const CrewLocationCreateSchema = z.object({
   description: z.string().optional(),
   latitude: z.number(),
   longitude: z.number(),
+  allowed_radius: z.number().min(30).max(500).default(50),
 });
 
 export const CrewLocationUpdateSchema = z.object({
@@ -35,6 +38,7 @@ export const CrewLocationUpdateSchema = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   is_active: z.boolean().optional(),
+  allowed_radius: z.number().min(30).max(500).optional(),
 });
 
 // Zod 기반 타입 추론

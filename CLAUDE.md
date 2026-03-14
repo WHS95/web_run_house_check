@@ -152,6 +152,22 @@ import { createClient } from "@/lib/supabase/admin";
 
 ## Design Rules
 
+### ⚠️ 디자인 시스템 필수 준수 규칙 (CRITICAL)
+- **모든 UI 구현은 반드시 `.pen` 파일의 디자인 시스템을 기반으로 해야 합니다.**
+- 새로운 UI 컴포넌트를 만들기 전, `.pen` 파일에서 해당 컴포넌트가 정의되어 있는지 확인하세요.
+- `.pen` 파일에 정의된 컴포넌트가 있다면, 해당 디자인의 색상, 크기, 간격, 폰트 등을 **정확히** 코드에 반영하세요.
+- `.pen` 파일에 해당 디자인이 **없는 경우**, 임의로 디자인하지 말고 **사용자에게 먼저 물어보세요.**
+  - 예: "이 컴포넌트는 .pen 디자인 시스템에 정의되어 있지 않습니다. 디자인을 추가하시겠습니까, 아니면 기존 스타일을 기반으로 구현할까요?"
+- 기존에 정의된 공통 컴포넌트(`Switch`, `Button`, `Card` 등)가 있다면 **인라인 코드 대신 해당 컴포넌트를 재사용**하세요.
+
+### 디자인 시스템 컴포넌트 매핑 (.pen → 코드)
+| .pen 컴포넌트 | 코드 컴포넌트 | 경로 |
+|---|---|---|
+| Component/Switch/On, Off | `<Switch />` | `components/ui/switch.tsx` |
+| Component/SwitchRow | SwitchRow 패턴 (bg-surface 카드 + Switch) | 인라인 패턴 |
+| Component/Button/Primary | `bg-rh-accent` 버튼 | - |
+| Component/Card/Default | `ios-card` 클래스 | globals.css |
+
 ### Color Palette (RunHouse Design Tokens)
 RunHouse 프로젝트의 일관된 색상 시스템 (.pen 디자인 기준):
 

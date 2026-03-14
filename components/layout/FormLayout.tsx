@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { FiChevronLeft } from "react-icons/fi";
+import { ChevronLeft } from "lucide-react";
 
 interface FormLayoutProps {
   title: string;
@@ -23,7 +23,7 @@ export function FormLayout({ title, children }: FormLayoutProps) {
               onClick={() => router.back()}
               className='flex items-center text-white transition-colors hover:text-rh-text-secondary'
             >
-              <FiChevronLeft size={24} />
+              <ChevronLeft size={24} />
             </button>
           </div>
 

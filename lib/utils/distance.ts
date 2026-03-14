@@ -116,38 +116,53 @@ export interface LocationValidationResult {
 
 export const validateUserLocation = (
   userLocation: Coordinates,
-  activityLocations: (Coordinates & { name?: string })[],
-  allowedRadius: number = 50
+  activityLocations: (Coordinates & { name?: string; allowedRadius?: number })[],
+  defaultRadius: number = 50
 ): LocationValidationResult => {
   if (activityLocations.length === 0) {
     return {
-      isValid: true, // 활동장소가 설정되지 않은 경우 허용
+      isValid: true,
       message: '활동장소가 설정되지 않아 어디서든 출석 가능합니다.',
     };
   }
 
-  const closest = findClosestLocation(userLocation, activityLocations);
-  
-  if (!closest) {
-    return {
-      isValid: false,
-      message: '활동장소를 확인할 수 없습니다.',
-    };
+  let closestIndex = 0;
+  let closestDistance = calculateDistance(userLocation, activityLocations[0]);
+  let isAnyWithinRadius = false;
+  let withinRadiusIndex = -1;
+
+  for (let i = 0; i < activityLocations.length; i++) {
+    const distance = calculateDistance(userLocation, activityLocations[i]);
+    const radius = activityLocations[i].allowedRadius || defaultRadius;
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = i;
+    }
+
+    if (distance <= radius && !isAnyWithinRadius) {
+      isAnyWithinRadius = true;
+      withinRadiusIndex = i;
+    }
   }
 
-  const closestLocation = activityLocations[closest.index];
-  const isWithinRadius = closest.distance <= allowedRadius;
+  const resultIndex = isAnyWithinRadius ? withinRadiusIndex : closestIndex;
+  const resultLocation = activityLocations[resultIndex];
+  const resultDistance = isAnyWithinRadius
+    ? calculateDistance(userLocation, resultLocation)
+    : closestDistance;
+  const resultRadius = resultLocation.allowedRadius || defaultRadius;
 
   return {
-    isValid: isWithinRadius,
+    isValid: isAnyWithinRadius,
     closestLocation: {
-      index: closest.index,
-      name: closestLocation.name,
-      distance: closest.distance,
-      isWithinRadius,
+      index: resultIndex,
+      name: resultLocation.name,
+      distance: resultDistance,
+      isWithinRadius: isAnyWithinRadius,
     },
-    message: isWithinRadius
-      ? `${closestLocation.name || '활동장소'}에서 출석 가능합니다. (${formatDistance(closest.distance)})`
-      : `가장 가까운 ${closestLocation.name || '활동장소'}까지 ${formatDistance(closest.distance)}입니다. ${allowedRadius}m 이내로 이동해주세요.`,
+    message: isAnyWithinRadius
+      ? `${resultLocation.name || '활동장소'}에서 출석 가능합니다. (${formatDistance(resultDistance)})`
+      : `가장 가까운 ${resultLocation.name || '활동장소'}까지 ${formatDistance(closestDistance)}입니다. ${resultRadius}m 이내로 이동해주세요.`,
   };
 };

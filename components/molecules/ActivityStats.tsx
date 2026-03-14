@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { FiTrendingUp, FiAward, FiUsers } from "react-icons/fi";
+import { TrendingUp, Award, Users } from "lucide-react";
 import { UserActivityStatistics } from "@/lib/supabase/admin";
 
 interface ActivityStatsProps {
@@ -90,7 +90,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
     return (
       <div className='flex flex-col items-center justify-center py-16 text-center'>
         <div className='w-[4rem] h-[4rem] bg-red-500/20 rounded-full flex items-center justify-center mb-4'>
-          <FiTrendingUp className='w-[1.5rem] h-[1.5rem] text-red-400' />
+          <TrendingUp className='w-[1.5rem] h-[1.5rem] text-red-400' />
         </div>
         <p className='text-rh-text-secondary text-[0.875rem] mb-4'>{error}</p>
         <button
@@ -107,7 +107,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
     return (
       <div className='flex flex-col items-center justify-center py-16 text-center'>
         <div className='w-[4rem] h-[4rem] bg-rh-bg-muted/20 rounded-full flex items-center justify-center mb-4'>
-          <FiTrendingUp className='w-[1.5rem] h-[1.5rem] text-rh-text-secondary' />
+          <TrendingUp className='w-[1.5rem] h-[1.5rem] text-rh-text-secondary' />
         </div>
         <p className='text-rh-text-secondary text-[0.875rem]'>활동 데이터가 없습니다.</p>
       </div>
@@ -127,7 +127,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                 stat.user_rank
               )}`}
             >
-              <FiAward className='w-[0.75rem] h-[0.75rem] mr-0.5' />
+              <Award className='w-[0.75rem] h-[0.75rem] mr-0.5' />
               {stat.user_rank}위
             </div>
           </div>
@@ -150,7 +150,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
                 {stat.total_participants}
               </div>
               <div className='text-[0.75rem] text-rh-text-secondary flex items-center justify-center'>
-                <FiUsers className='w-[0.75rem] h-[0.75rem] mr-0.5' />
+                <Users className='w-[0.75rem] h-[0.75rem] mr-0.5' />
                 전체 참가자
               </div>
             </div>

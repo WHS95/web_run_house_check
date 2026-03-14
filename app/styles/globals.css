@@ -2,29 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 폰트 스무딩 */
-* {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-/* 하드웨어 가속 */
-.hw-accelerated {
-    transform: translateZ(0);
-    will-change: transform;
-}
-
-/* 네이티브 스크롤 최적화 */
-.native-scroll {
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.native-scroll::-webkit-scrollbar {
-    display: none;
-}
-
 @layer base {
     :root {
         /* === RunHouse Design System Tokens (.pen 기준) === */
@@ -340,9 +317,9 @@
         -moz-appearance: none;
         appearance: none;
         border-radius: var(--rh-radius-md);
-        padding: 0.75rem 1rem;
+        padding: 0 1rem;
         font-size: var(--rh-text-body);
-        line-height: 1.5;
+        line-height: 44px;
         width: 100%;
         height: 44px;
         outline: none;
@@ -434,10 +411,10 @@
         appearance: none;
         background-image: none;
         border-radius: var(--rh-radius-md);
-        padding: 0.75rem 1rem;
+        padding: 0 1rem;
         padding-right: 2.5rem;
         font-size: var(--rh-text-body);
-        line-height: 1.5;
+        line-height: 44px;
         width: 100%;
         height: 44px;
         outline: none;
@@ -458,22 +435,6 @@
         overscroll-behavior: contain;
     }
 
-    /* === Safe Area === */
-    .safe-area-top {
-        padding-top: var(--safe-area-inset-top);
-    }
-
-    .safe-area-bottom {
-        padding-bottom: var(--safe-area-inset-bottom);
-    }
-
-    .safe-area-left {
-        padding-left: var(--safe-area-inset-left);
-    }
-
-    .safe-area-right {
-        padding-right: var(--safe-area-inset-right);
-    }
 }
 
 /* Safe Area 유틸리티 */
@@ -525,6 +486,17 @@
             - var(--safe-area-inset-bottom)
         );
     }
+
+    /* 리스트 렌더링 최적화 */
+    .list-item-lazy {
+        content-visibility: auto;
+        contain-intrinsic-size: 0 72px;
+    }
+
+    .list-item-lazy-sm {
+        content-visibility: auto;
+        contain-intrinsic-size: 0 56px;
+    }
 }
 
 /* 폰트 */
@@ -532,6 +504,7 @@
     font-family: 'Apple SD Gothic Neo';
     font-style: normal;
     font-weight: 300;
+    font-display: swap;
     src: local('Apple SD Gothic Neo Light');
 }
 
@@ -539,6 +512,7 @@
     font-family: 'Apple SD Gothic Neo';
     font-style: normal;
     font-weight: 400;
+    font-display: swap;
     src: local('Apple SD Gothic Neo Regular');
 }
 
@@ -546,6 +520,7 @@
     font-family: 'Apple SD Gothic Neo';
     font-style: normal;
     font-weight: 600;
+    font-display: swap;
     src: local('Apple SD Gothic Neo Bold');
 }
 
@@ -553,6 +528,7 @@
     font-family: 'SF Pro Text';
     font-style: normal;
     font-weight: 400;
+    font-display: swap;
     src: local('SF Pro Text Regular');
 }
 
@@ -560,12 +536,13 @@
     font-family: 'SF Pro Text';
     font-style: normal;
     font-weight: 600;
+    font-display: swap;
     src: local('SF Pro Text Semibold');
 }
 
 /* Black Han Sans 구글 폰트 */
 .black-han-sans-regular {
-    font-family: "Black Han Sans", sans-serif;
+    font-family: var(--font-black-han-sans), "Black Han Sans", sans-serif;
     font-weight: 400;
     font-style: normal;
 }
@@ -581,8 +558,97 @@
 
 /* 앱 시작 시 깜빡임 방지 */
 html, body {
-    background-color: #1D2530 !important;
+    background-color: #0F1318 !important;
     overflow-x: hidden;
+}
+
+/* === 모바일 뷰포트 래퍼 (데스크탑에서 폰 형태) === */
+.mobile-viewport-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-color: #0F1318;
+}
+
+.mobile-viewport {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #1D2530;
+    position: relative;
+}
+
+/* 데스크탑(431px 이상)에서 폰 프레임 적용 */
+@media (min-width: 431px) {
+    .mobile-viewport-wrapper {
+        align-items: center;
+        padding: 24px 0;
+    }
+
+    .mobile-viewport {
+        max-width: 390px;
+        min-height: 0;
+        height: 844px;
+        border-radius: 40px;
+        overflow: hidden;
+        box-shadow:
+            0 0 0 10px #1a1a1a,
+            0 0 0 12px #333,
+            0 25px 60px rgba(0, 0, 0, 0.5);
+        position: relative;
+    }
+
+    /* 상단 노치 */
+    .mobile-viewport::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 28px;
+        background-color: #000;
+        border-radius: 0 0 16px 16px;
+        z-index: 9999;
+    }
+
+    /* 하단 홈 인디케이터 */
+    .mobile-viewport::after {
+        content: '';
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 134px;
+        height: 5px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 100px;
+        z-index: 9999;
+    }
+
+    /* fixed 요소를 mobile-viewport 내에서 absolute로 변환 */
+    .mobile-viewport .ios-tab-bar,
+    .mobile-viewport .ios-nav-bar {
+        position: absolute;
+    }
+
+    /* 모든 fixed 포지셔닝을 absolute로 변환 */
+    .mobile-viewport [class*="fixed"] {
+        position: absolute !important;
+    }
+
+    /* h-screen(100vh)을 mobile-viewport 높이에 맞추기 */
+    .mobile-viewport .main-content {
+        height: 100%;
+    }
+
+    .mobile-viewport .h-screen {
+        height: 100% !important;
+    }
+
+    .mobile-viewport .min-h-screen {
+        min-height: 100% !important;
+    }
 }
 
 /* 스플래시 로고 애니메이션 */

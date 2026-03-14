@@ -6,14 +6,8 @@ import ChartWithAxis from "@/components/molecules/ChartWithAxis";
 import LocationChart from "@/components/molecules/LocationChart";
 import MemberAttendanceStatusChart from "@/components/molecules/MemberAttendanceStatusChart";
 import AdminPageContainer from "@/components/layouts/AdminPageContainer";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 // 참여율에 따른 블루 그래디언트 색상 반환
@@ -430,6 +424,7 @@ function AnalyzeLoadingSkeleton() {
 
 export default function AnalyzePage() {
   const { crewId } = useAdminContext();
+  const router = useRouter();
   const [analyzeData, setAnalyzeData] = useState<AnalyzeData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -526,97 +521,112 @@ export default function AnalyzePage() {
   return (
     <AdminPageContainer>
       {/* 헤더 */}
-      <div className='flex justify-between items-center mb-6 sticky top-4 lg:top-6 z-30 bg-rh-bg-primary py-4'>
-        <div>
-          <h1 className='text-xl font-bold text-white'>통계</h1>
+      <div className='sticky top-4 lg:top-6 z-30 bg-rh-bg-primary py-4'>
+        <div className='flex items-center mb-4'>
+          <button
+            onClick={() => router.back()}
+            className='p-1 mr-2 text-white'
+          >
+            <ChevronLeft className='w-6 h-6' />
+          </button>
+          <h1 className='text-xl font-bold text-white'>통계 분석</h1>
         </div>
 
-        {/* 년도/월 선택 드롭다운 */}
-        <div className='flex space-x-2'>
-          {/* 년도 선택 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant='outline'
-                size='sm'
-                className='text-white bg-rh-bg-surface border-rh-border hover:bg-rh-bg-muted min-w-20'
-              >
-                {selectedYear}년
-                <ChevronDown className='ml-1 w-4 h-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align='end'
-              className='bg-rh-bg-surface border-rh-border'
-            >
-              {yearOptions.map((year) => (
-                <DropdownMenuItem
-                  key={year}
-                  onClick={() => setSelectedYear(year)}
-                  className={`text-white hover:bg-rh-bg-muted ${
-                    selectedYear === year ? "bg-rh-accent" : ""
-                  }`}
-                >
-                  {year}년
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* 년도 네비게이터 */}
+        <div className='flex items-center justify-center gap-4 mb-4'>
+          <button
+            onClick={() => setSelectedYear(selectedYear - 1)}
+            className='p-1 text-rh-text-secondary hover:text-white transition-colors'
+          >
+            <ChevronLeft className='w-5 h-5' />
+          </button>
+          <span className='text-base font-semibold text-white'>
+            {selectedYear}년
+          </span>
+          <button
+            onClick={() => setSelectedYear(selectedYear + 1)}
+            className='p-1 text-rh-text-secondary hover:text-white transition-colors'
+          >
+            <ChevronRight className='w-5 h-5' />
+          </button>
+        </div>
 
-          {/* 월 선택 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant='outline'
-                size='sm'
-                className='text-white bg-rh-bg-surface border-rh-border hover:bg-rh-bg-muted min-w-16'
-              >
-                {selectedMonth}월
-                <ChevronDown className='ml-1 w-4 h-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align='end'
-              className='bg-rh-bg-surface border-rh-border'
+        {/* 월 선택 가로 스크롤 */}
+        <div className='flex gap-2 overflow-x-auto pb-1 scrollbar-hide'>
+          {monthOptions.map((month) => (
+            <button
+              key={month}
+              onClick={() => setSelectedMonth(month)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                selectedMonth === month
+                  ? "bg-rh-accent text-white"
+                  : "text-rh-text-secondary hover:text-white"
+              }`}
             >
-              {monthOptions.map((month) => (
-                <DropdownMenuItem
-                  key={month}
-                  onClick={() => setSelectedMonth(month)}
-                  className={`text-white hover:bg-rh-bg-muted ${
-                    selectedMonth === month ? "bg-rh-accent" : ""
-                  }`}
-                >
-                  {month}월
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              {month}월
+            </button>
+          ))}
         </div>
       </div>
 
       {/* 차트 컨텐츠 */}
-      <div className='space-y-6'>
-        <MemberAttendanceStatusChart
-          title='전체 인원 대비 출석 현황'
-          data={analyzeData.memberAttendanceStatus}
-          year={analyzeData.year}
-          month={analyzeData.month}
-        />
+      <div className='space-y-4 mt-4'>
+        {/* 요일별 참여율 카드 */}
+        <div className='bg-rh-bg-surface rounded-rh-md p-4'>
+          <div className='flex items-center justify-between mb-3'>
+            <h3 className='text-sm font-semibold text-white'>요일별 참여율</h3>
+            <button
+              onClick={() => router.push("/admin/analyze/day-detail")}
+              className='text-xs text-rh-accent hover:text-rh-accent-hover transition-colors'
+            >
+              상세
+            </button>
+          </div>
+          <ChartWithAxis
+            title=''
+            data={analyzeData.dayParticipation}
+            year={analyzeData.year}
+            month={analyzeData.month}
+          />
+        </div>
 
-        <ChartWithAxis
-          title='요일별 출석 분석'
-          data={analyzeData.dayParticipation}
-          year={analyzeData.year}
-          month={analyzeData.month}
-        />
+        {/* 장소별 참여율 카드 */}
+        <div className='bg-rh-bg-surface rounded-rh-md p-4'>
+          <div className='flex items-center justify-between mb-3'>
+            <h3 className='text-sm font-semibold text-white'>장소별 참여율</h3>
+            <button
+              onClick={() => router.push("/admin/analyze/place-detail")}
+              className='text-xs text-rh-accent hover:text-rh-accent-hover transition-colors'
+            >
+              상세
+            </button>
+          </div>
+          <LocationChart
+            title=''
+            data={analyzeData.locationParticipation}
+            year={analyzeData.year}
+            month={analyzeData.month}
+          />
+        </div>
 
-        <LocationChart
-          title='장소별 출석 분석'
-          data={analyzeData.locationParticipation}
-          year={analyzeData.year}
-          month={analyzeData.month}
-        />
+        {/* 전체 대비 출석 현황 카드 */}
+        <div className='bg-rh-bg-surface rounded-rh-md p-4'>
+          <div className='flex items-center justify-between mb-3'>
+            <h3 className='text-sm font-semibold text-white'>전체 대비 출석 현황</h3>
+            <button
+              onClick={() => router.push("/admin/analyze/overall-detail")}
+              className='text-xs text-rh-accent hover:text-rh-accent-hover transition-colors'
+            >
+              상세
+            </button>
+          </div>
+          <MemberAttendanceStatusChart
+            title=''
+            data={analyzeData.memberAttendanceStatus}
+            year={analyzeData.year}
+            month={analyzeData.month}
+          />
+        </div>
       </div>
     </AdminPageContainer>
   );

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { FaRegUserCircle } from "react-icons/fa";
+import { UserCircle } from "lucide-react";
 
 interface HeaderProps {
   title?: string;
@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
                   className='p-2 rounded-full transition-colors active:bg-rh-bg-muted'
                 >
                   <div className='relative w-6 h-6 text-rh-accent'>
-                    <FaRegUserCircle size={24} />
+                    <UserCircle size={24} />
                   </div>
                 </Link>
               </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiHome, FiUser, FiCalendar, FiBarChart2 } from "react-icons/fi";
+import { Home, User, Calendar, BarChart2 } from "lucide-react";
 
 export default function AdminBottomNav() {
   const pathname = usePathname();
@@ -14,7 +14,7 @@ export default function AdminBottomNav() {
   const navItems = [
     {
       href: "/admin",
-      icon: FiHome,
+      icon: Home,
       label: "홈",
       isActive:
         isActive("/admin") &&
@@ -24,19 +24,19 @@ export default function AdminBottomNav() {
     },
     {
       href: "/admin/user",
-      icon: FiUser,
+      icon: User,
       label: "회원",
       isActive: isActive("/admin/user"),
     },
     {
       href: "/admin/attendance/calendar",
-      icon: FiCalendar,
+      icon: Calendar,
       label: "출석",
       isActive: isActive("/admin/attendance"),
     },
     {
       href: "/admin/stats",
-      icon: FiBarChart2,
+      icon: BarChart2,
       label: "통계",
       isActive: isActive("/admin/stats"),
     },

@@ -517,7 +517,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
             (userStatus && !userStatus.isActive) ||
             (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
           }
-          className={`rounded-xl h-[52px] w-full text-base font-semibold text-white transition-all duration-200 active:scale-[0.97] hw-accelerated ${
+          className={`rounded-rh-lg h-[52px] w-full text-base font-semibold text-white transition-all duration-200 active:scale-[0.97] hw-accelerated ${
             isSubmitting ||
             (userStatus && !userStatus.isActive) ||
             (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)

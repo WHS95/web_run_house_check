@@ -109,7 +109,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
 
   const getStatusColor = () => {
     switch (locationStatus) {
-      case 'allowed': return 'text-rh-accent';
+      case 'allowed': return 'text-[#8BB5F5]';
       case 'checking': return 'text-rh-text-secondary';
       case 'out_of_range':
       case 'error': return 'text-rh-status-error';

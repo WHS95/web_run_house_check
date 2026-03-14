@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { MapPin, Users, Ticket, Megaphone } from "lucide-react";
 import AdminCrewMembersManagement from "@/components/organisms/AdminCrewMembersManagement";
 import AdminInviteCodesManagement from "@/components/organisms/AdminInviteCodesManagement";
 import AdminNoticeManagement from "@/components/organisms/AdminNoticeManagement";
+import AdminGradeManagement from "@/components/organisms/AdminGradeManagement";
 import CrewLocationManagement from "@/components/admin/locations/CrewLocationManagement";
 import NaverMapLoader from "@/components/map/NaverMapLoader";
 
@@ -34,13 +34,13 @@ export default function AdminSettingsManagementNew({
 }: AdminSettingsManagementProps) {
   // 탭 상태
   const [activeTab, setActiveTab] = useState<
-    "locations" | "members" | "invites" | "notices"
+    "locations" | "members" | "invites" | "notices" | "grades"
   >("locations");
 
   const [localLocationBasedAttendance, setLocalLocationBasedAttendance] = useState(locationBasedAttendance);
 
   // 탭 변경 핸들러 최적화
-  const handleTabChange = useCallback((tab: "locations" | "members" | "invites" | "notices") => {
+  const handleTabChange = useCallback((tab: "locations" | "members" | "invites" | "notices" | "grades") => {
     haptic.light();
     setActiveTab(tab);
     
@@ -56,51 +56,47 @@ export default function AdminSettingsManagementNew({
         <InviteCodeProvider initialInviteCodes={initialInviteCodes}>
           <AdminPageContainer>
         {/* 탭 네비게이션 */}
-        <div className='sticky top-4 z-30 p-2 rounded-lg shadow-sm bg-rh-bg-surface lg:top-6'>
-          <div className='flex p-1 rounded-lg bg-rh-bg-muted/30'>
+        <div className='sticky top-4 z-30 lg:top-6'>
+          <div className='bg-rh-bg-surface rounded-lg p-1 flex'>
             <button
               onClick={() => handleTabChange("locations")}
-              className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all text-center ${
                 activeTab === "locations"
-                  ? "bg-rh-accent text-white shadow-sm"
+                  ? "bg-rh-accent text-white"
                   : "text-rh-text-secondary hover:text-white"
               }`}
             >
-              <MapPin className='w-4 h-4' />
-              <span className='hidden sm:inline'>장소</span>
+              장소
             </button>
             <button
               onClick={() => handleTabChange("members")}
-              className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all text-center ${
                 activeTab === "members"
-                  ? "bg-rh-accent text-white shadow-sm"
+                  ? "bg-rh-accent text-white"
                   : "text-rh-text-secondary hover:text-white"
               }`}
             >
-              <Users className='w-4 h-4' />
-              <span className='hidden sm:inline'>운영진</span>
+              운영진
             </button>
             <button
               onClick={() => handleTabChange("invites")}
-              className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all text-center ${
                 activeTab === "invites"
-                  ? "bg-rh-accent text-white shadow-sm"
+                  ? "bg-rh-accent text-white"
                   : "text-rh-text-secondary hover:text-white"
               }`}
             >
-              <Ticket className='w-4 h-4' />
-              <span className='hidden sm:inline'>초대코드</span>
+              초대코드
             </button>
             <button
-              onClick={() => handleTabChange("notices")}
-              className={`flex-1 py-3 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                activeTab === "notices"
-                  ? "bg-rh-accent text-white shadow-sm"
+              onClick={() => handleTabChange("grades")}
+              className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all text-center ${
+                activeTab === "grades"
+                  ? "bg-rh-accent text-white"
                   : "text-rh-text-secondary hover:text-white"
               }`}
             >
-              <Megaphone className='w-4 h-4' />
-              <span className='hidden sm:inline'>공지</span>
+              등급
             </button>
           </div>
         </div>
@@ -128,6 +124,11 @@ export default function AdminSettingsManagementNew({
         {/* 공지 관리 */}
         {activeTab === "notices" && (
           <AdminNoticeManagement crewId={crewId} />
+        )}
+
+        {/* 등급 관리 */}
+        {activeTab === "grades" && (
+          <AdminGradeManagement crewId={crewId} />
         )}
           </AdminPageContainer>
         </InviteCodeProvider>

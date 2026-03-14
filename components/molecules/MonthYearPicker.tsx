@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { FiChevronDown } from "react-icons/fi";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { ChevronDown } from "lucide-react";
 
 interface MonthYearPickerProps {
   selectedYear: number;
@@ -54,10 +54,13 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     };
   }, []);
 
-  const handleYearMonthSelect = (year: number, month: number) => {
-    onDateChange(year, month);
-    setIsOpen(false);
-  };
+  const handleYearMonthSelect = useCallback(
+    (year: number, month: number) => {
+      onDateChange(year, month);
+      setIsOpen(false);
+    },
+    [onDateChange]
+  );
 
   const formatDisplayText = () => {
     return `${selectedYear}년 ${selectedMonth}월`;
@@ -71,28 +74,28 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
         className='flex items-center justify-between w-full text-white text-[1.125rem] font-medium focus:outline-none'
       >
         <span>{formatDisplayText()}</span>
-        <FiChevronDown
-          className={`w-[1rem] h-[1rem] text-gray-400 transition-transform ${
+        <ChevronDown
+          className={`w-[1rem] h-[1rem] text-rh-text-secondary transition-transform ${
             isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {/* 드롭다운 메뉴 */}
       {isOpen && (
-        <div className='absolute top-full left-0 right-0 mt-[1vh] bg-basic-gray rounded-[1rem] shadow-lg z-50 max-h-[50vh] overflow-hidden'>
-          <div className='p-[4vw]'>
+        <div className='absolute top-full left-0 right-0 mt-2 bg-rh-bg-muted rounded-rh-xl shadow-lg z-50 max-h-[50vh] overflow-hidden'>
+          <div className='p-4'>
             {/* 년도 선택 섹션 */}
-            <div className='mb-[3vh]'>
-              <h3 className='text-white text-[0.875rem] mb-[2vh]'>년</h3>
-              <div className='grid grid-cols-5 gap-[2vw]'>
+            <div className='mb-6'>
+              <h3 className='text-white text-[0.875rem] mb-4'>년</h3>
+              <div className='grid grid-cols-5 gap-2'>
                 {years.map((year) => (
                   <button
                     key={year}
                     onClick={() => handleYearMonthSelect(year, selectedMonth)}
-                    className={`py-[1.5vh] text-center rounded-[0.5rem] text-[0.875rem] font-medium transition-colors ${
+                    className={`py-1.5 text-center rounded-rh-md text-[0.875rem] font-medium transition-colors ${
                       year === selectedYear
-                        ? "bg-white text-basic-black"
-                        : "text-gray-300 hover:text-white hover:bg-gray-600"
+                        ? "bg-rh-accent text-white"
+                        : "text-rh-text-secondary hover:text-white hover:bg-rh-bg-surface"
                     }`}
                   >
                     {year}
@@ -103,18 +106,18 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
 
             {/* 월 선택 섹션 */}
             <div>
-              <h3 className='text-gray-400 text-[0.875rem] mb-[2vh]'>월</h3>
-              <div className='grid grid-cols-4 gap-[2vw]'>
+              <h3 className='text-rh-text-secondary text-[0.875rem] mb-4'>월</h3>
+              <div className='grid grid-cols-4 gap-2'>
                 {months.map((month) => (
                   <button
                     key={month.value}
                     onClick={() =>
                       handleYearMonthSelect(selectedYear, month.value)
                     }
-                    className={`py-[1.5vh] text-center rounded-[0.5rem] text-[0.875rem] font-medium transition-colors ${
+                    className={`py-1.5 text-center rounded-rh-md text-[0.875rem] font-medium transition-colors ${
                       month.value === selectedMonth
-                        ? "bg-white text-basic-black"
-                        : "text-gray-300 hover:text-white hover:bg-gray-600"
+                        ? "bg-rh-accent text-white"
+                        : "text-rh-text-secondary hover:text-white hover:bg-rh-bg-surface"
                     }`}
                   >
                     {month.label}

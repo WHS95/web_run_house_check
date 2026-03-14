@@ -251,17 +251,17 @@ export default function BulkAttendanceManagement({
 
   if (isLoading) {
     return (
-      <div className='space-y-[3vh] animate-pulse'>
+      <div className='space-y-3 animate-pulse'>
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className='bg-basic-black-gray rounded-[0.75rem] p-[4vw]'
+            className='bg-rh-bg-surface rounded-rh-lg p-4'
           >
-            <div className='flex items-center space-x-[3vw]'>
-              <div className='w-[3rem] h-[3rem] bg-basic-gray rounded-full'></div>
-              <div className='flex-1 space-y-[1vh]'>
-                <div className='h-[1rem] bg-basic-gray rounded w-[30vw]'></div>
-                <div className='h-[0.875rem] bg-basic-gray rounded w-[50vw]'></div>
+            <div className='flex items-center space-x-3'>
+              <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
+              <div className='flex-1 space-y-1'>
+                <div className='h-[1rem] bg-rh-bg-muted rounded w-[120px]'></div>
+                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-1/2'></div>
               </div>
             </div>
           </div>
@@ -273,21 +273,21 @@ export default function BulkAttendanceManagement({
   return (
     <div className='space-y-6'>
       {/* 헤더 */}
-      <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
-        <div className='p-[4vw] border-b border-basic-gray'>
-          <div className='flex items-center space-x-[2vw]'>
-            <UserPlus className='w-[1.25rem] h-[1.25rem] text-basic-blue' />
+      <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
+        <div className='p-4 border-b border-rh-border'>
+          <div className='flex items-center space-x-2'>
+            <UserPlus className='w-[1.25rem] h-[1.25rem] text-rh-accent' />
             <span className='text-[1.125rem] font-bold text-white'>
               출석 관리
             </span>
-            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-basic-gray rounded-full text-[0.75rem] font-medium text-gray-300'>
+            <div className='ml-1 px-2 py-0.5 bg-rh-bg-muted rounded-full text-[0.75rem] font-medium text-rh-text-secondary'>
               {selectedUsers.size}명 선택됨
             </div>
           </div>
         </div>
 
         {/* 출석 정보 입력 */}
-        <div className='p-[4vw] space-y-[3vh]'>
+        <div className='p-4 space-y-3'>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
             {/* 날짜 */}
             <div>
@@ -300,8 +300,8 @@ export default function BulkAttendanceManagement({
                 onChange={(e) =>
                   handleAttendanceDataChange("date", e.target.value)
                 }
-                className='w-full text-white border-0 bg-basic-black placeholder:text-gray-400'
-                //  className='justify-between w-full text-white border-0 bg-basic-black'
+                className='w-full text-white border-0 bg-rh-bg-primary placeholder:text-rh-text-secondary'
+                //  className='justify-between w-full text-white border-0 bg-rh-bg-primary'
               />
             </div>
 
@@ -316,7 +316,7 @@ export default function BulkAttendanceManagement({
                 onChange={(e) =>
                   handleAttendanceDataChange("time", e.target.value)
                 }
-                className='text-white border-0 bg-basic-black placeholder:text-gray-400'
+                className='text-white border-0 bg-rh-bg-primary placeholder:text-rh-text-secondary'
               />
             </div>
 
@@ -329,7 +329,7 @@ export default function BulkAttendanceManagement({
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant='outline'
-                    className='justify-between w-full text-white border-0 bg-basic-black'
+                    className='justify-between w-full text-white border-0 bg-rh-bg-primary'
                   >
                     {locations.find(
                       (l) => l.id.toString() === attendanceData.location
@@ -337,7 +337,7 @@ export default function BulkAttendanceManagement({
                     <MapPin className='w-4 h-4' />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className='w-full border-0 bg-basic-black-gray'>
+                <DropdownMenuContent className='w-full border-0 bg-rh-bg-surface'>
                   {locations.map((location) => (
                     <DropdownMenuItem
                       key={location.id}
@@ -347,7 +347,7 @@ export default function BulkAttendanceManagement({
                           location.id.toString()
                         )
                       }
-                      className='text-white hover:bg-basic-gray'
+                      className='text-white hover:bg-rh-bg-muted'
                     >
                       {location.name}
                     </DropdownMenuItem>
@@ -361,7 +361,7 @@ export default function BulkAttendanceManagement({
           <Button
             onClick={handleBulkAttendance}
             disabled={isSubmitting || selectedUsers.size === 0}
-            className='w-full bg-basic-blue hover:bg-basic-blue/80 disabled:bg-basic-gray'
+            className='w-full bg-rh-accent hover:bg-rh-accent-hover/80 disabled:bg-rh-bg-muted'
           >
             {isSubmitting ? (
               <>
@@ -379,23 +379,23 @@ export default function BulkAttendanceManagement({
       </div>
 
       {/* 사용자 검색 및 선택 */}
-      <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
-        <div className='p-[4vw] border-b border-basic-gray'>
-          <div className='flex items-center space-x-[2vw]'>
+      <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
+        <div className='p-4 border-b border-rh-border'>
+          <div className='flex items-center space-x-2'>
             {/* <Users className='w-[1.25rem] h-[1.25rem] text-white' /> */}
             <span className='text-[1.125rem] font-bold text-white'>크루원</span>
           </div>
         </div>
 
-        <div className='p-[4vw] space-y-[3vh]'>
+        <div className='p-4 space-y-3'>
           {/* 검색 */}
           <div className='relative'>
-            <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
+            <Search className='absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2' />
             <Input
               placeholder='이름, 이메일, 전화번호, 출생연도로 검색'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className='pl-10 text-white border-0 bg-basic-black placeholder:text-gray-400'
+              className='pl-10 text-white border-0 bg-rh-bg-primary placeholder:text-rh-text-secondary'
             />
           </div>
 
@@ -405,7 +405,7 @@ export default function BulkAttendanceManagement({
               variant='outline'
               size='sm'
               onClick={toggleAllUsers}
-              className='text-white border-0 bg-basic-black-gray hover:bg-basic-gray'
+              className='text-white border-0 bg-rh-bg-surface hover:bg-rh-bg-muted'
             >
               {selectedUsers.size === filteredUsers.length ? (
                 <>
@@ -419,7 +419,7 @@ export default function BulkAttendanceManagement({
                 </>
               )}
             </Button>
-            <span className='text-sm text-gray-400'>
+            <span className='text-sm text-rh-text-secondary'>
               {filteredUsers.length}명 중 {selectedUsers.size}명 선택
             </span>
           </div>
@@ -432,8 +432,8 @@ export default function BulkAttendanceManagement({
                 onClick={() => toggleUserSelection(user.id)}
                 className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                   selectedUsers.has(user.id)
-                    ? "bg-basic-blue/20 border-basic-blue"
-                    : "bg-basic-black border-basic-gray hover:bg-basic-gray/20"
+                    ? "bg-rh-accent/20 border-rh-accent"
+                    : "bg-rh-bg-primary border-rh-border hover:bg-rh-bg-muted/20"
                 }`}
               >
                 <div className='flex justify-between items-center'>
@@ -442,8 +442,8 @@ export default function BulkAttendanceManagement({
                       <div
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                           selectedUsers.has(user.id)
-                            ? "bg-basic-blue border-basic-blue"
-                            : "border-gray-400"
+                            ? "bg-rh-accent border-rh-accent"
+                            : "border-rh-border"
                         }`}
                       >
                         {selectedUsers.has(user.id) && (
@@ -456,16 +456,16 @@ export default function BulkAttendanceManagement({
                             {user.first_name}
                           </h4>
                           {user.birth_year && (
-                            <span className='px-2 py-1 text-xs font-medium text-gray-300 rounded-full bg-basic-gray'>
+                            <span className='px-2 py-1 text-xs font-medium text-rh-text-secondary rounded-full bg-rh-bg-muted'>
                               {user.birth_year}
                             </span>
                           )}
                         </div>
-                        {/* <p className='text-sm text-gray-300'>
+                        {/* <p className='text-sm text-rh-text-secondary'>
                           {user.email || user.phone || "연락처 없음"}
                         </p> */}
                         {/* {user.birth_year && (
-                          <p className='text-xs text-gray-400'>
+                          <p className='text-xs text-rh-text-secondary'>
                             {user.birth_year}년생
                           </p>
                         )} */}
@@ -479,13 +479,13 @@ export default function BulkAttendanceManagement({
 
           {filteredUsers.length === 0 && (
             <div className='py-8 text-center'>
-              <Users className='mx-auto mb-4 w-16 h-16 text-gray-500' />
-              <p className='mb-2 text-lg font-medium text-gray-300'>
+              <Users className='mx-auto mb-4 w-16 h-16 text-rh-text-tertiary' />
+              <p className='mb-2 text-lg font-medium text-rh-text-secondary'>
                 {searchTerm
                   ? "검색 결과가 없습니다"
                   : "등록된 사용자가 없습니다"}
               </p>
-              <p className='text-gray-400'>
+              <p className='text-rh-text-secondary'>
                 {searchTerm
                   ? "다른 검색어를 시도해보세요"
                   : "사용자가 등록되면 여기에 표시됩니다"}

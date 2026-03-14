@@ -10,15 +10,28 @@ import { haptic } from "@/lib/haptic";
 
 interface HomePageData {
   userName: string;
+  crewId: string | null;
   crewName: string | null;
   noticeText: string | null;
 }
 
-interface ClientHomePageProps {
-  initialData: HomePageData;
+interface RecentActivity {
+  id: string;
+  userName: string;
+  location: string;
+  exerciseType: string;
+  time: string;
 }
 
-const ClientHomePage: React.FC<ClientHomePageProps> = ({ initialData }) => {
+interface ClientHomePageProps {
+  initialData: HomePageData;
+  recentActivities?: RecentActivity[];
+}
+
+const ClientHomePage: React.FC<ClientHomePageProps> = ({
+  initialData,
+  recentActivities = [],
+}) => {
   const router = useRouter();
   const [pageData] = useState<HomePageData>(initialData);
   
@@ -67,9 +80,11 @@ const ClientHomePage: React.FC<ClientHomePageProps> = ({ initialData }) => {
     <>
       <EnhancedHomeTemplate
         username={pageData.userName}
+        crewId={pageData.crewId}
         crewName={pageData.crewName}
-        rankName='Beginer' // 기본값으로 고정
+        rankName='Beginer'
         noticeText={pageData.noticeText}
+        recentActivities={recentActivities}
       />
       
       {/* 알림 */}

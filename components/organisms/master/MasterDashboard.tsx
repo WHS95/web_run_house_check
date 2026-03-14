@@ -67,48 +67,48 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
     <div className="space-y-6">
       {/* 페이지 제목 */}
       <div className="flex items-center space-x-3">
-        <Shield className="w-6 h-6 text-basic-blue" />
+        <Shield className="w-6 h-6 text-rh-accent" />
         <div>
           <h1 className="text-xl font-semibold text-white">마스터 대시보드</h1>
-          <p className="text-sm text-gray-300">전체 크루 및 초대 코드 현황을 확인합니다.</p>
+          <p className="text-sm text-rh-text-secondary">전체 크루 및 초대 코드 현황을 확인합니다.</p>
         </div>
       </div>
 
       {/* 통계 카드들 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-basic-black-gray border-basic-gray">
+        <Card className="bg-rh-bg-surface border-rh-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                <p className="text-xs font-medium text-rh-text-secondary uppercase tracking-wide">
                   총 크루 수
                 </p>
                 <p className="text-2xl font-bold text-white">{totalCrews}</p>
               </div>
-              <Building2 className="w-8 h-8 text-basic-blue" />
+              <Building2 className="w-8 h-8 text-rh-accent" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-basic-black-gray border-basic-gray">
+        <Card className="bg-rh-bg-surface border-rh-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                <p className="text-xs font-medium text-rh-text-secondary uppercase tracking-wide">
                   총 초대 코드
                 </p>
                 <p className="text-2xl font-bold text-white">{totalInviteCodes}</p>
               </div>
-              <Key className="w-8 h-8 text-basic-blue" />
+              <Key className="w-8 h-8 text-rh-accent" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-basic-black-gray border-basic-gray">
+        <Card className="bg-rh-bg-surface border-rh-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                <p className="text-xs font-medium text-rh-text-secondary uppercase tracking-wide">
                   활성 코드
                 </p>
                 <p className="text-2xl font-bold text-white">{activeInviteCodes}</p>
@@ -118,11 +118,11 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
           </CardContent>
         </Card>
 
-        <Card className="bg-basic-black-gray border-basic-gray">
+        <Card className="bg-rh-bg-surface border-rh-border">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                <p className="text-xs font-medium text-rh-text-secondary uppercase tracking-wide">
                   이번 주 신규
                 </p>
                 <p className="text-2xl font-bold text-white">{recentCrews}</p>
@@ -134,7 +134,7 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
       </div>
 
       {/* 최근 활동 */}
-      <Card className="bg-basic-black-gray border-basic-gray">
+      <Card className="bg-rh-bg-surface border-rh-border">
         <CardHeader>
           <CardTitle className="text-white flex items-center space-x-2">
             <Clock className="w-5 h-5" />
@@ -143,17 +143,17 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
         </CardHeader>
         <CardContent>
           {recentActivities.length === 0 ? (
-            <p className="text-gray-400 text-center py-4">최근 활동이 없습니다.</p>
+            <p className="text-rh-text-secondary text-center py-4">최근 활동이 없습니다.</p>
           ) : (
             <div className="space-y-3">
               {recentActivities.map((activity, index) => {
                 const Icon = activity.icon;
                 return (
-                  <div key={index} className="flex items-center space-x-3 p-3 bg-basic-black rounded-lg">
-                    <Icon className="w-5 h-5 text-basic-blue" />
+                  <div key={index} className="flex items-center space-x-3 p-3 bg-rh-bg-primary rounded-lg">
+                    <Icon className="w-5 h-5 text-rh-accent" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-white">{activity.title}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-rh-text-secondary">
                         {new Date(activity.time).toLocaleDateString('ko-KR', {
                           year: 'numeric',
                           month: 'long',
@@ -182,7 +182,7 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
       </Card>
 
       {/* 크루별 초대 코드 현황 */}
-      <Card className="bg-basic-black-gray border-basic-gray">
+      <Card className="bg-rh-bg-surface border-rh-border">
         <CardHeader>
           <CardTitle className="text-white flex items-center space-x-2">
             <Users className="w-5 h-5" />
@@ -191,7 +191,7 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
         </CardHeader>
         <CardContent>
           {crews.length === 0 ? (
-            <p className="text-gray-400 text-center py-4">생성된 크루가 없습니다.</p>
+            <p className="text-rh-text-secondary text-center py-4">생성된 크루가 없습니다.</p>
           ) : (
             <div className="space-y-3">
               {crews.map((crew) => {
@@ -199,15 +199,15 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
                 const activeCodes = crewCodes.filter(code => code.is_active);
                 
                 return (
-                  <div key={crew.id} className="flex items-center justify-between p-3 bg-basic-black rounded-lg">
+                  <div key={crew.id} className="flex items-center justify-between p-3 bg-rh-bg-primary rounded-lg">
                     <div className="flex-1">
                       <h4 className="font-medium text-white">{crew.name}</h4>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-rh-text-secondary">
                         생성: {new Date(crew.created_at).toLocaleDateString('ko-KR')}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant="outline" className="bg-basic-blue text-white border-basic-blue">
+                      <Badge variant="outline" className="bg-rh-accent text-white border-rh-accent">
                         총 {crewCodes.length}개
                       </Badge>
                       <Badge variant="outline" className="bg-green-600 text-white border-green-600">

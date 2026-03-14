@@ -16,7 +16,6 @@ const nextConfig = {
       "@radix-ui/react-slot",
       "@radix-ui/react-tooltip",
       "lucide-react",
-      "react-icons",
       "framer-motion",
     ],
     turbo: {

@@ -2,581 +2,709 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 페이지 전환 애니메이션 최적화 */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* 하드웨어 가속 */
-.hw-accelerated {
-  transform: translateZ(0);
-  will-change: transform;
-}
-
-/* 네이티브 스크롤 최적화 */
-.native-scroll {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.native-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-/* 터치 피드백 최적화 */
-.native-shadow {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* 스플래시 애니메이션 */
-.splash-dot {
-  animation: splash-pulse 1.4s ease-in-out infinite both;
-}
-
-.splash-dot:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-.splash-dot:nth-child(3) {
-  animation-delay: -0.32s;
-}
-
-@keyframes splash-pulse {
-  0%, 80%, 100% {
-    transform: scale(0);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* 페이지 전환 제거 - 즉시 네비게이션 */
-body {
-  overflow-x: hidden;
-}
-
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-    
-    /* 네이티브 앱 추가 변수 */
-    --safe-area-inset-top: env(safe-area-inset-top);
-    --safe-area-inset-right: env(safe-area-inset-right);
-    --safe-area-inset-bottom: env(safe-area-inset-bottom);
-    --safe-area-inset-left: env(safe-area-inset-left);
-  }
-  
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-  
-  * {
-    @apply border-border;
-  }
-  
-  body {
-    @apply bg-background text-foreground font-sans;
-    /* 핀치 줌 비활성화 */
-    touch-action: pan-x pan-y;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    /* 스크롤바 숨김 */
-    overflow-x: hidden;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-    
-    /* 네이티브 앱 스타일 추가 */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overscroll-behavior: none;
-    
-    /* Safe Area 패딩 제거 - 각 컴포넌트에서 개별 처리 */
-    padding: 0;
-    margin: 0;
-  }
-  
-  /* 웹킷 기반 브라우저에서 스크롤바 숨김 */
-  body::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* 모든 요소에 대해 스크롤바 숨김 */
-  *::-webkit-scrollbar {
-    display: none;
-  }
-  
-  * {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-  }
-  
-  /* HTML 요소에도 핀치 줌 비활성화 적용 */
-  html {
-    touch-action: pan-x pan-y;
-    -webkit-text-size-adjust: none;
-    -webkit-touch-callout: none;
-    
-    /* 네이티브 앱 스타일 - 배경색을 검은색으로 변경 */
-    height: 100%;
-    overflow-x: hidden;
-    background-color: #1a1a1a; /* 검은색 배경으로 변경 */
-    
-    /* 성능 최적화 */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeSpeed;
-    image-rendering: crisp-edges;
-  }
-  
-  /* 성능 최적화를 위한 하드웨어 가속 */
-  .hw-accelerated {
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    perspective: 1000px;
-    -webkit-perspective: 1000px;
-  }
-  
-  /* 빠른 트랜지션을 위한 GPU 가속 */
-  .fast-transition {
-    will-change: transform, opacity;
-    transform: translateZ(0);
-  }
+    :root {
+        /* === RunHouse Design System Tokens (.pen 기준) === */
+
+        /* Background */
+        --rh-bg-primary: #1D2530;
+        --rh-bg-inset: #1A2029;
+        --rh-bg-surface: #2B3644;
+        --rh-bg-muted: #4C525E;
+        --rh-bg-accent: #669FF2;
+
+        /* Accent */
+        --rh-accent: #669FF2;
+        --rh-accent-hover: #5A8FE0;
+
+        /* Border */
+        --rh-border: #374151;
+        --rh-border-subtle: #1A2029;
+        --rh-divider: #2B3644;
+
+        /* Text */
+        --rh-text-primary: #FFFFFF;
+        --rh-text-secondary: #94A3B8;
+        --rh-text-tertiary: #64748B;
+        --rh-text-muted: #475569;
+        --rh-text-inverted: #1D2530;
+
+        /* Status */
+        --rh-status-success: #4ADE80;
+        --rh-status-warning: #FBBF24;
+        --rh-status-error: #F87171;
+
+        /* Typography (px) */
+        --rh-text-hero: 32px;
+        --rh-text-title1: 24px;
+        --rh-text-title2: 20px;
+        --rh-text-title3: 16px;
+        --rh-text-body: 14px;
+        --rh-text-caption: 12px;
+        --rh-text-label: 11px;
+        --rh-text-small: 10px;
+
+        /* Spacing */
+        --rh-spacing-xs: 2px;
+        --rh-spacing-sm: 4px;
+        --rh-spacing-md: 8px;
+        --rh-spacing-lg: 12px;
+        --rh-spacing-xl: 16px;
+        --rh-spacing-2xl: 24px;
+        --rh-spacing-3xl: 32px;
+
+        /* Radius */
+        --rh-radius-xs: 4px;
+        --rh-radius-sm: 6px;
+        --rh-radius-md: 8px;
+        --rh-radius-lg: 12px;
+        --rh-radius-xl: 16px;
+        --rh-radius-full: 100px;
+
+        /* === shadcn/ui 호환 (RunHouse 토큰 매핑) === */
+        --background: 213 24% 15%;
+        --foreground: 0 0% 100%;
+        --card: 213 22% 22%;
+        --card-foreground: 0 0% 100%;
+        --popover: 213 22% 22%;
+        --popover-foreground: 0 0% 100%;
+        --primary: 216 84% 67%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 213 22% 22%;
+        --secondary-foreground: 0 0% 100%;
+        --muted: 216 10% 33%;
+        --muted-foreground: 215 16% 47%;
+        --accent: 216 84% 67%;
+        --accent-foreground: 0 0% 100%;
+        --destructive: 0 86% 71%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 218 19% 27%;
+        --input: 213 22% 22%;
+        --ring: 216 84% 67%;
+        --radius: 0.5rem;
+
+        /* Chart */
+        --chart-1: 216 84% 67%;
+        --chart-2: 216 70% 55%;
+        --chart-3: 216 60% 45%;
+        --chart-4: 216 50% 35%;
+        --chart-5: 216 40% 25%;
+
+        /* Sidebar */
+        --sidebar-background: 213 24% 15%;
+        --sidebar-foreground: 0 0% 100%;
+        --sidebar-primary: 216 84% 67%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 213 22% 22%;
+        --sidebar-accent-foreground: 0 0% 100%;
+        --sidebar-border: 218 19% 27%;
+        --sidebar-ring: 216 84% 67%;
+
+        /* Safe Area */
+        --safe-area-inset-top: env(safe-area-inset-top);
+        --safe-area-inset-right: env(safe-area-inset-right);
+        --safe-area-inset-bottom: env(safe-area-inset-bottom);
+        --safe-area-inset-left: env(safe-area-inset-left);
+    }
+
+    /* 다크 모드 (기본과 동일 - 다크 퍼스트 앱) */
+    .dark {
+        --background: 213 24% 15%;
+        --foreground: 0 0% 100%;
+        --card: 213 22% 22%;
+        --card-foreground: 0 0% 100%;
+        --popover: 213 22% 22%;
+        --popover-foreground: 0 0% 100%;
+        --primary: 216 84% 67%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 213 22% 22%;
+        --secondary-foreground: 0 0% 100%;
+        --muted: 216 10% 33%;
+        --muted-foreground: 215 16% 47%;
+        --accent: 216 84% 67%;
+        --accent-foreground: 0 0% 100%;
+        --destructive: 0 86% 71%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 218 19% 27%;
+        --input: 213 22% 22%;
+        --ring: 216 84% 67%;
+        --sidebar-background: 213 24% 15%;
+        --sidebar-foreground: 0 0% 100%;
+        --sidebar-primary: 216 84% 67%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 213 22% 22%;
+        --sidebar-accent-foreground: 0 0% 100%;
+        --sidebar-border: 218 19% 27%;
+        --sidebar-ring: 216 84% 67%;
+    }
+
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        font-family: -apple-system, BlinkMacSystemFont,
+            'Apple SD Gothic Neo', 'SF Pro Text',
+            system-ui, sans-serif;
+        touch-action: pan-x pan-y;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overscroll-behavior: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    body::-webkit-scrollbar {
+        display: none;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+    }
+
+    * {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    html {
+        touch-action: pan-x pan-y;
+        -webkit-text-size-adjust: none;
+        -webkit-touch-callout: none;
+        height: 100%;
+        overflow-x: hidden;
+        background-color: #1D2530;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeSpeed;
+    }
+
+    /* 하드웨어 가속 */
+    .hw-accelerated {
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        perspective: 1000px;
+        -webkit-perspective: 1000px;
+    }
+
+    .fast-transition {
+        will-change: transform, opacity;
+        transform: translateZ(0);
+    }
 }
 
 @layer components {
-  /* iOS 스타일 카드 컴포넌트 */
-  .ios-card {
-    @apply rounded-2xl p-2 bg-white shadow-sm;
-  }
-  
-  /* iOS 스타일 버튼 */
-  .ios-button {
-    @apply rounded-xl px-4 py-2 font-medium transition-colors;
-  }
-  
-  /* iOS 스타일 입력 필드 */
-  .ios-input {
-    @apply rounded-xl border border-gray-200 px-4 py-3 bg-white;
-  }
-  
-  /* iOS에서 날짜/시간 입력 필드 커스텀 스타일 */
-  .ios-date-input {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    color: #374151;
-    font-size: 1rem;
-    line-height: 1.5;
-    width: 100%;
-    height: 3rem;
-    outline: none;
-    transition: all 0.2s ease;
-    position: relative;
-    text-align: left;
-    color-scheme: light;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  .ios-date-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  }
-  
-  .ios-date-input:active {
-    transform: scale(0.995);
-  }
-  
-  /* iOS Safari에서 날짜 picker 아이콘 및 텍스트 정렬 개선 */
-  .ios-date-input::-webkit-calendar-picker-indicator {
-    opacity: 0;
-    position: absolute;
-    right: 0;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    z-index: 2;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Safari에서 날짜 입력 필드 내부 요소들 정렬 */
-  .ios-date-input::-webkit-datetime-edit {
-    text-align: left;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    height: 100%;
-  }
-  
-  .ios-date-input::-webkit-datetime-edit-fields-wrapper {
-    text-align: left;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-  }
-  
-  .ios-date-input::-webkit-datetime-edit-text {
-    text-align: left;
-    padding: 0 2px;
-    color: #6b7280;
-  }
-  
-  .ios-date-input::-webkit-datetime-edit-month-field,
-  .ios-date-input::-webkit-datetime-edit-day-field,
-  .ios-date-input::-webkit-datetime-edit-year-field {
-    text-align: left;
-    padding: 0 1px;
-    color: #374151;
-    font-weight: 500;
-  }
-  
-  .ios-date-input::-webkit-inner-spin-button,
-  .ios-date-input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-    display: none;
-  }
-  
-  /* 빈 날짜 필드일 때 플레이스홀더 스타일 */
-  .ios-date-input:invalid {
-    color: #9ca3af;
-  }
-  
-  /* iOS에서 select 요소 커스텀 스타일 */
-  .ios-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: none;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    padding-right: 2.5rem;
-    color: #374151;
-    font-size: 1rem;
-    line-height: 1.5;
-    width: 100%;
-    height: 3rem;
-    outline: none;
-    transition: all 0.2s ease;
-  }
-  
-  .ios-select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  }
-  
-  /* 네이티브 앱 스타일 컴포넌트 추가 */
-  .native-scroll {
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
-  }
-  
-  .native-card {
-    @apply  rounded-2xl ;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  .native-card:active {
-    transform: scale(0.98);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .safe-area-top {
-    padding-top: var(--safe-area-inset-top);
-  }
-  
-  .safe-area-bottom {
-    padding-bottom: var(--safe-area-inset-bottom);
-  }
-  
-  .safe-area-left {
-    padding-left: var(--safe-area-inset-left);
-  }
-  
-  .safe-area-right {
-    padding-right: var(--safe-area-inset-right);
-  }
-  
-  /* 풀 투 리프레시 애니메이션 */
-  .pull-refresh-indicator {
-    animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  
-  /* 네이티브 스크롤 스타일 */
-  .native-list {
-    @apply divide-y divide-gray-100 bg-white rounded-2xl overflow-hidden;
-  }
-  
-  .native-list-item {
-    @apply px-4 pt-[1.5vh] pb-[1vh] active:bg-gray-50 transition-colors duration-150;
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  /* 네이티브 앱 스타일 그림자 */
-  .native-shadow {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  }
-  
-  .native-shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  }
+    /* === iOS Grouped Inset List === */
+    .ios-grouped-list {
+        @apply overflow-hidden;
+        border-radius: var(--rh-radius-lg);
+        background-color: var(--rh-bg-surface);
+    }
+
+    .ios-grouped-list-item {
+        @apply flex items-center px-4;
+        min-height: 44px;
+        -webkit-tap-highlight-color: transparent;
+        transition: background-color 0.15s ease;
+    }
+
+    .ios-grouped-list-item:active {
+        background-color: var(--rh-bg-muted);
+    }
+
+    /* 리스트 아이템 구분선 (아이콘 뒤 들여쓰기) */
+    .ios-grouped-list-separator {
+        border-top: 0.5px solid var(--rh-border);
+        margin-left: 52px;
+    }
+
+    /* 섹션 헤더 */
+    .ios-section-header {
+        font-size: var(--rh-text-caption);
+        color: var(--rh-text-secondary);
+        padding: var(--rh-spacing-sm) var(--rh-spacing-md);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    /* 섹션 푸터 */
+    .ios-section-footer {
+        font-size: var(--rh-text-caption);
+        color: var(--rh-text-tertiary);
+        padding: var(--rh-spacing-sm) var(--rh-spacing-md);
+    }
+
+    /* === iOS 네비게이션 바 === */
+    .ios-nav-bar {
+        @apply fixed top-0 left-0 right-0 z-50;
+        height: 44px;
+        background-color: rgba(28, 28, 30, 0.72);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 0.5px solid var(--rh-border);
+    }
+
+    /* === iOS 탭 바 === */
+    .ios-tab-bar {
+        @apply fixed bottom-0 left-0 right-0 z-50;
+        background-color: rgba(28, 28, 30, 0.72);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 0.5px solid var(--rh-border);
+    }
+
+    /* === iOS 카드 === */
+    .ios-card {
+        @apply p-4;
+        border-radius: var(--rh-radius-lg);
+        background-color: var(--rh-bg-surface);
+    }
+
+    /* === iOS 입력 필드 === */
+    .ios-input {
+        @apply px-4 py-3;
+        border-radius: var(--rh-radius-md);
+        background-color: var(--rh-bg-surface);
+        color: var(--rh-text-primary);
+        font-size: var(--rh-text-body);
+        border: none;
+        outline: none;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .ios-input:focus {
+        box-shadow: 0 0 0 1px var(--rh-accent),
+            0 0 0 4px rgba(102, 159, 242, 0.1);
+    }
+
+    .ios-input::placeholder {
+        color: var(--rh-text-tertiary);
+    }
+
+    .ios-input:disabled {
+        opacity: 0.4;
+    }
+
+    /* === iOS 버튼 === */
+    .ios-button {
+        @apply px-4 font-semibold;
+        border-radius: var(--rh-radius-lg);
+        height: 44px;
+        font-size: var(--rh-text-body);
+        transition: all 0.2s ease;
+    }
+
+    .ios-button:active {
+        opacity: 0.7;
+        transform: scale(0.98);
+    }
+
+    /* === iOS 날짜 입력 필드 === */
+    .ios-date-input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border-radius: var(--rh-radius-md);
+        padding: 0 1rem;
+        font-size: var(--rh-text-body);
+        line-height: 44px;
+        width: 100%;
+        height: 44px;
+        outline: none;
+        transition: all 0.2s ease;
+        position: relative;
+        text-align: left;
+        color-scheme: dark;
+        color: var(--rh-text-primary);
+        background-color: var(--rh-bg-surface);
+        font-family: -apple-system, BlinkMacSystemFont,
+            'Apple SD Gothic Neo', 'SF Pro Text',
+            system-ui, sans-serif;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .ios-date-input:focus {
+        box-shadow: 0 0 0 1px var(--rh-accent),
+            0 0 0 4px rgba(102, 159, 242, 0.1);
+    }
+
+    .ios-date-input:active {
+        transform: scale(0.995);
+    }
+
+    .ios-date-input::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        position: absolute;
+        right: 0;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+        margin: 0;
+        padding: 0;
+    }
+
+    .ios-date-input::-webkit-datetime-edit {
+        text-align: left;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+
+    .ios-date-input::-webkit-datetime-edit-fields-wrapper {
+        text-align: left;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .ios-date-input::-webkit-datetime-edit-text {
+        text-align: left;
+        padding: 0 2px;
+        color: var(--rh-text-secondary);
+    }
+
+    .ios-date-input::-webkit-datetime-edit-month-field,
+    .ios-date-input::-webkit-datetime-edit-day-field,
+    .ios-date-input::-webkit-datetime-edit-year-field {
+        text-align: left;
+        padding: 0 1px;
+        color: var(--rh-text-primary);
+        font-weight: 500;
+    }
+
+    .ios-date-input::-webkit-inner-spin-button,
+    .ios-date-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        display: none;
+    }
+
+    .ios-date-input:invalid {
+        color: var(--rh-text-tertiary);
+    }
+
+    /* === iOS Select === */
+    .ios-select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: none;
+        border-radius: var(--rh-radius-md);
+        padding: 0 1rem;
+        padding-right: 2.5rem;
+        font-size: var(--rh-text-body);
+        line-height: 44px;
+        width: 100%;
+        height: 44px;
+        outline: none;
+        transition: all 0.2s ease;
+        color: var(--rh-text-primary);
+        background-color: var(--rh-bg-surface);
+    }
+
+    .ios-select:focus {
+        box-shadow: 0 0 0 1px var(--rh-accent),
+            0 0 0 4px rgba(102, 159, 242, 0.1);
+    }
+
+    /* === 네이티브 스크롤 === */
+    .native-scroll {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        overscroll-behavior: contain;
+    }
+
 }
 
-/* 안전 영역을 위한 유틸리티 클래스 */
+/* Safe Area 유틸리티 */
 @layer utilities {
-  .pb-safe {
-    padding-bottom: var(--safe-area-inset-bottom);
-  }
-  
-  .pt-safe {
-    padding-top: var(--safe-area-inset-top);
-  }
-  
-  .pl-safe {
-    padding-left: var(--safe-area-inset-left);
-  }
-  
-  .pr-safe {
-    padding-right: var(--safe-area-inset-right);
-  }
-  
-  .px-safe {
-    padding-left: var(--safe-area-inset-left);
-    padding-right: var(--safe-area-inset-right);
-  }
-  
-  .py-safe {
-    padding-top: var(--safe-area-inset-top);
-    padding-bottom: var(--safe-area-inset-bottom);
-  }
-  
-  .mb-safe {
-    margin-bottom: var(--safe-area-inset-bottom);
-  }
-  
-  .mt-safe {
-    margin-top: var(--safe-area-inset-top);
-  }
-  
-  /* 모든 Safe Area를 적용하는 클래스 */
-  .safe-area-all {
-    padding-top: var(--safe-area-inset-top);
-    padding-right: var(--safe-area-inset-right);
-    padding-bottom: var(--safe-area-inset-bottom);
-    padding-left: var(--safe-area-inset-left);
-  }
-  
-  /* 네이티브 앱 스타일의 높이 설정 */
-  .h-screen-safe {
-    height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
-  }
+    .pb-safe {
+        padding-bottom: var(--safe-area-inset-bottom);
+    }
+
+    .pt-safe {
+        padding-top: var(--safe-area-inset-top);
+    }
+
+    .pl-safe {
+        padding-left: var(--safe-area-inset-left);
+    }
+
+    .pr-safe {
+        padding-right: var(--safe-area-inset-right);
+    }
+
+    .px-safe {
+        padding-left: var(--safe-area-inset-left);
+        padding-right: var(--safe-area-inset-right);
+    }
+
+    .py-safe {
+        padding-top: var(--safe-area-inset-top);
+        padding-bottom: var(--safe-area-inset-bottom);
+    }
+
+    .mb-safe {
+        margin-bottom: var(--safe-area-inset-bottom);
+    }
+
+    .mt-safe {
+        margin-top: var(--safe-area-inset-top);
+    }
+
+    .safe-area-all {
+        padding-top: var(--safe-area-inset-top);
+        padding-right: var(--safe-area-inset-right);
+        padding-bottom: var(--safe-area-inset-bottom);
+        padding-left: var(--safe-area-inset-left);
+    }
+
+    .h-screen-safe {
+        height: calc(
+            100vh - var(--safe-area-inset-top)
+            - var(--safe-area-inset-bottom)
+        );
+    }
+
+    /* 리스트 렌더링 최적화 */
+    .list-item-lazy {
+        content-visibility: auto;
+        contain-intrinsic-size: 0 72px;
+    }
+
+    .list-item-lazy-sm {
+        content-visibility: auto;
+        contain-intrinsic-size: 0 56px;
+    }
 }
 
-/* 필요한 폰트 추가 */
+/* 폰트 */
 @font-face {
-  font-family: 'Apple SD Gothic Neo';
-  font-style: normal;
-  font-weight: 300;
-  src: local('Apple SD Gothic Neo Light');
-}
-
-@font-face {
-  font-family: 'Apple SD Gothic Neo';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Apple SD Gothic Neo Regular');
-}
-
-@font-face {
-  font-family: 'Apple SD Gothic Neo';
-  font-style: normal;
-  font-weight: 600;
-  src: local('Apple SD Gothic Neo Bold');
-}
-
-@font-face {
-  font-family: 'SF Pro Text';
-  font-style: normal;
-  font-weight: 400;
-  src: local('SF Pro Text Regular');
+    font-family: 'Apple SD Gothic Neo';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: local('Apple SD Gothic Neo Light');
 }
 
 @font-face {
-  font-family: 'SF Pro Text';
-  font-style: normal;
-  font-weight: 600;
-  src: local('SF Pro Text Semibold');
+    font-family: 'Apple SD Gothic Neo';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local('Apple SD Gothic Neo Regular');
+}
+
+@font-face {
+    font-family: 'Apple SD Gothic Neo';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: local('Apple SD Gothic Neo Bold');
+}
+
+@font-face {
+    font-family: 'SF Pro Text';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local('SF Pro Text Regular');
+}
+
+@font-face {
+    font-family: 'SF Pro Text';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: local('SF Pro Text Semibold');
 }
 
 /* Black Han Sans 구글 폰트 */
 .black-han-sans-regular {
-  font-family: "Black Han Sans", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+    font-family: var(--font-black-han-sans), "Black Han Sans", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
-/* ⚡ 스플래시 화면 최적화 */
+/* 스플래시 화면 */
 .splash-screen {
-  will-change: opacity, transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
-/* ⚡ 앱 시작 시 깜빡임 방지 */
+/* 앱 시작 시 깜빡임 방지 */
 html, body {
-  background-color: #1d2530 !important;
-  overflow-x: hidden;
+    background-color: #0F1318 !important;
+    overflow-x: hidden;
 }
 
-/* ⚡ 스플래시 로고 애니메이션 */
+/* === 모바일 뷰포트 래퍼 (데스크탑에서 폰 형태) === */
+.mobile-viewport-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-color: #0F1318;
+}
+
+.mobile-viewport {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #1D2530;
+    position: relative;
+}
+
+/* 데스크탑(431px 이상)에서 폰 프레임 적용 */
+@media (min-width: 431px) {
+    .mobile-viewport-wrapper {
+        align-items: center;
+        padding: 24px 0;
+    }
+
+    .mobile-viewport {
+        max-width: 390px;
+        min-height: 0;
+        height: 844px;
+        border-radius: 40px;
+        overflow: hidden;
+        box-shadow:
+            0 0 0 10px #1a1a1a,
+            0 0 0 12px #333,
+            0 25px 60px rgba(0, 0, 0, 0.5);
+        position: relative;
+    }
+
+    /* 상단 노치 */
+    .mobile-viewport::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 28px;
+        background-color: #000;
+        border-radius: 0 0 16px 16px;
+        z-index: 9999;
+    }
+
+    /* 하단 홈 인디케이터 */
+    .mobile-viewport::after {
+        content: '';
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 134px;
+        height: 5px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 100px;
+        z-index: 9999;
+    }
+
+    /* fixed 요소를 mobile-viewport 내에서 absolute로 변환 */
+    .mobile-viewport .ios-tab-bar,
+    .mobile-viewport .ios-nav-bar {
+        position: absolute;
+    }
+
+    /* 모든 fixed 포지셔닝을 absolute로 변환 */
+    .mobile-viewport [class*="fixed"] {
+        position: absolute !important;
+    }
+
+    /* h-screen(100vh)을 mobile-viewport 높이에 맞추기 */
+    .mobile-viewport .main-content {
+        height: 100%;
+    }
+
+    .mobile-viewport .h-screen {
+        height: 100% !important;
+    }
+
+    .mobile-viewport .min-h-screen {
+        min-height: 100% !important;
+    }
+}
+
+/* 스플래시 로고 애니메이션 */
 @keyframes splash-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.8;
-  }
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
 }
 
 .splash-logo {
-  animation: splash-pulse 2s ease-in-out infinite;
+    animation: splash-pulse 2s ease-in-out infinite;
 }
 
-/* ⚡ 스플래시 로딩 도트 애니메이션 개선 */
+/* 스플래시 로딩 도트 애니메이션 */
 @keyframes splash-bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .splash-dot {
-  animation: splash-bounce 1.4s ease-in-out infinite both;
+    animation: splash-bounce 1.4s ease-in-out infinite both;
 }
 
 .splash-dot:nth-child(1) { animation-delay: -0.32s; }
 .splash-dot:nth-child(2) { animation-delay: -0.16s; }
 .splash-dot:nth-child(3) { animation-delay: 0s; }
 
-/* ⚡ 페이지 전환 제거 - 즉시 네비게이션 */
-.page-transition {
-  /* 전환 효과 제거 */
-}
-
-/* ⚡ 초기 로딩 최적화 */
+/* 초기 로딩 최적화 */
 .initial-load {
-  opacity: 0;
-  animation: fadeIn 0.3s ease-in-out forwards;
+    opacity: 0;
+    animation: fadeIn 0.3s ease-in-out forwards;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+/* iOS 날짜 입력 다크 텍스트 */
 .ios-date-input,
 .ios-date-input::-webkit-datetime-edit,
 .ios-date-input::-webkit-datetime-edit-fields-wrapper,
@@ -585,4 +713,4 @@ html, body {
 .ios-date-input::-webkit-datetime-edit-day-field,
 .ios-date-input::-webkit-datetime-edit-year-field {
     color: #fff !important;
-} 
+}

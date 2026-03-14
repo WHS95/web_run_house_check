@@ -14,7 +14,7 @@ interface MemberProfileInfoProps {
 const MemberProfileInfo = memo<MemberProfileInfoProps>(
   ({ name, joinDate, grade }) => {
     return (
-      <div className='flex items-center mb-[2vh]'>
+      <div className='flex items-center mb-4'>
         {/* 임시 프로필 아이콘
       <div className='w-16 h-16 rounded-full bg-[#476565]/30 flex items-center justify-center mr-4 flex-shrink-0'>
         <Image
@@ -27,7 +27,7 @@ const MemberProfileInfo = memo<MemberProfileInfoProps>(
       </div> */}
         <div className='flex-1'>
           <div className='flex items-center mb-1'>
-            <h2 className='mr-[1vw] text-[1.25rem] font-bold text-white'>
+            <h2 className='mr-1 text-[1.25rem] font-bold text-white'>
               {name}
             </h2>
             {/* <Image
@@ -37,7 +37,7 @@ const MemberProfileInfo = memo<MemberProfileInfoProps>(
             height={16}
           /> */}
           </div>
-          <div className='flex space-x-[2vw] text-[0.875rem] text-white'>
+          <div className='flex space-x-2 text-[0.875rem] text-white'>
             <span>가입일 {joinDate}</span>
             {/* <span>등급 {grade}</span> */}
           </div>

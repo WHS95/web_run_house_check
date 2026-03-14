@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { AdminContextProvider } from "./AdminContextProvider";
 import { verifyAdminAuth } from "@/lib/admin-auth";
 import AdminLayoutWrapper from "@/components/organisms/AdminLayoutWrapper";
+import { NaverMapLoader } from "@/components/map/NaverMapLoader";
 import type { Metadata } from "next";
 
 // 관리자 페이지 메타데이터
@@ -46,14 +47,16 @@ export default async function AdminLayout({
   const authData = await verifyAdminAuth();
 
   return (
-    <AdminContextProvider
-      crewId={authData.crewId}
-      userId={authData.userId}
-      firstName={authData.firstName}
-    >
-      <AdminLayoutWrapper>
-        {children}
-      </AdminLayoutWrapper>
-    </AdminContextProvider>
+    <NaverMapLoader>
+      <AdminContextProvider
+        crewId={authData.crewId}
+        userId={authData.userId}
+        firstName={authData.firstName}
+      >
+        <AdminLayoutWrapper>
+          {children}
+        </AdminLayoutWrapper>
+      </AdminContextProvider>
+    </NaverMapLoader>
   );
 }

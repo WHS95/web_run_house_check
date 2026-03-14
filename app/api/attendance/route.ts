@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { attendanceSubmissionSchema } from "@/lib/validators/attendanceSchema";
+import { sendNotification } from "@/lib/push/send-notification";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
@@ -135,6 +136,19 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // 출석 알림 발송 (fire-and-forget)
+    sendNotification(
+        crewId,
+        "CREW_MANAGER",
+        userId,
+        {
+            type: "attendance",
+            title: "새 출석 알림",
+            body: `회원이 ${locationName}에서 출석했습니다.`,
+            data: { crewId, locationName },
+        }
+    ).catch(() => {});
 
     return NextResponse.json(
       {

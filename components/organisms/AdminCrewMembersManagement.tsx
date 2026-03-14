@@ -24,18 +24,8 @@ import { haptic } from "@/lib/haptic";
 import PopupNotification, {
   NotificationType,
 } from "@/components/molecules/common/PopupNotification";
-
-interface CrewMember {
-  id: string;
-  first_name: string | null;
-  email: string | null;
-  phone: string | null;
-  birth_year: number | null;
-  profile_image_url: string | null;
-  role_id: number | null; // user_roles 테이블의 role_id (2: ADMIN, 3: USER)
-  is_crew_verified: boolean;
-  created_at: string;
-}
+import { useCrewMemberContext } from "@/contexts/CrewMemberContext";
+import { CrewMember } from "@/lib/validators/crewMemberSchema";
 
 interface AdminCrewMembersManagementProps {
   crewId: string;
@@ -44,12 +34,20 @@ interface AdminCrewMembersManagementProps {
 export default function AdminCrewMembersManagement({
   crewId,
 }: AdminCrewMembersManagementProps) {
-  const [members, setMembers] = useState<CrewMember[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  // 전역 상태 사용
+  const { state, actions } = useCrewMemberContext();
+  const { members, searchTerm, sortBy, sortOrder, loading, error } = state;
+  const {
+    setMembers,
+    updateMember,
+    removeMember,
+    setLoading,
+    setError,
+    setSearchTerm,
+    setSort,
+  } = actions;
+
   const [statusFilter, setStatusFilter] = useState("전체");
-  const [sortBy, setSortBy] = useState("name");
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
@@ -70,7 +68,7 @@ export default function AdminCrewMembersManagement({
         type,
       });
     },
-    []
+    [],
   );
 
   // 알림 닫기
@@ -81,7 +79,7 @@ export default function AdminCrewMembersManagement({
   // 멤버 목록 조회
   const fetchMembers = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       const response = await fetch(`/api/admin/crew-members?crewId=${crewId}`);
       const result = await response.json();
 
@@ -97,7 +95,7 @@ export default function AdminCrewMembersManagement({
       haptic.error();
       showNotification("멤버 조회 중 오류가 발생했습니다.", "error");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }, [crewId, showNotification]);
 
@@ -124,13 +122,13 @@ export default function AdminCrewMembersManagement({
           await fetchMembers(); // 목록 새로고침
           showNotification(
             result.message || "권한이 성공적으로 변경되었습니다.",
-            "success"
+            "success",
           );
         } else {
           haptic.error();
           showNotification(
             result.error || "권한 변경에 실패했습니다.",
-            "error"
+            "error",
           );
         }
       } catch (error) {
@@ -142,7 +140,7 @@ export default function AdminCrewMembersManagement({
         setIsUpdating(null);
       }
     },
-    [crewId, fetchMembers, actionLoading, showNotification]
+    [crewId, fetchMembers, actionLoading, showNotification],
   );
 
   // 정렬 함수
@@ -155,14 +153,10 @@ export default function AdminCrewMembersManagement({
           return sortOrder === "asc"
             ? aName.localeCompare(bName)
             : bName.localeCompare(aName);
-        case "joinDate":
+        case "created_at":
           const aDate = new Date(a.created_at).getTime();
           const bDate = new Date(b.created_at).getTime();
           return sortOrder === "desc" ? bDate - aDate : aDate - bDate;
-        case "role":
-          const aRole = a.role_id || 3;
-          const bRole = b.role_id || 3;
-          return sortOrder === "asc" ? aRole - bRole : bRole - aRole;
         default:
           return 0;
       }
@@ -186,10 +180,10 @@ export default function AdminCrewMembersManagement({
   const getStatusCounts = () => {
     const total = searchFilteredMembers.length;
     const admin = searchFilteredMembers.filter(
-      (member) => member.role_id === 2
+      (member) => member.is_admin,
     ).length;
     const user = searchFilteredMembers.filter(
-      (member) => member.role_id === 3 || member.role_id === null
+      (member) => !member.is_admin,
     ).length;
 
     return {
@@ -204,22 +198,25 @@ export default function AdminCrewMembersManagement({
   // 최종 필터링 및 정렬된 멤버 목록
   const filteredMembers = sortMembers(
     searchFilteredMembers.filter((member) => {
-      const isAdmin = member.role_id === 2;
       const matchesStatus =
         statusFilter === "전체" ||
-        (statusFilter === "운영진" && isAdmin) ||
-        (statusFilter === "멤버" && !isAdmin);
+        (statusFilter === "운영진" && member.is_admin) ||
+        (statusFilter === "멤버" && !member.is_admin);
 
       return matchesStatus;
-    })
+    }),
   );
 
   const handleSort = (newSortBy: string) => {
+    const typedSortBy = newSortBy as
+      | "name"
+      | "attendance_rate"
+      | "last_attendance"
+      | "created_at";
     if (sortBy === newSortBy) {
-      setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+      setSort(typedSortBy, sortOrder === "desc" ? "asc" : "desc");
     } else {
-      setSortBy(newSortBy);
-      setSortOrder("asc");
+      setSort(typedSortBy, "asc");
     }
   };
 
@@ -239,10 +236,12 @@ export default function AdminCrewMembersManagement({
     switch (sortBy) {
       case "name":
         return `이름 ${sortOrder === "desc" ? "↓" : "↑"}`;
-      case "joinDate":
+      case "created_at":
         return `가입 ${sortOrder === "desc" ? "↓" : "↑"}`;
-      case "role":
-        return `권한 ${sortOrder === "desc" ? "↓" : "↑"}`;
+      case "attendance_rate":
+        return `출석률 ${sortOrder === "desc" ? "↓" : "↑"}`;
+      case "last_attendance":
+        return `최근출석 ${sortOrder === "desc" ? "↓" : "↑"}`;
       default:
         return "정렬";
     }
@@ -260,25 +259,23 @@ export default function AdminCrewMembersManagement({
     const date = new Date(dateString);
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}.${String(date.getDate()).padStart(2, "0")}`;
   };
 
-  const getRoleBadge = (roleId: number | null) => {
-    const isAdmin = roleId === 2;
-
+  const getRoleBadge = (isAdmin: boolean) => {
     if (isAdmin) {
       return (
         <div className='flex items-center'>
-          <Crown className='w-4 h-4 text-basic-blue mr-1.5' />
-          <span className='font-medium text-basic-blue'>운영진</span>
+          <Crown className='w-4 h-4 text-rh-accent mr-1.5' />
+          <span className='font-medium text-rh-accent'>운영진</span>
         </div>
       );
     } else {
       return (
         <div className='flex items-center'>
-          <Users className='w-4 h-4 text-gray-400 mr-1.5' />
-          <span className='text-gray-300'>멤버</span>
+          <Users className='w-4 h-4 text-rh-text-secondary mr-1.5' />
+          <span className='text-rh-text-secondary'>멤버</span>
         </div>
       );
     }
@@ -289,19 +286,19 @@ export default function AdminCrewMembersManagement({
     fetchMembers();
   }, [fetchMembers]);
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className='space-y-[3vh] animate-pulse'>
+      <div className='space-y-3 animate-pulse'>
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className='bg-basic-black-gray rounded-[0.75rem] p-[4vw]'
+            className='bg-rh-bg-surface rounded-rh-lg p-4'
           >
-            <div className='flex items-center space-x-[3vw]'>
-              <div className='w-[3rem] h-[3rem] bg-basic-gray rounded-full'></div>
-              <div className='flex-1 space-y-[1vh]'>
-                <div className='h-[1rem] bg-basic-gray rounded w-[30vw]'></div>
-                <div className='h-[0.875rem] bg-basic-gray rounded w-[50vw]'></div>
+            <div className='flex items-center space-x-3'>
+              <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
+              <div className='flex-1 space-y-1'>
+                <div className='h-[1rem] bg-rh-bg-muted rounded w-[120px]'></div>
+                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-1/2'></div>
               </div>
             </div>
           </div>
@@ -311,31 +308,31 @@ export default function AdminCrewMembersManagement({
   }
 
   return (
-    <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
+    <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
       {/* 헤더 */}
-      <div className='p-[4vw] border-b border-basic-gray'>
+      <div className='p-4 border-b border-rh-border'>
         <div className='flex justify-between items-center'>
-          <div className='flex items-center space-x-[2vw]'>
+          <div className='flex items-center space-x-2'>
             <Users className='w-[1.25rem] h-[1.25rem] text-white' />
             <span className='text-[1.125rem] font-bold text-white'>
               운영진 관리
             </span>
-            <div className='ml-[1vw] px-[2vw] py-[0.5vh] bg-basic-black rounded-full text-[0.75rem] font-medium text-white'>
+            <div className='ml-1 px-2 py-0.5 bg-rh-bg-primary rounded-full text-[0.75rem] font-medium text-white'>
               {members.length}명
             </div>
           </div>
         </div>
       </div>
 
-      <div className='p-[4vw] space-y-[3vh]'>
+      <div className='p-4 space-y-3'>
         {/* 검색 */}
         <div className='relative'>
-          <Search className='absolute left-3 top-1/2 w-4 h-4 text-gray-400 transform -translate-y-1/2' />
+          <Search className='absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2' />
           <Input
             placeholder='이름 또는 이메일로 검색'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='pl-10 text-white rounded-lg border-0 bg-basic-black placeholder:text-gray-400'
+            className='pl-10 text-white rounded-lg border-0 bg-rh-bg-primary placeholder:text-rh-text-secondary'
           />
         </div>
 
@@ -348,30 +345,30 @@ export default function AdminCrewMembersManagement({
                 <Button
                   variant='outline'
                   size='sm'
-                  className='text-white rounded-full border-0 bg-basic-black-gray'
+                  className='text-white rounded-full border-0 bg-rh-bg-surface'
                 >
                   <ChevronDown className='mr-1 w-4 h-4' />
                   {statusFilter}
-                  <span className='ml-2 text-gray-400'>
+                  <span className='ml-2 text-rh-text-secondary'>
                     {statusCounts[statusFilter as keyof typeof statusCounts]}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='start'
-                className='border-0 bg-basic-black-gray'
+                className='border-0 bg-rh-bg-surface'
               >
                 {["전체", "운영진", "멤버"].map((status) => (
                   <DropdownMenuItem
                     key={status}
                     onClick={() => setStatusFilter(status)}
-                    className={`text-white hover:bg-basic-gray ${
-                      statusFilter === status ? "bg-basic-blue font-medium" : ""
+                    className={`text-white hover:bg-rh-bg-muted ${
+                      statusFilter === status ? "bg-rh-accent font-medium" : ""
                     }`}
                   >
                     <div className='flex justify-between items-center w-full'>
                       <span>{status}</span>
-                      <span className='ml-2 text-gray-400'>
+                      <span className='ml-2 text-rh-text-secondary'>
                         {statusCounts[status as keyof typeof statusCounts]}
                       </span>
                     </div>
@@ -388,7 +385,7 @@ export default function AdminCrewMembersManagement({
                 <Button
                   variant='outline'
                   size='sm'
-                  className='text-white rounded-full border-0 bg-basic-black-gray'
+                  className='text-white rounded-full border-0 bg-rh-bg-surface'
                 >
                   <ArrowUpDown className='mr-1 w-4 h-4' />
                   {getSortLabel()}
@@ -396,23 +393,23 @@ export default function AdminCrewMembersManagement({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align='end'
-                className='border-0 bg-basic-black-gray'
+                className='border-0 bg-rh-bg-surface'
               >
                 <DropdownMenuItem
                   onClick={() => handleSort("name")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   이름
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSort("joinDate")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   가입일
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleSort("role")}
-                  className='text-white hover:bg-basic-gray'
+                  className='text-white hover:bg-rh-bg-muted'
                 >
                   권한
                 </DropdownMenuItem>
@@ -425,10 +422,10 @@ export default function AdminCrewMembersManagement({
         <div className='space-y-3 max-h-[60vh] overflow-y-auto'>
           {filteredMembers.map((member) => {
             const isExpanded = expandedUsers.has(member.id);
-            const isAdmin = member.role_id === 2;
+            const isAdmin = member.is_admin;
 
             return (
-              <Card key={member.id} className='border-0 bg-basic-black-gray'>
+              <Card key={member.id} className='border-0 bg-rh-bg-surface'>
                 <CardContent className='px-3 py-2'>
                   {/* 메인 멤버 정보 */}
                   <div className='flex justify-between items-center'>
@@ -439,7 +436,7 @@ export default function AdminCrewMembersManagement({
                             <h3 className='text-base font-semibold text-white sm:text-lg'>
                               {getUserDisplayName(member)}
                             </h3>
-                            {getRoleBadge(member.role_id)}
+                            {getRoleBadge(member.is_admin)}
                           </div>
                         </div>
 
@@ -470,20 +467,20 @@ export default function AdminCrewMembersManagement({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align='end'
-                              className='border-0 bg-basic-black-gray'
+                              className='border-0 bg-rh-bg-surface'
                             >
                               <DropdownMenuItem
                                 onClick={() =>
                                   handleToggleAdmin(member.id, !isAdmin)
                                 }
                                 disabled={isUpdating === member.id}
-                                className='text-white hover:bg-basic-gray'
+                                className='text-white hover:bg-rh-bg-muted'
                               >
                                 {isUpdating === member.id
                                   ? "처리 중..."
                                   : isAdmin
-                                  ? "운영진 권한 해제"
-                                  : "운영진  승격"}
+                                    ? "운영진 권한 해제"
+                                    : "운영진  승격"}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -498,8 +495,8 @@ export default function AdminCrewMembersManagement({
                       isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <div className='pt-3 mt-3 border-t border-basic-gray'>
-                      <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
+                    <div className='pt-3 mt-3 border-t border-rh-border'>
+                      <div className='grid grid-cols-1 gap-3 text-sm text-rh-text-secondary sm:grid-cols-2'>
                         <div className='flex justify-between'>
                           <span className='font-bold text-white'>연락처</span>
                           <span className='text-right break-all'>
@@ -512,16 +509,7 @@ export default function AdminCrewMembersManagement({
                             {formatDate(member.created_at)}
                           </span>
                         </div>
-                        {member.birth_year && (
-                          <div className='flex justify-between'>
-                            <span className='font-bold text-white'>
-                              출생연도
-                            </span>
-                            <span className='text-right'>
-                              {member.birth_year}
-                            </span>
-                          </div>
-                        )}
+
                         <div className='flex justify-between'>
                           <span className='font-bold text-white'>권한</span>
                           <span className='text-right'>
@@ -539,11 +527,11 @@ export default function AdminCrewMembersManagement({
 
         {filteredMembers.length === 0 && (
           <div className='py-8 text-center'>
-            <Users className='mx-auto mb-4 w-16 h-16 text-gray-500' />
-            <p className='mb-2 text-lg font-medium text-gray-300'>
+            <Users className='mx-auto mb-4 w-16 h-16 text-rh-text-tertiary' />
+            <p className='mb-2 text-lg font-medium text-rh-text-secondary'>
               {searchTerm ? "검색 결과가 없습니다" : "등록된 멤버가 없습니다"}
             </p>
-            <p className='text-gray-400'>
+            <p className='text-rh-text-secondary'>
               {searchTerm
                 ? "다른 검색어를 시도해보세요"
                 : "새로운 멤버가 가입하면 여기에 표시됩니다"}

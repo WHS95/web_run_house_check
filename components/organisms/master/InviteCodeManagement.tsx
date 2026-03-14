@@ -177,15 +177,15 @@ export default function InviteCodeManagement({
     <div className="space-y-6">
       {/* 페이지 제목 */}
       <div className="flex items-center space-x-3">
-        <Key className="w-6 h-6 text-basic-blue" />
+        <Key className="w-6 h-6 text-rh-accent" />
         <div>
           <h1 className="text-xl font-semibold text-white">초대 코드 관리</h1>
-          <p className="text-sm text-gray-300">크루 초대 코드를 생성하고 관리합니다.</p>
+          <p className="text-sm text-rh-text-secondary">크루 초대 코드를 생성하고 관리합니다.</p>
         </div>
       </div>
 
       {/* 초대 코드 생성 카드 */}
-      <Card className="bg-basic-black-gray border-basic-gray">
+      <Card className="bg-rh-bg-surface border-rh-border">
         <CardHeader>
           <CardTitle className="text-white flex items-center space-x-2">
             <Plus className="w-5 h-5" />
@@ -194,13 +194,13 @@ export default function InviteCodeManagement({
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-rh-text-secondary mb-2">
               크루 선택 *
             </label>
             <select
               value={newInviteCode.crew_id}
               onChange={(e) => setNewInviteCode(prev => ({ ...prev, crew_id: e.target.value }))}
-              className="w-full p-2 bg-basic-black border border-basic-gray rounded-md text-white"
+              className="w-full p-2 bg-rh-bg-primary border border-rh-border rounded-md text-white"
             >
               <option value="">크루를 선택하세요</option>
               {crews.map((crew) => (
@@ -212,21 +212,21 @@ export default function InviteCodeManagement({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-rh-text-secondary mb-2">
               코드 설명
             </label>
             <Input
               placeholder="예: 신규 멤버용 초대 코드"
               value={newInviteCode.description}
               onChange={(e) => setNewInviteCode(prev => ({ ...prev, description: e.target.value }))}
-              className="bg-basic-black border-basic-gray text-white placeholder:text-gray-400"
+              className="bg-rh-bg-primary border-rh-border text-white placeholder:text-rh-text-secondary"
             />
           </div>
 
           <Button
             onClick={handleCreateInviteCode}
             disabled={isCreating || !newInviteCode.crew_id}
-            className="w-full bg-basic-blue hover:bg-blue-600 text-white"
+            className="w-full bg-rh-accent hover:bg-blue-600 text-white"
           >
             {isCreating ? "생성 중..." : "초대 코드 생성"}
           </Button>
@@ -241,16 +241,16 @@ export default function InviteCodeManagement({
         </h3>
         
         {inviteCodes.length === 0 ? (
-          <Card className="bg-basic-black-gray border-basic-gray">
+          <Card className="bg-rh-bg-surface border-rh-border">
             <CardContent className="py-8 text-center">
-              <Key className="w-12 h-12 text-gray-500 mx-auto mb-2" />
-              <p className="text-gray-400">생성된 초대 코드가 없습니다.</p>
+              <Key className="w-12 h-12 text-rh-text-tertiary mx-auto mb-2" />
+              <p className="text-rh-text-secondary">생성된 초대 코드가 없습니다.</p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-3">
             {inviteCodes.map((code) => (
-              <Card key={code.id} className="bg-basic-black-gray border-basic-gray hover:border-basic-blue transition-colors">
+              <Card key={code.id} className="bg-rh-bg-surface border-rh-border hover:border-rh-accent transition-colors">
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     {/* 헤더 */}
@@ -259,7 +259,7 @@ export default function InviteCodeManagement({
                         <h4 className="font-medium text-white">
                           {code.crew_name || `크루 ID: ${code.crew_id.slice(0, 8)}...`}
                         </h4>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-rh-text-tertiary mt-1">
                           생성일: {new Date(code.created_at).toLocaleDateString('ko-KR')}
                         </p>
                       </div>
@@ -277,7 +277,7 @@ export default function InviteCodeManagement({
                           size="sm"
                           variant="ghost"
                           onClick={() => startEditing(code)}
-                          className="text-gray-400 hover:text-white p-1"
+                          className="text-rh-text-secondary hover:text-white p-1"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -286,39 +286,39 @@ export default function InviteCodeManagement({
 
                     {/* 편집 모드 또는 일반 모드 */}
                     {editingCode === code.id ? (
-                      <div className="space-y-3 p-3 bg-basic-black rounded-lg border border-basic-gray">
+                      <div className="space-y-3 p-3 bg-rh-bg-primary rounded-lg border border-rh-border">
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-xs font-medium text-rh-text-secondary mb-1">
                             초대 코드 *
                           </label>
                           <Input
                             placeholder="초대 코드"
                             value={editForm.invite_code}
                             onChange={(e) => setEditForm(prev => ({ ...prev, invite_code: e.target.value }))}
-                            className="bg-basic-black-gray border-basic-gray text-white placeholder:text-gray-400 text-sm font-mono"
+                            className="bg-rh-bg-surface border-rh-border text-white placeholder:text-rh-text-secondary text-sm font-mono"
                           />
                         </div>
                         
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-xs font-medium text-rh-text-secondary mb-1">
                             설명
                           </label>
                           <Input
                             placeholder="코드 설명"
                             value={editForm.description}
                             onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
-                            className="bg-basic-black-gray border-basic-gray text-white placeholder:text-gray-400 text-sm"
+                            className="bg-rh-bg-surface border-rh-border text-white placeholder:text-rh-text-secondary text-sm"
                           />
                         </div>
                         
                         <div className="flex items-center space-x-3">
                           <button
                             onClick={() => setEditForm(prev => ({ ...prev, is_active: !prev.is_active }))}
-                            className="flex items-center space-x-2 text-sm text-gray-300 hover:text-white"
+                            className="flex items-center space-x-2 text-sm text-rh-text-secondary hover:text-white"
                           >
                             {editForm.is_active ? 
                               <ToggleRight className="w-5 h-5 text-green-500" /> : 
-                              <ToggleLeft className="w-5 h-5 text-gray-500" />
+                              <ToggleLeft className="w-5 h-5 text-rh-text-tertiary" />
                             }
                             <span>{editForm.is_active ? "활성" : "비활성"}</span>
                           </button>
@@ -329,7 +329,7 @@ export default function InviteCodeManagement({
                             size="sm"
                             onClick={() => handleUpdateInviteCode(code.id)}
                             disabled={!editForm.invite_code.trim()}
-                            className="bg-basic-blue hover:bg-blue-600 text-white flex-1 disabled:opacity-50"
+                            className="bg-rh-accent hover:bg-blue-600 text-white flex-1 disabled:opacity-50"
                           >
                             <Save className="w-4 h-4 mr-1" />
                             저장
@@ -338,7 +338,7 @@ export default function InviteCodeManagement({
                             size="sm"
                             variant="ghost"
                             onClick={cancelEditing}
-                            className="text-gray-400 hover:text-white"
+                            className="text-rh-text-secondary hover:text-white"
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -348,19 +348,19 @@ export default function InviteCodeManagement({
                       <>
                         {/* 설명 */}
                         {code.description && (
-                          <p className="text-sm text-gray-300">{code.description}</p>
+                          <p className="text-sm text-rh-text-secondary">{code.description}</p>
                         )}
 
                         {/* 초대 코드 */}
-                        <div className="flex items-center space-x-2 p-3 bg-basic-black rounded-lg">
-                          <code className="flex-1 text-lg font-mono text-basic-blue">
+                        <div className="flex items-center space-x-2 p-3 bg-rh-bg-primary rounded-lg">
+                          <code className="flex-1 text-lg font-mono text-rh-accent">
                             {visibleCodes.has(code.id) ? code.invite_code : "*".repeat(code.invite_code.length)}
                           </code>
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => toggleCodeVisibility(code.id)}
-                            className="text-gray-400 hover:text-white"
+                            className="text-rh-text-secondary hover:text-white"
                           >
                             {visibleCodes.has(code.id) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </Button>
@@ -368,7 +368,7 @@ export default function InviteCodeManagement({
                             size="sm"
                             variant="ghost"
                             onClick={() => copyToClipboard(code.invite_code)}
-                            className="text-gray-400 hover:text-white"
+                            className="text-rh-text-secondary hover:text-white"
                           >
                             <Copy className="w-4 h-4" />
                           </Button>

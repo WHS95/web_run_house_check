@@ -1,169 +1,305 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '../organisms/Header';
-import Hero from '../organisms/Hero';
-import NoticeBar from '../molecules/NoticeBar';
-import RankingCard from '../molecules/RankingCard';
-import AttendanceCard from '../molecules/AttendanceCard';
+import {
+    Bell,
+    Megaphone,
+    CircleCheck,
+    Trophy,
+    Calculator,
+    X,
+    BellOff,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import QuickActionButton from '../atoms/QuickActionButton';
+import ActivityListItem from '../molecules/ActivityListItem';
+import SectionLabel from '../atoms/SectionLabel';
+import PushPermissionBanner from '../molecules/PushPermissionBanner';
+import NoticeListSheet from '../molecules/NoticeListSheet';
+import BottomNavigation from '../organisms/BottomNavigation';
+import { usePushNotification } from '@/hooks/usePushNotification';
+import { useOfflineAttendance } from '@/hooks/useOfflineAttendance';
+import { CloudUpload } from 'lucide-react';
 
-interface RankingData {
-    selectedYear: number;
-    selectedMonth: number;
-    attendanceRanking: Array<{
-        user_id: string;
-        rank: number;
-        name: string;
-        value: number;
-        is_current_user: boolean;
-    }>;
-    crewName: string;
+interface Notice {
+    id: string;
+    content: string;
+    created_at: string;
+    is_active: boolean;
+    author?: { first_name: string } | null;
+}
+
+interface RecentActivity {
+    id: string;
+    userName: string;
+    location: string;
+    exerciseType: string;
+    time: string;
 }
 
 interface EnhancedHomeTemplateProps {
     username: string | null;
+    crewId: string | null;
     rankName: string | null;
     crewName: string | null;
     noticeText: string | null;
+    recentActivities?: RecentActivity[];
 }
 
 const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     username,
-    rankName,
+    crewId,
     crewName,
     noticeText,
+    recentActivities = [],
 }) => {
     const router = useRouter();
-    const [rankingData, setRankingData] = useState<RankingData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const { shouldShowBanner, requestPermission, dismissBanner } =
+        usePushNotification({ crewId });
+    const { queueCount, isOnline, isFlushing } = useOfflineAttendance();
 
-    // 랭킹 데이터 가져오기
+    const [isNoticeSheetOpen, setIsNoticeSheetOpen] = useState(false);
+    const [isNoticeListOpen, setIsNoticeListOpen] = useState(false);
+    const [notices, setNotices] = useState<Notice[]>([]);
+    const [noticesLoading, setNoticesLoading] = useState(false);
+
+    const handleNavigate = useCallback(
+        (path: string) => {
+            router.push(path);
+        },
+        [router]
+    );
+
     useEffect(() => {
-        const fetchRankingData = async () => {
-            try {
-                // 한국 시간(Asia/Seoul)으로 현재 날짜 생성
-                const currentDate = new Date(
-                    new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
-                );
-                const response = await fetch(`/api/ranking?year=${currentDate.getFullYear()}&month=${currentDate.getMonth() + 1}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setRankingData(data);
-                }
-            } catch (error) {
-                console.error('랭킹 데이터 로드 오류:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+        if (!isNoticeSheetOpen || !crewId) return;
+        setNoticesLoading(true);
+        fetch(`/api/admin/notices?crewId=${crewId}`)
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.success) setNotices(json.data ?? []);
+            })
+            .catch(() => {})
+            .finally(() => setNoticesLoading(false));
+    }, [isNoticeSheetOpen, crewId]);
 
-        fetchRankingData();
-    }, []);
-
-    // 랭킹 페이지로 이동 - 최적화
-    const handleSwipeToRanking = useCallback(() => {
-        // haptic 피드백을 비동기로 처리하여 UI 블로킹 방지
-        if ('vibrate' in navigator) {
-            navigator.vibrate(50);
-        }
-        router.push('/ranking');
-    }, [router]);
-
-    // 내 랭킹 정보 찾기
-    const getMyRankingInfo = () => {
-        if (!rankingData?.attendanceRanking) return null;
-        return rankingData.attendanceRanking.find(item => item.is_current_user);
-    };
-
-    // 날짜 포매팅 함수
-    const formatMonthYear = (year: number, month: number) => {
-        return `${year}년 ${month.toString().padStart(2, '0')}월`;
+    const formatDate = (dateStr: string) => {
+        const d = new Date(dateStr);
+        const month = d.getMonth() + 1;
+        const day = d.getDate();
+        const hours = d.getHours().toString().padStart(2, '0');
+        const mins = d.getMinutes().toString().padStart(2, '0');
+        return `${month}/${day} ${hours}:${mins}`;
     };
 
     return (
-        <div className="main-content">
-            {/* 🔒 헤더 - Header 컴포넌트에서 fixed 처리됨 */}
-            <Header title={"RUN HOUSE"} />
+        <div className="flex flex-col min-h-screen bg-rh-bg-primary">
+            {/* ── Header: 인사말 + 알림 버튼 ── */}
+            <header className="flex items-center justify-between px-4 h-14 pt-safe">
+                <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-semibold text-rh-accent">
+                        {crewName ?? 'RunHouse Crew'}
+                    </span>
+                    <span className="text-lg font-semibold text-white">
+                        안녕하세요, {username ?? '사용자'}님
+                    </span>
+                </div>
+                <button
+                    onClick={() => setIsNoticeSheetOpen(true)}
+                    className="flex h-10 w-10 items-center justify-center rounded-rh-md bg-rh-bg-surface"
+                >
+                    <Bell className="h-5 w-5 text-rh-text-secondary" />
+                </button>
+            </header>
 
-            {/* 📢 공지사항 - 헤더 바로 아래 고정 */}
-            {noticeText && (
-                <div className="fixed top-20 left-0 right-0 z-40 px-4 pt-safe">
-                    <NoticeBar noticeText={noticeText} />
+            {/* ── 알림 유도 배너 ── */}
+            <PushPermissionBanner
+                show={shouldShowBanner}
+                onAllow={requestPermission}
+                onDismiss={dismissBanner}
+            />
+
+            {/* ── 오프라인 출석 대기 배너 ── */}
+            {queueCount > 0 && (
+                <div className="px-4 pt-2">
+                    <div className="flex items-center gap-3 rounded-rh-lg bg-rh-bg-surface p-3 border border-rh-border">
+                        <CloudUpload className="h-5 w-5 text-rh-accent" />
+                        <div>
+                            <p className="text-sm text-white">
+                                오프라인 출석 {queueCount}건 대기 중
+                            </p>
+                            <p className="text-xs text-rh-text-tertiary">
+                                {isOnline
+                                    ? isFlushing
+                                        ? '전송 중...'
+                                        : '곧 자동 전송됩니다'
+                                    : '네트워크 연결 시 자동 전송'}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {/* 📱 Hero 영역 - 공지사항 아래에 위치 */}
-            <div className="relative min-h-screen">
-                {/* Hero 배경 - 가운데 정렬 */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    {username && (
-                        <div className="relative w-full">
-                            {/* Hero 전체 화면 높이로 설정 */}
-                            <div className="relative w-full flex items-center justify-center">
-                                <div className="flex items-center justify-center min-h-[60vh]">
-                                    <div className="w-full max-w-2xl mx-auto text-center px-6 py-10">
-                                        {/* 랭킹 정보 */}
-                                        {isLoading ? (
-                                            <div className='flex flex-col items-center mt-12 space-y-4'>
-                                                <div className='flex space-x-2'>
-                                                  <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-                                                  <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-                                                  <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-                                                </div>
-                                              </div>
-                                        ) : rankingData ? (
-                                            <div className="text-center">
-                                                <h3 className="text-2xl font-bold text-white mb-4">
-                                                    {formatMonthYear(rankingData.selectedYear, rankingData.selectedMonth)}
-                                                </h3>
-                                                {(() => {
-                                                    const myRanking = getMyRankingInfo();
-                                                    return myRanking ? (
+            {/* ── ScrollContent ── */}
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 space-y-5">
+                {/* 공지 카드 */}
+                {noticeText && (
+                    <button
+                        onClick={() => setIsNoticeListOpen(true)}
+                        className="flex w-full items-center gap-2.5 rounded-rh-lg bg-rh-bg-surface px-4 h-12 text-left"
+                    >
+                        <Megaphone className="h-4 w-4 shrink-0 text-rh-accent" />
+                        <p className="text-[13px] text-white truncate">
+                            {noticeText}
+                        </p>
+                    </button>
+                )}
 
-                                                    
-                                                        <div>
-                                                            <p className="text-white font-extrabold text-3xl mb-2">
-                                                                {myRanking.name} 
-                                                            </p>
-                                                            <p className="text-basic-blue font-extrabold text-3xl mb-2">
-                                                              나의 랭킹 {myRanking.rank}위
-                                                            </p>
-                                                        </div>
-                                                    ) : (
-                                                        <div>
-                                                            <p className="text-white font-bold text-3xl mb-2">
-                                                                이번 달은 기록이 없어요
-                                                            </p>
-                                                            <p className="text-white font-bold text-3xl mb-2">
-                                                                얼른 출석해보세요! 
-                                                            </p>
-                                                        </div>
-                                                    );
-                                                })()}
-                                                <button
-                                                    onClick={handleSwipeToRanking}
-                                                    className="mt-6 px-6 py-3 bg-basic-blue hover:bg-basic-blue/80 text-white rounded-xl text-base font-semibold transition-colors"
-                                                >
-                                                    전체 랭킹 보기
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="text-center py-10">
-                                                <p className="text-gray-400 text-lg">
-                                                    랭킹 정보를 불러올 수 없어요
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                {/* 빠른 액션 3개 */}
+                <div className="flex gap-3">
+                    <QuickActionButton
+                        icon={CircleCheck}
+                        label="출석체크"
+                        onClick={() => handleNavigate('/attendance')}
+                    />
+                    <QuickActionButton
+                        icon={Trophy}
+                        label="랭킹"
+                        onClick={() => handleNavigate('/ranking')}
+                    />
+                    <QuickActionButton
+                        icon={Calculator}
+                        label="계산기"
+                        onClick={() => handleNavigate('/calculator')}
+                    />
+                </div>
+
+                {/* 최근 활동 */}
+                <SectionLabel>최근 활동</SectionLabel>
+
+                <div className="space-y-2">
+                    {recentActivities.length > 0 ? (
+                        recentActivities.map((a) => (
+                            <ActivityListItem
+                                key={a.id}
+                                name={a.userName}
+                                meta={`${a.location} · ${a.exerciseType} · ${a.time}`}
+                            />
+                        ))
+                    ) : (
+                        <div className="flex items-center justify-center rounded-rh-md bg-rh-bg-surface py-10">
+                            <p className="text-sm text-rh-text-tertiary">
+                                아직 최근 활동이 없습니다
+                            </p>
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* ── BottomNav ── */}
+            <BottomNavigation />
+
+            <AnimatePresence>
+                {isNoticeSheetOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 z-50 bg-rh-bg-primary/60"
+                            onClick={() => setIsNoticeSheetOpen(false)}
+                        />
+                        <motion.div
+                            initial={{ y: '100%' }}
+                            animate={{ y: 0 }}
+                            exit={{ y: '100%' }}
+                            transition={{
+                                type: 'spring',
+                                damping: 28,
+                                stiffness: 300,
+                            }}
+                            drag="y"
+                            dragConstraints={{ top: 0 }}
+                            dragElastic={0.1}
+                            onDragEnd={(_, info) => {
+                                if (info.offset.y > 100)
+                                    setIsNoticeSheetOpen(false);
+                            }}
+                            className="fixed bottom-0 left-0 right-0 z-50 max-h-[75vh] rounded-t-[20px] bg-rh-bg-surface pb-safe"
+                        >
+                            <div className="flex justify-center pt-3 pb-1">
+                                <div className="h-1 w-10 rounded-full bg-rh-bg-muted" />
+                            </div>
+
+                            <div className="flex items-center justify-between px-5 pb-3">
+                                <h2 className="text-lg font-semibold text-white">
+                                    알림 내역
+                                </h2>
+                                <button
+                                    onClick={() =>
+                                        setIsNoticeSheetOpen(false)
+                                    }
+                                    className="flex h-8 w-8 items-center justify-center rounded-full bg-rh-bg-muted"
+                                >
+                                    <X className="h-4 w-4 text-rh-text-secondary" />
+                                </button>
+                            </div>
+
+                            <div className="border-t border-rh-border" />
+
+                            <div className="overflow-y-auto px-5 py-4 max-h-[calc(75vh-80px)] space-y-3">
+                                {noticesLoading ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-rh-accent border-t-transparent" />
+                                    </div>
+                                ) : notices.length > 0 ? (
+                                    notices.map((notice) => (
+                                        <div
+                                            key={notice.id}
+                                            className="rounded-rh-lg bg-rh-bg-primary p-4 space-y-1.5"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-medium text-rh-accent">
+                                                    {notice.author
+                                                        ?.first_name ??
+                                                        '관리자'}
+                                                </span>
+                                                <span className="text-xs text-rh-text-tertiary">
+                                                    {formatDate(
+                                                        notice.created_at
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm leading-relaxed text-white">
+                                                {notice.content}
+                                            </p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-16 gap-3">
+                                        <BellOff className="h-10 w-10 text-rh-text-muted" />
+                                        <p className="text-sm text-rh-text-tertiary">
+                                            알림 내역이 없습니다
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* 공지사항 리스트 바텀시트 */}
+            {crewId && (
+                <NoticeListSheet
+                    isOpen={isNoticeListOpen}
+                    onClose={() => setIsNoticeListOpen(false)}
+                    crewId={crewId}
+                />
+            )}
         </div>
     );
 };
 
-export default EnhancedHomeTemplate; 
+export default EnhancedHomeTemplate;

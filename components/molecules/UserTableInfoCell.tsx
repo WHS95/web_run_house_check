@@ -32,7 +32,7 @@ const UserTableInfoCell: React.FC<UserTableInfoCellProps> = ({
         <Avatar src={profileUrl} alt={`${name} profile`} size={40} />
       </div>
       <div className='ml-4'>
-        <div className='text-sm font-medium text-gray-900'>{displayName}</div>
+        <div className='text-sm font-medium text-rh-text-inverted'>{displayName}</div>
       </div>
     </div>
   );

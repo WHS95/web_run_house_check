@@ -73,13 +73,13 @@ async function getDayParticipationAnalysis(
   if (!activeMembers || activeMembers.length === 0) {
     // 활성 멤버가 없으면 빈 결과 반환
     const dayInfo = [
-      { name: "일요일", color: "bg-basic-black-gray" },
-      { name: "월요일", color: "bg-basic-black-gray" },
-      { name: "화요일", color: "bg-basic-black-gray" },
-      { name: "수요일", color: "bg-basic-black-gray" },
-      { name: "목요일", color: "bg-basic-black-gray" },
-      { name: "금요일", color: "bg-basic-black-gray" },
-      { name: "토요일", color: "bg-basic-black-gray" },
+      { name: "일요일", color: "bg-rh-bg-surface" },
+      { name: "월요일", color: "bg-rh-bg-surface" },
+      { name: "화요일", color: "bg-rh-bg-surface" },
+      { name: "수요일", color: "bg-rh-bg-surface" },
+      { name: "목요일", color: "bg-rh-bg-surface" },
+      { name: "금요일", color: "bg-rh-bg-surface" },
+      { name: "토요일", color: "bg-rh-bg-surface" },
     ];
 
     return Array.from({ length: 7 }, (_, index) => ({
@@ -143,13 +143,13 @@ async function getDayParticipationAnalysis(
 
   // 요일 이름과 색상 정의
   const dayInfo = [
-    { name: "일요일", color: "bg-basic-blue" },
-    { name: "월요일", color: "bg-basic-blue" },
-    { name: "화요일", color: "bg-basic-blue" },
-    { name: "수요일", color: "bg-basic-blue" },
-    { name: "목요일", color: "bg-basic-blue" },
-    { name: "금요일", color: "bg-basic-blue" },
-    { name: "토요일", color: "bg-basic-blue" },
+    { name: "일요일", color: "bg-rh-accent" },
+    { name: "월요일", color: "bg-rh-accent" },
+    { name: "화요일", color: "bg-rh-accent" },
+    { name: "수요일", color: "bg-rh-accent" },
+    { name: "목요일", color: "bg-rh-accent" },
+    { name: "금요일", color: "bg-rh-accent" },
+    { name: "토요일", color: "bg-rh-accent" },
   ];
 
   // 결과 데이터 생성 (전체 출석 횟수 대비 요일별 비율)
@@ -263,7 +263,7 @@ async function getLocationParticipationAnalysis(
   // 장소별 색상 생성 (해시 기반)
   const generateColor = (locationName: string, index: number) => {
     const colors = [
-      "bg-basic-blue",
+      "bg-rh-accent",
       "bg-blue-500",
       "bg-green-500",
       "bg-yellow-500",

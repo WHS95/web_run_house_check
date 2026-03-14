@@ -122,7 +122,7 @@ export default function SplitTimeCalculatorClient() {
 
         <Button
           onClick={handleCalculate}
-          className='w-full text-white bg-basic-blue hover:bg-basic-blue/80'
+          className='w-full text-white bg-rh-accent hover:bg-rh-accent-hover/80'
         >
           계산하기
         </Button>

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { FiChevronLeft } from "react-icons/fi";
+import { ChevronLeft } from "lucide-react";
 
 interface PageHeaderProps {
   title: string;
@@ -13,34 +13,34 @@ interface PageHeaderProps {
 
 const PageHeader: React.FC<PageHeaderProps> = ({
   title,
-  backgroundColor = "bg-basic-black-gray",
+  backgroundColor,
   backLink = "/",
-  iconColor = "black",
+  iconColor = "white",
   borderColor,
   rightAction,
 }) => {
-  const textColor = iconColor === "white" ? "text-white" : "text-white";
-
   return (
     <header
-      className={`flex relative z-50 items-center py-4 border-b border-basic-gray shadow-sm ${backgroundColor}`}
+      className={`flex relative z-50 items-center h-14 border-b border-rh-border ${
+        backgroundColor || "bg-rh-bg-surface/72 backdrop-blur-[20px]"
+      }`}
     >
-      <div className='flex-1 px-4'>
-        {/* 
-          font-thin: 100
-          font-extralight: 200
-          font-light: 300
-          font-normal: 400
-          font-medium: 500
-          font-semibold: 600
-          font-bold: 700
-          font-extrabold: 800
-          font-black: 900
-        */}
-        <h1 className={`text-xl font-bold ${textColor} black-han-sans-regular`}>
-          {title}
-        </h1>
+      {/* 뒤로가기 버튼 */}
+      {backLink && (
+        <Link
+          href={backLink}
+          className='flex items-center pl-2 pr-1 h-full text-rh-accent active:opacity-70 transition-opacity'
+        >
+          <ChevronLeft size={24} />
+        </Link>
+      )}
+
+      {/* 타이틀 (중앙) */}
+      <div className='flex-1 px-2'>
+        <h1 className='text-[18px] font-semibold text-white truncate'>{title}</h1>
       </div>
+
+      {/* 우측 액션 */}
       {rightAction && <div className='px-3'>{rightAction}</div>}
     </header>
   );

@@ -3,72 +3,59 @@
 import { useEffect, useState } from "react";
 import { useAdminContext } from "../AdminContextProvider";
 import AdminUserManagement from "@/components/organisms/AdminUserManagement";
+import AdminPageContainer from "@/components/layouts/AdminPageContainer";
 import { getUsersByCrewIdOptimized } from "@/lib/supabase/admin";
 
 // 로딩 컴포넌트
 function AdminUserManagementSkeleton() {
   return (
-    <div className='flex flex-col h-full bg-basic-black'>
-      {/* 헤더 스켈레톤 */}
-      <div className='sticky top-0 z-10 bg-basic-black-gray border-b border-basic-gray'>
-        <div className='px-4 py-4'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <div className='w-20 h-6 bg-basic-gray rounded animate-pulse'></div>
-              <div className='mt-1 w-16 h-4 bg-basic-gray rounded animate-pulse'></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <AdminPageContainer>
       {/* 검색 및 필터 스켈레톤 */}
-      <div className='sticky top-[73px] z-10 bg-basic-black px-4 py-4 space-y-4 border-b border-basic-gray'>
-        <div className='w-full h-10 bg-basic-gray rounded-lg animate-pulse'></div>
+      <div className='sticky top-4 lg:top-6 z-30 bg-rh-bg-primary py-4 space-y-4'>
+        <div className='w-full h-10 bg-rh-bg-muted rounded-lg animate-pulse'></div>
         <div className='flex justify-between items-center'>
           <div className='flex space-x-2'>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className='w-16 h-8 bg-basic-gray rounded-full animate-pulse'
+                className='w-16 h-8 bg-rh-bg-muted rounded-full animate-pulse'
               ></div>
             ))}
           </div>
-          <div className='w-20 h-8 bg-basic-gray rounded-full animate-pulse'></div>
+          <div className='w-20 h-8 bg-rh-bg-muted rounded-full animate-pulse'></div>
         </div>
       </div>
 
       {/* 사용자 목록 스켈레톤 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4'>
-        <div className='space-y-3'>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className='p-4 bg-basic-black-gray rounded-lg border border-basic-gray'
-            >
-              <div className='flex justify-between items-center'>
-                <div className='flex-1'>
-                  <div className='flex justify-between items-center mb-2'>
-                    <div className='flex items-center space-x-3'>
-                      <div className='w-20 h-5 bg-basic-gray rounded animate-pulse'></div>
-                      <div className='w-12 h-5 bg-basic-gray rounded-full animate-pulse'></div>
+      <div className='space-y-3'>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            className='p-4 bg-rh-bg-surface rounded-lg border border-rh-border'
+          >
+            <div className='flex justify-between items-center'>
+              <div className='flex-1'>
+                <div className='flex justify-between items-center mb-2'>
+                  <div className='flex items-center space-x-3'>
+                    <div className='w-20 h-5 bg-rh-bg-muted rounded animate-pulse'></div>
+                    <div className='w-12 h-5 bg-rh-bg-muted rounded-full animate-pulse'></div>
+                  </div>
+                  <div className='w-6 h-6 bg-rh-bg-muted rounded animate-pulse'></div>
+                </div>
+                <div className='space-y-1'>
+                  {[1, 2, 3].map((j) => (
+                    <div key={j} className='flex justify-between'>
+                      <div className='w-16 h-4 bg-rh-bg-muted rounded animate-pulse'></div>
+                      <div className='w-24 h-4 bg-rh-bg-muted rounded animate-pulse'></div>
                     </div>
-                    <div className='w-6 h-6 bg-basic-gray rounded animate-pulse'></div>
-                  </div>
-                  <div className='space-y-1'>
-                    {[1, 2, 3].map((j) => (
-                      <div key={j} className='flex justify-between'>
-                        <div className='w-16 h-4 bg-basic-gray rounded animate-pulse'></div>
-                        <div className='w-24 h-4 bg-basic-gray rounded animate-pulse'></div>
-                      </div>
-                    ))}
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-    </div>
+    </AdminPageContainer>
   );
 }
 
@@ -113,16 +100,16 @@ export default function AdminUserPage() {
 
   if (error) {
     return (
-      <div className='flex flex-col h-full bg-basic-black'>
-        <div className='flex flex-1 justify-center items-center'>
+      <AdminPageContainer>
+        <div className='flex justify-center items-center min-h-64'>
           <div className='text-center'>
             <h2 className='mb-2 text-lg font-semibold text-white'>
               데이터를 불러올 수 없습니다
             </h2>
-            <p className='text-gray-300'>{error}</p>
+            <p className='text-rh-text-secondary'>{error}</p>
           </div>
         </div>
-      </div>
+      </AdminPageContainer>
     );
   }
 

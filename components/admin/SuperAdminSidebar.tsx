@@ -50,7 +50,7 @@ export default function SuperAdminSidebar() {
     <div className='w-64 bg-white h-screen shadow-md pt-6 flex flex-col'>
       <div className='px-6 mb-6'>
         <h1 className='text-xl font-bold text-blue-600'>런하우스 관리자</h1>
-        <p className='text-xs text-gray-500 mt-1'>슈퍼 관리자 콘솔</p>
+        <p className='text-xs text-rh-text-tertiary mt-1'>슈퍼 관리자 콘솔</p>
       </div>
 
       <nav className='flex-1'>
@@ -62,7 +62,7 @@ export default function SuperAdminSidebar() {
                 className={`flex items-center px-3 py-2 rounded-md text-sm ${
                   item.active
                     ? "bg-blue-50 text-blue-600 font-medium"
-                    : "text-gray-700 hover:bg-gray-100"
+                    : "text-rh-text-muted hover:bg-rh-bg-muted"
                 }`}
               >
                 <span className='mr-3'>{item.icon}</span>
@@ -73,11 +73,11 @@ export default function SuperAdminSidebar() {
         </ul>
       </nav>
 
-      <div className='border-t border-gray-200 mt-auto'>
+      <div className='border-t border-rh-border mt-auto'>
         <div className='px-6 py-4'>
           <Link
             href='/'
-            className='text-sm text-gray-600 hover:text-blue-600 flex items-center'
+            className='text-sm text-rh-text-muted hover:text-blue-600 flex items-center'
           >
             <Home size={16} className='mr-2' />
             홈으로 돌아가기

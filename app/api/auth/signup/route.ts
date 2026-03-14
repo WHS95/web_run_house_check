@@ -1,9 +1,22 @@
 import { NextResponse } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { signupSchema } from "@/lib/validators/signupSchema";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
+  // Rate limit 체크
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
+  const rateLimitResult = rateLimit({ key: `signup:${ip}`, limit: 5, windowMs: 60_000 });
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { success: false, message: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000)) } }
+    );
+  }
+
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

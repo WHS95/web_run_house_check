@@ -48,7 +48,7 @@ export const PageTransitionProvider: React.FC<PageTransitionProviderProps> = ({ 
     <PageTransitionContext.Provider value={{ isTransitioning, startTransition, endTransition }}>
       {/* 전환 오버레이 */}
       <div 
-        className={`fixed inset-0 z-[9999] bg-basic-black transition-opacity duration-150 pointer-events-none ${
+        className={`fixed inset-0 z-[9999] bg-rh-bg-primary transition-opacity duration-150 pointer-events-none ${
           isTransitioning ? 'opacity-40' : 'opacity-0'
         }`}
       />

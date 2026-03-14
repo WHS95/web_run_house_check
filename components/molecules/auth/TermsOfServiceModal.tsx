@@ -14,16 +14,16 @@ export default function TermsOfServiceModal({
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 bg-basic-black'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 bg-rh-bg-primary'>
       <div className='bg-white rounded-lg max-w-md w-full mx-4 max-h-[80vh] overflow-hidden'>
         {/* 헤더 */}
-        <div className='flex items-center justify-between p-4 border-b border-gray-200'>
-          <h2 className='text-lg font-semibold text-gray-900'>
+        <div className='flex items-center justify-between p-4 border-b border-rh-border'>
+          <h2 className='text-lg font-semibold text-rh-text-inverted'>
             런하우스 이용약관
           </h2>
           <button
             onClick={onClose}
-            className='text-xl font-bold text-gray-400 hover:text-gray-600'
+            className='text-xl font-bold text-rh-text-secondary hover:text-rh-text-muted'
           >
             ×
           </button>
@@ -31,8 +31,8 @@ export default function TermsOfServiceModal({
 
         {/* 내용 */}
         <div className='p-4 overflow-y-auto max-h-[60vh]'>
-          <div className='space-y-4 text-sm text-gray-700'>
-            <p className='font-medium text-gray-900'>
+          <div className='space-y-4 text-sm text-rh-text-muted'>
+            <p className='font-medium text-rh-text-inverted'>
               본 약관은 러닝 크루 연결 플랫폼
               &apos;런하우스(RunHouse)&apos;(이하 &quot;서비스&quot;)의 이용과
               관련하여 이용자(이하 &quot;회원&quot;)와 운영자(이하
@@ -41,7 +41,7 @@ export default function TermsOfServiceModal({
             </p>
 
             <div>
-              <h3 className='mb-2 font-semibold text-gray-900'>제1조 (정의)</h3>
+              <h3 className='mb-2 font-semibold text-rh-text-inverted'>제1조 (정의)</h3>
               <ul className='ml-2 space-y-1 text-xs list-disc list-inside'>
                 <li>
                   <strong>서비스:</strong> &apos;런하우스&apos; 웹사이트 및 관련
@@ -62,7 +62,7 @@ export default function TermsOfServiceModal({
             </div>
 
             <div>
-              <h3 className='mb-2 font-semibold text-gray-900'>
+              <h3 className='mb-2 font-semibold text-rh-text-inverted'>
                 제2조 (약관의 효력 및 변경)
               </h3>
               <div className='space-y-1 text-xs'>
@@ -82,7 +82,7 @@ export default function TermsOfServiceModal({
             </div>
 
             <div>
-              <h3 className='mb-2 font-semibold text-gray-900'>
+              <h3 className='mb-2 font-semibold text-rh-text-inverted'>
                 제3조 (회원가입)
               </h3>
               <div className='space-y-1 text-xs'>
@@ -103,7 +103,7 @@ export default function TermsOfServiceModal({
             </div>
 
             <div>
-              <h3 className='mb-2 font-semibold text-gray-900'>
+              <h3 className='mb-2 font-semibold text-rh-text-inverted'>
                 제4조 (회원의 의무)
               </h3>
               <div className='space-y-1 text-xs'>
@@ -123,7 +123,7 @@ export default function TermsOfServiceModal({
             </div>
 
             <div>
-              <h3 className='mb-2 font-semibold text-gray-900'>
+              <h3 className='mb-2 font-semibold text-rh-text-inverted'>
                 제5조 (서비스의 제공 및 변경)
               </h3>
               <div className='space-y-1 text-xs'>
@@ -141,7 +141,7 @@ export default function TermsOfServiceModal({
             </div>
 
             <div>
-              <h3 className='mb-2 font-semibold text-gray-900'>
+              <h3 className='mb-2 font-semibold text-rh-text-inverted'>
                 제10조 (책임의 제한)
               </h3>
               <div className='space-y-1 text-xs'>
@@ -156,8 +156,8 @@ export default function TermsOfServiceModal({
               </div>
             </div>
 
-            <div className='pt-4 text-center border-t border-gray-200'>
-              <p className='text-xs text-gray-500'>
+            <div className='pt-4 text-center border-t border-rh-border'>
+              <p className='text-xs text-rh-text-tertiary'>
                 <strong>부칙:</strong> 본 약관은 2025년 6월 3일부터 적용됩니다.
               </p>
             </div>
@@ -165,10 +165,10 @@ export default function TermsOfServiceModal({
         </div>
 
         {/* 하단 버튼 */}
-        <div className='p-4 border-t border-gray-200'>
+        <div className='p-4 border-t border-rh-border'>
           <button
             onClick={onClose}
-            className='w-full px-4 py-2 text-white rounded-md bg-primary-blue bg-basic-blue hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary-blue'
+            className='w-full px-4 py-2 text-white rounded-md bg-primary-blue bg-rh-accent hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary-blue'
           >
             확인
           </button>

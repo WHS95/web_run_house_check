@@ -6,10 +6,14 @@ import PageHeader from "@/components/organisms/common/PageHeader";
 import PopupNotification, {
   NotificationType,
 } from "@/components/molecules/common/PopupNotification";
+import LocationVerificationModal from "@/components/molecules/LocationVerificationModal";
+import LocationStatusIndicator from "@/components/molecules/LocationStatusIndicator";
 import { haptic } from "@/lib/haptic";
 import { AiOutlineCalendar } from "react-icons/ai";
 import { IoChevronDown } from "react-icons/io5";
+import { MapPin, WifiOff, CloudUpload } from "lucide-react";
 import LoadingSpinner from "../atoms/LoadingSpinner";
+import { useOfflineAttendance } from "@/hooks/useOfflineAttendance";
 
 const HOST_OPTIONS = [
   { value: "예", label: "예" },
@@ -110,6 +114,12 @@ interface ClientAttendancePageProps {
     crewInfo: any;
     locationOptions: any[];
     exerciseOptions: any[];
+    crewLocations?: Array<{
+      id: number;
+      name: string;
+      latitude: number | null;
+      longitude: number | null;
+    }>;
   };
   userStatus?: any;
   userId?: string;
@@ -123,12 +133,19 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   error,
 }) => {
   const router = useRouter();
+  const { isOnline, queueCount, enqueue, isFlushing } = useOfflineAttendance();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationType, setNotificationType] =
     useState<NotificationType | null>(null);
   const [notificationMessage, setNotificationMessage] = useState("");
+
+  // 위치 기반 출석 관련 상태
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [locationVerified, setLocationVerified] = useState<boolean | null>(null);
+  const [locationMessage, setLocationMessage] = useState("");
+  const [canAttendByLocation, setCanAttendByLocation] = useState(true); // 위치 기반 출석 가능 여부
 
   // 초기 폼 데이터
   const [formData, setFormData] = useState(() => {
@@ -175,29 +192,32 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
     }
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    if (isSubmitting || !userId) return;
+  // 위치 상태 변경 핸들러
+  const handleLocationStatusChange = useCallback((canAttend: boolean, message: string) => {
+    setCanAttendByLocation(canAttend);
+    setLocationMessage(message);
+  }, []);
 
-    // 사용자 상태 확인
-    if (userStatus && !userStatus.isActive) {
+  // 위치 검증 완료 핸들러
+  const handleLocationVerified = useCallback((isVerified: boolean, message: string) => {
+    setLocationVerified(isVerified);
+    setLocationMessage(message);
+    setShowLocationModal(false);
+
+    if (isVerified) {
+      // 위치 검증 성공 시 출석 제출
+      proceedWithSubmission();
+    } else {
+      // 위치 검증 실패
       haptic.error();
       setNotificationType("error");
-      setNotificationMessage(
-        `${userStatus.statusMessage}\n\n${userStatus.suspensionReason}`
-      );
+      setNotificationMessage(message);
       setShowNotification(true);
-      return;
     }
+  }, []);
 
-    // 허용된 시간 범위 검증
-    if (isFutureDateTime(formData.date, formData.time)) {
-      haptic.error();
-      setNotificationType("error");
-      setNotificationMessage("허용된 시간 범위를 초과했습니다.");
-      setShowNotification(true);
-      return;
-    }
-
+  // 실제 출석 제출 처리
+  const proceedWithSubmission = useCallback(async () => {
     setIsSubmitting(true);
     haptic.medium();
 
@@ -217,6 +237,24 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         isHost: formData.isHost === "예",
         attendanceTimestamp: attendanceDateTime.toISOString(),
       };
+
+      // 오프라인 상태: 큐에 저장
+      if (!isOnline) {
+        await enqueue({
+          userId: submissionData.userId!,
+          crewId: submissionData.crewId,
+          locationId: Number(submissionData.locationId),
+          exerciseTypeId: Number(submissionData.exerciseTypeId),
+          isHost: submissionData.isHost,
+          attendanceTimestamp: submissionData.attendanceTimestamp,
+        });
+        haptic.success();
+        setNotificationType("success");
+        setNotificationMessage("오프라인 출석이 저장되었습니다. 연결 시 자동 전송됩니다.");
+        setIsSubmitting(false);
+        setShowNotification(true);
+        return;
+      }
 
       const response = await fetch("/api/attendance", {
         method: "POST",
@@ -243,9 +281,51 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       setNotificationMessage("네트워크 오류가 발생했습니다.");
     } finally {
       setIsSubmitting(false);
+      setShowNotification(true);
+    }
+  }, [formData, initialFormData, userId, isOnline, enqueue]);
+
+  const handleSubmit = useCallback(async () => {
+    if (isSubmitting || !userId) return;
+
+    // 사용자 상태 확인
+    if (userStatus && !userStatus.isActive) {
+      haptic.error();
+      setNotificationType("error");
+      setNotificationMessage(
+        `${userStatus.statusMessage}\n\n${userStatus.suspensionReason}`
+      );
+      setShowNotification(true);
+      return;
     }
 
-    setShowNotification(true);
+    // 허용된 시간 범위 검증
+    if (isFutureDateTime(formData.date, formData.time)) {
+      haptic.error();
+      setNotificationType("error");
+      setNotificationMessage("허용된 시간 범위를 초과했습니다.");
+      setShowNotification(true);
+      return;
+    }
+
+    // 위치 기반 출석이 활성화된 경우
+    if (initialFormData?.crewInfo?.location_based_attendance) {
+      // 위치 상태가 출석 불가능한 경우 출석 차단
+      if (!canAttendByLocation) {
+        haptic.error();
+        setNotificationType("error");
+        setNotificationMessage(locationMessage || "현재 위치에서는 출석할 수 없습니다.");
+        setShowNotification(true);
+        return;
+      }
+      
+      // 위치 검증 모달 표시
+      setShowLocationModal(true);
+      return;
+    }
+
+    // 위치 기반 출석이 비활성화된 경우 바로 제출
+    proceedWithSubmission();
   }, [isSubmitting, userId, userStatus, formData, initialFormData]);
 
   const availableTimeOptions = useMemo(
@@ -256,13 +336,13 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   // 에러 상태 처리
   if (error) {
     return (
-      <div className='flex flex-col justify-center items-center h-screen bg-basic-black'>
+      <div className='flex flex-col justify-center items-center h-screen bg-rh-bg-primary'>
         <div className='p-4 text-center text-white'>
           <h2 className='mb-4 text-xl font-bold'>오류가 발생했습니다</h2>
           <p className='mb-4'>{error}</p>
           <button
             onClick={() => router.push("/")}
-            className='px-4 py-2 text-white rounded bg-basic-blue'
+            className='px-4 py-2 text-white rounded bg-rh-accent'
           >
             홈으로 돌아가기
           </button>
@@ -274,58 +354,79 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   // 초기 데이터가 없는 경우
   if (!initialFormData) {
     return (
-      <div className='flex justify-center items-center h-screen bg-basic-black'>
+      <div className='flex justify-center items-center h-screen bg-rh-bg-primary'>
         <LoadingSpinner size='sm' color='white' />
       </div>
     );
   }
 
   return (
-    <div className='flex overflow-hidden relative flex-col h-screen bg-basic-black'>
+    <div className='flex overflow-hidden relative flex-col h-screen bg-rh-bg-primary'>
       {/* 헤더 */}
       <div className='fixed top-0 right-0 left-0 z-50'>
         <PageHeader
           title='출석 체크'
           iconColor='white'
-          borderColor='gray-500'
+          borderColor='rh-border'
         />
       </div>
 
       {/* 메인 콘텐츠 */}
-      <div className='flex-1 overflow-y-auto native-scroll pt-[10vh] pb-[40vh] px-[4vw]'>
-        <div className='space-y-[3vh]'>
+      <div className='flex-1 overflow-y-auto native-scroll pt-20 pb-40 px-4'>
+        {/* 오프라인 상태 배너 */}
+        {!isOnline && (
+          <div className="mb-3 flex items-center gap-2 rounded-rh-md bg-rh-status-warning/20 px-3 py-2">
+            <WifiOff className="h-4 w-4 text-rh-status-warning" />
+            <span className="text-rh-caption text-rh-status-warning">
+              오프라인 상태 · 출석 시 자동 저장됩니다
+            </span>
+          </div>
+        )}
+
+        {queueCount > 0 && isOnline && (
+          <div className="mb-3 flex items-center gap-2 rounded-rh-md bg-rh-accent/20 px-3 py-2">
+            <CloudUpload className="h-4 w-4 text-rh-accent" />
+            <span className="text-rh-caption text-rh-accent">
+              {isFlushing
+                ? "대기 중인 출석을 전송하고 있습니다..."
+                : `대기 중인 출석 ${queueCount}건`}
+            </span>
+          </div>
+        )}
+
+        <div className='space-y-3'>
           {/* 이름 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               이름
             </label>
-            <div className='h-[6vh] bg-basic-black-gray rounded-xl flex items-center px-[2vw]'>
+            <div className='h-12 bg-rh-bg-surface rounded-xl flex items-center px-2'>
               <span className='font-medium text-white'>{formData.name}</span>
             </div>
           </div>
 
           {/* 참여일시 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               참여일시
             </label>
-            <div className='space-y-[1.5vh]'>
+            <div className='space-y-1.5'>
               <div className='relative'>
                 <input
                   type='date'
                   value={formData.date}
                   onChange={(e) => handleFormChange("date", e.target.value)}
-                  className='text-white ios-date-input bg-basic-black-gray'
+                  className='text-white ios-date-input bg-rh-bg-surface'
                 />
-                <div className='absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none'>
-                  <AiOutlineCalendar className='w-[1.25rem] h-[1.25rem] text-gray-400' />
+                <div className='absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none'>
+                  <AiOutlineCalendar className='w-[1.25rem] h-[1.25rem] text-rh-text-secondary' />
                 </div>
               </div>
               <div className='relative'>
                 <select
                   value={formData.time}
                   onChange={(e) => handleFormChange("time", e.target.value)}
-                  className='text-white ios-select bg-basic-black-gray'
+                  className='text-white ios-select bg-rh-bg-surface'
                 >
                   {availableTimeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -333,8 +434,8 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                     </option>
                   ))}
                 </select>
-                <div className='absolute inset-y-0 right-0 flex items-center pr-[1.5vw] pointer-events-none'>
-                  <IoChevronDown className='w-[1.25rem] h-[1.25rem] text-gray-400' />
+                <div className='absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none'>
+                  <IoChevronDown className='w-[1.25rem] h-[1.25rem] text-rh-text-secondary' />
                 </div>
               </div>
             </div>
@@ -342,14 +443,14 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
           {/* 장소 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               참여 장소
             </label>
             <div className='relative'>
               <select
                 value={formData.location}
                 onChange={(e) => handleFormChange("location", e.target.value)}
-                className='text-white ios-select bg-basic-black-gray'
+                className='text-white ios-select bg-rh-bg-surface'
               >
                 {initialFormData!.locationOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -358,14 +459,14 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 ))}
               </select>
               <div className='flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none'>
-                <IoChevronDown className='w-5 h-5 text-gray-400' />
+                <IoChevronDown className='w-5 h-5 text-rh-text-secondary' />
               </div>
             </div>
           </div>
 
           {/* 운동 종류 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               운동 종류
             </label>
             <div className='relative'>
@@ -374,7 +475,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 onChange={(e) =>
                   handleFormChange("exerciseType", e.target.value)
                 }
-                className='text-white ios-select bg-basic-black-gray'
+                className='text-white ios-select bg-rh-bg-surface'
               >
                 {initialFormData!.exerciseOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -383,17 +484,17 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 ))}
               </select>
               <div className='flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none'>
-                <IoChevronDown className='w-5 h-5 text-gray-400' />
+                <IoChevronDown className='w-5 h-5 text-rh-text-secondary' />
               </div>
             </div>
           </div>
 
           {/* 개설자 여부 */}
           <div>
-            <label className='block mb-[1.5vh] text-[0.875rem] font-bold text-white'>
+            <label className='block mb-3 text-[0.875rem] font-bold text-white'>
               개설자 여부
             </label>
-            <div className='flex space-x-[2vw]'>
+            <div className='flex space-x-2'>
               {HOST_OPTIONS.map((option) => (
                 <label
                   key={option.value}
@@ -405,7 +506,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                     value={option.value}
                     checked={formData.isHost === option.value}
                     onChange={(e) => handleFormChange("isHost", e.target.value)}
-                    className='mr-[1vw] text-blue-500 focus:ring-blue-500'
+                    className='mr-1 text-blue-500 focus:ring-blue-500'
                   />
                   <span className='text-white'>{option.label}</span>
                 </label>
@@ -414,29 +515,62 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           </div>
         </div>
 
+        {/* 위치 상태 표시 컴포넌트 */}
+        <LocationStatusIndicator
+          isLocationBasedAttendance={initialFormData?.crewInfo?.location_based_attendance || false}
+          crewLocations={initialFormData?.crewLocations || []}
+          allowedRadius={50}
+          onStatusChange={handleLocationStatusChange}
+        />
+
         {/* 제출 버튼 */}
         <button
           onClick={handleSubmit}
-          disabled={isSubmitting || (userStatus && !userStatus.isActive)}
-          className={`mt-[2vh] p-[1vh] rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-[7vh] font-bold text-white ${
-            isSubmitting || (userStatus && !userStatus.isActive)
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-basic-blue hover:bg-blue-600"
+          disabled={
+            isSubmitting || 
+            (userStatus && !userStatus.isActive) ||
+            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
+          }
+          className={`mt-4 p-2 rounded-md transition-colors active:scale-95 native-shadow hw-accelerated hover:bg-white/10 w-full h-14 font-bold text-white ${
+            isSubmitting || 
+            (userStatus && !userStatus.isActive) ||
+            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
+              ? "bg-rh-bg-muted cursor-not-allowed"
+              : "bg-rh-accent hover:bg-blue-600"
           }`}
           style={{ WebkitTapHighlightColor: "transparent" }}
         >
           {isSubmitting ? (
-            <div className='flex items-center justify-center space-x-[1vw]'>
+            <div className='flex items-center justify-center space-x-1'>
               <LoadingSpinner size='sm' color='white' />
               <span>처리 중...</span>
             </div>
           ) : userStatus && !userStatus.isActive ? (
             "출석 불가"
+          ) : initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation ? (
+            <div className='flex items-center justify-center space-x-1'>
+              <MapPin className="w-4 h-4" />
+              <span>위치 확인 필요</span>
+            </div>
+          ) : initialFormData?.crewInfo?.location_based_attendance ? (
+            <div className='flex items-center justify-center space-x-1'>
+              <MapPin className="w-4 h-4" />
+              <span>위치 확인 후 출석</span>
+            </div>
           ) : (
             "출석 체크"
           )}
         </button>
       </div>
+
+      {/* 위치 검증 모달 */}
+      <LocationVerificationModal
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        onVerified={handleLocationVerified}
+        crewLocations={initialFormData?.crewLocations || []}
+        allowedRadius={50}
+      />
 
       {/* 알림 팝업 */}
       {notificationType && (

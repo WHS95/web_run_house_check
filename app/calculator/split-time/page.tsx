@@ -5,7 +5,7 @@ const SplitTimeCalculatorClient = dynamic(
   () => import("@/components/calculator/SplitTimeCalculatorClient"),
   { 
     ssr: false, 
-    loading: () => <div className='h-96 bg-gray-700 rounded animate-pulse' /> 
+    loading: () => <div className='h-96 bg-rh-bg-surface rounded animate-pulse' /> 
   }
 );
 

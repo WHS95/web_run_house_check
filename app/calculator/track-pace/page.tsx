@@ -150,7 +150,7 @@ export default function TrackPacePage() {
     <FormLayout title='트랙 페이스 계산기'>
       <div className='space-y-6 mb-44'>
         {/* 입력 섹션 */}
-        <div className='p-4 space-y-4 bg-basic-black-gray rounded-2xl'>
+        <div className='p-4 space-y-4 bg-rh-bg-surface rounded-2xl'>
           <h3 className='text-lg font-bold text-white'>목표 설정</h3>
 
           {/* 입력 모드 선택 탭 */}
@@ -159,8 +159,8 @@ export default function TrackPacePage() {
               onClick={() => setInputMode("marathon")}
               className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 inputMode === "marathon"
-                  ? "bg-basic-blue text-white"
-                  : "bg-basic-gray text-gray-300 hover:bg-basic-blue/20"
+                  ? "bg-rh-accent text-white"
+                  : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
               }`}
             >
               마라톤 목표 기록
@@ -169,8 +169,8 @@ export default function TrackPacePage() {
               onClick={() => setInputMode("pace")}
               className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 inputMode === "pace"
-                  ? "bg-basic-blue text-white"
-                  : "bg-basic-gray text-gray-300 hover:bg-basic-blue/20"
+                  ? "bg-rh-accent text-white"
+                  : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
               }`}
             >
               1km 페이스 직접
@@ -187,7 +187,7 @@ export default function TrackPacePage() {
                 <select
                   value={marathonHours}
                   onChange={(e) => setMarathonHours(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-basic-gray'
+                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
                 >
                   {Array.from({ length: 25 }, (_, i) => (
                     <option key={i} value={i.toString()}>
@@ -198,7 +198,7 @@ export default function TrackPacePage() {
                 <select
                   value={marathonMinutes}
                   onChange={(e) => setMarathonMinutes(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-basic-gray'
+                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
                 >
                   {Array.from({ length: 60 }, (_, i) => (
                     <option key={i} value={i.toString()}>
@@ -209,7 +209,7 @@ export default function TrackPacePage() {
                 <select
                   value={marathonSeconds}
                   onChange={(e) => setMarathonSeconds(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-basic-gray'
+                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
                 >
                   {Array.from({ length: 60 }, (_, i) => (
                     <option key={i} value={i.toString()}>
@@ -218,7 +218,7 @@ export default function TrackPacePage() {
                   ))}
                 </select>
               </div>
-              <div className='mt-2 text-xs text-gray-400'>
+              <div className='mt-2 text-xs text-rh-text-secondary'>
                 입력한 마라톤 기록에서 1km 페이스를 자동 계산합니다
               </div>
             </div>
@@ -234,7 +234,7 @@ export default function TrackPacePage() {
                 <select
                   value={paceMinutes}
                   onChange={(e) => setPaceMinutes(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-basic-gray'
+                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
                 >
                   {Array.from({ length: 60 }, (_, i) => (
                     <option key={i} value={i.toString()}>
@@ -246,7 +246,7 @@ export default function TrackPacePage() {
                 <select
                   value={paceSeconds}
                   onChange={(e) => setPaceSeconds(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-basic-gray'
+                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
                 >
                   {Array.from({ length: 60 }, (_, i) => (
                     <option key={i} value={i.toString()}>
@@ -255,7 +255,7 @@ export default function TrackPacePage() {
                   ))}
                 </select>
               </div>
-              <div className='mt-2 text-xs text-gray-400'>
+              <div className='mt-2 text-xs text-rh-text-secondary'>
                 1km당 목표 페이스를 직접 설정합니다
               </div>
             </div>
@@ -279,8 +279,8 @@ export default function TrackPacePage() {
                   }
                   className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedLanes === option.value
-                      ? "bg-basic-blue text-white"
-                      : "bg-basic-gray text-gray-300 hover:bg-basic-blue/20"
+                      ? "bg-rh-accent text-white"
+                      : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
                   }`}
                 >
                   {option.label}
@@ -299,8 +299,8 @@ export default function TrackPacePage() {
                 onClick={() => setOutputMode("single")}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   outputMode === "single"
-                    ? "bg-basic-blue text-white"
-                    : "bg-basic-gray text-gray-300 hover:bg-basic-blue/20"
+                    ? "bg-rh-accent text-white"
+                    : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
                 }`}
               >
                 단일 결과
@@ -309,8 +309,8 @@ export default function TrackPacePage() {
                 onClick={() => setOutputMode("table")}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   outputMode === "table"
-                    ? "bg-basic-blue text-white"
-                    : "bg-basic-gray text-gray-300 hover:bg-basic-blue/20"
+                    ? "bg-rh-accent text-white"
+                    : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
                 }`}
               >
                 전체 표 보기
@@ -321,34 +321,34 @@ export default function TrackPacePage() {
 
         {/* 결과 섹션 */}
         {(singleResult || tableResults.length > 0) && (
-          <div className='p-4 bg-basic-black-gray rounded-2xl'>
+          <div className='p-4 bg-rh-bg-surface rounded-2xl'>
             {outputMode === "single" && singleResult && (
               <div className='space-y-3'>
                 <div className='mb-4 text-center'>
-                  <div className='text-sm text-gray-400 mb-1'>
+                  <div className='text-sm text-rh-text-secondary mb-1'>
                     {inputMode === "marathon" 
                       ? `마라톤 ${marathonHours}:${marathonMinutes.padStart(2, "0")}:${marathonSeconds.padStart(2, "0")} 기준`
                       : "직접 입력 페이스"
                     }
                   </div>
-                  <div className='text-lg font-bold text-basic-blue'>
+                  <div className='text-lg font-bold text-rh-accent'>
                     페이스: {getCurrentPaceString()}/km
                   </div>
                 </div>
 
                 {selectedLanes !== "lane2" && (
-                  <div className='flex items-center justify-between px-4 py-3 rounded-lg bg-basic-gray'>
+                  <div className='flex items-center justify-between px-4 py-3 rounded-lg bg-rh-bg-muted'>
                     <span className='font-medium text-white'>1레인 (400m)</span>
-                    <span className='text-lg font-bold text-basic-blue'>
+                    <span className='text-lg font-bold text-rh-accent'>
                       {singleResult.lane1}
                     </span>
                   </div>
                 )}
 
                 {selectedLanes !== "lane1" && (
-                  <div className='flex items-center justify-between px-4 py-3 rounded-lg bg-basic-gray'>
+                  <div className='flex items-center justify-between px-4 py-3 rounded-lg bg-rh-bg-muted'>
                     <span className='font-medium text-white'>2레인 (407m)</span>
-                    <span className='text-lg font-bold text-basic-blue'>
+                    <span className='text-lg font-bold text-rh-accent'>
                       {singleResult.lane2}
                     </span>
                   </div>
@@ -359,20 +359,20 @@ export default function TrackPacePage() {
             {outputMode === "table" && tableResults.length > 0 && (
               <div>
                 <div className='mb-4 text-center'>
-                  <div className='text-sm text-gray-400 mb-1'>
+                  <div className='text-sm text-rh-text-secondary mb-1'>
                     {inputMode === "marathon" 
                       ? `마라톤 ${marathonHours}:${marathonMinutes.padStart(2, "0")}:${marathonSeconds.padStart(2, "0")} 기준`
                       : "직접 입력 페이스"
                     }
                   </div>
-                  <div className='text-lg font-bold text-basic-blue'>
+                  <div className='text-lg font-bold text-rh-accent'>
                     기준 페이스: {getCurrentPaceString()}/km ± 1분
                   </div>
                 </div>
                 <div className='overflow-x-auto'>
                   <table className='w-full text-white'>
                   <thead>
-                    <tr className='border-b border-basic-gray'>
+                    <tr className='border-b border-rh-border'>
                       <th className='px-2 py-2 text-left'>페이스(/km)</th>
                       {selectedLanes !== "lane2" && (
                         <th className='px-2 py-2 text-center'>1레인 (400m)</th>
@@ -388,13 +388,13 @@ export default function TrackPacePage() {
                       return (
                         <tr
                           key={index}
-                          className={`border-b border-basic-gray/30 ${
-                            isCurrentPace ? "bg-basic-blue/20" : ""
+                          className={`border-b border-rh-border/30 ${
+                            isCurrentPace ? "bg-rh-accent/20" : ""
                           }`}
                         >
                           <td
                             className={`py-2 px-2 font-medium ${
-                              isCurrentPace ? "text-basic-blue" : ""
+                              isCurrentPace ? "text-rh-accent" : ""
                             }`}
                           >
                             {row.pace}
@@ -402,7 +402,7 @@ export default function TrackPacePage() {
                           {selectedLanes !== "lane2" && (
                             <td
                               className={`text-center py-2 px-2 ${
-                                isCurrentPace ? "text-basic-blue font-bold" : ""
+                                isCurrentPace ? "text-rh-accent font-bold" : ""
                               }`}
                             >
                               {row.lane1}
@@ -411,7 +411,7 @@ export default function TrackPacePage() {
                           {selectedLanes !== "lane1" && (
                             <td
                               className={`text-center py-2 px-2 ${
-                                isCurrentPace ? "text-basic-blue font-bold" : ""
+                                isCurrentPace ? "text-rh-accent font-bold" : ""
                               }`}
                             >
                               {row.lane2}
@@ -429,9 +429,9 @@ export default function TrackPacePage() {
         )}
 
         {/* 설명 섹션 */}
-        <div className='p-4 bg-basic-black-gray rounded-2xl'>
+        <div className='p-4 bg-rh-bg-surface rounded-2xl'>
           <h3 className='mb-2 text-lg font-bold text-white'>사용법</h3>
-          <div className='space-y-2 text-sm text-gray-300'>
+          <div className='space-y-2 text-sm text-rh-text-secondary'>
             <p>• <strong>마라톤 목표 기록:</strong> 풀코스 완주 목표 시간을 입력하면 1km 페이스를 자동 계산</p>
             <p>• <strong>1km 페이스 직접:</strong> 원하는 킬로미터당 페이스를 직접 설정</p>
             <p>• 탭을 선택하여 두 가지 입력 방식 중 하나를 선택하세요</p>

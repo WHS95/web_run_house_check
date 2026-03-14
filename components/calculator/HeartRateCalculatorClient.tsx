@@ -25,7 +25,7 @@ const getZoneColor = (zone: number) => {
     case 5:
       return "bg-gradient-to-r from-red-500/20 to-red-500/30 hover:from-red-500/30 hover:to-red-500/40 border border-red-500/30";
     default:
-      return "bg-gradient-to-r from-gray-500/20 to-gray-500/30 hover:from-gray-500/30 hover:to-gray-500/40 border border-gray-500/30";
+      return "bg-gradient-to-r from-rh-bg-muted/20 to-rh-bg-muted/30 hover:from-rh-bg-muted/30 hover:to-rh-bg-muted/40 border border-rh-border/30";
   }
 };
 
@@ -59,7 +59,7 @@ export default function HeartRateCalculatorClient() {
         <div>
           <label className='block mb-2 text-sm font-bold text-white'>
             나이
-            <span className='ml-1 text-gray-400'>(세)</span>
+            <span className='ml-1 text-rh-text-secondary'>(세)</span>
           </label>
           <Input
             type='number'
@@ -68,13 +68,13 @@ export default function HeartRateCalculatorClient() {
             value={age}
             onChange={(e) => setAge(e.target.value)}
             placeholder='30'
-            className='placeholder-gray-400 text-white bg-gray-800 border-gray-600'
+            className='placeholder-rh-text-secondary text-white bg-rh-bg-primary border-rh-border'
           />
         </div>
 
         <Button
           onClick={handleCalculate}
-          className='w-full text-white bg-basic-blue hover:bg-basic-blue/80'
+          className='w-full text-white bg-rh-accent hover:bg-rh-accent-hover/80'
         >
           계산하기
         </Button>
@@ -86,11 +86,11 @@ export default function HeartRateCalculatorClient() {
           <div className='flex gap-2 items-center mb-4'>
             <h2 className='text-lg font-medium'>트레이닝 존</h2>
             <div className='relative group'>
-              <div className='text-gray-400 cursor-help'>ⓘ</div>
-              <div className='absolute bottom-full mb-2 p-3 text-sm bg-gray-800 text-white rounded-lg shadow-lg invisible group-hover:visible w-[280px] left-1/2 -translate-x-1/2 border border-gray-600'>
+              <div className='text-rh-text-secondary cursor-help'>ⓘ</div>
+              <div className='absolute bottom-full mb-2 p-3 text-sm bg-rh-bg-primary text-white rounded-lg shadow-lg invisible group-hover:visible w-[280px] left-1/2 -translate-x-1/2 border border-rh-border'>
                 <p>최대 심박수 계산 공식:</p>
                 <p className='mt-1 font-mono text-xs'>220 - 나이</p>
-                <p className='mt-2 text-xs text-gray-400'>
+                <p className='mt-2 text-xs text-rh-text-secondary'>
                   각 존은 최대 심박수의 비율로 계산됩니다.
                   <br />
                   이는 일반적인 추정치이며, 개인차가 있을 수 있습니다.
@@ -102,7 +102,7 @@ export default function HeartRateCalculatorClient() {
           <div className='p-3 mb-4 bg-gradient-to-r rounded-lg border from-blue-600/20 to-blue-600/30 border-blue-600/30'>
             <div className='font-medium'>예상 최대 심박수</div>
             <div className='mt-1 text-2xl'>
-              {maxHR} <span className='text-sm text-gray-400'>bpm</span>
+              {maxHR} <span className='text-sm text-rh-text-secondary'>bpm</span>
             </div>
           </div>
 
@@ -126,10 +126,10 @@ export default function HeartRateCalculatorClient() {
                       </div>
                       <div className='text-sm font-mono text-white'>
                         {zone.min}-{zone.max}
-                        <span className='ml-1 text-gray-400'>bpm</span>
+                        <span className='ml-1 text-rh-text-secondary'>bpm</span>
                       </div>
                     </div>
-                    <p className='mt-0.5 text-xs text-gray-300 line-clamp-1 group-hover/zone:line-clamp-none'>
+                    <p className='mt-0.5 text-xs text-rh-text-secondary line-clamp-1 group-hover/zone:line-clamp-none'>
                       {zone.description}
                     </p>
                   </div>

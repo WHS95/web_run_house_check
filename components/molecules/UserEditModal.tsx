@@ -51,7 +51,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
     <div className='flex fixed inset-0 z-50 justify-center items-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 backdrop-blur-sm bg-basic-black/50'
+        className='absolute inset-0 backdrop-blur-sm bg-rh-bg-primary/50'
         onClick={onClose}
       />
 
@@ -59,7 +59,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
       <div className='relative p-8 mx-4 w-full max-w-md bg-white rounded-3xl shadow-2xl'>
         <div className='text-center'>
           {/* 제목 */}
-          <h2 className='mb-6 text-xl font-bold text-gray-900'>
+          <h2 className='mb-6 text-xl font-bold text-rh-text-inverted'>
             사용자 정보 수정
           </h2>
 
@@ -67,7 +67,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
           <div className='space-y-4 text-left'>
             {/* 이름 */}
             <div>
-              <label className='block mb-2 text-sm font-medium text-gray-700'>
+              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
                 이름
               </label>
               <input
@@ -76,14 +76,14 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, first_name: e.target.value })
                 }
-                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent'
                 placeholder='이름을 입력하세요'
               />
             </div>
 
             {/* 연락처 */}
             <div>
-              <label className='block mb-2 text-sm font-medium text-gray-700'>
+              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
                 연락처
               </label>
               <input
@@ -92,14 +92,14 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent'
                 placeholder='010-0000-0000'
               />
             </div>
 
             {/* 출생년도 */}
             <div>
-              <label className='block mb-2 text-sm font-medium text-gray-700'>
+              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
                 출생년도
               </label>
               <input
@@ -111,7 +111,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                     birth_year: parseInt(e.target.value),
                   })
                 }
-                className='p-3 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-basic-blue'
+                className='p-3 w-full rounded-lg border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent'
                 placeholder='1990'
                 min='1950'
                 max={new Date().getFullYear()}
@@ -120,14 +120,14 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
 
             {/* 가입일 (읽기 전용) */}
             <div>
-              <label className='block mb-2 text-sm font-medium text-gray-700'>
+              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
                 가입일
               </label>
               <input
                 type='text'
                 value={new Date(user.created_at).toLocaleDateString("ko-KR")}
                 disabled
-                className='p-3 w-full text-gray-500 bg-gray-100 rounded-lg border border-gray-300'
+                className='p-3 w-full text-rh-text-tertiary bg-rh-bg-surface rounded-lg border border-rh-border'
               />
             </div>
           </div>
@@ -137,14 +137,14 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
             <Button
               onClick={onClose}
               variant='outline'
-              className='flex-1 py-3 text-gray-600 border-gray-300 hover:bg-gray-50'
+              className='flex-1 py-3 text-rh-text-muted border-rh-border hover:bg-rh-bg-surface'
               disabled={isLoading}
             >
               취소
             </Button>
             <Button
               onClick={handleSave}
-              className='flex-1 py-3 text-white bg-basic-blue hover:bg-blue-600'
+              className='flex-1 py-3 text-white bg-rh-accent hover:bg-blue-600'
               disabled={isLoading}
             >
               {isLoading ? "저장 중..." : "저장"}

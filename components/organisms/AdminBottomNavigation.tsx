@@ -58,7 +58,7 @@ export default function AdminBottomNavigation() {
 
   return (
     <>
-      <div className='fixed right-0 bottom-0 left-0 z-50 border-t bg-basic-black-gray border-basic-gray safe-area-pb'>
+      <div className='fixed right-0 bottom-0 left-0 z-50 border-t bg-rh-bg-surface border-rh-border safe-area-pb'>
         <div className='flex justify-around items-center px-2 py-2'>
           {navigationItems.map((item) => {
             const isActive =
@@ -73,10 +73,10 @@ export default function AdminBottomNavigation() {
                   className='flex-1'
                 >
                   <div
-                    className={`flex flex-col justify-center items-center px-1 py-2 w-full h-auto text-gray-400 rounded-xl`}
+                    className={`flex flex-col justify-center items-center px-1 py-2 w-full h-auto text-rh-text-secondary rounded-xl`}
                   >
-                    <item.icon className='mb-1 w-5 h-5 text-gray-400' />
-                    <span className='text-xs font-medium text-gray-400'>
+                    <item.icon className='mb-1 w-5 h-5 text-rh-text-secondary' />
+                    <span className='text-xs font-medium text-rh-text-secondary'>
                       {item.name}
                     </span>
                   </div>
@@ -89,17 +89,17 @@ export default function AdminBottomNavigation() {
                 <Button
                   variant='ghost'
                   className={`w-full h-auto flex flex-col items-center justify-center py-2 px-1 rounded-xl ${
-                    isActive ? "text-basic-blue" : "text-gray-400"
+                    isActive ? "text-rh-accent" : "text-rh-text-secondary"
                   }`}
                 >
                   <item.icon
                     className={`h-5 w-5 mb-1 ${
-                      isActive ? "text-basic-blue" : "text-gray-400"
+                      isActive ? "text-rh-accent" : "text-rh-text-secondary"
                     }`}
                   />
                   <span
                     className={`text-xs font-medium ${
-                      isActive ? "text-basic-blue" : "text-gray-400"
+                      isActive ? "text-rh-accent" : "text-rh-text-secondary"
                     }`}
                   >
                     {item.name}

@@ -36,7 +36,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     <div className='fixed inset-0 z-50 flex items-center justify-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 bg-basic-black/50 backdrop-blur-sm'
+        className='absolute inset-0 bg-rh-bg-primary/50 backdrop-blur-sm'
         onClick={onClose}
       />
 
@@ -53,10 +53,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           )}
 
           {/* 제목 */}
-          <h2 className='mb-6 text-xl font-bold text-gray-900'>{title}</h2>
+          <h2 className='mb-6 text-xl font-bold text-rh-text-inverted'>{title}</h2>
 
           {/* 내용 */}
-          <p className='mb-8 leading-relaxed text-gray-600 whitespace-pre-line'>
+          <p className='mb-8 leading-relaxed text-rh-text-muted whitespace-pre-line'>
             {content}
           </p>
 
@@ -65,7 +65,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <Button
               onClick={onClose}
               variant='outline'
-              className='flex-1 py-4 text-base font-medium border-gray-300 rounded-2xl hover:bg-gray-50'
+              className='flex-1 py-4 text-base font-medium border-rh-border rounded-2xl hover:bg-rh-bg-surface'
             >
               {cancelText}
             </Button>
@@ -74,7 +74,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
               className={`flex-1 py-4 text-base font-medium rounded-2xl ${
                 variant === "destructive"
                   ? "bg-red-600 hover:bg-red-700 text-white"
-                  : "bg-basic-black hover:bg-gray-800 text-white"
+                  : "bg-rh-bg-primary hover:bg-rh-bg-primary text-white"
               }`}
             >
               {confirmText}

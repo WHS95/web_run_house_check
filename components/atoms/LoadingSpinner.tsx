@@ -21,8 +21,8 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   // 색상별 클래스 정의
   const colorClasses = {
     white: "bg-white",
-    blue: "bg-basic-blue",
-    gray: "bg-gray-400",
+    blue: "bg-rh-accent",
+    gray: "bg-rh-bg-muted",
     red: "bg-red-400",
   };
 

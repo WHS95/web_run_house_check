@@ -11,8 +11,8 @@ const NavigationLabel: React.FC<NavigationLabelProps> = ({
 }) => {
   return (
     <span
-      className={`text-xs font-medium transition-colors duration-200 ${
-        isActive ? "text-white" : "text-gray-400"
+      className={`text-rh-small transition-colors duration-200 ${
+        isActive ? "text-rh-accent font-semibold" : "text-rh-text-muted font-medium"
       }`}
     >
       {text}

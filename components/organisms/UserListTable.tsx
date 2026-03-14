@@ -52,17 +52,17 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
         `}</style>
 
         <table className='min-w-full border-collapse table-fixed md:table-auto'>
-          <thead className='bg-white border-b border-gray-200 sticky top-0 z-10'>
+          <thead className='bg-white border-b border-rh-border sticky top-0 z-10'>
             <tr>
               <th
                 scope='col'
-                className='px-3 sm:px-6 py-3 text-left text-sm font-normal text-gray-500 opacity-60 w-1/2'
+                className='px-3 sm:px-6 py-3 text-left text-sm font-normal text-rh-text-tertiary opacity-60 w-1/2'
               >
                 이름/나이
               </th>
               <th
                 scope='col'
-                className='px-3 sm:px-6 py-3 text-left text-sm font-normal text-gray-500 opacity-60 w-1/3'
+                className='px-3 sm:px-6 py-3 text-left text-sm font-normal text-rh-text-tertiary opacity-60 w-1/3'
               >
                 가입일
               </th>
@@ -77,18 +77,18 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
           <tbody className='bg-white'>
             {users.map((user) => (
               <tr key={user.id}>
-                <td className='px-3 sm:px-6 pt-4 pb-3 text-xs text-gray-900'>
+                <td className='px-3 sm:px-6 pt-4 pb-3 text-xs text-rh-text-inverted'>
                   <UserTableInfoCell
                     profileUrl={user.profile_image_url}
                     name={user.first_name}
                     birthYear={user.birth_year}
                   />
                 </td>
-                <td className='px-3 sm:px-6 pt-4 pb-3 text-xs text-gray-900'>
+                <td className='px-3 sm:px-6 pt-4 pb-3 text-xs text-rh-text-inverted'>
                   {formatDate(user.join_date)}
                 </td>
                 <td className='relative pt-4 pb-6 pl-3 pr-2 sm:pr-6 text-right text-sm font-medium'>
-                  <button className='text-gray-400 hover:text-gray-600'>
+                  <button className='text-rh-text-secondary hover:text-rh-text-muted'>
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
                       className='h-5 w-5'

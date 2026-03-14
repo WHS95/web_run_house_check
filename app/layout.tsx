@@ -1,10 +1,19 @@
 import "./styles/globals.css";
 import { ReactNode } from "react";
+import { Black_Han_Sans } from 'next/font/google';
+
+const blackHanSans = Black_Han_Sans({
+    weight: '400',
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-black-han-sans',
+});
 // import StagewiseWrapper from "@/components/StagewiseWrapper";
 import { StagewiseToolbar } from "@stagewise/toolbar-next";
 import { Analytics } from "@vercel/analytics/react";
 import ConditionalBottomNav from "@/components/ConditionalBottomNav";
 import { NavigationProvider } from "@/components/providers/NavigationProvider";
+import FCMForegroundProvider from "@/components/providers/FCMForegroundProvider";
 
 import type { Metadata, Viewport } from "next";
 
@@ -48,7 +57,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang='ko'>
+    <html lang='ko' className={blackHanSans.variable}>
       <head>
         {/* 필수 PWA 메타태그만 유지 */}
         <meta name='application-name' content='런하우스' />
@@ -62,23 +71,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         {/* 성능 최적화 메타태그 */}
         <meta name='X-DNS-Prefetch-Control' content='on' />
-        <link rel='dns-prefetch' href='//fonts.googleapis.com' />
-        <link
-          rel='preconnect'
-          href='https://fonts.googleapis.com'
-          crossOrigin=''
-        />
-        <link
-          rel='preconnect'
-          href='https://fonts.gstatic.com'
-          crossOrigin=''
-        />
-
-        {/* Black Han Sans 폰트 추가 */}
-        <link
-          href='https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap'
-          rel='stylesheet'
-        />
 
         {/* 필수 링크만 유지 */}
         <link rel='apple-touch-icon' href='/apple-touch-icon.png' />
@@ -113,8 +105,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           />
         )} */}
         <NavigationProvider>
-          <div className="main-content">{children}</div>
-          <ConditionalBottomNav />
+          <FCMForegroundProvider />
+          <div className="mobile-viewport-wrapper">
+            <div className="mobile-viewport">
+              <div className="main-content">{children}</div>
+              <ConditionalBottomNav />
+            </div>
+          </div>
         </NavigationProvider>
         <Analytics />
       </body>

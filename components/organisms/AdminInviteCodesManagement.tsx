@@ -264,14 +264,14 @@ export default function AdminInviteCodesManagement({
 
   if (isLoading) {
     return (
-      <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
-        <div className='p-[4vw] space-y-[3vh] animate-pulse'>
-          <div className='bg-basic-gray/20 rounded-[0.75rem] p-[4vw]'>
-            <div className='flex items-center space-x-[3vw]'>
-              <div className='w-[3rem] h-[3rem] bg-basic-gray rounded-full'></div>
-              <div className='flex-1 space-y-[1vh]'>
-                <div className='h-[1rem] bg-basic-gray rounded w-[30vw]'></div>
-                <div className='h-[0.875rem] bg-basic-gray rounded w-[50vw]'></div>
+      <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
+        <div className='p-4 space-y-3 animate-pulse'>
+          <div className='bg-rh-bg-muted/20 rounded-rh-lg p-4'>
+            <div className='flex items-center space-x-3'>
+              <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
+              <div className='flex-1 space-y-1'>
+                <div className='h-[1rem] bg-rh-bg-muted rounded w-[120px]'></div>
+                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-1/2'></div>
               </div>
             </div>
           </div>
@@ -281,12 +281,12 @@ export default function AdminInviteCodesManagement({
   }
 
   return (
-    <div className='bg-basic-black-gray rounded-[0.75rem] shadow-sm overflow-hidden'>
+    <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
       {/* 헤더 */}
-      <div className='p-[4vw] border-b border-basic-gray'>
+      <div className='p-4 border-b border-rh-border'>
         <div className='flex justify-between items-center'>
-          <div className='flex items-center space-x-[2vw]'>
-            <Ticket className='w-[1.25rem] h-[1.25rem] text-basic-blue' />
+          <div className='flex items-center space-x-2'>
+            <Ticket className='w-[1.25rem] h-[1.25rem] text-rh-accent' />
             <span className='text-[1.125rem] font-bold text-white'>
               초대코드 관리
             </span>
@@ -297,7 +297,7 @@ export default function AdminInviteCodesManagement({
                 haptic.light();
                 setIsEditing(true);
               }}
-              className='px-[3vw] py-[3vw] bg-basic-blue hover:bg-basic-blue/80 text-white rounded-[0.75rem] text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
+              className='px-3 py-3 bg-rh-accent hover:bg-rh-accent-hover/80 text-white rounded-rh-lg text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
               disabled={isEditing}
             >
               <Plus className='w-[1rem] h-[1rem]' />
@@ -306,12 +306,12 @@ export default function AdminInviteCodesManagement({
         </div>
       </div>
 
-      <div className='p-[4vw] space-y-[3vh]'>
+      <div className='p-4 space-y-3'>
         {/* 초대코드 생성/수정 폼 */}
         {isEditing && (
-          <div className='border border-basic-blue bg-basic-blue/20 rounded-[0.75rem] p-[4vw] space-y-[2vh]'>
+          <div className='border border-rh-accent bg-rh-accent/20 rounded-rh-lg p-4 space-y-2'>
             <div>
-              <label className='block mb-[1vh] text-[0.875rem] font-medium text-white'>
+              <label className='block mb-2 text-[0.875rem] font-medium text-white'>
                 초대코드 *
               </label>
               <div className='flex space-x-2'>
@@ -327,7 +327,7 @@ export default function AdminInviteCodesManagement({
                       setEditData({ ...editData, inviteCode: value });
                     }
                   }}
-                  className='font-mono text-white border-0 bg-basic-black-gray placeholder:text-gray-400'
+                  className='font-mono text-white border-0 bg-rh-bg-surface placeholder:text-rh-text-secondary'
                   maxLength={7}
                 />
                 <Button
@@ -336,17 +336,17 @@ export default function AdminInviteCodesManagement({
                   size='sm'
                   onClick={handleGenerateRandomCode}
                   disabled={actionLoading}
-                  className='px-3 text-white border-0 bg-basic-black-gray hover:bg-basic-gray'
+                  className='px-3 text-white border-0 bg-rh-bg-surface hover:bg-rh-bg-muted'
                 >
                   <Shuffle className='w-4 h-4' />
                 </Button>
               </div>
-              <p className='mt-1 text-xs text-gray-400'>
+              <p className='mt-1 text-xs text-rh-text-secondary'>
                 영문 대문자와 숫자만 사용 가능 (정확히 7자리)
               </p>
             </div>
             {/* <div>
-              <label className='block mb-[1vh] text-[0.875rem] font-medium text-white'>
+              <label className='block mb-2 text-[0.875rem] font-medium text-white'>
                 설명 (선택사항)
               </label>
               <Input
@@ -356,10 +356,10 @@ export default function AdminInviteCodesManagement({
                 onChange={(e) =>
                   setEditData({ ...editData, description: e.target.value })
                 }
-                className='text-white border-0 bg-basic-black-gray placeholder:text-gray-400'
+                className='text-white border-0 bg-rh-bg-surface placeholder:text-rh-text-secondary'
               />
             </div> */}
-            <div className='flex space-x-[2vw]'>
+            <div className='flex space-x-2'>
               <Button
                 onClick={handleCreateInviteCode}
                 disabled={
@@ -367,7 +367,7 @@ export default function AdminInviteCodesManagement({
                   !editData.inviteCode.trim() ||
                   editData.inviteCode.length !== 7
                 }
-                className='bg-basic-blue hover:bg-basic-blue/80'
+                className='bg-rh-accent hover:bg-rh-accent-hover/80'
               >
                 {actionLoading ? "처리 중..." : inviteCode ? "수정" : "생성"}
               </Button>
@@ -375,7 +375,7 @@ export default function AdminInviteCodesManagement({
                 variant='outline'
                 onClick={handleCancelEdit}
                 disabled={actionLoading}
-                className='text-white border-0 bg-basic-gray hover:bg-basic-gray/80'
+                className='text-white border-0 bg-rh-bg-muted hover:bg-rh-bg-muted/80'
               >
                 취소
               </Button>
@@ -385,29 +385,29 @@ export default function AdminInviteCodesManagement({
 
         {/* 현재 초대코드 표시 */}
         {inviteCode && !isEditing && (
-          <Card className='border-0 bg-basic-black-gray'>
+          <Card className='border-0 bg-rh-bg-surface'>
             <CardContent className='px-4 py-4'>
               <div className='flex justify-between items-start'>
                 <div className='flex-1'>
                   <div className='flex items-center mb-3 space-x-3'>
-                    <code className='px-3 py-2 font-mono text-xl font-bold rounded-lg text-basic-blue bg-basic-blue/20'>
+                    <code className='px-3 py-2 font-mono text-xl font-bold rounded-lg text-rh-accent bg-rh-accent/20'>
                       {inviteCode.invite_code}
                     </code>
                   </div>
 
                   {inviteCode.description && (
-                    <p className='mb-3 text-sm text-gray-300'>
+                    <p className='mb-3 text-sm text-rh-text-secondary'>
                       {inviteCode.description}
                     </p>
                   )}
 
-                  {/* <div className='grid grid-cols-1 gap-3 text-sm text-gray-300 sm:grid-cols-2'>
+                  {/* <div className='grid grid-cols-1 gap-3 text-sm text-rh-text-secondary sm:grid-cols-2'>
                     <div className='flex items-center space-x-2'>
-                      <Calendar className='w-4 h-4 text-gray-400' />
+                      <Calendar className='w-4 h-4 text-rh-text-secondary' />
                       <span>생성: {formatDate(inviteCode.created_at)}</span>
                     </div>
                     <div className='flex items-center space-x-2'>
-                      <Calendar className='w-4 h-4 text-gray-400' />
+                      <Calendar className='w-4 h-4 text-rh-text-secondary' />
                       <span>수정: {formatDate(inviteCode.updated_at)}</span>
                     </div>
                   </div> */}
@@ -417,7 +417,7 @@ export default function AdminInviteCodesManagement({
                     variant='ghost'
                     size='sm'
                     onClick={() => handleCopyCode(inviteCode.invite_code)}
-                    className='p-2 text-white hover:bg-basic-gray'
+                    className='p-2 text-white hover:bg-rh-bg-muted'
                   >
                     <Copy className='w-4 h-4' />
                   </Button>
@@ -425,7 +425,7 @@ export default function AdminInviteCodesManagement({
                     variant='ghost'
                     size='sm'
                     onClick={handleStartEdit}
-                    className='p-2 text-basic-blue hover:bg-basic-blue/20'
+                    className='p-2 text-rh-accent hover:bg-rh-accent-hover/20'
                   >
                     <Edit className='w-4 h-4' />
                   </Button>
@@ -447,11 +447,11 @@ export default function AdminInviteCodesManagement({
         {/* 초대코드가 없을 때 */}
         {!inviteCode && !isEditing && (
           <div className='py-8 text-center'>
-            <Ticket className='mx-auto mb-4 w-16 h-16 text-gray-500' />
-            <p className='mb-2 text-lg font-medium text-gray-300'>
+            <Ticket className='mx-auto mb-4 w-16 h-16 text-rh-text-tertiary' />
+            <p className='mb-2 text-lg font-medium text-rh-text-secondary'>
               등록된 초대코드가 없습니다
             </p>
-            <p className='mb-4 text-gray-400'>
+            <p className='mb-4 text-rh-text-secondary'>
               크루 초대를 위한 코드를 생성해보세요
             </p>
             <Button
@@ -459,7 +459,7 @@ export default function AdminInviteCodesManagement({
                 haptic.light();
                 setIsEditing(true);
               }}
-              className='bg-basic-blue hover:bg-basic-blue/80'
+              className='bg-rh-accent hover:bg-rh-accent-hover/80'
             >
               <Plus className='mr-2 w-4 h-4' />첫 번째 초대코드 생성하기
             </Button>

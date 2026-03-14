@@ -36,7 +36,7 @@ const KakaoLoginButton: React.FC = () => {
       <button
         onClick={handleLogin}
         disabled={loading}
-        className='flex items-center justify-center w-full py-3 px-4 bg-[#FEE500] text-[#3C1E1E] font-medium rounded-md hover:bg-[#FFDD00] transition-colors disabled:opacity-70 disabled:cursor-not-allowed'
+        className='flex items-center justify-center w-full h-[52px] px-4 bg-[#FEE500] text-[#191919] font-semibold rounded-rh-lg hover:bg-[#FDD800] transition-colors disabled:opacity-70 disabled:cursor-not-allowed'
       >
         {loading ? (
           <span>로그인 중...</span>
@@ -52,7 +52,7 @@ const KakaoLoginButton: React.FC = () => {
                 />
               </svg>
             </div>
-            카카오톡 로그인
+            카카오로 시작하기
           </>
         )}
       </button>

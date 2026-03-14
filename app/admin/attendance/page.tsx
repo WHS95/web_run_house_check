@@ -3,66 +3,50 @@
 import { useEffect, useState } from "react";
 import { useAdminContext } from "../AdminContextProvider";
 import AdminAttendanceManagement from "@/components/organisms/AdminAttendanceManagement";
+import AdminPageContainer from "@/components/layouts/AdminPageContainer";
 import { getMonthlyAttendanceData } from "@/lib/supabase/admin";
 
 // 로딩 스켈레톤 컴포넌트
 function AttendanceLoadingSkeleton() {
   return (
-    <div className='flex flex-col h-full bg-basic-black'>
-      {/* 헤더 스켈레톤 */}
-      <div className='sticky top-0 z-10 border-b bg-basic-black-gray border-basic-gray'>
-        <div className='px-4 py-4'>
-          <div className='flex justify-between items-center'>
-            <div>
-              <div className='w-24 h-6 rounded animate-pulse bg-basic-gray'></div>
-              <div className='mt-1 w-32 h-4 rounded animate-pulse bg-basic-gray/70'></div>
+    <AdminPageContainer>
+      {/* 달력 스켈레톤 */}
+      <div className='p-4 rounded-lg border bg-rh-bg-surface border-rh-border'>
+        <div className='flex justify-between items-center mb-4'>
+          <div className='w-8 h-8 rounded animate-pulse bg-rh-bg-muted'></div>
+          <div className='w-32 h-6 rounded animate-pulse bg-rh-bg-muted'></div>
+          <div className='w-8 h-8 rounded animate-pulse bg-rh-bg-muted'></div>
+        </div>
+
+        {/* 요일 헤더 */}
+        <div className='grid grid-cols-7 gap-1 mb-2'>
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} className='py-2 text-center'>
+              <div className='mx-auto w-4 h-4 rounded animate-pulse bg-rh-bg-muted'></div>
             </div>
-          </div>
+          ))}
+        </div>
+
+        {/* 달력 날짜들 */}
+        <div className='grid grid-cols-7 gap-1' style={{ height: "80%" }}>
+          {Array.from({ length: 35 }).map((_, i) => (
+            <div
+              key={i}
+              className='h-10 rounded animate-pulse bg-rh-bg-muted/50'
+            ></div>
+          ))}
         </div>
       </div>
 
-      {/* 메인 컨텐츠 스켈레톤 */}
-      <div className='overflow-y-auto flex-1 px-4 py-4'>
-        <div className='space-y-6'>
-          {/* 달력 스켈레톤 */}
-          <div className='p-4 rounded-lg border bg-basic-black-gray border-basic-gray'>
-            <div className='flex justify-between items-center mb-4'>
-              <div className='w-8 h-8 rounded animate-pulse bg-basic-gray'></div>
-              <div className='w-32 h-6 rounded animate-pulse bg-basic-gray'></div>
-              <div className='w-8 h-8 rounded animate-pulse bg-basic-gray'></div>
-            </div>
-
-            {/* 요일 헤더 */}
-            <div className='grid grid-cols-7 gap-1 mb-2'>
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className='py-2 text-center'>
-                  <div className='mx-auto w-4 h-4 rounded animate-pulse bg-basic-gray'></div>
-                </div>
-              ))}
-            </div>
-
-            {/* 달력 날짜들 */}
-            <div className='grid grid-cols-7 gap-1' style={{ height: "80%" }}>
-              {Array.from({ length: 35 }).map((_, i) => (
-                <div
-                  key={i}
-                  className='h-10 rounded animate-pulse bg-basic-gray/50'
-                ></div>
-              ))}
-            </div>
-          </div>
-
-          {/* 안내 메시지 스켈레톤 */}
-          <div className='p-4 rounded-lg border bg-basic-black-gray border-basic-gray'>
-            <div className='text-center'>
-              <div className='mx-auto mb-2 w-8 h-8 rounded animate-pulse bg-basic-gray'></div>
-              <div className='mx-auto mb-1 w-48 h-4 rounded animate-pulse bg-basic-gray'></div>
-              <div className='mx-auto w-40 h-4 rounded animate-pulse bg-basic-gray'></div>
-            </div>
-          </div>
+      {/* 안내 메시지 스켈레톤 */}
+      <div className='p-4 rounded-lg border bg-rh-bg-surface border-rh-border'>
+        <div className='text-center'>
+          <div className='mx-auto mb-2 w-8 h-8 rounded animate-pulse bg-rh-bg-muted'></div>
+          <div className='mx-auto mb-1 w-48 h-4 rounded animate-pulse bg-rh-bg-muted'></div>
+          <div className='mx-auto w-40 h-4 rounded animate-pulse bg-rh-bg-muted'></div>
         </div>
       </div>
-    </div>
+    </AdminPageContainer>
   );
 }
 
@@ -120,12 +104,14 @@ export default function AttendancePage() {
 
   if (error) {
     return (
-      <div className='flex justify-center items-center min-h-screen bg-basic-black'>
-        <div className='p-6 text-center rounded-lg border shadow-sm bg-basic-black-gray border-red-500/30'>
-          <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
-          <p className='text-gray-300'>{error}</p>
+      <AdminPageContainer>
+        <div className='flex justify-center items-center min-h-64'>
+          <div className='p-6 text-center rounded-lg border shadow-sm bg-rh-bg-surface border-red-500/30'>
+            <h3 className='mb-2 text-lg font-semibold text-white'>오류 발생</h3>
+            <p className='text-rh-text-secondary'>{error}</p>
+          </div>
         </div>
-      </div>
+      </AdminPageContainer>
     );
   }
 

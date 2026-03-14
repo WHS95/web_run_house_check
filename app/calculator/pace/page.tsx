@@ -9,14 +9,14 @@ const PaceCalculatorClient = dynamic(
     loading: () => (
       <div className='px-4 mx-auto space-y-6'>
         <div className='flex p-1 space-x-1 rounded-lg border'>
-          <div className='flex-1 h-10 bg-gray-700 rounded-md animate-pulse' />
-          <div className='flex-1 h-10 bg-gray-700 rounded-md animate-pulse' />
-          <div className='flex-1 h-10 bg-gray-700 rounded-md animate-pulse' />
+          <div className='flex-1 h-10 bg-rh-bg-surface rounded-md animate-pulse' />
+          <div className='flex-1 h-10 bg-rh-bg-surface rounded-md animate-pulse' />
+          <div className='flex-1 h-10 bg-rh-bg-surface rounded-md animate-pulse' />
         </div>
         <div className='space-y-4'>
-          <div className='h-16 bg-gray-700 rounded-md animate-pulse' />
-          <div className='h-24 bg-gray-700 rounded-md animate-pulse' />
-          <div className='h-12 bg-gray-700 rounded-md animate-pulse' />
+          <div className='h-16 bg-rh-bg-surface rounded-md animate-pulse' />
+          <div className='h-24 bg-rh-bg-surface rounded-md animate-pulse' />
+          <div className='h-12 bg-rh-bg-surface rounded-md animate-pulse' />
         </div>
       </div>
     ),

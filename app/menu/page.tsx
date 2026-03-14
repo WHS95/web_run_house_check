@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 import dynamic from "next/dynamic";
+import { getFCMToken } from "@/lib/firebase/client";
 
 // 동적 로딩으로 번들 크기 최적화
 const PageHeader = dynamic(
@@ -86,6 +87,16 @@ export default function MenuPage() {
         window.navigator.vibrate([50, 100, 50]);
       }
 
+      // FCM 토큰 비활성화
+      const fcmToken = await getFCMToken();
+      if (fcmToken) {
+        await fetch("/api/push/token", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: fcmToken }),
+        }).catch(() => {});
+      }
+
       // Supabase 세션 종료
       const { error } = await supabase.auth.signOut();
 
@@ -104,18 +115,18 @@ export default function MenuPage() {
   }, [supabase, router]);
 
   return (
-    <div className='flex flex-col h-screen bg-basic-black main-content'>
-      <div className='fixed top-0 left-0 right-0 z-10 bg-basic-black-gray'>
+    <div className='flex flex-col h-screen bg-rh-bg-primary main-content'>
+      <div className='fixed top-0 left-0 right-0 z-10 bg-rh-bg-surface'>
         <PageHeader
           title='러닝 계산기'
           iconColor='white'
-          borderColor='gray-300'
+          borderColor='rh-border'
         />
       </div>
 
       {/* 메뉴 리스트 */}
       <div className='flex-1 overflow-y-auto px-2 py-2 pt-[80px]'>
-        <div className='bg-basic-black'>
+        <div className='bg-rh-bg-primary'>
           {/* 계산기 메뉴들 */}
           {menuItems.map((item, index) => {
             const IconComponent = item.icon;
@@ -123,26 +134,26 @@ export default function MenuPage() {
               <button
                 key={index}
                 onClick={() => handleItemClick(item)}
-                className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-basic-black-gray'
+                className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-rh-bg-surface'
               >
                 <div className='flex items-center gap-3'>
-                  <div className='flex items-center justify-center w-10 h-10 rounded-full bg-basic-black-gray'>
+                  <div className='flex items-center justify-center w-10 h-10 rounded-full bg-rh-bg-surface'>
                     <IconComponent size={20} className='text-white' />
                   </div>
                   <div className='text-left'>
-                    <div className='font-extrabold text-basic-blue'>
+                    <div className='font-extrabold text-rh-accent'>
                       {item.title}
                     </div>
                     <div className='text-sm text-white'>{item.description}</div>
                   </div>
                 </div>
-                <ChevronRight size={20} className='text-gray-400' />
+                <ChevronRight size={20} className='text-rh-text-secondary' />
               </button>
             );
           })}
 
           {/* 구분선 */}
-          <div className='my-4 border-t border-gray-600'></div>
+          <div className='my-4 border-t border-rh-border'></div>
 
           {/* 로그아웃 버튼 */}
           <button
@@ -155,7 +166,7 @@ export default function MenuPage() {
               </div>
               <div className='text-left'>
                 <div className='font-extrabold text-red-500'>로그아웃</div>
-                <div className='text-sm text-gray-400'>계정에서 로그아웃</div>
+                <div className='text-sm text-rh-text-secondary'>계정에서 로그아웃</div>
               </div>
             </div>
           </button>

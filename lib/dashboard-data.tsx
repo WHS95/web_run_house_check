@@ -40,13 +40,13 @@ export const getStatsCardsData = (): StatsCardData[] => [
     icon: <Users size={20} className='text-white' />,
     title: "총 크루원",
     value: "240명",
-    bgColor: "bg-blue-900",
+    bgColor: "bg-rh-bg-surface",
   },
   {
     icon: <Calendar size={20} className='text-white' />,
     title: "오늘 출석자",
     subtitle: "2024/05/01(수)",
     value: "6명",
-    bgColor: "bg-gray-700",
+    bgColor: "bg-rh-bg-surface",
   },
 ];

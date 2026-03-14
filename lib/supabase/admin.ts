@@ -91,6 +91,7 @@ export async function getCrewById(crewId: string) {
                 id,
                 name,
                 description,
+                location_based_attendance,
                 created_at,
                 updated_at
             `
@@ -1021,17 +1022,11 @@ export async function getDeletedAttendanceRecords(
 /**
  * 크루 모임 장소 인터페이스
  */
-export interface CrewLocation {
-  id: number;
-  crewId: string;
-  name: string;
-  description?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import {
+  CrewLocation,
+  CrewLocationCreateData,
+  CrewLocationUpdateData,
+} from "../types/crew-locations";
 
 interface GetCrewLocationsReturn {
   data: CrewLocation[] | null;
@@ -1040,55 +1035,41 @@ interface GetCrewLocationsReturn {
 
 /**
  * 특정 크루의 모임 장소 목록을 가져옵니다.
+ * @param crewId 크루 ID
+ * @param activeOnly 활성화된 장소만 조회할지 여부 (기본값: false - 모든 장소 조회)
  */
 export async function getCrewLocations(
-  crewId: string
-): Promise<GetCrewLocationsReturn> {
+  crewId: string,
+  activeOnly: boolean = false
+): Promise<{
+  data: CrewLocation[] | null;
+  error: Error | null;
+}> {
   try {
     const supabase = await createClient();
 
-    const { data, error } = await supabase
+    let query = supabase
       .schema("attendance")
       .from("crew_locations")
-      .select(
-        `
-        id,
-        crew_id,
-        name,
-        description,
-        latitude,
-        longitude,
-        is_active,
-        created_at,
-        updated_at
-      `
-      )
-      .eq("crew_id", crewId)
-      .eq("is_active", true) // 활성화된 장소만
-      .order("name");
+      .select("*")
+      .eq("crew_id", crewId);
+
+    if (activeOnly) {
+      query = query.eq("is_active", true);
+    }
+
+    const { data, error } = await query.order("created_at", {
+      ascending: false,
+    });
 
     if (error) {
-      //console.error("크루 모임 장소 조회 오류:", error);
+      console.error("크루 활동장소 조회 오류:", error);
       return { data: null, error: new Error(error.message) };
     }
 
-    if (!data) return { data: [], error: null };
-
-    const locations: CrewLocation[] = data.map((location) => ({
-      id: location.id,
-      crewId: location.crew_id,
-      name: location.name,
-      description: location.description,
-      latitude: location.latitude,
-      longitude: location.longitude,
-      isActive: location.is_active,
-      createdAt: location.created_at,
-      updatedAt: location.updated_at,
-    }));
-
-    return { data: locations, error: null };
+    return { data: data as CrewLocation[], error: null };
   } catch (error: any) {
-    //console.error("크루 모임 장소 조회 오류:", error);
+    console.error("크루 활동장소 조회 오류:", error);
     return {
       data: null,
       error: new Error(error.message || "알 수 없는 오류 발생"),
@@ -1132,14 +1113,14 @@ export async function createCrewLocation(
 
     const location: CrewLocation = {
       id: data.id,
-      crewId: data.crew_id,
+      crew_id: data.crew_id,
       name: data.name,
       description: data.description,
       latitude: data.latitude,
       longitude: data.longitude,
-      isActive: data.is_active,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
+      is_active: data.is_active,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
     };
 
     return { data: location, error: null };
@@ -1162,7 +1143,7 @@ export async function updateCrewLocation(
     description?: string;
     latitude?: number;
     longitude?: number;
-    isActive?: boolean;
+    is_active?: boolean;
   }
 ) {
   try {
@@ -1183,14 +1164,14 @@ export async function updateCrewLocation(
 
     const location: CrewLocation = {
       id: data.id,
-      crewId: data.crew_id,
+      crew_id: data.crew_id,
       name: data.name,
       description: data.description,
       latitude: data.latitude,
       longitude: data.longitude,
-      isActive: data.is_active,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
+      is_active: data.is_active,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
     };
 
     return { data: location, error: null };
@@ -1204,19 +1185,38 @@ export async function updateCrewLocation(
 }
 
 /**
- * 크루 모임 장소를 비활성화합니다 (soft delete).
+ * 크루 모임 장소를 완전히 삭제합니다 (hard delete).
  */
 export async function deleteCrewLocation(locationId: number) {
   try {
     const supabase = await createClient();
+    console.log("📡 삭제 요청 받음");
+    console.log("📡 요청 데이터:", locationId);
 
-    const { data, error } = await supabase
+    // 먼저 해당 location이 존재하는지 확인
+    const { data: existingLocation, error: checkError } = await supabase
       .schema("attendance")
       .from("crew_locations")
-      .update({ is_active: false })
+      .select("id, name")
       .eq("id", locationId)
-      .select()
       .single();
+
+    console.log("📡 존재하는 활동장소:", existingLocation);
+    console.log("📡 존재하는 활동장소 오류:", checkError);
+
+    if (checkError || !existingLocation) {
+      return {
+        success: false,
+        error: new Error("삭제할 활동장소를 찾을 수 없습니다."),
+      };
+    }
+
+    // 삭제 실행
+    const { error } = await supabase
+      .schema("attendance")
+      .from("crew_locations")
+      .delete()
+      .eq("id", locationId);
 
     if (error) {
       //console.error("크루 모임 장소 삭제 오류:", error);
@@ -1587,6 +1587,46 @@ export async function getSpecificMonthStats(
     //console.error("특정 월 통계 조회 오류:", error);
     return {
       data: null,
+      error: new Error(error.message || "알 수 없는 오류 발생"),
+    };
+  }
+}
+
+// Note: 기존 getCrewLocations, createCrewLocation, updateCrewLocation 함수들을
+// 새로운 타입 시스템과 통합하여 개선합니다.
+
+/**
+ * 크루의 위치 기반 출석 설정을 토글합니다.
+ */
+export async function toggleLocationBasedAttendance(
+  crewId: string,
+  locationBasedAttendance: boolean
+): Promise<{
+  success: boolean;
+  error: Error | null;
+}> {
+  try {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .schema("attendance")
+      .from("crews")
+      .update({
+        location_based_attendance: locationBasedAttendance,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", crewId);
+
+    if (error) {
+      console.error("위치 기반 출석 설정 변경 오류:", error);
+      return { success: false, error: new Error(error.message) };
+    }
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error("위치 기반 출석 설정 변경 오류:", error);
+    return {
+      success: false,
       error: new Error(error.message || "알 수 없는 오류 발생"),
     };
   }

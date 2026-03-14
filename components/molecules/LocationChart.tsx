@@ -24,7 +24,7 @@ function LocationParticipationItem({ item }: LocationParticipationItemProps) {
             {locationName}
           </span>
         </div>
-        <div className='flex-1 h-2 bg-gray-200 rounded-full max-w-48'>
+        <div className='flex-1 h-2 bg-rh-bg-muted rounded-full max-w-48'>
           <div
             className={`h-2 rounded-full ${color}`}
             style={{ width: `${Math.min(participationRate, 100)}%` }}
@@ -49,7 +49,7 @@ export default function LocationChart({
   month,
 }: LocationChartProps) {
   return (
-    <div className='p-6 rounded-lg shadow-sm bg-basic-black-gray'>
+    <div className='p-6 rounded-lg shadow-sm bg-rh-bg-surface'>
       <div className='mb-6'>
         <h3 className='mb-1 text-lg font-semibold text-white'>{title}</h3>
       </div>
@@ -67,8 +67,8 @@ export default function LocationChart({
       </div>
 
       {/* {data.length > 0 && (
-        <div className='pt-4 mt-6 border-t border-gray-100'>
-          <div className='flex justify-between text-xs text-gray-500'>
+        <div className='pt-4 mt-6 border-t border-rh-border'>
+          <div className='flex justify-between text-xs text-rh-text-tertiary'>
             <span>총 {data.length}개 장소</span>
           </div>
         </div>

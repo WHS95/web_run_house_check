@@ -271,17 +271,17 @@ export default function CrewManagement({
     <div className='space-y-6'>
       {/* 페이지 제목 */}
       <div className='flex items-center space-x-3'>
-        <Building2 className='w-6 h-6 text-basic-blue' />
+        <Building2 className='w-6 h-6 text-rh-accent' />
         <div>
           <h1 className='text-xl font-semibold text-white'>크루 관리</h1>
-          <p className='text-sm text-gray-300'>
+          <p className='text-sm text-rh-text-secondary'>
             새로운 크루를 생성하고 관리합니다.
           </p>
         </div>
       </div>
 
       {/* 크루 생성 카드 */}
-      <Card className='bg-basic-black-gray border-basic-gray'>
+      <Card className='bg-rh-bg-surface border-rh-border'>
         <CardHeader>
           <CardTitle className='flex items-center space-x-2 text-white'>
             <Plus className='w-5 h-5' />
@@ -290,7 +290,7 @@ export default function CrewManagement({
         </CardHeader>
         <CardContent className='space-y-4'>
           <div>
-            <label className='block mb-2 text-sm font-medium text-gray-300'>
+            <label className='block mb-2 text-sm font-medium text-rh-text-secondary'>
               크루 이름 *
             </label>
             <Input
@@ -299,12 +299,12 @@ export default function CrewManagement({
               onChange={(e) =>
                 setNewCrew((prev) => ({ ...prev, name: e.target.value }))
               }
-              className='text-white bg-basic-black border-basic-gray placeholder:text-gray-400'
+              className='text-white bg-rh-bg-primary border-rh-border placeholder:text-rh-text-secondary'
             />
           </div>
 
           <div>
-            <label className='block mb-2 text-sm font-medium text-gray-300'>
+            <label className='block mb-2 text-sm font-medium text-rh-text-secondary'>
               크루 설명
             </label>
             <Textarea
@@ -313,13 +313,13 @@ export default function CrewManagement({
               onChange={(e) =>
                 setNewCrew((prev) => ({ ...prev, description: e.target.value }))
               }
-              className='text-white bg-basic-black border-basic-gray placeholder:text-gray-400'
+              className='text-white bg-rh-bg-primary border-rh-border placeholder:text-rh-text-secondary'
               rows={3}
             />
           </div>
 
           {/* 초대 코드 자동 생성 옵션 */}
-          <div className='p-4 space-y-3 rounded-lg border bg-basic-black border-basic-gray'>
+          <div className='p-4 space-y-3 rounded-lg border bg-rh-bg-primary border-rh-border'>
             <div className='flex items-center space-x-3'>
               <input
                 type='checkbox'
@@ -331,11 +331,11 @@ export default function CrewManagement({
                     createInviteCode: e.target.checked,
                   }))
                 }
-                className='w-4 h-4 rounded text-basic-blue bg-basic-black border-basic-gray focus:ring-basic-blue'
+                className='w-4 h-4 rounded text-rh-accent bg-rh-bg-primary border-rh-border focus:ring-rh-accent'
               />
               <label
                 htmlFor='createInviteCode'
-                className='flex items-center space-x-2 text-sm font-medium text-gray-300'
+                className='flex items-center space-x-2 text-sm font-medium text-rh-text-secondary'
               >
                 <Key className='w-4 h-4' />
                 <span>초대 코드 자동 생성</span>
@@ -344,7 +344,7 @@ export default function CrewManagement({
 
             {newCrew.createInviteCode && (
               <div>
-                <label className='block mb-1 text-xs font-medium text-gray-400'>
+                <label className='block mb-1 text-xs font-medium text-rh-text-secondary'>
                   초대 코드 설명
                 </label>
                 <Input
@@ -356,7 +356,7 @@ export default function CrewManagement({
                       inviteCodeDescription: e.target.value,
                     }))
                   }
-                  className='text-sm text-white bg-basic-black border-basic-gray placeholder:text-gray-400'
+                  className='text-sm text-white bg-rh-bg-primary border-rh-border placeholder:text-rh-text-secondary'
                 />
               </div>
             )}
@@ -365,7 +365,7 @@ export default function CrewManagement({
           <Button
             onClick={handleCreateCrew}
             disabled={isCreating || !newCrew.name.trim()}
-            className='w-full text-white bg-basic-blue hover:bg-blue-600'
+            className='w-full text-white bg-rh-accent hover:bg-blue-600'
           >
             {isCreating
               ? "생성 중..."
@@ -384,10 +384,10 @@ export default function CrewManagement({
         </h3>
 
         {crews.length === 0 ? (
-          <Card className='bg-basic-black-gray border-basic-gray'>
+          <Card className='bg-rh-bg-surface border-rh-border'>
             <CardContent className='py-8 text-center'>
-              <Building2 className='mx-auto mb-2 w-12 h-12 text-gray-500' />
-              <p className='text-gray-400'>생성된 크루가 없습니다.</p>
+              <Building2 className='mx-auto mb-2 w-12 h-12 text-rh-text-tertiary' />
+              <p className='text-rh-text-secondary'>생성된 크루가 없습니다.</p>
             </CardContent>
           </Card>
         ) : (
@@ -403,7 +403,7 @@ export default function CrewManagement({
               return (
                 <Card
                   key={crew.id}
-                  className='transition-colors bg-basic-black-gray border-basic-gray hover:border-basic-blue'
+                  className='transition-colors bg-rh-bg-surface border-rh-border hover:border-rh-accent'
                 >
                   <CardContent className='p-4'>
                     <div className='space-y-3'>
@@ -416,7 +416,7 @@ export default function CrewManagement({
                             </h4>
                             <Badge
                               variant='outline'
-                              className='text-xs text-white bg-basic-blue border-basic-blue'
+                              className='text-xs text-white bg-rh-accent border-rh-accent'
                             >
                               ID: {crew.id.slice(0, 8)}...
                             </Badge>
@@ -430,11 +430,11 @@ export default function CrewManagement({
                             )}
                           </div>
                           {crew.description && (
-                            <p className='mb-2 text-sm text-gray-300'>
+                            <p className='mb-2 text-sm text-rh-text-secondary'>
                               {crew.description}
                             </p>
                           )}
-                          <div className='flex items-center space-x-4 text-xs text-gray-500'>
+                          <div className='flex items-center space-x-4 text-xs text-rh-text-tertiary'>
                             <div className='flex items-center space-x-1'>
                               <Calendar className='w-3 h-3' />
                               <span>
@@ -462,7 +462,7 @@ export default function CrewManagement({
                           variant='ghost'
                           size='sm'
                           onClick={() => toggleCrewExpansion(crew.id)}
-                          className='text-gray-400 hover:text-white'
+                          className='text-rh-text-secondary hover:text-white'
                         >
                           <Users className='mr-1 w-4 h-4' />
                           멤버 관리
@@ -476,8 +476,8 @@ export default function CrewManagement({
 
                       {/* 멤버 목록 (확장 시) */}
                       {isExpanded && (
-                        <div className='pt-3 border-t border-basic-gray'>
-                          <h5 className='flex items-center mb-3 space-x-2 text-sm font-medium text-gray-300'>
+                        <div className='pt-3 border-t border-rh-border'>
+                          <h5 className='flex items-center mb-3 space-x-2 text-sm font-medium text-rh-text-secondary'>
                             <UserCheck className='w-4 h-4' />
                             <span>크루 멤버 ({members.length}명)</span>
                           </h5>
@@ -485,14 +485,14 @@ export default function CrewManagement({
                           {isLoadingMembers ? (
                             <div className='flex justify-center items-center py-4'>
                               <LoadingSpinner size='sm' color='white' />
-                              <span className='ml-2 text-sm text-gray-400'>
+                              <span className='ml-2 text-sm text-rh-text-secondary'>
                                 멤버 목록 로딩 중...
                               </span>
                             </div>
                           ) : members.length === 0 ? (
                             <div className='py-4 text-center'>
-                              <Users className='mx-auto mb-2 w-8 h-8 text-gray-500' />
-                              <p className='text-sm text-gray-400'>
+                              <Users className='mx-auto mb-2 w-8 h-8 text-rh-text-tertiary' />
+                              <p className='text-sm text-rh-text-secondary'>
                                 아직 가입한 멤버가 없습니다.
                               </p>
                             </div>
@@ -508,21 +508,21 @@ export default function CrewManagement({
                                 return (
                                   <div
                                     key={member.id}
-                                    className='flex justify-between items-center p-3 rounded-lg border bg-basic-black border-basic-gray'
+                                    className='flex justify-between items-center p-3 rounded-lg border bg-rh-bg-primary border-rh-border'
                                   >
                                     <div className='flex items-center space-x-3'>
-                                      <div className='flex justify-center items-center w-8 h-8 rounded-full bg-basic-gray'>
+                                      <div className='flex justify-center items-center w-8 h-8 rounded-full bg-rh-bg-muted'>
                                         {isManager ? (
                                           <Crown className='w-4 h-4 text-yellow-500' />
                                         ) : (
-                                          <Users className='w-4 h-4 text-gray-400' />
+                                          <Users className='w-4 h-4 text-rh-text-secondary' />
                                         )}
                                       </div>
                                       <div>
                                         <p className='text-sm font-medium text-white'>
                                           {member.first_name}
                                         </p>
-                                        <p className='text-xs text-gray-400'>
+                                        <p className='text-xs text-rh-text-secondary'>
                                           {member.email}
                                         </p>
                                       </div>
@@ -534,7 +534,7 @@ export default function CrewManagement({
                                         className={
                                           isManager
                                             ? "text-white bg-yellow-600 border-yellow-600"
-                                            : "text-white bg-gray-600 border-gray-600"
+                                            : "text-white bg-rh-bg-surface border-rh-border"
                                         }
                                       >
                                         {isManager ? "운영진" : "멤버"}

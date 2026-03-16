@@ -576,7 +576,7 @@ export default function AdminAttendanceManagement({
             </div>
 
             {/* 메인 컨텐츠 */}
-            <div className="overflow-y-auto flex-1 px-4 py-4 pb-24">
+            <div className="overflow-y-auto flex-1 px-4 py-4 scroll-area-bottom">
                 {activeTab === "calendar" && (
                     <div className="space-y-4">
                         {/* MonthNavigator */}

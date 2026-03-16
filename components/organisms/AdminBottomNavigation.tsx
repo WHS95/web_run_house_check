@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, Users, Calendar, Settings, BarChart3 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -48,6 +48,17 @@ export default function AdminBottomNavigation() {
     content: "",
   });
 
+  /* Bottom Inset Layer System: 마운트 시 CSS 변수 설정 */
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--rh-bottom-inset',
+      'calc(4.5rem + env(safe-area-inset-bottom, 0px))'
+    );
+    return () => {
+      document.documentElement.style.setProperty('--rh-bottom-inset', '0px');
+    };
+  }, []);
+
   const handleComingSoonClick = (itemName: string) => {
     setModalContent({
       title: "공지",
@@ -58,7 +69,7 @@ export default function AdminBottomNavigation() {
 
   return (
     <>
-      <div className='fixed right-0 bottom-0 left-0 z-50 border-t bg-rh-bg-surface border-rh-border safe-area-pb'>
+      <div className='fixed right-0 bottom-0 left-0 z-40 border-t bg-rh-bg-surface border-rh-border safe-area-pb'>
         <div className='flex justify-around items-center px-2 py-2'>
           {navigationItems.map((item) => {
             const isActive =

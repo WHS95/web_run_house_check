@@ -7,51 +7,41 @@ import {
   predictFinishTime,
   calculatePace,
 } from "@/lib/utils/calculator";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function PredictionCalculatorClient() {
   const { toast } = useToast();
   const [recordedDistance, setRecordedDistance] = useState<string>("");
-  const [hours, setHours] = useState<string>("");
-  const [minutes, setMinutes] = useState<string>("");
-  const [seconds, setSeconds] = useState<string>("");
+  const [hours, setHours] = useState<string>("0");
+  const [minutes, setMinutes] = useState<string>("0");
+  const [seconds, setSeconds] = useState<string>("0");
   const [targetDistance, setTargetDistance] = useState<string>("");
   const [result, setResult] = useState<{
     time: string;
     pace: string;
   } | null>(null);
 
-  // 계산하기 버튼 활성화 조건 검사
   const isFormValid = () => {
     const distance = parseFloat(recordedDistance);
     const targetDist = parseFloat(targetDistance);
     const inputHours = parseInt(hours || "0");
     const inputMinutes = parseInt(minutes || "0");
     const inputSeconds = parseInt(seconds || "0");
-
-    const hasValidDistance = distance && distance > 0 && distance <= 300;
-    const hasValidTargetDistance =
-      targetDist && targetDist > 0 && targetDist <= 300;
-    const hasValidTime = inputHours > 0 || inputMinutes > 0 || inputSeconds > 0;
-
-    return hasValidDistance && hasValidTargetDistance && hasValidTime;
+    return (
+      distance > 0 && distance <= 300 &&
+      targetDist > 0 && targetDist <= 300 &&
+      (inputHours > 0 || inputMinutes > 0 || inputSeconds > 0)
+    );
   };
 
-  // 항상 hh:mm:ss 형식으로 포맷팅하는 함수
   const formatTimeToHHMMSS = (totalSeconds: number): string => {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = Math.floor(totalSeconds % 60);
-
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = Math.floor(totalSeconds % 60);
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
   const handleCalculate = () => {
-    // 입력값 검증
     const distance = parseFloat(recordedDistance);
     const targetDist = parseFloat(targetDistance);
     const inputHours = parseInt(hours || "0");
@@ -59,202 +49,142 @@ export default function PredictionCalculatorClient() {
     const inputSeconds = parseInt(seconds || "0");
 
     if (!targetDist || targetDist <= 0 || targetDist > 300) {
-      toast({
-        description: "목표 거리를 올바르게 입력해주세요. (1km ~ 300km)",
-        duration: 2000,
-      });
+      toast({ description: "목표 거리를 올바르게 입력해주세요. (1~300km)", duration: 2000 });
       return;
     }
-
     if (!distance || distance <= 0 || distance > 300) {
-      toast({
-        description: "기록한 거리를 올바르게 입력해주세요. (1km ~ 300km)",
-        duration: 2000,
-      });
+      toast({ description: "기록 거리를 올바르게 입력해주세요. (1~300km)", duration: 2000 });
       return;
     }
-
     if (!validateTimeInputs(inputHours, inputMinutes, inputSeconds)) {
-      toast({
-        description: "기록 시간을 입력해주세요. (시/분/초 중 하나 이상 필요)",
-        duration: 2000,
-      });
+      toast({ description: "기록 시간을 입력해주세요.", duration: 2000 });
       return;
     }
 
-    // 계산
     const totalSeconds = timeToSeconds(inputHours, inputMinutes, inputSeconds);
-    const predictedSeconds = predictFinishTime(
-      distance,
-      totalSeconds,
-      targetDist
-    );
+    const predictedSeconds = predictFinishTime(distance, totalSeconds, targetDist);
     const pace = calculatePace(targetDist, predictedSeconds);
-
-    setResult({
-      time: formatTimeToHHMMSS(predictedSeconds),
-      pace: pace,
-    });
+    setResult({ time: formatTimeToHHMMSS(predictedSeconds), pace });
   };
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-4'>
       {/* 설명 */}
-      <div className='p-4 text-sm rounded-lg bg-accent/50'>
-        <p className='text-white text-muted-foreground'>
-          이전에 달린 나의 기록을 바탕으로
+      <div className='p-4 bg-rh-bg-surface rounded-rh-lg'>
+        <p className='text-xs text-rh-text-secondary leading-relaxed'>
+          이전에 달린 기록을 바탕으로 다른 거리의 예상 완주 시간을 계산합니다.
           <br />
-          다른 거리의 예상 완주 시간을 계산합니다.
-          <br />
-          Riegel의 레이스 타임 공식을 사용
+          <span className='text-rh-text-muted'>Riegel의 레이스 타임 공식 (T2 = T1 x (D2/D1)^1.06)</span>
         </p>
       </div>
 
       {/* 입력 폼 */}
-      <div className='space-y-4 text-white'>
-        {/* 기록한 거리 입력 */}
+      <div className='p-4 bg-rh-bg-surface rounded-rh-lg space-y-4'>
+        <h3 className='text-[15px] font-semibold text-white'>나의 기록</h3>
+
         <div>
-          <label className='block mb-2 text-sm font-medium'>
-            나의 기록 거리 (km)
+          <label className='block mb-2 text-xs font-medium text-rh-text-secondary'>
+            기록 거리 (km)
           </label>
-          <Input
+          <input
             type='number'
             min='1'
             max='300'
-            step='1'
+            step='0.1'
             value={recordedDistance}
             onChange={(e) => setRecordedDistance(e.target.value)}
-            placeholder='예: 10.5'
-            className='text-white bg-rh-bg-surface border-rh-border'
+            placeholder='예: 10'
+            className='w-full px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none placeholder:text-rh-text-muted focus:ring-1 focus:ring-rh-accent'
           />
         </div>
 
-        {/* 기록 시간 입력 */}
         <div>
-          <label className='block mb-2 text-sm font-medium'>
-            나의 기록 시간
+          <label className='block mb-2 text-xs font-medium text-rh-text-secondary'>
+            기록 시간
           </label>
-          <div className='flex relative gap-1 items-center'>
+          <div className='flex gap-2 items-center'>
             <div className='flex-1'>
-              <Input
-                type='number'
-                min='0'
+              <select
                 value={hours}
                 onChange={(e) => setHours(e.target.value)}
-                placeholder='0'
-                className='text-center'
-              />
-              <span className='block mt-1 text-xs text-center text-muted-foreground'>
-                시
-              </span>
+                className='w-full px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none'
+              >
+                {Array.from({ length: 25 }, (_, i) => (
+                  <option key={i} value={i.toString()}>{i.toString().padStart(2, "0")}시</option>
+                ))}
+              </select>
             </div>
-            <span className='text-xl text-muted-foreground'>:</span>
+            <span className='text-rh-text-muted'>:</span>
             <div className='flex-1'>
-              <Input
-                type='number'
-                min='0'
-                max='59'
+              <select
                 value={minutes}
                 onChange={(e) => setMinutes(e.target.value)}
-                placeholder='0'
-                className='text-center'
-              />
-              <span className='block mt-1 text-xs text-center text-muted-foreground'>
-                분
-              </span>
+                className='w-full px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none'
+              >
+                {Array.from({ length: 60 }, (_, i) => (
+                  <option key={i} value={i.toString()}>{i.toString().padStart(2, "0")}분</option>
+                ))}
+              </select>
             </div>
-            <span className='text-xl text-muted-foreground'>:</span>
+            <span className='text-rh-text-muted'>:</span>
             <div className='flex-1'>
-              <Input
-                type='number'
-                min='0'
-                max='59'
+              <select
                 value={seconds}
                 onChange={(e) => setSeconds(e.target.value)}
-                placeholder='0'
-                className='text-center'
-              />
-              <span className='block mt-1 text-xs text-center text-muted-foreground'>
-                초
-              </span>
+                className='w-full px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none'
+              >
+                {Array.from({ length: 60 }, (_, i) => (
+                  <option key={i} value={i.toString()}>{i.toString().padStart(2, "0")}초</option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
 
-        {/* 목표 거리 입력 */}
         <div>
-          <label className='block mb-2 text-sm font-medium text-white'>
+          <label className='block mb-2 text-xs font-medium text-rh-text-secondary'>
             목표 거리 (km)
           </label>
-          <Input
+          <input
             type='number'
             min='1'
             max='300'
-            step='1'
+            step='0.1'
             value={targetDistance}
             onChange={(e) => setTargetDistance(e.target.value)}
-            placeholder='예: 21.1'
-            className='text-white bg-rh-bg-surface border-rh-border'
+            placeholder='예: 42.195'
+            className='w-full px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none placeholder:text-rh-text-muted focus:ring-1 focus:ring-rh-accent'
           />
         </div>
 
-        <Button
+        <button
           onClick={handleCalculate}
           disabled={!isFormValid()}
-          className='w-full text-white bg-rh-accent hover:bg-rh-accent-hover/80 disabled:opacity-50 disabled:cursor-not-allowed'
+          className='w-full py-3 text-sm font-semibold text-white bg-rh-accent rounded-rh-md transition-colors active:bg-rh-accent-hover disabled:opacity-40 disabled:cursor-not-allowed'
         >
           계산하기
-        </Button>
+        </button>
 
-        {/* 필수 입력 안내 */}
         {!isFormValid() && (
-          <div className='p-3 text-sm rounded-lg border bg-red-500/10 border-red-500/20'>
-            <p className='text-red-400'>
-              기록 거리, 목표 거리, 기록 시간을 모두 입력해주세요.
-            </p>
-          </div>
+          <p className='text-xs text-rh-status-error'>
+            기록 거리, 목표 거리, 기록 시간을 모두 입력해주세요.
+          </p>
         )}
       </div>
 
       {/* 결과 */}
       {result && (
-        <div className='mt-6 text-white'>
-          <div className='flex gap-2 items-center mb-4'>
-            <h2 className='text-lg font-medium'>
-              {targetDistance}km 예상 완주 시간
-            </h2>
-            <div className='relative group'>
-              <div className='cursor-help text-muted-foreground'>ⓘ</div>
-              <div className='absolute bottom-full mb-2 p-3 text-sm bg-popover text-popover-foreground rounded-lg shadow-lg invisible group-hover:visible w-[280px] left-1/2 -translate-x-1/2'>
-                <p>Riegel의 레이스 타임 공식을 사용</p>
-                <p className='mt-1 font-mono text-xs'>
-                  T2 = T1 × (D2/D1)^1.06
-                </p>
-                <p className='mt-2 text-xs text-muted-foreground'>
-                  T1: 기록한 시간, D1: 기록한 거리
-                  <br />
-                  T2: 예상 시간, D2: 목표 거리
-                </p>
-              </div>
-            </div>
+        <div className='p-4 bg-rh-bg-surface rounded-rh-lg space-y-3'>
+          <h3 className='text-[15px] font-semibold text-white'>
+            {targetDistance}km 예상 완주
+          </h3>
+          <div className='flex items-center justify-between px-4 py-3 bg-rh-bg-muted rounded-rh-md'>
+            <span className='text-sm text-rh-text-secondary'>예상 시간</span>
+            <span className='text-base font-bold text-rh-accent'>{result.time}</span>
           </div>
-          <div className='overflow-hidden rounded-lg border'>
-            <table className='w-full'>
-              <tbody className='divide-y'>
-                <tr>
-                  <td className='px-4 py-3 font-medium text-white'>
-                    예상 시간
-                  </td>
-                  <td className='px-4 py-3'>{result.time}</td>
-                </tr>
-                <tr>
-                  <td className='px-4 py-3 font-medium text-white'>
-                    평균 페이스
-                  </td>
-                  <td className='px-4 py-3'>{result.pace}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div className='flex items-center justify-between px-4 py-3 bg-rh-bg-muted rounded-rh-md'>
+            <span className='text-sm text-rh-text-secondary'>평균 페이스</span>
+            <span className='text-base font-bold text-rh-accent'>{result.pace}</span>
           </div>
         </div>
       )}

@@ -167,7 +167,7 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
         <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-surface" />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 space-y-5">
+      <div className="flex-1 overflow-y-auto px-4 pt-4 scroll-area-bottom space-y-5">
         <MonthNavigator
           year={currentData.selectedYear}
           month={currentData.selectedMonth}

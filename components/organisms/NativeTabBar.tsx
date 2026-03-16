@@ -27,7 +27,7 @@ const NativeTabBar: React.FC<NativeTabBarProps> = ({ tabs }) => {
   return (
     <div
       className='
-            fixed bottom-0 left-0 right-0 z-50
+            fixed bottom-0 left-0 right-0 z-40
             bg-white/95 backdrop-blur-md border-t border-rh-border
             safe-area-inset-bottom
         '

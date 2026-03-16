@@ -105,6 +105,13 @@
         --safe-area-inset-right: env(safe-area-inset-right);
         --safe-area-inset-bottom: env(safe-area-inset-bottom);
         --safe-area-inset-left: env(safe-area-inset-left);
+
+        /* ── Bottom Inset Layer System ──
+         * BottomNavigation JS에서 마운트 시 동적으로 설정.
+         * 기본값 0px (바텀 내비 없는 페이지).
+         * 바텀 내비 있을 때: calc(4.5rem + env(safe-area-inset-bottom, 0px))
+         */
+        --rh-bottom-inset: 0px;
     }
 
     /* 다크 모드 (기본과 동일 - 다크 퍼스트 앱) */
@@ -256,9 +263,9 @@
         border-bottom: 0.5px solid var(--rh-border);
     }
 
-    /* === iOS 탭 바 === */
+    /* === iOS 탭 바 (z-40: 오버레이 z-50 아래) === */
     .ios-tab-bar {
-        @apply fixed bottom-0 left-0 right-0 z-50;
+        @apply fixed bottom-0 left-0 right-0 z-40;
         background-color: rgba(28, 28, 30, 0.72);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -485,6 +492,28 @@
             100vh - var(--safe-area-inset-top)
             - var(--safe-area-inset-bottom)
         );
+    }
+
+    /* ── Bottom Inset Layer System 유틸리티 ── */
+
+    /* 스크롤 콘텐츠 영역용: 바텀 인셋 + 여유 공간 */
+    .scroll-area-bottom {
+        padding-bottom: calc(var(--rh-bottom-inset) + 1.25rem);
+    }
+
+    /* 바텀 인셋만큼 정확한 패딩 (스티키 푸터 등) */
+    .pb-bottom-inset {
+        padding-bottom: var(--rh-bottom-inset);
+    }
+
+    /* 바텀 인셋만큼 마진 */
+    .mb-bottom-inset {
+        margin-bottom: var(--rh-bottom-inset);
+    }
+
+    /* 바텀 인셋 위에 위치 (sticky 버튼 등) */
+    .bottom-above-inset {
+        bottom: var(--rh-bottom-inset);
     }
 
     /* 리스트 렌더링 최적화 */

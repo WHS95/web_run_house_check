@@ -80,7 +80,7 @@ export default function AdminDashboard({
 }: AdminDashboardProps) {
   return (
     <div className='flex flex-col h-screen bg-rh-bg-primary'>
-      <div className='overflow-y-auto flex-1 pb-20'>
+      <div className='overflow-y-auto flex-1 scroll-area-bottom'>
         <div className='px-4 py-4 mx-auto max-w-lg'>
           {/* iOS 스타일 기본 통계 섹션 */}
           <div className='mb-3 space-y-6'>

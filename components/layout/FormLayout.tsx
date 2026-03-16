@@ -37,7 +37,7 @@ export function FormLayout({ title, children }: FormLayoutProps) {
       </div>
 
       {/* Content */}
-      <div className='pt-[80px] pb-20 px-4'>{children}</div>
+      <div className='pt-[80px] scroll-area-bottom px-4'>{children}</div>
     </div>
   );
 }

@@ -6,27 +6,14 @@ import {
   calculateHeartRateZones,
   type HeartRateZone,
 } from "@/lib/utils/calculator";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
 
-// 존별 색상을 함수로 정의하여 정적 클래스 사용
-const getZoneColor = (zone: number) => {
-  switch (zone) {
-    case 1:
-      return "bg-gradient-to-r from-blue-500/20 to-blue-500/30 hover:from-blue-500/30 hover:to-blue-500/40 border border-blue-500/30";
-    case 2:
-      return "bg-gradient-to-r from-green-500/20 to-green-500/30 hover:from-green-500/30 hover:to-green-500/40 border border-green-500/30";
-    case 3:
-      return "bg-gradient-to-r from-yellow-500/20 to-yellow-500/30 hover:from-yellow-500/30 hover:to-yellow-500/40 border border-yellow-500/30";
-    case 4:
-      return "bg-gradient-to-r from-orange-500/20 to-orange-500/30 hover:from-orange-500/30 hover:to-orange-500/40 border border-orange-500/30";
-    case 5:
-      return "bg-gradient-to-r from-red-500/20 to-red-500/30 hover:from-red-500/30 hover:to-red-500/40 border border-red-500/30";
-    default:
-      return "bg-gradient-to-r from-rh-bg-muted/20 to-rh-bg-muted/30 hover:from-rh-bg-muted/30 hover:to-rh-bg-muted/40 border border-rh-border/30";
-  }
+const zoneColors: Record<number, { bg: string; accent: string }> = {
+  1: { bg: "bg-blue-500/15", accent: "text-blue-400" },
+  2: { bg: "bg-green-500/15", accent: "text-green-400" },
+  3: { bg: "bg-yellow-500/15", accent: "text-yellow-400" },
+  4: { bg: "bg-orange-500/15", accent: "text-orange-400" },
+  5: { bg: "bg-red-500/15", accent: "text-red-400" },
 };
 
 export default function HeartRateCalculatorClient() {
@@ -38,106 +25,89 @@ export default function HeartRateCalculatorClient() {
   const handleCalculate = () => {
     const ageNum = parseInt(age);
     if (!ageNum || ageNum <= 0 || ageNum > 120) {
-      toast({
-        description: "올바른 나이를 입력해주세요 (1-120).",
-        duration: 2000,
-      });
+      toast({ description: "올바른 나이를 입력해주세요 (1-120).", duration: 2000 });
       return;
     }
-
     const calculatedMaxHR = calculateMaxHeartRate(ageNum);
     const zones = calculateHeartRateZones(ageNum);
-
     setMaxHR(calculatedMaxHR);
     setResults(zones);
   };
 
   return (
-    <div className='mx-auto space-y-6 max-w-md'>
+    <div className='space-y-4'>
       {/* 입력 폼 */}
-      <div className='space-y-4 text-white'>
+      <div className='p-4 bg-rh-bg-surface rounded-rh-lg space-y-4'>
+        <h3 className='text-[15px] font-semibold text-white'>기본 정보</h3>
         <div>
-          <label className='block mb-2 text-sm font-bold text-white'>
-            나이
-            <span className='ml-1 text-rh-text-secondary'>(세)</span>
+          <label className='block mb-2 text-xs font-medium text-rh-text-secondary'>
+            나이 (세)
           </label>
-          <Input
+          <input
             type='number'
             min='1'
             max='120'
             value={age}
             onChange={(e) => setAge(e.target.value)}
             placeholder='30'
-            className='placeholder-rh-text-secondary text-white bg-rh-bg-primary border-rh-border'
+            className='w-full px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none placeholder:text-rh-text-muted focus:ring-1 focus:ring-rh-accent'
           />
+          <p className='mt-1.5 text-[11px] text-rh-text-muted'>
+            최대 심박수 = 220 - 나이
+          </p>
         </div>
 
-        <Button
+        <button
           onClick={handleCalculate}
-          className='w-full text-white bg-rh-accent hover:bg-rh-accent-hover/80'
+          className='w-full py-3 text-sm font-semibold text-white bg-rh-accent rounded-rh-md transition-colors active:bg-rh-accent-hover'
         >
           계산하기
-        </Button>
+        </button>
       </div>
 
       {/* 결과 */}
       {results.length > 0 && maxHR && (
-        <div className='mt-6 text-white'>
-          <div className='flex gap-2 items-center mb-4'>
-            <h2 className='text-lg font-medium'>트레이닝 존</h2>
-            <div className='relative group'>
-              <div className='text-rh-text-secondary cursor-help'>ⓘ</div>
-              <div className='absolute bottom-full mb-2 p-3 text-sm bg-rh-bg-primary text-white rounded-lg shadow-lg invisible group-hover:visible w-[280px] left-1/2 -translate-x-1/2 border border-rh-border'>
-                <p>최대 심박수 계산 공식:</p>
-                <p className='mt-1 font-mono text-xs'>220 - 나이</p>
-                <p className='mt-2 text-xs text-rh-text-secondary'>
-                  각 존은 최대 심박수의 비율로 계산됩니다.
-                  <br />
-                  이는 일반적인 추정치이며, 개인차가 있을 수 있습니다.
-                </p>
-              </div>
+        <>
+          {/* 최대 심박수 카드 */}
+          <div className='p-4 bg-rh-bg-surface rounded-rh-lg'>
+            <div className='flex items-center justify-between'>
+              <span className='text-xs text-rh-text-secondary'>예상 최대 심박수</span>
+              <span className='text-xl font-bold text-rh-accent'>
+                {maxHR} <span className='text-xs font-normal text-rh-text-muted'>bpm</span>
+              </span>
             </div>
           </div>
 
-          <div className='p-3 mb-4 bg-gradient-to-r rounded-lg border from-blue-600/20 to-blue-600/30 border-blue-600/30'>
-            <div className='font-medium'>예상 최대 심박수</div>
-            <div className='mt-1 text-2xl'>
-              {maxHR} <span className='text-sm text-rh-text-secondary'>bpm</span>
-            </div>
-          </div>
-
-          <div className='grid gap-2'>
-            {results.map((zone) => (
-              <div
-                key={zone.zone}
-                className={cn(
-                  "relative p-3 rounded-lg transition-all duration-200 group/zone",
-                  getZoneColor(zone.zone)
-                )}
-              >
-                <div className='flex gap-3 items-center'>
-                  <div className='flex justify-center items-center w-6 h-6 text-sm font-medium text-white rounded-full bg-white/10'>
-                    {zone.zone}
-                  </div>
-                  <div className='flex-1 min-w-0'>
-                    <div className='flex justify-between items-center'>
-                      <div className='font-medium text-white'>
-                        {zone.name}
-                      </div>
-                      <div className='text-sm font-mono text-white'>
-                        {zone.min}-{zone.max}
-                        <span className='ml-1 text-rh-text-secondary'>bpm</span>
-                      </div>
+          {/* 존 목록 */}
+          <div className='p-4 bg-rh-bg-surface rounded-rh-lg space-y-2'>
+            <h3 className='text-[15px] font-semibold text-white mb-3'>트레이닝 존</h3>
+            {results.map((zone) => {
+              const colors = zoneColors[zone.zone] || { bg: "bg-rh-bg-muted", accent: "text-white" };
+              return (
+                <div
+                  key={zone.zone}
+                  className={`p-3 rounded-rh-md ${colors.bg}`}
+                >
+                  <div className='flex items-center gap-3'>
+                    <div className='flex items-center justify-center w-7 h-7 text-xs font-bold text-white bg-white/10 rounded-full'>
+                      {zone.zone}
                     </div>
-                    <p className='mt-0.5 text-xs text-rh-text-secondary line-clamp-1 group-hover/zone:line-clamp-none'>
-                      {zone.description}
-                    </p>
+                    <div className='flex-1 min-w-0'>
+                      <div className='flex items-center justify-between'>
+                        <span className='text-sm font-semibold text-white'>{zone.name}</span>
+                        <span className={`text-sm font-mono font-bold ${colors.accent}`}>
+                          {zone.min}-{zone.max}
+                          <span className='ml-1 text-[10px] font-normal text-rh-text-muted'>bpm</span>
+                        </span>
+                      </div>
+                      <p className='mt-0.5 text-[11px] text-rh-text-tertiary'>{zone.description}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
+        </>
       )}
     </div>
   );

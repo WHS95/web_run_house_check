@@ -3,13 +3,13 @@
 import React, { useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Calculator,
-  Timer,
-  Target,
-  Heart,
-  MapPin,
-  ChevronRight,
-  LogOut,
+    Gauge,
+    Timer,
+    Split,
+    HeartPulse,
+    CircleDot,
+    ChevronRight,
+    LogOut,
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 import dynamic from "next/dynamic";
@@ -17,161 +17,178 @@ import { getFCMToken } from "@/lib/firebase/client";
 
 // 동적 로딩으로 번들 크기 최적화
 const PageHeader = dynamic(
-  () => import("@/components/organisms/common/PageHeader"),
-  {
-    ssr: true,
-  }
+    () => import("@/components/organisms/common/PageHeader"),
+    {
+        ssr: true,
+    }
 );
 
 const menuItems = [
-  {
-    icon: Calculator,
-    title: "페이스 계산기",
-    description: "거리, 시간, 페이스 계산",
-    href: "/calculator/pace",
-  },
-  {
-    icon: Target,
-    title: "완주 시간 예측기",
-    description: "기록 기반 완주 시간 예측",
-    href: "/calculator/prediction",
-  },
-  {
-    icon: Timer,
-    title: "스플릿 타임 계산기",
-    description: "구간별 예상 기록 계산",
-    href: "/calculator/split-time",
-  },
-  {
-    icon: Heart,
-    title: "심박수 존 계산기",
-    description: "나이별 트레이닝 존 계산",
-    href: "/calculator/heart-rate",
-  },
-  {
-    icon: MapPin,
-    title: "트랙 페이스 계산기",
-    description: "트랙 페이스 계산",
-    href: "/calculator/track-pace",
-  },
+    {
+        icon: Gauge,
+        title: "페이스 계산기",
+        description: "거리와 시간으로 페이스 계산",
+        href: "/calculator/pace",
+        iconBg: "#669FF2",
+    },
+    {
+        icon: Timer,
+        title: "완주 시간 예측기",
+        description: "기록 기반 완주 시간 예측",
+        href: "/calculator/prediction",
+        iconBg: "#8BB5F5",
+    },
+    {
+        icon: Split,
+        title: "스플릿 타임 계산기",
+        description: "구간별 스플릿 타임 계산",
+        href: "/calculator/split-time",
+        iconBg: "#5580C0",
+    },
+    {
+        icon: HeartPulse,
+        title: "심박수 존 계산기",
+        description: "최대 심박수 기반 존 계산",
+        href: "/calculator/heart-rate",
+        iconBg: "#3E6496",
+    },
+    {
+        icon: CircleDot,
+        title: "트랙 페이스 계산기",
+        description: "트랙 거리별 페이스 변환",
+        href: "/calculator/track-pace",
+        iconBg: "#4C525E",
+    },
 ];
 
 export default function MenuPage() {
-  const router = useRouter();
+    const router = useRouter();
 
-  // Supabase 클라이언트 메모화
-  const supabase = useMemo(
-    () =>
-      createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      ),
-    []
-  );
+    // Supabase 클라이언트 메모화
+    const supabase = useMemo(
+        () =>
+            createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            ),
+        []
+    );
 
-  const handleItemClick = useCallback(
-    (item: (typeof menuItems)[0]) => {
-      // 햅틱 피드백
-      if (typeof window !== "undefined" && window.navigator.vibrate) {
-        window.navigator.vibrate(50);
-      }
-      router.push(item.href);
-    },
-    [router]
-  );
+    const handleItemClick = useCallback(
+        (item: (typeof menuItems)[0]) => {
+            // 햅틱 피드백
+            if (typeof window !== "undefined" && window.navigator.vibrate) {
+                window.navigator.vibrate(50);
+            }
+            router.push(item.href);
+        },
+        [router]
+    );
 
-  const handleLogout = useCallback(async () => {
-    try {
-      // 햅틱 피드백
-      if (typeof window !== "undefined" && window.navigator.vibrate) {
-        window.navigator.vibrate([50, 100, 50]);
-      }
+    const handleLogout = useCallback(async () => {
+        try {
+            // 햅틱 피드백
+            if (typeof window !== "undefined" && window.navigator.vibrate) {
+                window.navigator.vibrate([50, 100, 50]);
+            }
 
-      // FCM 토큰 비활성화
-      const fcmToken = await getFCMToken();
-      if (fcmToken) {
-        await fetch("/api/push/token", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: fcmToken }),
-        }).catch(() => {});
-      }
+            // FCM 토큰 비활성화
+            const fcmToken = await getFCMToken();
+            if (fcmToken) {
+                await fetch("/api/push/token", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: fcmToken }),
+                }).catch(() => {});
+            }
 
-      // Supabase 세션 종료
-      const { error } = await supabase.auth.signOut();
+            // Supabase 세션 종료
+            const { error } = await supabase.auth.signOut();
 
-      if (error) {
-        //console.error("로그아웃 중 오류:", error);
-        alert("로그아웃 중 오류가 발생했습니다.");
-        return;
-      }
+            if (error) {
+                alert("로그아웃 중 오류가 발생했습니다.");
+                return;
+            }
 
-      // 로그인 페이지로 리다이렉트
-      router.push("/auth/login");
-    } catch (error) {
-      //console.error("로그아웃 처리 중 예외:", error);
-      alert("로그아웃 처리 중 문제가 발생했습니다.");
-    }
-  }, [supabase, router]);
+            // 로그인 페이지로 리다이렉트
+            router.push("/auth/login");
+        } catch {
+            alert("로그아웃 처리 중 문제가 발생했습니다.");
+        }
+    }, [supabase, router]);
 
-  return (
-    <div className='flex flex-col h-screen bg-rh-bg-primary main-content'>
-      <div className='fixed top-0 left-0 right-0 z-10 bg-rh-bg-surface'>
-        <PageHeader
-          title='러닝 계산기'
-          iconColor='white'
-          borderColor='rh-border'
-        />
-      </div>
-
-      {/* 메뉴 리스트 */}
-      <div className='flex-1 overflow-y-auto px-2 py-2 pt-[80px]'>
-        <div className='bg-rh-bg-primary'>
-          {/* 계산기 메뉴들 */}
-          {menuItems.map((item, index) => {
-            const IconComponent = item.icon;
-            return (
-              <button
-                key={index}
-                onClick={() => handleItemClick(item)}
-                className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-rh-bg-surface'
-              >
-                <div className='flex items-center gap-3'>
-                  <div className='flex items-center justify-center w-10 h-10 rounded-full bg-rh-bg-surface'>
-                    <IconComponent size={20} className='text-white' />
-                  </div>
-                  <div className='text-left'>
-                    <div className='font-extrabold text-rh-accent'>
-                      {item.title}
-                    </div>
-                    <div className='text-sm text-white'>{item.description}</div>
-                  </div>
-                </div>
-                <ChevronRight size={20} className='text-rh-text-secondary' />
-              </button>
-            );
-          })}
-
-          {/* 구분선 */}
-          <div className='my-4 border-t border-rh-border'></div>
-
-          {/* 로그아웃 버튼 */}
-          <button
-            onClick={handleLogout}
-            className='flex items-center justify-between w-full px-2 py-6 transition-colors hover:bg-red-900/20'
-          >
-            <div className='flex items-center gap-3'>
-              <div className='flex items-center justify-center w-10 h-10 bg-red-600 rounded-full'>
-                <LogOut size={20} className='text-white' />
-              </div>
-              <div className='text-left'>
-                <div className='font-extrabold text-red-500'>로그아웃</div>
-                <div className='text-sm text-rh-text-secondary'>계정에서 로그아웃</div>
-              </div>
+    return (
+        <div className="flex flex-col h-screen bg-rh-bg-primary main-content">
+            <div className="fixed top-0 left-0 right-0 z-10 bg-rh-bg-surface">
+                <PageHeader
+                    title="러닝 계산기"
+                    iconColor="white"
+                    borderColor="rh-border"
+                />
             </div>
-          </button>
+
+            {/* 메뉴 리스트 */}
+            <div className="flex-1 overflow-y-auto px-4 pt-[80px] scroll-area-bottom">
+                <div className="flex flex-col gap-3 pt-6">
+                    {/* 계산기 메뉴들 */}
+                    {menuItems.map((item, index) => {
+                        const IconComponent = item.icon;
+                        return (
+                            <button
+                                key={index}
+                                onClick={() => handleItemClick(item)}
+                                className="flex items-center gap-4 w-full h-[72px] px-4 rounded-xl bg-rh-bg-surface transition-colors active:opacity-80"
+                            >
+                                <div
+                                    className="flex items-center justify-center w-11 h-11 rounded-lg shrink-0"
+                                    style={{
+                                        backgroundColor:
+                                            item.iconBg,
+                                    }}
+                                >
+                                    <IconComponent
+                                        size={22}
+                                        className="text-white"
+                                    />
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <div className="text-[15px] font-semibold text-white">
+                                        {item.title}
+                                    </div>
+                                    <div className="text-xs text-rh-text-tertiary">
+                                        {item.description}
+                                    </div>
+                                </div>
+                                <ChevronRight
+                                    size={18}
+                                    className="text-rh-text-muted shrink-0"
+                                />
+                            </button>
+                        );
+                    })}
+
+                    {/* 구분선 */}
+                    <div className="my-1 border-t border-rh-border"></div>
+
+                    {/* 로그아웃 버튼 */}
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-4 w-full h-[72px] px-4 rounded-xl bg-rh-bg-surface transition-colors active:opacity-80"
+                    >
+                        <div className="flex items-center justify-center w-11 h-11 rounded-lg shrink-0 bg-red-600">
+                            <LogOut size={22} className="text-white" />
+                        </div>
+                        <div className="flex-1 text-left">
+                            <div className="text-[15px] font-semibold text-red-400">
+                                로그아웃
+                            </div>
+                            <div className="text-xs text-rh-text-tertiary">
+                                계정에서 로그아웃
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

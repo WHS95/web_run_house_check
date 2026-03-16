@@ -367,8 +367,8 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         />
       </div>
 
-      {/* 메인 콘텐츠 */}
-      <div className='flex flex-col flex-1 overflow-y-auto native-scroll pt-20 px-4 pb-28'>
+      {/* 스크롤 가능한 폼 영역 */}
+      <div className='flex-1 overflow-y-auto native-scroll pt-20 px-4 pb-4'>
         {/* 오프라인 상태 배너 */}
         {!isOnline && (
           <div className="mb-4 flex items-center gap-2 rounded-lg bg-rh-status-warning/20 px-3 py-2">
@@ -498,10 +498,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           </div>
         </div>
 
-        {/* Spacer - 하단 고정 */}
-        <div className='flex-1' />
-
-        {/* 위치 상태 (인라인 노트 스타일) */}
+        {/* 위치 상태 */}
         <LocationStatusIndicator
           isLocationBasedAttendance={initialFormData?.crewInfo?.location_based_attendance || false}
           crewLocations={initialFormData?.crewLocations || []}
@@ -509,6 +506,10 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           onStatusChange={handleLocationStatusChange}
         />
 
+      </div>
+
+      {/* 하단 고정 액션 영역 (바텀 네비 위) */}
+      <div className='shrink-0 px-4 pb-bottom-inset bg-rh-bg-primary'>
         {/* 제출 버튼 */}
         <button
           onClick={handleSubmit}
@@ -517,7 +518,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
             (userStatus && !userStatus.isActive) ||
             (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
           }
-          className={`rounded-rh-lg h-[52px] w-full text-base font-semibold text-white transition-all duration-200 active:scale-[0.97] hw-accelerated ${
+          className={`flex items-center justify-center rounded-[12px] h-[52px] w-full text-[16px] font-semibold text-white transition-all duration-200 active:scale-[0.97] hw-accelerated ${
             isSubmitting ||
             (userStatus && !userStatus.isActive) ||
             (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)

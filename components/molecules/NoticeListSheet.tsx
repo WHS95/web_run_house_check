@@ -102,7 +102,7 @@ export default function NoticeListSheet({
                         dragConstraints={{ top: 0 }}
                         dragElastic={0.2}
                         onDragEnd={handleDragEnd}
-                        className="fixed inset-x-0 bottom-0 z-50 flex max-h-[75vh] flex-col rounded-t-[20px] bg-rh-bg-surface"
+                        className="fixed inset-x-0 bottom-0 z-50 flex max-h-[75vh] flex-col rounded-t-[20px] bg-rh-bg-surface pb-safe"
                     >
                         {/* 드래그 핸들 */}
                         <div className="flex justify-center pt-3 pb-1">

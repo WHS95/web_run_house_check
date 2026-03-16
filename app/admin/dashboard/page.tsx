@@ -8,7 +8,7 @@ import DeviceGrid from "@/components/organisms/device-grid";
 
 export default function SmartHomeDashboard() {
   return (
-    <div className='pb-20 min-h-screen bg-rh-bg-primary'>
+    <div className='scroll-area-bottom min-h-screen bg-rh-bg-primary'>
       <div className='mx-auto max-w-sm min-h-screen bg-rh-bg-surface'>
         <div className='p-6 space-y-6'>
           {/* <Header />

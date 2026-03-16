@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { FormLayout } from "@/components/layout/FormLayout";
+import { cn } from "@/lib/utils";
 
 interface TrackResult {
   lane1: string;
@@ -15,8 +16,8 @@ interface PaceRow {
 }
 
 const LANE_DISTANCES = {
-  lane1: 400, // 미터
-  lane2: 407, // 미터
+  lane1: 400,
+  lane2: 407,
 } as const;
 
 export default function TrackPacePage() {
@@ -27,243 +28,177 @@ export default function TrackPacePage() {
   const [paceMinutes, setPaceMinutes] = useState("6");
   const [paceSeconds, setPaceSeconds] = useState("0");
   const [outputMode, setOutputMode] = useState<"single" | "table">("single");
-  const [selectedLanes, setSelectedLanes] = useState<
-    "both" | "lane1" | "lane2"
-  >("both");
+  const [selectedLanes, setSelectedLanes] = useState<"both" | "lane1" | "lane2">("both");
 
-  // 시간을 초로 변환
-  const timeToSeconds = (timeStr: string): number => {
-    const parts = timeStr.split(":");
-    if (parts.length === 3) {
-      return (
-        parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2])
-      );
-    }
-    return 0;
-  };
-
-  // 초를 시:분:초 형식으로 변환
   const secondsToTime = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
-
     if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, "0")}:${secs
-        .toString()
-        .padStart(2, "0")}`;
+      return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     }
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // 마라톤 시간에서 1km 페이스 계산
-  const calculatePaceFromMarathon = (
-    hours: string,
-    minutes: string,
-    seconds: string
-  ): number => {
-    const totalSeconds =
-      parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
-    return totalSeconds / 42.195; // 42.195km로 나누어 1km당 초 계산
+  const calculatePaceFromMarathon = (hours: string, minutes: string, seconds: string): number => {
+    const totalSeconds = parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
+    return totalSeconds / 42.195;
   };
 
-  // 페이스에서 랩 타임 계산
-  const calculateLapTime = (
-    pacePerKmInSeconds: number,
-    distance: number
-  ): string => {
+  const calculateLapTime = (pacePerKmInSeconds: number, distance: number): string => {
     const lapTimeSeconds = pacePerKmInSeconds * (distance / 1000);
     return secondsToTime(lapTimeSeconds);
   };
 
-  // 현재 설정된 페이스 가져우기 (초 단위)
   const getCurrentPaceInSeconds = (): number => {
     if (inputMode === "marathon") {
-      return calculatePaceFromMarathon(
-        marathonHours,
-        marathonMinutes,
-        marathonSeconds
-      );
-    } else if (inputMode === "pace") {
-      return parseInt(paceMinutes) * 60 + parseInt(paceSeconds);
+      return calculatePaceFromMarathon(marathonHours, marathonMinutes, marathonSeconds);
     }
-    return 0;
+    return parseInt(paceMinutes) * 60 + parseInt(paceSeconds);
   };
 
-  // 단일 결과 계산
   const calculateSingleResult = (): TrackResult | null => {
     const paceInSeconds = getCurrentPaceInSeconds();
     if (paceInSeconds === 0) return null;
-
     return {
       lane1: calculateLapTime(paceInSeconds, LANE_DISTANCES.lane1),
       lane2: calculateLapTime(paceInSeconds, LANE_DISTANCES.lane2),
     };
   };
 
-  // 표 형식 결과 계산 (±1분 범위)
   const calculateTableResults = (): PaceRow[] => {
     const basePaceInSeconds = getCurrentPaceInSeconds();
     if (basePaceInSeconds === 0) return [];
-
     const results: PaceRow[] = [];
-
-    // ±1분 범위에서 30초 간격으로 생성
     for (let offset = -60; offset <= 60; offset += 30) {
       const currentPaceInSeconds = basePaceInSeconds + offset;
       if (currentPaceInSeconds <= 0) continue;
-
       const minutes = Math.floor(currentPaceInSeconds / 60);
       const seconds = Math.floor(currentPaceInSeconds % 60);
-
       results.push({
         pace: `${minutes}:${seconds.toString().padStart(2, "0")}`,
         lane1: calculateLapTime(currentPaceInSeconds, LANE_DISTANCES.lane1),
         lane2: calculateLapTime(currentPaceInSeconds, LANE_DISTANCES.lane2),
       });
     }
-
     return results;
   };
 
   const singleResult = calculateSingleResult();
   const tableResults = calculateTableResults();
 
-  // 현재 페이스 문자열 가져오기
   const getCurrentPaceString = (): string => {
     if (inputMode === "marathon") {
-      const paceInSeconds = calculatePaceFromMarathon(
-        marathonHours,
-        marathonMinutes,
-        marathonSeconds
-      );
+      const paceInSeconds = calculatePaceFromMarathon(marathonHours, marathonMinutes, marathonSeconds);
       const minutes = Math.floor(paceInSeconds / 60);
       const seconds = Math.floor(paceInSeconds % 60);
       return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-    } else if (inputMode === "pace") {
-      return `${paceMinutes}:${paceSeconds.padStart(2, "0")}`;
     }
-    return "";
+    return `${paceMinutes}:${paceSeconds.padStart(2, "0")}`;
   };
 
   return (
     <FormLayout title='트랙 페이스 계산기'>
-      <div className='space-y-6 mb-44'>
-        {/* 입력 섹션 */}
-        <div className='p-4 space-y-4 bg-rh-bg-surface rounded-2xl'>
-          <h3 className='text-lg font-bold text-white'>목표 설정</h3>
+      <div className='space-y-4 mb-20'>
+        {/* 입력 모드 */}
+        <div className='p-4 bg-rh-bg-surface rounded-rh-lg space-y-4'>
+          <h3 className='text-[15px] font-semibold text-white'>목표 설정</h3>
 
-          {/* 입력 모드 선택 탭 */}
-          <div className='flex gap-2 mb-4'>
-            <button
-              onClick={() => setInputMode("marathon")}
-              className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                inputMode === "marathon"
-                  ? "bg-rh-accent text-white"
-                  : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
-              }`}
-            >
-              마라톤 목표 기록
-            </button>
-            <button
-              onClick={() => setInputMode("pace")}
-              className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                inputMode === "pace"
-                  ? "bg-rh-accent text-white"
-                  : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
-              }`}
-            >
-              1km 페이스 직접
-            </button>
+          <div className='flex gap-2'>
+            {[
+              { value: "marathon", label: "마라톤 목표 기록" },
+              { value: "pace", label: "1km 페이스 직접" },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setInputMode(opt.value as typeof inputMode)}
+                className={cn(
+                  "flex-1 px-3 py-2.5 text-sm font-medium rounded-rh-md transition-colors",
+                  inputMode === opt.value
+                    ? "bg-rh-accent text-white"
+                    : "bg-rh-bg-muted text-rh-text-secondary"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
 
-          {/* 마라톤 목표 시간 */}
           {inputMode === "marathon" && (
             <div>
-              <label className='block mb-2 text-sm font-medium text-white'>
+              <label className='block mb-2 text-xs font-medium text-rh-text-secondary'>
                 마라톤 목표 기록 (시:분:초)
               </label>
               <div className='flex gap-2'>
                 <select
                   value={marathonHours}
                   onChange={(e) => setMarathonHours(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
+                  className='flex-1 px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none'
                 >
                   {Array.from({ length: 25 }, (_, i) => (
-                    <option key={i} value={i.toString()}>
-                      {i.toString().padStart(2, "0")}시
-                    </option>
+                    <option key={i} value={i.toString()}>{i.toString().padStart(2, "0")}시</option>
                   ))}
                 </select>
                 <select
                   value={marathonMinutes}
                   onChange={(e) => setMarathonMinutes(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
+                  className='flex-1 px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none'
                 >
                   {Array.from({ length: 60 }, (_, i) => (
-                    <option key={i} value={i.toString()}>
-                      {i.toString().padStart(2, "0")}분
-                    </option>
+                    <option key={i} value={i.toString()}>{i.toString().padStart(2, "0")}분</option>
                   ))}
                 </select>
                 <select
                   value={marathonSeconds}
                   onChange={(e) => setMarathonSeconds(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
+                  className='flex-1 px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none'
                 >
                   {Array.from({ length: 60 }, (_, i) => (
-                    <option key={i} value={i.toString()}>
-                      {i.toString().padStart(2, "0")}초
-                    </option>
+                    <option key={i} value={i.toString()}>{i.toString().padStart(2, "0")}초</option>
                   ))}
                 </select>
               </div>
-              <div className='mt-2 text-xs text-rh-text-secondary'>
+              <p className='mt-1.5 text-[11px] text-rh-text-muted'>
                 입력한 마라톤 기록에서 1km 페이스를 자동 계산합니다
-              </div>
+              </p>
             </div>
           )}
 
-          {/* 1km 페이스 직접 입력 */}
           {inputMode === "pace" && (
             <div>
-              <label className='block mb-2 text-sm font-medium text-white'>
+              <label className='block mb-2 text-xs font-medium text-rh-text-secondary'>
                 1km 페이스 (분:초)
               </label>
-              <div className='flex gap-2'>
+              <div className='flex gap-2 items-center'>
                 <select
                   value={paceMinutes}
                   onChange={(e) => setPaceMinutes(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
+                  className='flex-1 px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none'
                 >
                   {Array.from({ length: 60 }, (_, i) => (
-                    <option key={i} value={i.toString()}>
-                      {i.toString().padStart(2, "0")}분
-                    </option>
+                    <option key={i} value={i.toString()}>{i.toString().padStart(2, "0")}분</option>
                   ))}
                 </select>
-                <span className='self-center text-white'>:</span>
+                <span className='text-rh-text-muted'>:</span>
                 <select
                   value={paceSeconds}
                   onChange={(e) => setPaceSeconds(e.target.value)}
-                  className='flex-1 px-3 py-2 text-white rounded-lg bg-rh-bg-muted'
+                  className='flex-1 px-3 py-2.5 text-sm text-white bg-rh-bg-muted rounded-rh-md outline-none'
                 >
                   {Array.from({ length: 60 }, (_, i) => (
-                    <option key={i} value={i.toString()}>
-                      {i.toString().padStart(2, "0")}초
-                    </option>
+                    <option key={i} value={i.toString()}>{i.toString().padStart(2, "0")}초</option>
                   ))}
                 </select>
               </div>
-              <div className='mt-2 text-xs text-rh-text-secondary'>
+              <p className='mt-1.5 text-[11px] text-rh-text-muted'>
                 1km당 목표 페이스를 직접 설정합니다
-              </div>
+              </p>
             </div>
           )}
 
           {/* 레인 선택 */}
           <div>
-            <label className='block mb-2 text-sm font-medium text-white'>
+            <label className='block mb-2 text-xs font-medium text-rh-text-secondary'>
               레인 선택
             </label>
             <div className='flex gap-2'>
@@ -274,14 +209,13 @@ export default function TrackPacePage() {
               ].map((option) => (
                 <button
                   key={option.value}
-                  onClick={() =>
-                    setSelectedLanes(option.value as typeof selectedLanes)
-                  }
-                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => setSelectedLanes(option.value as typeof selectedLanes)}
+                  className={cn(
+                    "flex-1 px-3 py-2.5 text-sm font-medium rounded-rh-md transition-colors",
                     selectedLanes === option.value
                       ? "bg-rh-accent text-white"
-                      : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
-                  }`}
+                      : "bg-rh-bg-muted text-rh-text-secondary"
+                  )}
                 >
                   {option.label}
                 </button>
@@ -289,96 +223,76 @@ export default function TrackPacePage() {
             </div>
           </div>
 
-          {/* 출력 모드 선택 */}
+          {/* 출력 모드 */}
           <div>
-            <label className='block mb-2 text-sm font-medium text-white'>
+            <label className='block mb-2 text-xs font-medium text-rh-text-secondary'>
               출력 모드
             </label>
             <div className='flex gap-2'>
-              <button
-                onClick={() => setOutputMode("single")}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  outputMode === "single"
-                    ? "bg-rh-accent text-white"
-                    : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
-                }`}
-              >
-                단일 결과
-              </button>
-              <button
-                onClick={() => setOutputMode("table")}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  outputMode === "table"
-                    ? "bg-rh-accent text-white"
-                    : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-accent-hover/20"
-                }`}
-              >
-                전체 표 보기
-              </button>
+              {[
+                { value: "single", label: "단일 결과" },
+                { value: "table", label: "전체 표 보기" },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setOutputMode(opt.value as typeof outputMode)}
+                  className={cn(
+                    "flex-1 px-3 py-2.5 text-sm font-medium rounded-rh-md transition-colors",
+                    outputMode === opt.value
+                      ? "bg-rh-accent text-white"
+                      : "bg-rh-bg-muted text-rh-text-secondary"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
         {/* 결과 섹션 */}
         {(singleResult || tableResults.length > 0) && (
-          <div className='p-4 bg-rh-bg-surface rounded-2xl'>
-            {outputMode === "single" && singleResult && (
-              <div className='space-y-3'>
-                <div className='mb-4 text-center'>
-                  <div className='text-sm text-rh-text-secondary mb-1'>
-                    {inputMode === "marathon" 
-                      ? `마라톤 ${marathonHours}:${marathonMinutes.padStart(2, "0")}:${marathonSeconds.padStart(2, "0")} 기준`
-                      : "직접 입력 페이스"
-                    }
-                  </div>
-                  <div className='text-lg font-bold text-rh-accent'>
-                    페이스: {getCurrentPaceString()}/km
-                  </div>
-                </div>
+          <div className='p-4 bg-rh-bg-surface rounded-rh-lg'>
+            <div className='mb-3 text-center'>
+              <p className='text-xs text-rh-text-secondary'>
+                {inputMode === "marathon"
+                  ? `마라톤 ${marathonHours}:${marathonMinutes.padStart(2, "0")}:${marathonSeconds.padStart(2, "0")} 기준`
+                  : "직접 입력 페이스"}
+              </p>
+              <p className='text-base font-bold text-rh-accent mt-0.5'>
+                페이스: {getCurrentPaceString()}/km
+                {outputMode === "table" && " ± 1분"}
+              </p>
+            </div>
 
+            {outputMode === "single" && singleResult && (
+              <div className='space-y-2'>
                 {selectedLanes !== "lane2" && (
-                  <div className='flex items-center justify-between px-4 py-3 rounded-lg bg-rh-bg-muted'>
-                    <span className='font-medium text-white'>1레인 (400m)</span>
-                    <span className='text-lg font-bold text-rh-accent'>
-                      {singleResult.lane1}
-                    </span>
+                  <div className='flex items-center justify-between px-4 py-3 bg-rh-bg-muted rounded-rh-md'>
+                    <span className='text-sm text-rh-text-secondary'>1레인 (400m)</span>
+                    <span className='text-base font-bold text-rh-accent'>{singleResult.lane1}</span>
                   </div>
                 )}
-
                 {selectedLanes !== "lane1" && (
-                  <div className='flex items-center justify-between px-4 py-3 rounded-lg bg-rh-bg-muted'>
-                    <span className='font-medium text-white'>2레인 (407m)</span>
-                    <span className='text-lg font-bold text-rh-accent'>
-                      {singleResult.lane2}
-                    </span>
+                  <div className='flex items-center justify-between px-4 py-3 bg-rh-bg-muted rounded-rh-md'>
+                    <span className='text-sm text-rh-text-secondary'>2레인 (407m)</span>
+                    <span className='text-base font-bold text-rh-accent'>{singleResult.lane2}</span>
                   </div>
                 )}
               </div>
             )}
 
             {outputMode === "table" && tableResults.length > 0 && (
-              <div>
-                <div className='mb-4 text-center'>
-                  <div className='text-sm text-rh-text-secondary mb-1'>
-                    {inputMode === "marathon" 
-                      ? `마라톤 ${marathonHours}:${marathonMinutes.padStart(2, "0")}:${marathonSeconds.padStart(2, "0")} 기준`
-                      : "직접 입력 페이스"
-                    }
-                  </div>
-                  <div className='text-lg font-bold text-rh-accent'>
-                    기준 페이스: {getCurrentPaceString()}/km ± 1분
-                  </div>
-                </div>
-                <div className='overflow-x-auto'>
-                  <table className='w-full text-white'>
+              <div className='overflow-x-auto -mx-1'>
+                <table className='w-full text-sm'>
                   <thead>
                     <tr className='border-b border-rh-border'>
-                      <th className='px-2 py-2 text-left'>페이스(/km)</th>
+                      <th className='px-2 py-2 text-left text-xs font-medium text-rh-text-secondary'>페이스(/km)</th>
                       {selectedLanes !== "lane2" && (
-                        <th className='px-2 py-2 text-center'>1레인 (400m)</th>
+                        <th className='px-2 py-2 text-center text-xs font-medium text-rh-text-secondary'>1레인</th>
                       )}
                       {selectedLanes !== "lane1" && (
-                        <th className='px-2 py-2 text-center'>2레인 (407m)</th>
+                        <th className='px-2 py-2 text-center text-xs font-medium text-rh-text-secondary'>2레인</th>
                       )}
                     </tr>
                   </thead>
@@ -388,32 +302,21 @@ export default function TrackPacePage() {
                       return (
                         <tr
                           key={index}
-                          className={`border-b border-rh-border/30 ${
-                            isCurrentPace ? "bg-rh-accent/20" : ""
-                          }`}
+                          className={cn(
+                            "border-b border-rh-border/30",
+                            isCurrentPace && "bg-rh-accent/15"
+                          )}
                         >
-                          <td
-                            className={`py-2 px-2 font-medium ${
-                              isCurrentPace ? "text-rh-accent" : ""
-                            }`}
-                          >
+                          <td className={cn("py-2 px-2 font-medium text-white", isCurrentPace && "text-rh-accent")}>
                             {row.pace}
                           </td>
                           {selectedLanes !== "lane2" && (
-                            <td
-                              className={`text-center py-2 px-2 ${
-                                isCurrentPace ? "text-rh-accent font-bold" : ""
-                              }`}
-                            >
+                            <td className={cn("text-center py-2 px-2 text-white", isCurrentPace && "text-rh-accent font-bold")}>
                               {row.lane1}
                             </td>
                           )}
                           {selectedLanes !== "lane1" && (
-                            <td
-                              className={`text-center py-2 px-2 ${
-                                isCurrentPace ? "text-rh-accent font-bold" : ""
-                              }`}
-                            >
+                            <td className={cn("text-center py-2 px-2 text-white", isCurrentPace && "text-rh-accent font-bold")}>
                               {row.lane2}
                             </td>
                           )}
@@ -421,23 +324,20 @@ export default function TrackPacePage() {
                       );
                     })}
                   </tbody>
-                  </table>
-                </div>
+                </table>
               </div>
             )}
           </div>
         )}
 
-        {/* 설명 섹션 */}
-        <div className='p-4 bg-rh-bg-surface rounded-2xl'>
-          <h3 className='mb-2 text-lg font-bold text-white'>사용법</h3>
-          <div className='space-y-2 text-sm text-rh-text-secondary'>
-            <p>• <strong>마라톤 목표 기록:</strong> 풀코스 완주 목표 시간을 입력하면 1km 페이스를 자동 계산</p>
-            <p>• <strong>1km 페이스 직접:</strong> 원하는 킬로미터당 페이스를 직접 설정</p>
-            <p>• 탭을 선택하여 두 가지 입력 방식 중 하나를 선택하세요</p>
-            <p>• 1레인: 400m, 2레인: 407m 기준으로 랩타임 계산</p>
-            <p>• 단일 결과: 설정한 페이스의 랩타임만 확인</p>
-            <p>• 전체 표 보기: 기준 페이스 ±1분 범위의 랩타임 비교표</p>
+        {/* 사용법 */}
+        <div className='p-4 bg-rh-bg-surface rounded-rh-lg'>
+          <h3 className='text-[15px] font-semibold text-white mb-2'>사용법</h3>
+          <div className='space-y-1.5 text-[12px] text-rh-text-tertiary leading-relaxed'>
+            <p>• 마라톤 목표 기록 또는 1km 페이스를 입력하세요</p>
+            <p>• 1레인: 400m, 2레인: 407m 기준 랩타임 계산</p>
+            <p>• 단일 결과: 설정 페이스의 랩타임만 확인</p>
+            <p>• 전체 표: 기준 페이스 ±1분 범위 비교표</p>
           </div>
         </div>
       </div>

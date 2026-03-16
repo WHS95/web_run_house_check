@@ -141,7 +141,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
             )}
 
             {/* ── ScrollContent ── */}
-            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 space-y-5">
+            <div className="flex-1 overflow-y-auto px-4 pt-4 scroll-area-bottom space-y-5">
                 {/* 공지 카드 */}
                 {noticeText && (
                     <button

@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Trophy, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import MonthNavigator from '@/components/molecules/MonthNavigator';
 import RankingTabs, { TabItem } from '@/components/organisms/ranking/RankingTabs';
@@ -161,13 +163,28 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
     [currentRankingData]
   );
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const handleScroll = useCallback(() => {
+    if (scrollRef.current) {
+      setShowScrollTop(scrollRef.current.scrollTop > 200);
+    }
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    haptic.light();
+    scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   return (
     <div className="flex flex-col h-screen bg-rh-bg-primary text-white">
       <div className="shrink-0 bg-rh-bg-surface pt-safe">
         <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-surface" />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-4 scroll-area-bottom space-y-5">
+      {/* Sticky 영역: 스크롤 밖 */}
+      <div className="shrink-0 sticky top-0 z-10 bg-rh-bg-primary/80 backdrop-blur-xl px-4 pt-4 pb-3 space-y-3 relative">
         <MonthNavigator
           year={currentData.selectedYear}
           month={currentData.selectedMonth}
@@ -175,12 +192,45 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
           onNext={handleNextMonth}
           disabled={isDataLoading}
         />
-
         <RankingTabs
           tabs={tabs}
           activeTabId={activeTab}
           onTabChange={handleTabChange}
         />
+        {/* 하단 그라데이션 섀도우 */}
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-b from-rh-bg-primary/40 to-transparent pointer-events-none translate-y-full" />
+      </div>
+
+      {/* 스크롤 영역: 리스트만 */}
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 pt-2 scroll-area-bottom space-y-2"
+      >
+        {/* 내 순위 카드 */}
+        {currentUserRank && !isDataLoading && (
+          <div className="flex items-center gap-3 px-4 h-14 rounded-xl bg-rh-accent/[0.1] border border-rh-accent/30">
+            <div className="w-8 h-8 rounded-lg bg-rh-accent/20 flex items-center justify-center">
+              <span className="font-bold text-base text-rh-accent">
+                {currentUserRank.rank}
+              </span>
+            </div>
+            <div className="flex-1 flex flex-col gap-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-semibold text-white">
+                  {currentUserRank.name || '알 수 없음'}
+                </span>
+                <span className="bg-rh-accent text-white text-[10px] rounded-full px-1.5 leading-4">
+                  나
+                </span>
+              </div>
+              <p className="text-xs text-rh-text-tertiary">
+                출석 {currentUserRank.value}회 · 총 {currentRankingData.length}명 중
+              </p>
+            </div>
+            <Trophy className="w-[18px] h-[18px] text-rh-accent" />
+          </div>
+        )}
 
         {isDataLoading ? (
           <RankingListSkeleton />
@@ -212,23 +262,22 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
         )}
       </div>
 
-      {currentUserRank && (
-        <div className="shrink-0 bg-rh-bg-surface border-t border-rh-border rounded-t-rh-lg px-4 py-3 flex items-center">
-          <div className="w-8 flex items-center justify-center">
-            <span className="font-bold text-sm text-rh-accent">
-              {currentUserRank.rank}
-            </span>
-          </div>
-          <div className="flex-1 ml-3">
-            <span className="text-sm font-medium text-white">
-              내 순위
-            </span>
-            <p className="text-xs text-rh-text-tertiary">
-              {currentUserRank.name || '알 수 없음'} · 출석 {currentUserRank.value}회
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Scroll to Top FAB */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2 }}
+            onClick={scrollToTop}
+            className="fixed right-4 bottom-24 z-20 w-10 h-10 rounded-full bg-rh-bg-surface/90 backdrop-blur-sm border border-rh-border shadow-lg flex items-center justify-center active:scale-90 transition-transform"
+            aria-label="맨 위로"
+          >
+            <ChevronUp className="w-5 h-5 text-rh-text-secondary" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       <BottomNavigation />
 

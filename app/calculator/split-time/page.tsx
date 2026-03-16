@@ -44,7 +44,7 @@ export default function SplitTimeCalculatorPage() {
             (d) => d < dist
         );
 
-        const resultRows = splitPoints.map((d) => ({
+        const resultRows: { label: string; value: string; highlight?: boolean }[] = splitPoints.map((d) => ({
             label: d === 21.1 ? "하프 (21.1km)" : `${d} km`,
             value: secondsToTimeString(pacePerKm * d),
         }));

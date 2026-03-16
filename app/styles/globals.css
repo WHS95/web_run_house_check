@@ -29,10 +29,10 @@
         --rh-text-muted: #475569;
         --rh-text-inverted: #1D2530;
 
-        /* Status */
-        --rh-status-success: #4ADE80;
-        --rh-status-warning: #FBBF24;
-        --rh-status-error: #F87171;
+        /* Status (블루 톤 테마 — 컬러풀 값 사용 금지) */
+        --rh-status-success: #8BB5F5;
+        --rh-status-warning: #5580C0;
+        --rh-status-error: #3E6496;
 
         /* Typography (px) */
         --rh-text-hero: 32px;

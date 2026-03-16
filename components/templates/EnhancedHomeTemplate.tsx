@@ -105,8 +105,8 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                     </span>
                 </div>
                 <button
-                    onClick={() => setIsNoticeSheetOpen(true)}
-                    className="flex h-10 w-10 items-center justify-center rounded-rh-md bg-rh-bg-surface"
+                    onClick={() => router.push('/notifications')}
+                    className="relative flex h-10 w-10 items-center justify-center rounded-rh-md bg-rh-bg-surface"
                 >
                     <Bell className="h-5 w-5 text-rh-text-secondary" />
                 </button>

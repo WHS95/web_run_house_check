@@ -60,7 +60,31 @@ export async function sendNotification(
 
         if (error || !tokens || tokens.length === 0) return;
 
-        // 2. FCM 멀티캐스트 발송 (최대 500개씩)
+        // 2. notifications 테이블에 기록 (개인 알림 히스토리)
+        const uniqueUserIds = Array.from(
+            new Set(tokens.map((t) => t.user_id))
+        );
+        if (uniqueUserIds.length > 0) {
+            const notificationRows = uniqueUserIds.map(
+                (userId) => ({
+                    user_id: userId,
+                    crew_id: crewId,
+                    type: payload.type,
+                    title: payload.title,
+                    body: payload.body,
+                })
+            );
+            try {
+                await supabaseAdmin
+                    .schema("attendance")
+                    .from("notifications")
+                    .insert(notificationRows);
+            } catch {
+                // 알림 기록 실패는 무시
+            }
+        }
+
+        // 3. FCM 멀티캐스트 발송 (최대 500개씩)
         const tokenStrings = tokens.map((t) => t.token);
         const chunks = chunkArray(tokenStrings, 500);
 
@@ -82,7 +106,7 @@ export async function sendNotification(
                 },
             });
 
-            // 3. 실패 토큰 비활성화
+            // 4. 실패 토큰 비활성화
             if (response.failureCount > 0) {
                 const failedTokens: string[] = [];
                 response.responses.forEach((resp, idx) => {

@@ -364,15 +364,16 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           title='출석 체크'
           iconColor='white'
           borderColor='rh-border'
+          backgroundColor='bg-rh-bg-surface'
         />
       </div>
 
       {/* 스크롤 가능한 폼 영역 */}
-      <div className='flex-1 overflow-y-auto native-scroll pt-20 px-4 pb-4'>
+      <div className='flex-1 min-h-0 overflow-y-auto native-scroll pt-20 px-4 pb-4'>
         {/* 오프라인 상태 배너 */}
         {!isOnline && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg bg-rh-status-warning/20 px-3 py-2">
-            <WifiOff className="h-4 w-4 text-rh-status-warning" />
+          <div className="mb-3 flex items-center gap-2 rounded-lg bg-rh-status-warning/20 border border-rh-status-warning/10 px-3 py-2">
+            <WifiOff className="h-4 w-4 shrink-0 text-rh-status-warning" />
             <span className="text-xs text-rh-status-warning">
               오프라인 상태 · 출석 시 자동 저장됩니다
             </span>
@@ -380,8 +381,8 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         )}
 
         {queueCount > 0 && isOnline && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg bg-rh-accent/20 px-3 py-2">
-            <CloudUpload className="h-4 w-4 text-rh-accent" />
+          <div className="mb-3 flex items-center gap-2 rounded-lg bg-rh-accent/20 border border-rh-accent/10 px-3 py-2">
+            <CloudUpload className="h-4 w-4 shrink-0 text-rh-accent" />
             <span className="text-xs text-rh-accent">
               {isFlushing
                 ? "대기 중인 출석을 전송하고 있습니다..."
@@ -502,6 +503,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         <LocationStatusIndicator
           isLocationBasedAttendance={initialFormData?.crewInfo?.location_based_attendance || false}
           crewLocations={initialFormData?.crewLocations || []}
+          selectedLocationId={formData.location}
           allowedRadius={50}
           onStatusChange={handleLocationStatusChange}
         />
@@ -509,7 +511,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       </div>
 
       {/* 하단 고정 액션 영역 (바텀 네비 위) */}
-      <div className='shrink-0 px-4 pb-bottom-inset bg-rh-bg-primary'>
+      <div className='shrink-0 px-4 pb-bottom-inset pt-2 bg-rh-bg-primary'>
         {/* 제출 버튼 */}
         <button
           onClick={handleSubmit}

@@ -14,6 +14,7 @@ import {
 import { createBrowserClient } from "@supabase/ssr";
 import dynamic from "next/dynamic";
 import { getFCMToken } from "@/lib/firebase/client";
+import BottomNavigation from "@/components/organisms/BottomNavigation";
 
 // 동적 로딩으로 번들 크기 최적화
 const PageHeader = dynamic(
@@ -29,35 +30,35 @@ const menuItems = [
         title: "페이스 계산기",
         description: "거리와 시간으로 페이스 계산",
         href: "/calculator/pace",
-        iconBg: "#669FF2",
+        iconBg: "bg-rh-accent",
     },
     {
         icon: Timer,
         title: "완주 시간 예측기",
         description: "기록 기반 완주 시간 예측",
         href: "/calculator/prediction",
-        iconBg: "#8BB5F5",
+        iconBg: "bg-rh-status-success",
     },
     {
         icon: Split,
         title: "스플릿 타임 계산기",
         description: "구간별 스플릿 타임 계산",
         href: "/calculator/split-time",
-        iconBg: "#5580C0",
+        iconBg: "bg-rh-status-warning",
     },
     {
         icon: HeartPulse,
         title: "심박수 존 계산기",
         description: "최대 심박수 기반 존 계산",
         href: "/calculator/heart-rate",
-        iconBg: "#3E6496",
+        iconBg: "bg-rh-status-error",
     },
     {
         icon: CircleDot,
         title: "트랙 페이스 계산기",
         description: "트랙 거리별 페이스 변환",
         href: "/calculator/track-pace",
-        iconBg: "#4C525E",
+        iconBg: "bg-rh-bg-muted",
     },
 ];
 
@@ -118,18 +119,17 @@ export default function MenuPage() {
     }, [supabase, router]);
 
     return (
-        <div className="flex flex-col h-screen bg-rh-bg-primary main-content">
-            <div className="fixed top-0 left-0 right-0 z-10 bg-rh-bg-surface">
-                <PageHeader
-                    title="러닝 계산기"
-                    iconColor="white"
-                    borderColor="rh-border"
-                />
-            </div>
+        <div className="flex flex-col min-h-screen bg-rh-bg-primary">
+            <PageHeader
+                title="러닝 계산기"
+                iconColor="white"
+                borderColor="rh-border"
+                backgroundColor="bg-rh-bg-surface"
+            />
 
             {/* 메뉴 리스트 */}
-            <div className="flex-1 overflow-y-auto px-4 pt-[80px] scroll-area-bottom">
-                <div className="flex flex-col gap-3 pt-6">
+            <div className="overflow-y-auto flex-1 px-4 pt-4 scroll-area-bottom">
+                <div className="flex flex-col gap-4">
                     {/* 계산기 메뉴들 */}
                     {menuItems.map((item, index) => {
                         const IconComponent = item.icon;
@@ -137,21 +137,17 @@ export default function MenuPage() {
                             <button
                                 key={index}
                                 onClick={() => handleItemClick(item)}
-                                className="flex items-center gap-4 w-full h-[72px] px-4 rounded-xl bg-rh-bg-surface transition-colors active:opacity-80"
+                                className="flex items-center gap-4 w-full h-[72px] px-4 rounded-rh-lg bg-rh-bg-surface transition-colors active:opacity-80"
                             >
                                 <div
-                                    className="flex items-center justify-center w-11 h-11 rounded-lg shrink-0"
-                                    style={{
-                                        backgroundColor:
-                                            item.iconBg,
-                                    }}
+                                    className={`flex justify-center items-center w-11 h-11 rounded-rh-md shrink-0 ${item.iconBg}`}
                                 >
                                     <IconComponent
                                         size={22}
                                         className="text-white"
                                     />
                                 </div>
-                                <div className="flex-1 text-left">
+                                <div className="flex-1 text-left space-y-0.5">
                                     <div className="text-[15px] font-semibold text-white">
                                         {item.title}
                                     </div>
@@ -173,13 +169,15 @@ export default function MenuPage() {
                     {/* 로그아웃 버튼 */}
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-4 w-full h-[72px] px-4 rounded-xl bg-rh-bg-surface transition-colors active:opacity-80"
+                        className="flex items-center gap-4 w-full h-[72px] px-4 rounded-rh-lg bg-rh-bg-surface transition-colors active:opacity-80"
                     >
-                        <div className="flex items-center justify-center w-11 h-11 rounded-lg shrink-0 bg-red-600">
+                        <div
+                            className="flex justify-center items-center w-11 h-11 rounded-rh-md shrink-0 bg-rh-status-error"
+                        >
                             <LogOut size={22} className="text-white" />
                         </div>
-                        <div className="flex-1 text-left">
-                            <div className="text-[15px] font-semibold text-red-400">
+                        <div className="flex-1 text-left space-y-0.5">
+                            <div className="text-[15px] font-semibold text-white">
                                 로그아웃
                             </div>
                             <div className="text-xs text-rh-text-tertiary">
@@ -189,6 +187,8 @@ export default function MenuPage() {
                     </button>
                 </div>
             </div>
+
+            <BottomNavigation />
         </div>
     );
 }

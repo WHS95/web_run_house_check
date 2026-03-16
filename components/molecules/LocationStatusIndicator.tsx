@@ -14,6 +14,7 @@ interface LocationStatusIndicatorProps {
     longitude: number | null;
     allowed_radius?: number;
   }>;
+  selectedLocationId?: string;
   allowedRadius?: number;
   onStatusChange?: (canAttend: boolean, message: string) => void;
 }
@@ -23,6 +24,7 @@ type LocationStatus = 'checking' | 'allowed' | 'out_of_range' | 'no_permission' 
 const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
   isLocationBasedAttendance,
   crewLocations,
+  selectedLocationId,
   allowedRadius = 50,
   onStatusChange,
 }) => {
@@ -37,7 +39,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
   // 초기 로드 여부 추적
   const hasCheckedRef = useRef(false);
 
-  const checkLocationStatus = useCallback(async () => {
+  const checkLocationStatus = useCallback(async (forceRefresh = false) => {
     if (!isLocationBasedAttendance) {
       setLocationStatus('disabled');
       setStatusMessage('');
@@ -56,7 +58,12 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
         return;
       }
 
-      const validLocations = crewLocations
+      // 선택된 장소가 있으면 해당 장소만 체크, 없으면 전체 체크
+      const targetLocations = selectedLocationId
+        ? crewLocations.filter(loc => loc.id === Number(selectedLocationId))
+        : crewLocations;
+
+      const validLocations = targetLocations
         .filter(loc => loc.latitude !== null && loc.longitude !== null)
         .map(loc => ({
           name: loc.name,
@@ -72,7 +79,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
         return;
       }
 
-      const userLocation = await getCurrentLocation();
+      const userLocation = await getCurrentLocation(forceRefresh);
       const validation = validateUserLocation(userLocation, validLocations, allowedRadius);
 
       if (validation.isValid) {
@@ -95,14 +102,22 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
         onStatusChangeRef.current?.(false, error.message || '위치 확인 실패');
       }
     }
-  }, [isLocationBasedAttendance, crewLocations, allowedRadius, getCurrentLocation]);
+  }, [isLocationBasedAttendance, crewLocations, selectedLocationId, allowedRadius, getCurrentLocation]);
 
-  // 초기 1회만 실행
+  // 초기 1회 실행
   useEffect(() => {
     if (hasCheckedRef.current) return;
     hasCheckedRef.current = true;
     checkLocationStatus();
   }, [checkLocationStatus]);
+
+  // 선택된 장소가 변경되면 다시 체크
+  const prevSelectedLocationRef = useRef(selectedLocationId);
+  useEffect(() => {
+    if (prevSelectedLocationRef.current === selectedLocationId) return;
+    prevSelectedLocationRef.current = selectedLocationId;
+    checkLocationStatus();
+  }, [selectedLocationId, checkLocationStatus]);
 
   // 위치 비활성 시 렌더링 없음
   if (!isLocationBasedAttendance) return null;
@@ -131,7 +146,7 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
           onClick={() => {
             clearError();
             hasCheckedRef.current = false;
-            checkLocationStatus();
+            checkLocationStatus(true);
           }}
           className="text-xs text-rh-text-secondary underline ml-auto"
         >

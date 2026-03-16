@@ -15,7 +15,7 @@ export interface UseGeolocationResult {
   location: GeolocationCoordinates | null;
   error: GeolocationError | null;
   loading: boolean;
-  getCurrentLocation: () => Promise<GeolocationCoordinates>;
+  getCurrentLocation: (forceRefresh?: boolean) => Promise<GeolocationCoordinates>;
   clearError: () => void;
 }
 
@@ -57,7 +57,7 @@ export const useGeolocation = (options?: PositionOptions): UseGeolocationResult 
     setLoading(false);
   }, []);
 
-  const getCurrentLocation = useCallback((): Promise<GeolocationCoordinates> => {
+  const getCurrentLocation = useCallback((forceRefresh = false): Promise<GeolocationCoordinates> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         const error = {
@@ -72,6 +72,10 @@ export const useGeolocation = (options?: PositionOptions): UseGeolocationResult 
       setLoading(true);
       setError(null);
 
+      const positionOptions = forceRefresh
+        ? { ...defaultOptions, maximumAge: 0 }
+        : defaultOptions;
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude, accuracy } = position.coords;
@@ -83,11 +87,11 @@ export const useGeolocation = (options?: PositionOptions): UseGeolocationResult 
           handleError(error);
           reject({
             code: error.code,
-            message: GEOLOCATION_ERRORS[error.code as keyof typeof GEOLOCATION_ERRORS] 
+            message: GEOLOCATION_ERRORS[error.code as keyof typeof GEOLOCATION_ERRORS]
               || GEOLOCATION_ERRORS.default,
           });
         },
-        defaultOptions
+        positionOptions
       );
     });
   }, [defaultOptions, handleSuccess, handleError]);

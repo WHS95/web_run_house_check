@@ -145,6 +145,20 @@ import { createClient } from "@/lib/supabase/admin";
 - 데이터 관련 기능 구현 시 Supabase MCP 도구 활용
 - 신규 기능 개발 시 context 7 참조
 
+### Hydration 에러 방지 (CRITICAL)
+- **`new Date()` 등 시간 기반 계산**은 서버/클라이언트 간 값이 달라 hydration 불일치를 유발합니다.
+  - 반드시 `mounted` 상태를 사용하여 클라이언트에서만 시간 계산을 수행하세요.
+  - SSR 시에는 고정된 포맷(예: `formatDate`)을 반환하고, mount 후 상대 시간으로 전환합니다.
+  ```typescript
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  // mounted 전: formatDate(dateStr) / mounted 후: "30분 전"
+  ```
+- **`nextDynamic`의 `ssr` 옵션**: Suspense boundary 내에서 `ssr: false`를 사용하면 hydration 에러가 발생할 수 있습니다.
+  - 가능하면 `ssr: true` (기본값)를 사용하세요.
+  - `ssr: false`가 필요하면 Suspense boundary 밖에서 사용하세요.
+- **조건부 렌더링**: 서버와 클라이언트에서 다른 결과를 내는 조건(window, localStorage, 현재 시간 등)은 `useEffect` + `useState`로 클라이언트에서만 처리하세요.
+
 ### 테스트 및 배포
 - 코드 변경 후 반드시 `npm run build`로 빌드 테스트
 - 타입 에러 및 린트 에러 해결 필수
@@ -192,11 +206,28 @@ RunHouse 프로젝트의 일관된 색상 시스템 (.pen 디자인 기준):
 --rh-text-tertiary: #64748B;
 --rh-text-muted: #475569;
 
-/* Status */
---rh-status-success: #4ADE80;
---rh-status-warning: #FBBF24;
---rh-status-error: #F87171;
+/* Status (블루 톤 테마 — 아래 값만 사용!) */
+--rh-status-success: #8BB5F5;
+--rh-status-warning: #5580C0;
+--rh-status-error: #3E6496;
 ```
+
+### ⛔ 색상 사용 금지 규칙 (CRITICAL)
+**프로젝트 전체에서 아래 컬러풀 색상은 절대 사용 금지입니다.**
+절대 하드코딩하거나 인라인 style로 사용하지 마세요.
+
+| 금지 색상 | 대체 색상 (블루 톤) | Tailwind 클래스 |
+|-----------|---------------------|-----------------|
+| ~~#4ADE80~~ (초록) | #8BB5F5 | `bg-rh-status-success`, `text-rh-status-success` |
+| ~~#FBBF24~~ (노랑) | #5580C0 | `bg-rh-status-warning`, `text-rh-status-warning` |
+| ~~#F87171~~ (빨강) | #3E6496 | `bg-rh-status-error`, `text-rh-status-error` |
+
+**이유:** RunHouse는 블루 톤 다크 테마를 사용합니다. 원색 계열(초록/노랑/빨강)은 디자인 시스템에 맞지 않습니다.
+
+**반드시 지켜야 할 원칙:**
+- 모든 색상은 `globals.css`에 정의된 CSS 변수(`--rh-*`)만 사용
+- 인라인 `style={{ color: '#xxx' }}` 대신 Tailwind 클래스(`bg-rh-*`, `text-rh-*`) 사용
+- 새로운 색상이 필요하면 globals.css에 변수로 추가하고 사용자에게 확인 받을 것
 
 #### Tailwind 사용 규칙
 - **기본 배경**: `bg-rh-bg-primary`

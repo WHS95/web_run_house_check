@@ -18624,11 +18624,23 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "0qxCx": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 16,
+              "y": 15
+            },
             "pdGRj": {
-              "enabled": true
+              "enabled": true,
+              "y": 1
             },
             "bCL8Z": {
-              "content": "알림"
+              "content": "알림",
+              "x": 36
+            },
+            "m1wGl": {
+              "x": 374,
+              "y": 28
             }
           }
         },
@@ -18651,11 +18663,27 @@
               "x": 16,
               "y": 8,
               "descendants": {
+                "bapXf": {
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "x": 4,
+                  "y": 4
+                },
                 "Rcln9": {
-                  "content": "공지"
+                  "content": "공지",
+                  "x": 74.5,
+                  "y": 6.5
+                },
+                "t6O73": {
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "x": 181,
+                  "y": 4
                 },
                 "HlPai": {
-                  "content": "알림"
+                  "content": "알림",
+                  "x": 74.5,
+                  "y": 6.5
                 },
                 "wFm0C": {
                   "enabled": false
@@ -19002,7 +19030,49 @@
           "name": "BottomNav",
           "width": "fill_container",
           "x": 0,
-          "y": 780
+          "y": 780,
+          "descendants": {
+            "MeuIn": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 37.75,
+              "y": 8
+            },
+            "MQKPf": {
+              "x": 6,
+              "y": 26
+            },
+            "x0jQk": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 135.25,
+              "y": 8
+            },
+            "CxFMN": {
+              "x": 1.5,
+              "y": 26
+            },
+            "3jNJN": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 232.75,
+              "y": 8
+            },
+            "yx2Yv": {
+              "x": 1.5,
+              "y": 26
+            },
+            "g23Ww": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 330.25,
+              "y": 8
+            },
+            "90ugr": {
+              "x": 1.5,
+              "y": 26
+            }
+          }
         }
       ]
     },
@@ -19027,11 +19097,23 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "0qxCx": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 16,
+              "y": 15
+            },
             "pdGRj": {
-              "enabled": true
+              "enabled": true,
+              "y": 1
             },
             "bCL8Z": {
-              "content": "알림"
+              "content": "알림",
+              "x": 36
+            },
+            "m1wGl": {
+              "x": 374,
+              "y": 28
             }
           }
         },
@@ -19055,20 +19137,32 @@
               "y": 8,
               "descendants": {
                 "bapXf": {
-                  "fill": "#00000000"
+                  "fill": "#00000000",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "x": 4,
+                  "y": 4
                 },
                 "Rcln9": {
                   "content": "공지",
                   "fill": "$text-tertiary",
-                  "fontWeight": "500"
+                  "fontWeight": "500",
+                  "x": 74.5,
+                  "y": 6.5
                 },
                 "t6O73": {
-                  "fill": "$accent-blue"
+                  "fill": "$accent-blue",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "x": 181,
+                  "y": 4
                 },
                 "HlPai": {
                   "content": "알림",
                   "fill": "$text-primary",
-                  "fontWeight": "600"
+                  "fontWeight": "600",
+                  "x": 74.5,
+                  "y": 6.5
                 },
                 "wFm0C": {
                   "enabled": false
@@ -19520,9 +19614,62 @@
           "name": "BottomNav",
           "width": "fill_container",
           "x": 0,
-          "y": 780
+          "y": 780,
+          "descendants": {
+            "MeuIn": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 37.75,
+              "y": 8
+            },
+            "MQKPf": {
+              "x": 6,
+              "y": 26
+            },
+            "x0jQk": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 135.25,
+              "y": 8
+            },
+            "CxFMN": {
+              "x": 1.5,
+              "y": 26
+            },
+            "3jNJN": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 232.75,
+              "y": 8
+            },
+            "yx2Yv": {
+              "x": 1.5,
+              "y": 26
+            },
+            "g23Ww": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 330.25,
+              "y": 8
+            },
+            "90ugr": {
+              "x": 1.5,
+              "y": 26
+            }
+          }
         }
       ]
+    },
+    {
+      "type": "text",
+      "id": "tfEQV",
+      "x": 1566.961309585815,
+      "y": 5351.996803611036,
+      "fill": "#000000",
+      "content": "text-[15px] font-semibold text-red-400",
+      "fontFamily": "Inter",
+      "fontSize": 12,
+      "fontWeight": "normal"
     }
   ],
   "variables": {

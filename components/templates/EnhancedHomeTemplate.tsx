@@ -10,6 +10,8 @@ import {
     Calculator,
     X,
     BellOff,
+    MapPin,
+    ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuickActionButton from '../atoms/QuickActionButton';
@@ -173,6 +175,25 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                         onClick={() => handleNavigate('/calculator')}
                     />
                 </div>
+
+                {/* 러닝 장소 카드 */}
+                <button
+                    onClick={() => handleNavigate('/map')}
+                    className="flex w-full items-center gap-3 rounded-rh-lg bg-rh-bg-surface px-4 py-3.5 text-left active:opacity-80 transition-opacity"
+                >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rh-accent/15">
+                        <MapPin className="h-5 w-5 text-rh-accent" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-[15px] font-semibold text-white">
+                            러닝 장소
+                        </p>
+                        <p className="text-xs text-rh-text-tertiary mt-0.5">
+                            크루 러닝 장소를 확인하세요
+                        </p>
+                    </div>
+                    <ChevronRight className="h-4.5 w-4.5 shrink-0 text-rh-text-muted" />
+                </button>
 
                 {/* 최근 활동 */}
                 <SectionLabel>최근 활동</SectionLabel>

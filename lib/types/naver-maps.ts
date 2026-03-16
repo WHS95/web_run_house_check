@@ -4,9 +4,16 @@ export interface NaverMapPosition {
   lng: number;
 }
 
+export interface NaverLatLngBounds {
+  extend: (latlng: NaverLatLng) => void;
+}
+
 export interface NaverMap {
   setCenter: (latlng: NaverLatLng) => void;
   getCenter: () => NaverLatLng;
+  panTo: (latlng: NaverLatLng) => void;
+  setZoom: (zoom: number) => void;
+  fitBounds: (bounds: NaverLatLngBounds, padding?: { top?: number; right?: number; bottom?: number; left?: number }) => void;
 }
 
 export interface NaverLatLng {
@@ -26,6 +33,8 @@ export interface NaverClickEvent {
 export interface NaverMapsAPI {
   maps: {
     LatLng: new (lat: number, lng: number) => NaverLatLng;
+    LatLngBounds: new (sw: NaverLatLng, ne: NaverLatLng) => NaverLatLngBounds;
+    Point: new (x: number, y: number) => { x: number; y: number };
     Map: new (element: HTMLElement, options: unknown) => NaverMap;
     Marker: new (options: unknown) => Marker;
     Event: {

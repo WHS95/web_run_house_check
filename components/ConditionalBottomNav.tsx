@@ -16,6 +16,7 @@ export default function ConditionalBottomNav() {
     "/auth/callback",
     "/auth/verify-crew",
     "/admin",
+    "/map",
   ];
 
   const shouldHideBottomNav = hideBottomNavPages.some(

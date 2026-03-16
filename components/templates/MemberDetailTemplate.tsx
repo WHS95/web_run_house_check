@@ -1,9 +1,12 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Settings, LogOut } from 'lucide-react';
 import { Bell, BellOff } from 'lucide-react';
+import { createBrowserClient } from '@supabase/ssr';
+import { getFCMToken } from '@/lib/firebase/client';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import SectionLabel from '@/components/atoms/SectionLabel';
 import MenuListItem from '@/components/molecules/MenuListItem';
@@ -65,8 +68,37 @@ const AdminButton = memo(() => (
 AdminButton.displayName = 'AdminButton';
 
 const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, activityData, userId }) => {
+    const router = useRouter();
     const { isSupported, permission, requestPermission } =
         usePushNotification({ crewId: userProfile?.crewId ?? null });
+
+    const handleLogout = useCallback(async () => {
+        try {
+            if (typeof window !== "undefined" && window.navigator.vibrate) {
+                window.navigator.vibrate([50, 100, 50]);
+            }
+            const fcmToken = await getFCMToken();
+            if (fcmToken) {
+                await fetch("/api/push/token", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: fcmToken }),
+                }).catch(() => {});
+            }
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                alert("로그아웃 중 오류가 발생했습니다.");
+                return;
+            }
+            router.push("/auth/login");
+        } catch {
+            alert("로그아웃 처리 중 문제가 발생했습니다.");
+        }
+    }, [router]);
 
     const displayName = useMemo(() => {
         if (!userProfile?.firstName) return '사용자';
@@ -206,6 +238,21 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                         </div>
                     </div>
                 )}
+
+                {/* 로그아웃 버튼 */}
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-center gap-2 w-full h-12 rounded-xl transition-colors active:opacity-80"
+                    style={{ backgroundColor: "#2B3644" }}
+                >
+                    <LogOut size={18} style={{ color: "#3E6496" }} />
+                    <span
+                        className="text-sm font-semibold"
+                        style={{ color: "#3E6496" }}
+                    >
+                        로그아웃
+                    </span>
+                </button>
             </div>
 
             {/* BottomNav */}

@@ -5,6 +5,7 @@ import React, {
     useState,
     useCallback,
     useMemo,
+    useRef,
     memo,
 } from "react";
 import { Send, Check, Bell, RefreshCw } from "lucide-react";
@@ -106,7 +107,10 @@ export default function PushTestTab({
         });
     }, [uniqueTargets]);
 
+    const isSendingRef = useRef(false);
+
     const handleSend = useCallback(async () => {
+        if (isSendingRef.current) return;
         if (selectedIds.size === 0) {
             showNotification(
                 "대상을 선택해주세요.",
@@ -119,6 +123,7 @@ export default function PushTestTab({
             return;
         }
 
+        isSendingRef.current = true;
         haptic.medium();
         setIsSending(true);
         try {
@@ -151,6 +156,7 @@ export default function PushTestTab({
         } catch {
             showNotification("발송 중 오류 발생", "error");
         } finally {
+            isSendingRef.current = false;
             setIsSending(false);
         }
     }, [selectedIds, title, body, showNotification]);

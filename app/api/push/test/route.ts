@@ -149,7 +149,8 @@ export async function POST(request: Request) {
             );
         }
 
-        const tokenStrings = tokens.map((t) => t.token);
+        // 동일 토큰 중복 제거 (같은 유저가 여러 크루에 등록된 경우)
+        const tokenStrings = [...new Set(tokens.map((t) => t.token))];
         const response = await messaging.sendEachForMulticast({
             tokens: tokenStrings,
             notification: { title, body: msgBody },

@@ -43,12 +43,12 @@ interface ActivityData {
 // ⚡ 로딩 스켈레톤 컴포넌트
 const MyPageSkeleton = React.memo(() => (
   <div className='flex flex-col h-screen bg-rh-bg-primary'>
-    <div className='flex-shrink-0 h-20 bg-rh-bg-surface border-b border-rh-border animate-pulse'>
+    <div className='flex-shrink-0 h-20 bg-rh-bg-surface border-b border-rh-border'>
       <div className='flex justify-center items-center h-full'>
-        <div className='w-20 h-[1.5rem] rounded bg-rh-bg-surface'></div>
+        <div className='w-20 h-[1.5rem] rounded bg-rh-bg-muted'></div>
       </div>
     </div>
-    <div className='flex-1 p-4 space-y-3 animate-pulse'>
+    <div className='flex-1 p-4 space-y-3'>
       {/* 프로필 영역 */}
       <div className='flex items-center space-x-2'>
         <div className='w-[4rem] h-[4rem] rounded-full bg-rh-bg-surface'></div>

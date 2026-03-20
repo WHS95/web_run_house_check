@@ -2,8 +2,6 @@ import { Suspense } from "react";
 import { getAdminAuth } from "@/lib/admin2/auth";
 import { getDashboardStats } from "@/lib/admin2/queries";
 import PageHeader from "@/components/organisms/common/PageHeader";
-import SectionLabel from "@/components/atoms/SectionLabel";
-import MenuListItem from "@/components/molecules/MenuListItem";
 import DashboardMonthNav from "./components/DashboardMonthNav";
 import DashboardStatCards from "./components/DashboardStatCards";
 
@@ -39,8 +37,6 @@ export default async function Admin2DashboardPage({
                     />
                 </Suspense>
 
-                <SectionLabel>관리 메뉴</SectionLabel>
-                <AdminMenuList />
             </div>
         </>
     );
@@ -79,40 +75,3 @@ function StatCardsSkeleton() {
     );
 }
 
-function AdminMenuList() {
-    const menuItems = [
-        {
-            title: "회원 관리",
-            subtitle: "멤버 조회 및 관리",
-            href: "/admin2/user",
-        },
-        {
-            title: "출석 관리",
-            subtitle: "캘린더 · 일별 출석 현황",
-            href: "/admin2/attendance",
-        },
-        {
-            title: "통계 분석",
-            subtitle: "요일별 · 장소별 참여율",
-            href: "/admin2/analyze",
-        },
-        {
-            title: "설정",
-            subtitle: "장소 · 운영진 · 초대코드",
-            href: "/admin2/settings",
-        },
-    ];
-
-    return (
-        <div className="space-y-2">
-            {menuItems.map((item) => (
-                <MenuListItem
-                    key={item.href}
-                    title={item.title}
-                    subtitle={item.subtitle}
-                    href={item.href}
-                />
-            ))}
-        </div>
-    );
-}

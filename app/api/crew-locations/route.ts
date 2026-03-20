@@ -24,16 +24,14 @@ export async function GET(request: NextRequest) {
         let crewId = searchParams.get("crew_id");
 
         if (!crewId) {
-            // crew_id가 없으면 사용자의 크루에서 가져오기
-            const { data: userCrew } = await supabase
-                .schema("attendance")
-                .from("user_crews")
-                .select("crew_id")
-                .eq("user_id", user.id)
-                .eq("is_crew_verified", true)
+            // crew_id가 없으면 users 테이블의 verified_crew_id에서 가져오기
+            const { data: userData } = await supabase
+                .from("users")
+                .select("verified_crew_id, is_crew_verified")
+                .eq("id", user.id)
                 .single();
 
-            if (!userCrew) {
+            if (!userData?.is_crew_verified || !userData?.verified_crew_id) {
                 return NextResponse.json(
                     {
                         success: false,
@@ -43,7 +41,7 @@ export async function GET(request: NextRequest) {
                 );
             }
 
-            crewId = userCrew.crew_id;
+            crewId = userData.verified_crew_id;
         }
 
         // 활성 장소만 조회

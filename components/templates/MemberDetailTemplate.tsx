@@ -142,9 +142,9 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {/* Header */}
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 shrink-0 bg-rh-bg-surface pt-safe">
                 <PageHeader
-                    title="마이페이지"
+                    title="MY"
                     iconColor="white"
                     borderColor="rh-border"
                     backgroundColor="bg-rh-bg-surface"

@@ -31,6 +31,11 @@ const InviteCodesTab = dynamic(
     { loading: () => <TabLoading /> }
 );
 
+const PushTestTab = dynamic(
+    () => import("./PushTestTab"),
+    { loading: () => <TabLoading /> }
+);
+
 function TabLoading() {
     return (
         <div className="flex justify-center items-center h-32">
@@ -85,6 +90,7 @@ const TABS = [
     { id: "crews", label: "크루" },
     { id: "members", label: "멤버" },
     { id: "invite-codes", label: "초대코드" },
+    { id: "push-test", label: "푸시" },
 ] as const;
 
 function getInitialColor(index: number): string {
@@ -389,7 +395,7 @@ export default function MasterPage() {
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {/* 헤더 */}
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 shrink-0 bg-rh-bg-surface pt-safe">
                 <PageHeader
                     title="마스터 관리"
                     iconColor="white"
@@ -449,12 +455,16 @@ export default function MasterPage() {
                         setMemberSearch={setMemberSearch}
                         handleRoleChange={handleRoleChange}
                     />
-                ) : (
+                ) : activeTab === "invite-codes" ? (
                     <InviteCodesTab
                         crews={crews}
                         inviteCodes={inviteCodes}
                         showNotification={showNotification}
                         onDataRefresh={loadData}
+                    />
+                ) : (
+                    <PushTestTab
+                        showNotification={showNotification}
                     />
                 )}
             </div>

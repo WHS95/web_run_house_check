@@ -24,7 +24,7 @@ const navigationItems = [
   },
   {
     type: "mypage" as const,
-    label: "마이페이지",
+    label: "MY",
     href: "/mypage",
   },
   {

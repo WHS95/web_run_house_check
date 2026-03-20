@@ -241,7 +241,7 @@ export default function MapTemplate() {
         <NaverMapLoader>
             <div className="relative flex flex-col h-full w-full bg-rh-bg-primary overflow-hidden">
                 {/* 헤더 */}
-                <div className="absolute top-0 left-0 right-0 z-20 flex items-center h-14 px-4 pt-safe bg-rh-bg-surface">
+                <div className="sticky top-0 z-20 flex items-center h-14 px-4 pt-safe bg-rh-bg-surface">
                     <button
                         onClick={() => router.back()}
                         className="flex h-9 w-9 items-center justify-center rounded-full"

@@ -119,6 +119,10 @@ mobile-viewport (flex column, height: 100dvh)
 2. **`scroll-area-bottom` 클래스는 더 이상 필요하지 않습니다.** `main-content`가 자동으로 바텀 내비 위 영역만 차지합니다.
 3. **페이지에서 `min-h-screen` 사용 시 자동으로 `main-content` 높이 기준으로 변환됩니다.** (CSS에서 `100%`로 오버라이드)
 4. **페이지 내부 스크롤 컨테이너가 필요한 경우**, `flex-1 overflow-y-auto`를 사용하되 바텀 패딩은 불필요합니다.
+5. **헤더는 반드시 `sticky top-0`을 사용하세요.** `main-content`가 스크롤 컨테이너이므로 `fixed`가 아닌 `sticky`만 올바르게 동작합니다.
+   - `position: fixed` → **사용 금지** (스크롤 컨테이너 내부에서 의도대로 작동하지 않음)
+   - `position: sticky; top: 0;` → **올바른 패턴** (스크롤 시 헤더가 상단에 고정)
+   - 헤더에 `fixed`를 쓰면 `pt-[80px]` 같은 상단 여백 hack이 필요하지만, `sticky`는 자연스럽게 공간을 차지하므로 불필요
 
 **올바른 페이지 구조 예시:**
 ```tsx
@@ -126,8 +130,9 @@ mobile-viewport (flex column, height: 100dvh)
 export default function MyPage() {
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
+            {/* 헤더: sticky top-0 (PageHeader는 이미 내장) */}
             <PageHeader title="제목" />
-            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-4">
+            <div className="flex-1 px-4 pt-4 pb-4">
                 {/* 콘텐츠 */}
             </div>
             {/* BottomNavigation 불필요 - 루트 레이아웃이 자동 처리 */}
@@ -139,7 +144,12 @@ export default function MyPage() {
 export default function MyPage() {
     return (
         <div>
-            {/* 콘텐츠 */}
+            <div className="fixed top-0">  {/* fixed 금지! sticky 사용 */}
+                <PageHeader title="제목" />
+            </div>
+            <div className="pt-[80px]">  {/* fixed 헤더용 hack 불필요 */}
+                {/* 콘텐츠 */}
+            </div>
             <BottomNavigation />  {/* 중복! 절대 하지 마세요 */}
         </div>
     );

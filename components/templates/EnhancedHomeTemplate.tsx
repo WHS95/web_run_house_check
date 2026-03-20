@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import QuickActionButton from '../atoms/QuickActionButton';
 import ActivityListItem from '../molecules/ActivityListItem';
 import SectionLabel from '../atoms/SectionLabel';
+import { AnimatedList, AnimatedItem } from '../atoms/AnimatedList';
 import PushPermissionBanner from '../molecules/PushPermissionBanner';
 import NoticeListSheet from '../molecules/NoticeListSheet';
 
@@ -97,7 +98,7 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {/* ── Header: 인사말 + 알림 버튼 ── */}
-            <header className="flex items-center justify-between px-4 h-14 pt-safe">
+            <header className="sticky top-0 z-50 flex items-center justify-between px-4 h-14 pt-safe bg-rh-bg-primary">
                 <div className="flex flex-col gap-0.5">
                     <span className="text-xs font-semibold text-rh-accent">
                         {crewName ?? 'RunHouse Crew'}
@@ -198,23 +199,24 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                 {/* 최근 활동 */}
                 <SectionLabel>최근 활동</SectionLabel>
 
-                <div className="space-y-2">
-                    {recentActivities.length > 0 ? (
-                        recentActivities.map((a) => (
-                            <ActivityListItem
-                                key={a.id}
-                                name={a.userName}
-                                meta={`${a.location} · ${a.exerciseType} · ${a.time}`}
-                            />
-                        ))
-                    ) : (
-                        <div className="flex items-center justify-center rounded-rh-md bg-rh-bg-surface py-10">
-                            <p className="text-sm text-rh-text-tertiary">
-                                아직 최근 활동이 없습니다
-                            </p>
-                        </div>
-                    )}
-                </div>
+                {recentActivities.length > 0 ? (
+                    <AnimatedList className="space-y-2">
+                        {recentActivities.map((a) => (
+                            <AnimatedItem key={a.id}>
+                                <ActivityListItem
+                                    name={a.userName}
+                                    meta={`${a.location} · ${a.exerciseType} · ${a.time}`}
+                                />
+                            </AnimatedItem>
+                        ))}
+                    </AnimatedList>
+                ) : (
+                    <div className="flex items-center justify-center rounded-rh-md bg-rh-bg-surface py-10">
+                        <p className="text-sm text-rh-text-tertiary">
+                            아직 최근 활동이 없습니다
+                        </p>
+                    </div>
+                )}
             </div>
 
             <AnimatePresence>

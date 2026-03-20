@@ -12,6 +12,7 @@ import { haptic } from "@/lib/haptic";
 import { Calendar, ChevronDown, Timer, MapPin, WifiOff, CloudUpload } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import LoadingSpinner from "../atoms/LoadingSpinner";
+import FadeIn from "../atoms/FadeIn";
 import { useOfflineAttendance } from "@/hooks/useOfflineAttendance";
 
 // 현재 시간 계산 함수들
@@ -357,6 +358,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   }
 
   return (
+    <FadeIn>
     <div className='flex overflow-hidden relative flex-col h-screen bg-rh-bg-primary'>
       {/* 헤더 - sticky 고정 */}
       <div className='sticky top-0 z-50'>
@@ -511,7 +513,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       </div>
 
       {/* 하단 고정 액션 영역 (바텀 네비 위) */}
-      <div className='shrink-0 px-4 pb-bottom-inset pt-2 bg-rh-bg-primary'>
+      <div className='shrink-0 px-4 pb-2 pt-2 bg-rh-bg-primary'>
         {/* 제출 버튼 */}
         <button
           onClick={handleSubmit}
@@ -573,6 +575,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         />
       )}
     </div>
+    </FadeIn>
   );
 };
 

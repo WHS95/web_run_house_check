@@ -8,6 +8,7 @@ import PageHeader from '@/components/organisms/common/PageHeader';
 import MonthNavigator from '@/components/molecules/MonthNavigator';
 import RankingTabs, { TabItem } from '@/components/organisms/ranking/RankingTabs';
 import RankingListItem from '@/components/organisms/ranking/RankingListItem';
+import { AnimatedList, AnimatedItem } from '../atoms/AnimatedList';
 import type { NotificationType } from '@/components/molecules/common/PopupNotification';
 
 import { haptic } from '@/lib/haptic';
@@ -235,18 +236,18 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
         {isDataLoading ? (
           <RankingListSkeleton />
         ) : currentRankingData.length > 0 ? (
-          <div className="space-y-2">
+          <AnimatedList className="space-y-2">
             {currentRankingData.map((item) => (
-              <div key={item.user_id}>
+              <AnimatedItem key={item.user_id}>
                 <RankingListItem
                   rank={item.rank}
                   name={item.name || '알 수 없음'}
                   score={item.value}
                   isCurrentUser={item.is_current_user}
                 />
-              </div>
+              </AnimatedItem>
             ))}
-          </div>
+          </AnimatedList>
         ) : (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">

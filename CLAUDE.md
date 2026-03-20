@@ -200,6 +200,59 @@ export default function MyPage() {
 - 데이터 관련 기능 구현 시 Supabase MCP 도구 활용
 - 신규 기능 개발 시 context 7 참조
 
+### ⚠️ 애니메이션 규칙 (CRITICAL)
+
+루트 레이아웃에 **PageTransition** (Framer Motion, 0.15초 fade-in)이 적용되어 있습니다. 모든 페이지 전환 시 자동으로 fade-in됩니다.
+
+**반드시 지켜야 할 규칙:**
+
+1. **페이지 레벨 스켈레톤(Suspense fallback, loading.tsx, dynamic import loading)에서 `animate-pulse` 사용 금지**
+   - PageTransition fade-in과 animate-pulse가 동시에 실행되면 시각적 충돌 발생
+   - 스켈레톤은 정적 플레이스홀더(배경색만)로 구현할 것
+   - 예외: 클라이언트 컴포넌트 내부의 `isLoading` 상태 스켈레톤은 페이지 전환 후 실행되므로 `animate-pulse` 사용 가능
+
+2. **리스트형 UI에는 `AnimatedList` + `AnimatedItem` 사용**
+   - `import { AnimatedList, AnimatedItem } from '@/components/atoms/AnimatedList'`
+   - stagger 효과: 항목당 0.05초 간격으로 순차 등장
+   - 적용 대상: 랭킹 리스트, 활동 내역, 멤버 목록 등 반복 렌더링 리스트
+
+3. **콘텐츠 등장 시 `FadeIn` 래퍼 사용**
+   - `import FadeIn from '@/components/atoms/FadeIn'`
+   - Suspense 해소 후 콘텐츠가 마운트될 때 0.2초 fade-in
+   - 적용 대상: 폼, 상세 페이지 등 비리스트 콘텐츠
+
+4. **새 페이지 추가 시 애니메이션 체크리스트**
+   - [ ] PageTransition이 자동 적용되므로 별도 페이지 전환 애니메이션 불필요
+   - [ ] Suspense fallback 스켈레톤에 `animate-pulse` 없는지 확인
+   - [ ] 리스트가 있으면 `AnimatedList`/`AnimatedItem` 적용
+   - [ ] 비리스트 콘텐츠는 `FadeIn`으로 감싸기
+
+```tsx
+// ✅ 올바른 스켈레톤 (정적)
+const MySkeleton = () => (
+    <div className="space-y-3">
+        <div className="h-12 rounded-xl bg-rh-bg-surface" />
+        <div className="h-12 rounded-xl bg-rh-bg-surface" />
+    </div>
+);
+
+// ❌ 잘못된 스켈레톤 (PageTransition과 충돌)
+const MySkeleton = () => (
+    <div className="space-y-3 animate-pulse">
+        <div className="h-12 rounded-xl bg-rh-bg-surface" />
+    </div>
+);
+
+// ✅ 리스트 애니메이션
+<AnimatedList className="space-y-2">
+    {items.map(item => (
+        <AnimatedItem key={item.id}>
+            <ListItemComponent {...item} />
+        </AnimatedItem>
+    ))}
+</AnimatedList>
+```
+
 ### Hydration 에러 방지 (CRITICAL)
 - **`new Date()` 등 시간 기반 계산**은 서버/클라이언트 간 값이 달라 hydration 불일치를 유발합니다.
   - 반드시 `mounted` 상태를 사용하여 클라이언트에서만 시간 계산을 수행하세요.

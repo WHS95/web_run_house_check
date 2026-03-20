@@ -55,7 +55,7 @@ async function SettingsDataServer({
 
 function SettingsSkeleton() {
     return (
-        <div className="flex-1 px-4 pt-4 space-y-3 animate-pulse">
+        <div className="flex-1 px-4 pt-4 space-y-3">
             <div className="bg-rh-bg-surface rounded-lg p-1 flex gap-1">
                 {[1, 2, 3, 4].map((i) => (
                     <div

@@ -72,7 +72,7 @@ function StatCardsSkeleton() {
             {[1, 2, 3].map((i) => (
                 <div
                     key={i}
-                    className="flex-1 h-[90px] bg-rh-bg-surface rounded-[12px] animate-pulse"
+                    className="flex-1 h-[90px] bg-rh-bg-surface rounded-[12px]"
                 />
             ))}
         </div>

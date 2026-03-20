@@ -67,7 +67,7 @@ async function AttendanceDataServer({
 
 function AttendanceSkeleton() {
     return (
-        <div className="flex-1 px-4 pt-4 space-y-4 animate-pulse">
+        <div className="flex-1 px-4 pt-4 space-y-4">
             <div className="h-10 flex items-center justify-center">
                 <div className="w-32 h-5 bg-rh-bg-muted rounded" />
             </div>

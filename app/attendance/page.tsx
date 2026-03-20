@@ -64,13 +64,13 @@ const AttendancePageFallback = () => (
   <div className='min-h-screen bg-rh-bg-primary'>
     <div className='pt-safe'>
       <div className='flex items-center justify-between w-full px-4 py-4 border-b border-rh-border'>
-        <div className='w-20 h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
-        <div className='w-[1.5rem] h-[1.5rem] rounded animate-pulse bg-rh-bg-surface'></div>
+        <div className='w-20 h-[1.5rem] rounded bg-rh-bg-surface'></div>
+        <div className='w-[1.5rem] h-[1.5rem] rounded bg-rh-bg-surface'></div>
       </div>
     </div>
     <div className='px-4 pt-6 space-y-3'>
       {Array.from({ length: 5 }).map((_, index) => (
-        <div key={index} className='animate-pulse'>
+        <div key={index}>
           <div className='mb-3 w-24 h-[1rem] rounded bg-rh-bg-surface'></div>
           <div className='h-12 rounded-xl bg-rh-bg-surface'></div>
         </div>

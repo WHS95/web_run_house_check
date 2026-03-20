@@ -257,7 +257,7 @@ async function AnalyticsChartsServer({
 
 function AnalyticsSkeleton() {
     return (
-        <div className="space-y-4 animate-pulse">
+        <div className="space-y-4">
             {[1, 2, 3].map((i) => (
                 <div
                     key={i}

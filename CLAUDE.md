@@ -205,14 +205,13 @@ export default function MyPage() {
 
 ### ⚠️ 애니메이션 규칙 (CRITICAL)
 
-루트 레이아웃에 **PageTransition** (Framer Motion, 0.15초 fade-in)이 적용되어 있습니다. 모든 페이지 전환 시 자동으로 fade-in됩니다.
+**PageTransition은 제거되었습니다.** 페이지 전환 시 깜빡임을 유발하므로 사용하지 않습니다.
 
 **반드시 지켜야 할 규칙:**
 
 1. **페이지 레벨 스켈레톤(Suspense fallback, loading.tsx, dynamic import loading)에서 `animate-pulse` 사용 금지**
-   - PageTransition fade-in과 animate-pulse가 동시에 실행되면 시각적 충돌 발생
    - 스켈레톤은 정적 플레이스홀더(배경색만)로 구현할 것
-   - 예외: 클라이언트 컴포넌트 내부의 `isLoading` 상태 스켈레톤은 페이지 전환 후 실행되므로 `animate-pulse` 사용 가능
+   - 예외: 클라이언트 컴포넌트 내부의 `isLoading` 상태 스켈레톤은 `animate-pulse` 사용 가능
 
 2. **리스트형 UI에는 `AnimatedList` + `AnimatedItem` 사용**
    - `import { AnimatedList, AnimatedItem } from '@/components/atoms/AnimatedList'`
@@ -225,7 +224,7 @@ export default function MyPage() {
    - 적용 대상: 폼, 상세 페이지 등 비리스트 콘텐츠
 
 4. **새 페이지 추가 시 애니메이션 체크리스트**
-   - [ ] PageTransition이 자동 적용되므로 별도 페이지 전환 애니메이션 불필요
+   - [ ] 별도 페이지 전환 애니메이션 사용 금지 (깜빡임 유발)
    - [ ] Suspense fallback 스켈레톤에 `animate-pulse` 없는지 확인
    - [ ] 리스트가 있으면 `AnimatedList`/`AnimatedItem` 적용
    - [ ] 비리스트 콘텐츠는 `FadeIn`으로 감싸기
@@ -239,7 +238,7 @@ const MySkeleton = () => (
     </div>
 );
 
-// ❌ 잘못된 스켈레톤 (PageTransition과 충돌)
+// ❌ 잘못된 스켈레톤 (animate-pulse 사용 금지)
 const MySkeleton = () => (
     <div className="space-y-3 animate-pulse">
         <div className="h-12 rounded-xl bg-rh-bg-surface" />

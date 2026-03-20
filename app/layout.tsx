@@ -14,7 +14,6 @@ import { Analytics } from "@vercel/analytics/react";
 import ConditionalBottomNav from "@/components/ConditionalBottomNav";
 import { NavigationProvider } from "@/components/providers/NavigationProvider";
 import FCMForegroundProvider from "@/components/providers/FCMForegroundProvider";
-import PageTransition from "@/components/providers/PageTransition";
 
 import type { Metadata, Viewport } from "next";
 
@@ -109,7 +108,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <FCMForegroundProvider />
           <div className="mobile-viewport-wrapper">
             <div className="mobile-viewport">
-              <div className="main-content"><PageTransition>{children}</PageTransition></div>
+              <div className="main-content">{children}</div>
               <ConditionalBottomNav />
             </div>
           </div>

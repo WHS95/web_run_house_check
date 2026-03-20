@@ -38,9 +38,48 @@ export function usePushNotification({
     useEffect(() => {
         if (!isSupported) return;
 
-        setPermission(Notification.permission);
+        const currentPermission = Notification.permission;
+        setPermission(currentPermission);
 
-        // 배너 표시 조건 확인
+        // 이미 권한이 허용된 경우 배너 숨기고
+        // 토큰 미등록 시 자동으로 재등록 시도
+        if (currentPermission === "granted") {
+            setShouldShowBanner(false);
+            if (!isTokenRegistered && crewId) {
+                (async () => {
+                    try {
+                        await navigator.serviceWorker.register(
+                            "/firebase-messaging-sw.js"
+                        );
+                        const token = await getFCMToken();
+                        if (token) {
+                            const res = await fetch(
+                                "/api/push/token",
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                        token,
+                                        crewId,
+                                    }),
+                                }
+                            );
+                            if (res.ok) {
+                                setIsTokenRegistered(true);
+                            }
+                        }
+                    } catch {
+                        // 토큰 재등록 실패 시 무시
+                    }
+                })();
+            }
+            return;
+        }
+
+        // 배너 표시 조건 확인 (권한 미허용 상태)
         const dismissedCount = parseInt(
             localStorage.getItem(DISMISSED_COUNT_KEY) || "0"
         );
@@ -59,14 +98,9 @@ export function usePushNotification({
             }
         }
 
-        // 토큰 미등록 + 권한 미결정/미허용 시 배너 표시
-        if (
-            Notification.permission !== "granted" ||
-            !isTokenRegistered
-        ) {
-            setShouldShowBanner(true);
-        }
-    }, [isSupported, isTokenRegistered]);
+        // 권한 미허용 시 배너 표시
+        setShouldShowBanner(true);
+    }, [isSupported, isTokenRegistered, crewId]);
 
     // 권한 요청 및 토큰 등록
     const requestPermission = useCallback(async (): Promise<boolean> => {

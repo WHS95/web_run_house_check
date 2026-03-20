@@ -9,7 +9,7 @@ import MonthNavigator from '@/components/molecules/MonthNavigator';
 import RankingTabs, { TabItem } from '@/components/organisms/ranking/RankingTabs';
 import RankingListItem from '@/components/organisms/ranking/RankingListItem';
 import type { NotificationType } from '@/components/molecules/common/PopupNotification';
-import BottomNavigation from '@/components/organisms/BottomNavigation';
+
 import { haptic } from '@/lib/haptic';
 import { fetchRankingData } from '@/app/ranking/actions';
 
@@ -278,8 +278,6 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
           </motion.button>
         )}
       </AnimatePresence>
-
-      <BottomNavigation />
 
       {notificationType && (
         <React.Suspense fallback={null}>

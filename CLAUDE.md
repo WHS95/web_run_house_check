@@ -101,6 +101,51 @@ import { createClient } from "@/lib/supabase/admin";
 
 ## 중요 규칙
 
+### ⚠️ 레이아웃 규칙 (CRITICAL)
+
+루트 레이아웃(`app/layout.tsx`)이 **flex column** 구조로 바텀 내비를 자동 관리합니다.
+
+**루트 레이아웃 구조:**
+```
+mobile-viewport (flex column, height: 100dvh)
+  ├── main-content (flex: 1, overflow-y: auto)  ← 자동 스크롤 영역
+  │     └── {children} (각 페이지)
+  └── ConditionalBottomNav (shrink-0)            ← 자동 배치
+```
+
+**반드시 지켜야 할 규칙:**
+1. **`<BottomNavigation />`을 개별 페이지에서 렌더링하지 마세요.** 루트 레이아웃의 `ConditionalBottomNav`이 자동으로 처리합니다.
+   - 예외: `ConditionalBottomNav`이 숨기는 페이지(`/admin`, `/auth/*`, `/map`)에서 자체 바텀 내비가 필요한 경우만 허용
+2. **`scroll-area-bottom` 클래스는 더 이상 필요하지 않습니다.** `main-content`가 자동으로 바텀 내비 위 영역만 차지합니다.
+3. **페이지에서 `min-h-screen` 사용 시 자동으로 `main-content` 높이 기준으로 변환됩니다.** (CSS에서 `100%`로 오버라이드)
+4. **페이지 내부 스크롤 컨테이너가 필요한 경우**, `flex-1 overflow-y-auto`를 사용하되 바텀 패딩은 불필요합니다.
+
+**올바른 페이지 구조 예시:**
+```tsx
+// ✅ 올바른 패턴
+export default function MyPage() {
+    return (
+        <div className="flex flex-col min-h-screen bg-rh-bg-primary">
+            <PageHeader title="제목" />
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-4">
+                {/* 콘텐츠 */}
+            </div>
+            {/* BottomNavigation 불필요 - 루트 레이아웃이 자동 처리 */}
+        </div>
+    );
+}
+
+// ❌ 잘못된 패턴
+export default function MyPage() {
+    return (
+        <div>
+            {/* 콘텐츠 */}
+            <BottomNavigation />  {/* 중복! 절대 하지 마세요 */}
+        </div>
+    );
+}
+```
+
 ### 코딩 컨벤션
 - 4 스페이스 들여쓰기
 - 80자 줄 길이 제한

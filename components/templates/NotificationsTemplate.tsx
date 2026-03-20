@@ -8,7 +8,7 @@ import {
     Bell,
 } from "lucide-react";
 import PageHeader from "@/components/organisms/common/PageHeader";
-import BottomNavigation from "@/components/organisms/BottomNavigation";
+
 
 interface Notice {
     id: string;
@@ -231,8 +231,6 @@ const NotificationsTemplate: React.FC<NotificationsTemplateProps> = ({
                     />
                 )}
             </div>
-
-            <BottomNavigation />
         </div>
     );
 };

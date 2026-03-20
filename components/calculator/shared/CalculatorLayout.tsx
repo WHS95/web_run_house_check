@@ -3,7 +3,6 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
-import BottomNavigation from "@/components/organisms/BottomNavigation";
 
 interface CalculatorLayoutProps {
     title: string;
@@ -34,11 +33,9 @@ export default function CalculatorLayout({
             </div>
 
             {/* 콘텐츠 */}
-            <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4 space-y-5 scroll-area-bottom">
+            <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4 space-y-5">
                 {children}
             </div>
-
-            <BottomNavigation />
         </div>
     );
 }

@@ -11,7 +11,6 @@ import {
     ChevronRight,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import BottomNavigation from "@/components/organisms/BottomNavigation";
 
 const PageHeader = dynamic(
     () => import("@/components/organisms/common/PageHeader"),
@@ -78,7 +77,7 @@ export default function MenuPage() {
                 backgroundColor="bg-rh-bg-surface"
             />
 
-            <div className="overflow-y-auto flex-1 px-4 pt-4 scroll-area-bottom">
+            <div className="overflow-y-auto flex-1 px-4 pt-4 pb-4">
                 <div className="flex flex-col gap-4">
                     {menuItems.map((item, index) => {
                         const IconComponent = item.icon;
@@ -119,8 +118,6 @@ export default function MenuPage() {
                     })}
                 </div>
             </div>
-
-            <BottomNavigation />
         </div>
     );
 }

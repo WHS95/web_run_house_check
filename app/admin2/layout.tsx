@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { verifyAdminAuth } from "@/lib/admin-auth";
-import BottomNavigation from "@/components/organisms/BottomNavigation";
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,9 +19,6 @@ export default async function Admin2Layout({
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {children}
-            <div className="shrink-0">
-                <BottomNavigation />
-            </div>
         </div>
     );
 }

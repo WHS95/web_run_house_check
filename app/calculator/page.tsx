@@ -4,7 +4,6 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Gauge, Timer, Split, HeartPulse, CircleDot, ChevronRight } from "lucide-react";
-import BottomNavigation from "@/components/organisms/BottomNavigation";
 
 const PageHeader = dynamic(
     () => import("@/components/organisms/common/PageHeader"),
@@ -77,7 +76,7 @@ export default function CalculatorPage() {
                 />
             </div>
 
-            <div className='flex-1 overflow-y-auto px-4 pt-[80px] scroll-area-bottom space-y-3'>
+            <div className='flex-1 overflow-y-auto px-4 pt-[80px] space-y-3'>
                 {calculatorItems.map((item, index) => {
                     const IconComponent = item.icon;
                     return (
@@ -104,8 +103,6 @@ export default function CalculatorPage() {
                     );
                 })}
             </div>
-
-            <BottomNavigation />
         </div>
     );
 }

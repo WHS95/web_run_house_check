@@ -10,7 +10,7 @@ import { getFCMToken } from '@/lib/firebase/client';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import SectionLabel from '@/components/atoms/SectionLabel';
 import MenuListItem from '@/components/molecules/MenuListItem';
-import BottomNavigation from '@/components/organisms/BottomNavigation';
+
 import { usePushNotification } from '@/hooks/usePushNotification';
 
 interface Activity {
@@ -58,7 +58,7 @@ ErrorState.displayName = 'ErrorState';
 
 const AdminButton = memo(() => (
     <Link
-        href="/admin"
+        href="/admin2"
         className="flex items-center justify-center w-10 h-10 rounded-rh-md bg-rh-bg-surface hover:bg-rh-bg-muted transition-colors"
         title="크루관리"
     >
@@ -254,9 +254,6 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                     </span>
                 </button>
             </div>
-
-            {/* BottomNav */}
-            <BottomNavigation />
         </div>
     );
 });

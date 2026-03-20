@@ -602,9 +602,35 @@ html, body {
 
 .mobile-viewport {
     width: 100%;
-    min-height: 100vh;
+    height: 100dvh;
     background-color: #1D2530;
     position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── 루트 레이아웃 flex 구조 ── */
+/* main-content: 바텀 내비 위 남은 공간을 채우고 스크롤 */
+.main-content {
+    flex: 1 1 0%;
+    overflow-y: auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 루트 레벨 바텀 내비: fixed 대신 flex shrink-0 */
+.mobile-viewport > .ios-tab-bar {
+    position: relative !important;
+    flex-shrink: 0;
+}
+
+/* main-content 내부에서 vh 단위를 컨테이너 기준으로 변환 */
+.main-content .min-h-screen {
+    min-height: 100% !important;
+}
+
+.main-content .h-screen {
+    height: 100% !important;
 }
 
 /* 데스크탑(431px 이상)에서 폰 프레임 적용 */
@@ -656,7 +682,6 @@ html, body {
     }
 
     /* fixed 요소를 mobile-viewport 내에서 absolute로 변환 */
-    .mobile-viewport .ios-tab-bar,
     .mobile-viewport .ios-nav-bar {
         position: absolute;
     }
@@ -666,9 +691,10 @@ html, body {
         position: absolute !important;
     }
 
-    /* h-screen(100vh)을 mobile-viewport 높이에 맞추기 */
-    .mobile-viewport .main-content {
-        height: 100%;
+    /* 루트 레벨 바텀 내비는 flex 레이아웃 유지 (위 규칙보다 후순위로 오버라이드) */
+    .mobile-viewport > .ios-tab-bar {
+        position: relative !important;
+        flex-shrink: 0;
     }
 
     .mobile-viewport .h-screen {

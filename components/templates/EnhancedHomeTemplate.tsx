@@ -19,7 +19,7 @@ import ActivityListItem from '../molecules/ActivityListItem';
 import SectionLabel from '../atoms/SectionLabel';
 import PushPermissionBanner from '../molecules/PushPermissionBanner';
 import NoticeListSheet from '../molecules/NoticeListSheet';
-import BottomNavigation from '../organisms/BottomNavigation';
+
 import { usePushNotification } from '@/hooks/usePushNotification';
 import { useOfflineAttendance } from '@/hooks/useOfflineAttendance';
 import { CloudUpload } from 'lucide-react';
@@ -216,9 +216,6 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                     )}
                 </div>
             </div>
-
-            {/* ── BottomNav ── */}
-            <BottomNavigation />
 
             <AnimatePresence>
                 {isNoticeSheetOpen && (

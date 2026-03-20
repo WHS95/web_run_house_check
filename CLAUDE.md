@@ -107,10 +107,11 @@ import { createClient } from "@/lib/supabase/admin";
 
 **루트 레이아웃 구조:**
 ```
-mobile-viewport (flex column, height: 100dvh)
-  ├── main-content (flex: 1, overflow-y: auto)  ← 자동 스크롤 영역
-  │     └── {children} (각 페이지)
-  └── ConditionalBottomNav (shrink-0)            ← 자동 배치
+html, body (overflow: hidden, overscroll-behavior: none)
+  └── mobile-viewport (flex column, height: 100dvh, overflow: hidden)
+        ├── main-content (flex: 1, overflow-y: auto, overscroll-behavior-y: contain)  ← 유일한 스크롤 영역
+        │     └── {children} (각 페이지)
+        └── ConditionalBottomNav (shrink-0)            ← 자동 배치
 ```
 
 **반드시 지켜야 할 규칙:**
@@ -120,6 +121,8 @@ mobile-viewport (flex column, height: 100dvh)
 3. **페이지에서 `min-h-screen` 사용 시 자동으로 `main-content` 높이 기준으로 변환됩니다.** (CSS에서 `100%`로 오버라이드)
 4. **페이지 내부 스크롤 컨테이너가 필요한 경우**, `flex-1 overflow-y-auto`를 사용하되 바텀 패딩은 불필요합니다.
 5. **헤더는 반드시 `sticky top-0`을 사용하세요.** `main-content`가 스크롤 컨테이너이므로 `fixed`가 아닌 `sticky`만 올바르게 동작합니다.
+6. **스크롤은 `.main-content`에서만 발생해야 합니다.** `html`, `body`, `.mobile-viewport`는 모두 `overflow: hidden`이므로 스크롤 불가. 이를 통해 모바일에서 격한 스크롤 시에도 헤더/바텀이 흔들리지 않습니다 (네이티브 앱 동작).
+   - 페이지 내부에 별도 스크롤 컨테이너를 만들 때는 반드시 `overscroll-behavior: contain`을 추가하세요.
    - `position: fixed` → **사용 금지** (스크롤 컨테이너 내부에서 의도대로 작동하지 않음)
    - `position: sticky; top: 0;` → **올바른 패턴** (스크롤 시 헤더가 상단에 고정)
    - 헤더에 `fixed`를 쓰면 `pt-[80px]` 같은 상단 여백 hack이 필요하지만, `sticky`는 자연스럽게 공간을 차지하므로 불필요

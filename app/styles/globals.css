@@ -161,7 +161,7 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        overflow-x: hidden;
+        overflow: hidden;
         scrollbar-width: none;
         -ms-overflow-style: none;
         -webkit-font-smoothing: antialiased;
@@ -189,7 +189,8 @@
         -webkit-text-size-adjust: none;
         -webkit-touch-callout: none;
         height: 100%;
-        overflow-x: hidden;
+        overflow: hidden;
+        overscroll-behavior: none;
         background-color: #1D2530;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -588,7 +589,8 @@
 /* 앱 시작 시 깜빡임 방지 */
 html, body {
     background-color: #0F1318 !important;
-    overflow-x: hidden;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
 }
 
 /* === 모바일 뷰포트 래퍼 (데스크탑에서 폰 형태) === */
@@ -607,6 +609,8 @@ html, body {
     position: relative;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    overscroll-behavior: none;
 }
 
 /* ── 루트 레이아웃 flex 구조 ── */
@@ -624,6 +628,13 @@ html, body {
     transform: translateZ(0);
     will-change: transform;
     backface-visibility: hidden;
+}
+
+/* 내부 스크롤 컨테이너 overscroll 전파 차단 */
+.main-content [class*="overflow-y-auto"],
+.main-content [class*="overflow-y-scroll"],
+.main-content [class*="overflow-auto"] {
+    overscroll-behavior-y: contain;
 }
 
 /* 루트 레벨 바텀 내비: fixed 대신 flex shrink-0 */

@@ -616,6 +616,14 @@ html, body {
     overflow-y: auto;
     min-height: 0;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+/* sticky 헤더 GPU 가속: 빠른 스크롤 시 떨림 방지 */
+.main-content .sticky {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
 }
 
 /* 루트 레벨 바텀 내비: fixed 대신 flex shrink-0 */

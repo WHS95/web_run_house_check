@@ -21,7 +21,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 }) => {
   return (
     <header
-      className={`flex relative z-50 items-center h-14 border-b border-rh-border ${
+      className={`flex sticky top-0 z-50 items-center h-14 border-b border-rh-border ${
         backgroundColor || "bg-rh-bg-surface/72 backdrop-blur-[20px]"
       }`}
     >

@@ -358,8 +358,8 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
   return (
     <div className='flex overflow-hidden relative flex-col h-screen bg-rh-bg-primary'>
-      {/* 헤더 */}
-      <div className='fixed top-0 right-0 left-0 z-50'>
+      {/* 헤더 - sticky 고정 */}
+      <div className='sticky top-0 z-50'>
         <PageHeader
           title='출석 체크'
           iconColor='white'
@@ -369,7 +369,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       </div>
 
       {/* 스크롤 가능한 폼 영역 */}
-      <div className='flex-1 min-h-0 overflow-y-auto native-scroll pt-20 px-4 pb-4'>
+      <div className='flex-1 min-h-0 overflow-y-auto native-scroll pt-4 px-4 pb-4'>
         {/* 오프라인 상태 배너 */}
         {!isOnline && (
           <div className="mb-3 flex items-center gap-2 rounded-lg bg-rh-status-warning/20 border border-rh-status-warning/10 px-3 py-2">

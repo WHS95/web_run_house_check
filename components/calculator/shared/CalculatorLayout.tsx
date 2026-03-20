@@ -17,8 +17,8 @@ export default function CalculatorLayout({
 
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
-            {/* 헤더 - flex shrink-0 패턴 */}
-            <div className="flex-shrink-0 border-b border-rh-border bg-rh-bg-surface">
+            {/* 헤더 - sticky 고정 */}
+            <div className="sticky top-0 z-10 border-b border-rh-border bg-rh-bg-surface">
                 <header className="flex items-center py-4 px-4">
                     <button
                         onClick={() => router.back()}

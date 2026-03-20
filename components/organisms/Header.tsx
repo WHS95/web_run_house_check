@@ -12,22 +12,27 @@ const Header: React.FC<HeaderProps> = ({ title = "RUNHOUSE" }) => {
   const mypageLink = "/mypage";
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const handleScroll = useCallback(() => {
-    setIsScrolled(window.scrollY > 44);
+  const handleScroll = useCallback((e: Event) => {
+    const target = e.target as HTMLElement;
+    setIsScrolled(target.scrollTop > 44);
   }, []);
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
-    return () => window.removeEventListener("scroll", handleScroll);
+    // main-content 스크롤 컨테이너에서 스크롤 감지
+    const scrollContainer = document.querySelector('.main-content');
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll, {
+        passive: true,
+      });
+      return () => scrollContainer.removeEventListener("scroll", handleScroll);
+    }
   }, [handleScroll]);
 
   return (
     <>
       {/* iOS 네비게이션 바 (스크롤 시 축소 상태) */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-200 ${
+        className={`sticky top-0 z-50 w-full transition-all duration-200 ${
           isScrolled
             ? "bg-rh-bg-surface/72 backdrop-blur-[20px] border-b border-rh-border"
             : "bg-transparent"

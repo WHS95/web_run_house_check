@@ -68,7 +68,7 @@ export default function CalculatorPage() {
 
     return (
         <div className='flex flex-col h-screen bg-rh-bg-primary main-content'>
-            <div className='fixed top-0 left-0 right-0 z-10 bg-rh-bg-surface'>
+            <div className='sticky top-0 z-10 bg-rh-bg-surface'>
                 <PageHeader
                     title='러닝 계산기'
                     iconColor='white'
@@ -76,7 +76,7 @@ export default function CalculatorPage() {
                 />
             </div>
 
-            <div className='flex-1 overflow-y-auto px-4 pt-[80px] space-y-3'>
+            <div className='flex-1 px-4 pt-4 space-y-3'>
                 {calculatorItems.map((item, index) => {
                     const IconComponent = item.icon;
                     return (

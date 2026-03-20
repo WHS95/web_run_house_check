@@ -84,7 +84,7 @@ export async function middleware(req: NextRequest) {
         }
 
         // 마스터 관리자 권한 체크
-        if (pathname.startsWith("/master/admin")) {
+        if (pathname.startsWith("/master")) {
             if (!perms?.is_super_admin) {
                 const redirectUrl = req.nextUrl.clone();
                 redirectUrl.pathname = "/";
@@ -100,7 +100,7 @@ export async function middleware(req: NextRequest) {
         // 크루 관리자 권한 체크
         if (
             pathname.startsWith("/admin") &&
-            !pathname.startsWith("/master/admin")
+            !pathname.startsWith("/master")
         ) {
             if (!perms?.is_crew_manager) {
                 const redirectUrl = req.nextUrl.clone();

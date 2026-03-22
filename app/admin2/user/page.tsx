@@ -9,7 +9,7 @@ export default async function Admin2UserPage() {
 
     return (
         <>
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
                 <PageHeader
                     title="회원 관리"
                     backLink="/admin2"

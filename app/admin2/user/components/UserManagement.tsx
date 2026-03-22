@@ -223,9 +223,9 @@ export default function UserManagement({
     };
 
     return (
-        <div className="flex flex-col flex-1 bg-rh-bg-primary">
+        <>
             {/* 검색 및 필터 */}
-            <div className="sticky top-0 z-10 bg-rh-bg-primary px-4 pt-4 pb-2 space-y-3">
+            <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-10 bg-rh-bg-primary px-4 pt-4 pb-2 space-y-3">
                 <div className="relative">
                     <Search className="absolute left-4 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2" />
                     <Input
@@ -318,7 +318,7 @@ export default function UserManagement({
             </div>
 
             {/* 사용자 목록 */}
-            <div className="overflow-y-auto flex-1 px-4 py-3 scroll-area-bottom">
+            <div className="px-4 py-3">
                 <div className="space-y-2">
                     {filteredUsers.map((user) => {
                         const isExpanded = expandedUsers.has(user.id);
@@ -523,6 +523,6 @@ export default function UserManagement({
                     onSave={handleSaveUserInfo}
                 />
             )}
-        </div>
+        </>
     );
 }

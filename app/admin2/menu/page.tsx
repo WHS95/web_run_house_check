@@ -33,14 +33,14 @@ const menuItems = [
 export default function AdminMenuPage() {
     return (
         <>
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
                 <PageHeader
                     title="메뉴"
                     iconColor="white"
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <div className="flex-1 overflow-y-auto px-4 pt-4 scroll-area-bottom space-y-4">
+            <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
                 <SectionLabel>관리 기능</SectionLabel>
                 <div className="space-y-2">
                     {menuItems.map((item) => (

@@ -145,156 +145,155 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
   };
 
   return (
-    <div className='flex fixed inset-0 z-50 justify-center items-center'>
+    <div className='absolute inset-0 z-50 flex justify-center items-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 backdrop-blur-sm bg-rh-bg-primary/50'
+        className='absolute inset-0 backdrop-blur-sm bg-black/50'
         onClick={onClose}
       />
 
-      {/* 모달 컨텐츠 */}
-      <div className='relative p-8 mx-4 w-full max-w-md bg-white rounded-3xl shadow-2xl'>
-        <div className='text-center'>
-          {/* 제목 */}
-          <h2 className='mb-6 text-xl font-bold text-rh-text-inverted'>
-            출석 정보 수정
-          </h2>
+      {/* 모달 컨텐츠 — 다크 테마 */}
+      <div className='relative p-6 mx-4 w-full max-w-md bg-rh-bg-surface rounded-2xl'>
+        {/* 제목 */}
+        <h2 className='mb-5 text-lg font-bold text-white'>
+          출석 정보 수정
+        </h2>
 
-          {/* 사용자 정보 (읽기 전용) */}
-          <div className='p-4 mb-6 bg-rh-bg-surface rounded-lg'>
-            <p className='font-medium text-rh-text-inverted'>{attendance.userName}</p>
-            <p className='text-xs text-rh-text-tertiary'>{attendance.exerciseType}</p>
+        {/* 사용자 정보 (읽기 전용) */}
+        <div className='p-3 mb-5 bg-rh-bg-primary rounded-[12px]'>
+          <p className='font-medium text-white'>{attendance.userName}</p>
+          <p className='text-xs text-rh-text-tertiary'>{attendance.exerciseType}</p>
+        </div>
+
+        {/* 폼 */}
+        <div className='space-y-4'>
+          {/* 참여시간 */}
+          <div>
+            <label className='block mb-2 text-sm font-medium text-rh-text-secondary'>
+              참여시간
+            </label>
+            <input
+              type='datetime-local'
+              value={formatDateTimeForInput(formData.checkInTime)}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  checkInTime: formatInputToDateTime(e.target.value),
+                })
+              }
+              className='p-3 w-full text-white bg-rh-bg-primary rounded-[12px] border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent'
+            />
           </div>
 
-          {/* 폼 */}
-          <div className='space-y-4 text-left'>
-            {/* 참여시간 */}
-            <div>
-              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
-                참여시간
-              </label>
+          {/* 장소 */}
+          <div className='relative location-dropdown-container'>
+            <label className='block mb-2 text-sm font-medium text-rh-text-secondary'>
+              장소
+            </label>
+            <div className='relative'>
               <input
-                type='datetime-local'
-                value={formatDateTimeForInput(formData.checkInTime)}
+                type='text'
+                value={formData.location}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    checkInTime: formatInputToDateTime(e.target.value),
-                  })
+                  setFormData({ ...formData, location: e.target.value })
                 }
-                className='p-3 w-full rounded-lg border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent'
+                onFocus={() => setShowLocationDropdown(true)}
+                className='p-3 pr-10 w-full text-white bg-rh-bg-primary rounded-[12px] border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent placeholder:text-rh-text-tertiary'
+                placeholder='모임 장소를 입력하세요'
               />
-            </div>
-
-            {/* 장소 */}
-            <div className='relative location-dropdown-container'>
-              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
-                장소
-              </label>
-              <div className='relative'>
-                <input
-                  type='text'
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                  onFocus={() => setShowLocationDropdown(true)}
-                  className='p-3 pr-10 w-full rounded-lg border border-rh-border focus:outline-none focus:ring-2 focus:ring-rh-accent'
-                  placeholder='모임 장소를 입력하세요'
-                />
-                <button
-                  type='button'
-                  onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-                  className='absolute right-3 top-1/2 text-rh-text-secondary transform -translate-y-1/2 hover:text-rh-text-muted'
+              <button
+                type='button'
+                onClick={() => setShowLocationDropdown(!showLocationDropdown)}
+                className='absolute right-3 top-1/2 text-rh-text-secondary transform -translate-y-1/2'
+              >
+                <svg
+                  className='w-5 h-5'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
                 >
-                  <svg
-                    className='w-5 h-5'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M19 9l-7 7-7-7'
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {/* 드롭다운 메뉴 */}
-              {showLocationDropdown && (
-                <div className='overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-white rounded-lg border border-rh-border shadow-lg'>
-                  {locations.length > 0 && (
-                    <>
-                      {locations.map((location) => (
-                        <button
-                          key={location.id}
-                          type='button'
-                          onClick={() => handleLocationSelect(location)}
-                          className='px-3 py-3 w-full text-left border-b border-rh-border hover:bg-rh-bg-surface focus:bg-rh-bg-surface focus:outline-none last:border-b-0'
-                        >
-                          <div className='font-medium text-rh-text-inverted'>
-                            {location.name}
-                          </div>
-                        </button>
-                      ))}
-                      <div className='border-t border-rh-border'></div>
-                    </>
-                  )}
-                </div>
-              )}
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M19 9l-7 7-7-7'
+                  />
+                </svg>
+              </button>
             </div>
 
-            {/* 벙주여부 */}
-            <div>
-              <label className='block mb-2 text-sm font-medium text-rh-text-muted'>
-                벙주여부
-              </label>
-              <div className='flex items-center space-x-4'>
-                <label className='flex items-center'>
-                  <input
-                    type='radio'
-                    name='isHost'
-                    checked={formData.isHost}
-                    onChange={() => setFormData({ ...formData, isHost: true })}
-                    className='mr-2 text-rh-accent focus:ring-rh-accent'
-                  />
-                  <span className='text-sm text-rh-text-muted'>벙주</span>
-                </label>
-                <label className='flex items-center'>
-                  <input
-                    type='radio'
-                    name='isHost'
-                    checked={!formData.isHost}
-                    onChange={() => setFormData({ ...formData, isHost: false })}
-                    className='mr-2 text-rh-accent focus:ring-rh-accent'
-                  />
-                  <span className='text-sm text-rh-text-muted'>일반 참여자</span>
-                </label>
+            {/* 드롭다운 메뉴 */}
+            {showLocationDropdown && (
+              <div className='overflow-y-auto absolute z-10 mt-1 w-full max-h-60 bg-rh-bg-primary rounded-[12px] border border-rh-border shadow-lg'>
+                {locations.length > 0 && (
+                  <>
+                    {locations.map((location) => (
+                      <button
+                        key={location.id}
+                        type='button'
+                        onClick={() => handleLocationSelect(location)}
+                        className='px-3 py-3 w-full text-left border-b border-rh-border/50 hover:bg-rh-bg-muted focus:bg-rh-bg-muted focus:outline-none last:border-b-0'
+                      >
+                        <div className='font-medium text-white'>
+                          {location.name}
+                        </div>
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
-            </div>
+            )}
           </div>
 
-          {/* 버튼들 */}
-          <div className='flex gap-3 mt-8'>
-            <Button
-              onClick={onClose}
-              variant='outline'
-              className='flex-1 py-3 text-rh-text-muted border-rh-border hover:bg-rh-bg-surface'
-              disabled={isLoading}
-            >
-              취소
-            </Button>
-            <Button
-              onClick={handleSave}
-              className='flex-1 py-3 text-white bg-rh-accent hover:bg-blue-600'
-              disabled={isLoading}
-            >
-              {isLoading ? "저장 중..." : "저장"}
-            </Button>
+          {/* 벙주여부 */}
+          <div>
+            <label className='block mb-2 text-sm font-medium text-rh-text-secondary'>
+              벙주여부
+            </label>
+            <div className='flex items-center gap-4'>
+              <button
+                type='button'
+                onClick={() => setFormData({ ...formData, isHost: true })}
+                className={`flex-1 py-2.5 rounded-[12px] text-sm font-medium transition-colors ${
+                  formData.isHost
+                    ? 'bg-rh-accent text-white'
+                    : 'bg-rh-bg-primary text-rh-text-secondary border border-rh-border'
+                }`}
+              >
+                벙주
+              </button>
+              <button
+                type='button'
+                onClick={() => setFormData({ ...formData, isHost: false })}
+                className={`flex-1 py-2.5 rounded-[12px] text-sm font-medium transition-colors ${
+                  !formData.isHost
+                    ? 'bg-rh-accent text-white'
+                    : 'bg-rh-bg-primary text-rh-text-secondary border border-rh-border'
+                }`}
+              >
+                일반 참여자
+              </button>
+            </div>
           </div>
+        </div>
+
+        {/* 버튼들 */}
+        <div className='flex gap-3 mt-6'>
+          <Button
+            onClick={onClose}
+            variant='secondary'
+            className='flex-1'
+            disabled={isLoading}
+          >
+            취소
+          </Button>
+          <Button
+            onClick={handleSave}
+            className='flex-1'
+            disabled={isLoading}
+          >
+            {isLoading ? "저장 중..." : "저장"}
+          </Button>
         </div>
       </div>
     </div>

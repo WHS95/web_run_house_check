@@ -87,14 +87,15 @@ function computePlaceStats(
         total++;
     });
 
+    // 블루 톤 팔레트만 사용 (디자인 시스템 준수)
     const colors = [
         "bg-rh-accent",
-        "bg-blue-500",
-        "bg-green-500",
-        "bg-yellow-500",
-        "bg-purple-500",
-        "bg-pink-500",
-        "bg-indigo-500",
+        "bg-rh-status-success",
+        "bg-rh-status-warning",
+        "bg-rh-status-error",
+        "bg-blue-400",
+        "bg-blue-300",
+        "bg-blue-200",
     ];
 
     return Object.entries(locationCounts)
@@ -150,7 +151,7 @@ export default async function Admin2AnalyzePage({
 
     return (
         <>
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
                 <PageHeader
                     title="통계 분석"
                     backLink="/admin2"
@@ -158,7 +159,7 @@ export default async function Admin2AnalyzePage({
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <div className="flex-1 overflow-y-auto px-4 pt-4 scroll-area-bottom space-y-4">
+            <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
                 <YearMonthSelector year={year} month={month} />
 
                 <Suspense fallback={<AnalyticsSkeleton />}>

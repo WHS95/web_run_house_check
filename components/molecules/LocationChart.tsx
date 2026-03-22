@@ -49,30 +49,24 @@ export default function LocationChart({
   month,
 }: LocationChartProps) {
   return (
-    <div className='p-6 rounded-lg shadow-sm bg-rh-bg-surface'>
-      <div className='mb-6'>
-        <h3 className='mb-1 text-lg font-semibold text-white'>{title}</h3>
-      </div>
+    <div>
+      {title && (
+        <div className='mb-4'>
+          <h3 className='text-sm font-semibold text-white'>{title}</h3>
+        </div>
+      )}
 
       <div className='space-y-1'>
         {data.length > 0 ? (
-          data.map((item, index) => (
+          data.map((item) => (
             <LocationParticipationItem key={item.locationName} item={item} />
           ))
         ) : (
-          <div className='py-8 text-center text-white'>
+          <div className='py-6 text-center text-rh-text-secondary text-sm'>
             <p>해당 기간의 데이터가 없습니다.</p>
           </div>
         )}
       </div>
-
-      {/* {data.length > 0 && (
-        <div className='pt-4 mt-6 border-t border-rh-border'>
-          <div className='flex justify-between text-xs text-rh-text-tertiary'>
-            <span>총 {data.length}개 장소</span>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }

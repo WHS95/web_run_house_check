@@ -7,7 +7,7 @@ export default async function Admin2GradePage() {
 
     return (
         <>
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
                 <PageHeader
                     title="등급 관리"
                     backLink="/admin2/settings"
@@ -15,7 +15,7 @@ export default async function Admin2GradePage() {
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <div className="flex-1 overflow-y-auto scroll-area-bottom">
+            <div className="flex-1 overflow-y-auto">
                 <GradeManagementWrapper crewId={crewId} />
             </div>
         </>

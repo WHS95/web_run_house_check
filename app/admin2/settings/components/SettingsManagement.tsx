@@ -54,9 +54,9 @@ export default function SettingsManagement({
     return (
         <CrewLocationProvider initialLocations={initialLocations}>
           <CrewMemberProvider initialMembers={[]}>
-            <div className="flex flex-col flex-1 bg-rh-bg-primary">
+            <>
                 {/* 탭 네비게이션 */}
-                <div className="sticky top-0 z-30 px-4 pt-4 bg-rh-bg-primary">
+                <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-30 px-4 pt-4 pb-2 bg-rh-bg-primary">
                     <div className="bg-rh-bg-surface rounded-lg p-1 flex">
                         {tabs.map((tab) => (
                             <button
@@ -75,7 +75,7 @@ export default function SettingsManagement({
                 </div>
 
                 {/* 탭 컨텐츠 */}
-                <div className="flex-1 overflow-y-auto px-4 py-4 scroll-area-bottom">
+                <div className="px-4 py-4">
                     {activeTab === "location" && (
                         <NaverMapLoader>
                             <CrewLocationManagement
@@ -95,7 +95,7 @@ export default function SettingsManagement({
                         <AdminInviteCodesManagement crewId={crewId} />
                     )}
                 </div>
-            </div>
+            </>
           </CrewMemberProvider>
         </CrewLocationProvider>
     );

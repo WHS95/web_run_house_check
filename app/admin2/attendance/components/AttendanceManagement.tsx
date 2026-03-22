@@ -196,8 +196,8 @@ export default function AttendanceManagement({
     const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
 
     return (
-        <div className="flex flex-col flex-1 bg-rh-bg-primary">
-            <div className="flex-1 overflow-y-auto px-4 pt-4 scroll-area-bottom space-y-4">
+        <>
+            <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
                 {/* 월 네비게이터 */}
                 <MonthNavigator
                     year={year}
@@ -419,6 +419,6 @@ export default function AttendanceManagement({
             {showBulk && (
                 <BulkAttendanceManagement crewId={crewId} />
             )}
-        </div>
+        </>
     );
 }

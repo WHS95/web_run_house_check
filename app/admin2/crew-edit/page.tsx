@@ -3,7 +3,7 @@ import PageHeader from "@/components/organisms/common/PageHeader";
 export default function AdminCrewEditPage() {
     return (
         <>
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
                 <PageHeader
                     title="크루 정보 편집"
                     backLink="/admin2/menu"

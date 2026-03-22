@@ -33,49 +33,48 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   };
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center'>
+    <div className='absolute inset-0 z-50 flex items-center justify-center'>
       {/* 배경 오버레이 */}
       <div
-        className='absolute inset-0 bg-rh-bg-primary/50 backdrop-blur-sm'
+        className='absolute inset-0 bg-black/50 backdrop-blur-sm'
         onClick={onClose}
       />
 
-      {/* 모달 컨텐츠 */}
-      <div className='relative w-full max-w-sm p-8 mx-4 bg-white shadow-2xl rounded-3xl'>
+      {/* 모달 컨텐츠 — 다크 테마 */}
+      <div className='relative w-full max-w-sm p-6 mx-4 bg-rh-bg-surface rounded-2xl'>
         <div className='text-center'>
           {/* 아이콘 */}
           {variant === "destructive" && (
             <div className='flex justify-center mb-4'>
-              <div className='p-3 bg-red-100 rounded-full'>
-                <AlertTriangle className='w-6 h-6 text-red-600' />
+              <div className='w-12 h-12 rounded-full flex items-center justify-center'
+                style={{ backgroundColor: '#3E649633' }}
+              >
+                <AlertTriangle className='w-6 h-6 text-rh-status-error' />
               </div>
             </div>
           )}
 
           {/* 제목 */}
-          <h2 className='mb-6 text-xl font-bold text-rh-text-inverted'>{title}</h2>
+          <h2 className='mb-3 text-lg font-bold text-white'>{title}</h2>
 
           {/* 내용 */}
-          <p className='mb-8 leading-relaxed text-rh-text-muted whitespace-pre-line'>
+          <p className='mb-6 text-sm leading-relaxed text-rh-text-secondary whitespace-pre-line'>
             {content}
           </p>
 
           {/* 버튼들 */}
-          <div className='flex space-x-3'>
+          <div className='flex gap-3'>
             <Button
               onClick={onClose}
-              variant='outline'
-              className='flex-1 py-4 text-base font-medium border-rh-border rounded-2xl hover:bg-rh-bg-surface'
+              variant='secondary'
+              className='flex-1'
             >
               {cancelText}
             </Button>
             <Button
               onClick={handleConfirm}
-              className={`flex-1 py-4 text-base font-medium rounded-2xl ${
-                variant === "destructive"
-                  ? "bg-red-600 hover:bg-red-700 text-white"
-                  : "bg-rh-bg-primary hover:bg-rh-bg-primary text-white"
-              }`}
+              variant={variant === "destructive" ? "destructive" : "default"}
+              className='flex-1'
             >
               {confirmText}
             </Button>

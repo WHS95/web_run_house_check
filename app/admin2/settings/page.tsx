@@ -15,7 +15,7 @@ export default async function Admin2SettingsPage({
 
     return (
         <>
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
                 <PageHeader
                     title="설정"
                     backLink="/admin2"

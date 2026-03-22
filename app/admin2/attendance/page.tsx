@@ -22,7 +22,7 @@ export default async function Admin2AttendancePage({
 
     return (
         <>
-            <div className="shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
                 <PageHeader
                     title="출석 관리"
                     backLink="/admin2"

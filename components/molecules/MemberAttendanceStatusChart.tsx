@@ -28,13 +28,12 @@ export default function MemberAttendanceStatusChart({
   } = data;
 
   return (
-    <div className='p-6 rounded-lg  shadow-sm bg-rh-bg-surface'>
-      <div className='mb-6'>
-        <h3 className='mb-1 text-lg font-semibold text-white'>{title}</h3>
-        {/* <p className='text-sm text-rh-text-tertiary'>
-          {year}년 {month}월 멤버 출석 현황 분석
-        </p> */}
-      </div>
+    <div>
+      {title && (
+        <div className='mb-4'>
+          <h3 className='text-sm font-semibold text-white'>{title}</h3>
+        </div>
+      )}
 
       {totalActiveMembers > 0 ? (
         <div className='space-y-6'>
@@ -128,7 +127,7 @@ export default function MemberAttendanceStatusChart({
           </div> */}
         </div>
       ) : (
-        <div className='py-8 text-center text-rh-text-tertiary'>
+        <div className='py-6 text-center text-rh-text-secondary text-sm'>
           <p>활성 멤버가 없습니다.</p>
         </div>
       )}

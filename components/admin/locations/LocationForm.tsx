@@ -8,20 +8,9 @@ import AddressSearch from "@/components/map/AddressSearch";
 import { useGeocoding } from "@/hooks/useGeocoding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import {
-  MapPin,
-  Save,
-  X,
-  RefreshCw,
-  Trash2,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
+import { MapPin, Save } from "lucide-react";
 import RadiusSlider from "./RadiusSlider";
 
 interface LocationFormProps {
@@ -239,65 +228,63 @@ export default function LocationForm({
   };
 
   return (
-    <Card className='border-rh-border bg-rh-bg-surface'>
-      <CardContent>
-        <form onSubmit={handleSubmit} className='space-y-6'>
-          {/* 활동장소 이름 */}
-          <div className='space-y-2'>
-            <Label htmlFor='name' className='font-semibold text-white'>
-              모임 장소명
-            </Label>
-            <Input
-              id='name'
-              value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              placeholder='예: 한강공원 정기런닝 장소'
-              className='placeholder-rh-text-secondary text-white border-rh-border bg-rh-bg-primary focus:border-rh-accent'
-            />
-            {errors.name && (
-              <p className='text-sm text-red-400'>{errors.name}</p>
-            )}
-          </div>
-
-          {/* 주소 검색 */}
-          <div className='space-y-2'>
-            <Label className='font-semibold text-white'>주소 검색</Label>
-            <AddressSearch
-              onAddressSelect={handleAddressSelect}
-              placeholder='도로명 주소 입력'
-            />
-          </div>
-          {/* 좌표 및 주소 정보 */}
-          {formData.latitude !== 0 && formData.longitude !== 0 && (
-            <div className='p-3 rounded-lg border border-rh-border bg-rh-bg-primary'>
-              <div className='flex justify-between items-center mb-2'>
-                <Label className='text-sm text-white'>선택된 위치 정보</Label>
-              </div>
-
-              <div className='space-y-2 text-sm'>
-                <div className='text-rh-text-secondary'>
-                  <span className='font-medium text-white'>좌표:</span>{" "}
-                  {formData.latitude?.toFixed(6)},{" "}
-                  {formData.longitude?.toFixed(6)}
-                </div>
-
-                {formData.address && (
-                  <div className='text-rh-text-secondary'>
-                    <span className='font-medium text-white'>주소:</span>{" "}
-                    {formData.address}
-                  </div>
-                )}
-
-                {reverseGeocoding && (
-                  <div className='text-rh-accent'>주소 정보 가져오는 중</div>
-                )}
-              </div>
-            </div>
+    <div className='bg-rh-bg-primary'>
+      <form onSubmit={handleSubmit} className='space-y-5 px-4 py-5'>
+        {/* 활동장소 이름 */}
+        <div className='space-y-2'>
+          <Label htmlFor='name' className='text-sm font-semibold text-white'>
+            모임 장소명
+          </Label>
+          <Input
+            id='name'
+            value={formData.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
+            placeholder='예: 한강공원'
+            className='placeholder-rh-text-muted text-white border-rh-border bg-rh-bg-surface focus:border-rh-accent'
+          />
+          {errors.name && (
+            <p className='text-xs text-rh-status-error mt-1'>
+              {errors.name}
+            </p>
           )}
+        </div>
 
-          {/* 지도 */}
-          <div className='space-y-2'>
-            <Label className='font-semibold text-white'>위치 선택</Label>
+        {/* 주소 검색 */}
+        <div className='space-y-2'>
+          <Label className='text-sm font-semibold text-white'>
+            주소 검색
+          </Label>
+          <AddressSearch
+            onAddressSelect={handleAddressSelect}
+            placeholder='도로명 주소 입력'
+          />
+        </div>
+
+        {/* 좌표 및 주소 정보 */}
+        {formData.latitude !== 0 && formData.longitude !== 0 && (
+          <div className='p-3 rounded-xl border border-rh-border bg-rh-bg-surface'>
+            <div className='space-y-1.5 text-sm'>
+              <div className='flex items-center gap-2 text-rh-text-secondary'>
+                <MapPin className='w-3.5 h-3.5 text-rh-accent flex-shrink-0' />
+                <span className='truncate'>
+                  {formData.address || `${formData.latitude?.toFixed(6)}, ${formData.longitude?.toFixed(6)}`}
+                </span>
+              </div>
+              {reverseGeocoding && (
+                <div className='text-xs text-rh-accent pl-5.5'>
+                  주소 가져오는 중...
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 지도 */}
+        <div className='space-y-2'>
+          <Label className='text-sm font-semibold text-white'>
+            위치 선택
+          </Label>
+          <div className='rounded-xl overflow-hidden border border-rh-border'>
             <NaverMapContainer
               locations={
                 selectedPosition
@@ -319,76 +306,63 @@ export default function LocationForm({
               center={mapCenter}
               onMapClick={handleMapClick}
               clickable={true}
-              height='300px'
-            />
-
-            {errors.position && (
-              <p className='text-sm text-red-400'>{errors.position}</p>
-            )}
-          </div>
-
-          {/* 허용 반경 슬라이더 */}
-          <div className='space-y-2'>
-            <RadiusSlider
-              value={formData.allowed_radius}
-              onChange={(radius) =>
-                setFormData((prev) => ({ ...prev, allowed_radius: radius }))
-              }
+              height='220px'
             />
           </div>
-
-          {/* 편집 모드 전용 컨트롤 */}
-          {initialData && (
-            <div className='pt-4 space-y-4'>
-              {/* 삭제 버튼 */}
-              <div className='flex justify-end'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  onClick={() => setShowDeleteConfirm(true)}
-                  disabled={loading}
-                  className='text-white bg-rh-bg-primary border-rh-border hover:bg-rh-bg-primary/20'
-                >
-                  <Trash2 className='mr-2 w-4 h-4 text-red-400' />
-                  장소 삭제
-                </Button>
-              </div>
-            </div>
+          {errors.position && (
+            <p className='text-xs text-rh-status-error mt-1'>
+              {errors.position}
+            </p>
           )}
+        </div>
 
-          {/* 버튼 */}
-          <div className='flex gap-3 pt-4'>
-            <Button
-              type='submit'
-              disabled={loading}
-              className='flex-1 text-white bg-rh-accent hover:bg-rh-accent-hover/80'
-            >
-              {loading ? (
-                <div className='flex gap-2 items-center'>
-                  <div className='w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent'></div>
-                  저장 중...
-                </div>
-              ) : (
-                <div className='flex gap-2 items-center'>
-                  <Save className='w-4 h-4' />
-                  {initialData ? "수정" : "추가"}
-                </div>
-              )}
-            </Button>
+        {/* 허용 반경 슬라이더 */}
+        <div className='bg-rh-bg-surface rounded-xl p-4 border border-rh-border'>
+          <RadiusSlider
+            value={formData.allowed_radius}
+            onChange={(radius) =>
+              setFormData((prev) => ({
+                ...prev,
+                allowed_radius: radius,
+              }))
+            }
+          />
+        </div>
 
-            <Button
+        {/* 하단 액션 버튼 영역 */}
+        <div className='pt-2 pb-safe space-y-3'>
+          {/* 저장/추가 버튼 */}
+          <Button
+            type='submit'
+            disabled={loading}
+            className='w-full h-12 text-white bg-rh-accent hover:bg-rh-accent-hover/80 rounded-xl text-base font-medium'
+          >
+            {loading ? (
+              <div className='flex gap-2 items-center'>
+                <div className='w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent' />
+                저장 중...
+              </div>
+            ) : (
+              <div className='flex gap-2 items-center'>
+                <Save className='w-4 h-4' />
+                {initialData ? "수정하기" : "추가하기"}
+              </div>
+            )}
+          </Button>
+
+          {/* 편집 모드: 삭제 버튼 */}
+          {initialData && (
+            <button
               type='button'
-              variant='outline'
-              onClick={onCancel}
+              onClick={() => setShowDeleteConfirm(true)}
               disabled={loading}
-              className='flex-1 text-white bg-rh-bg-primary border-rh-border hover:bg-rh-bg-primary/20'
+              className='w-full py-3 text-sm text-rh-status-error hover:text-rh-status-error/80 transition-colors'
             >
-              <X className='mr-2 w-4 h-4 text-white' />
-              취소
-            </Button>
-          </div>
-        </form>
-      </CardContent>
+              장소 삭제
+            </button>
+          )}
+        </div>
+      </form>
 
       {/* 삭제 확인 모달 */}
       <DeleteConfirmDialog
@@ -400,26 +374,7 @@ export default function LocationForm({
         itemName={initialData?.name}
         loading={loading}
       />
-    </Card>
+    </div>
   );
 }
 
-{
-  /* <Button
-type='button'
-variant='outline'
-size='sm'
-onClick={() =>
-  handleReverseGeocode(formData.latitude, formData.longitude)
-}
-disabled={reverseGeocoding}
-className='text-xs text-rh-text-secondary border-rh-border hover:bg-rh-bg-muted/20'
->
-{reverseGeocoding ? (
-  <RefreshCw className='mr-1 w-3 h-3 animate-spin' />
-) : (
-  <RefreshCw className='mr-1 w-3 h-3' />
-)}
-주소 가져오기
-</Button> */
-}

@@ -6,8 +6,6 @@ import LocationForm from "./LocationForm";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -20,7 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MapPin, AlertTriangle } from "lucide-react";
+import { MapPin, AlertTriangle, X } from "lucide-react";
 
 interface LocationModalProps {
   isOpen: boolean;
@@ -122,8 +120,22 @@ function LocationModal({
   }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='max-w-4xl max-h-[90vh] overflow-auto bg-rh-bg-surface border-rh-border'>
-        <div className='max-h-[calc(90vh-120px)] overflow-auto'>
+      <DialogContent className='!w-full !max-w-full !h-full !max-h-full !rounded-none !translate-x-0 !translate-y-0 !left-0 !top-0 bg-rh-bg-primary border-none p-0 overflow-hidden flex flex-col [&>button:last-child]:hidden'>
+        {/* 헤더 */}
+        <div className='shrink-0 flex items-center justify-between px-4 py-3 bg-rh-bg-surface border-b border-rh-border'>
+          <DialogTitle className='text-base font-semibold text-white'>
+            {location ? "장소 수정" : "장소 추가"}
+          </DialogTitle>
+          <button
+            type='button'
+            onClick={onClose}
+            className='rounded-full p-2 text-rh-text-secondary hover:text-white active:opacity-70'
+          >
+            <X className='w-5 h-5' />
+          </button>
+        </div>
+        {/* 스크롤 가능한 폼 영역 */}
+        <div className='flex-1 overflow-y-auto overscroll-contain'>
           <LocationForm
             initialData={location}
             onSubmit={handleFormSubmit}

@@ -4,8 +4,8 @@
   "description": "러닝크루의 모든것",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3f82f6",
+  "background_color": "#1D2530",
+  "theme_color": "#1D2530",
   "orientation": "portrait-primary",
   "icons": [
     {

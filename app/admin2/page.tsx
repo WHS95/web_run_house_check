@@ -44,7 +44,7 @@ export default async function Admin2DashboardPage({
 
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
                 <PageHeader
                     title="관리자 대시보드"
                     iconColor="white"

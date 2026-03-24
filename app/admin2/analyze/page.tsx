@@ -151,7 +151,7 @@ export default async function Admin2AnalyzePage({
 
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
                 <PageHeader
                     title="통계 분석"
                     backLink="/admin2"

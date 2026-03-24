@@ -33,7 +33,7 @@ const menuItems = [
 export default function AdminMenuPage() {
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
                 <PageHeader
                     title="메뉴"
                     iconColor="white"

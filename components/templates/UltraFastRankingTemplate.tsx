@@ -180,7 +180,7 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
 
   return (
     <div className="flex flex-col h-screen bg-rh-bg-primary text-white">
-      <div className="shrink-0 bg-rh-bg-surface pt-safe">
+      <div className="shrink-0 bg-rh-bg-primary pt-safe">
         <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-surface" />
       </div>
 

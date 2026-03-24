@@ -142,18 +142,18 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {/* Header */}
-            <div className="sticky top-0 z-50 shrink-0 bg-rh-bg-surface pt-safe">
+            <div className="sticky top-0 z-50 shrink-0 bg-rh-bg-primary pt-safe">
                 <PageHeader
                     title="MY"
                     iconColor="white"
                     borderColor="rh-border"
-                    backgroundColor="bg-rh-bg-surface"
+                    backgroundColor="bg-rh-bg-primary"
                     rightAction={adminButton}
                 />
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-4 pt-4 scroll-area-bottom space-y-5">
+            {/* Content */}
+            <div className="flex-1 px-4 pt-4 pb-4 space-y-5">
                 {/* Profile */}
                 <div className="flex items-center gap-4">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-rh-accent">

@@ -11,7 +11,10 @@ interface UsePushNotificationReturn {
     isSupported: boolean;
     permission: NotificationPermission | "unsupported";
     isTokenRegistered: boolean;
+    isNotificationEnabled: boolean;
     requestPermission: () => Promise<boolean>;
+    unregisterToken: () => Promise<boolean>;
+    toggleNotification: () => Promise<void>;
     dismissBanner: () => void;
     shouldShowBanner: boolean;
 }
@@ -19,6 +22,7 @@ interface UsePushNotificationReturn {
 const DISMISSED_KEY = "push_dismissed_at";
 const DISMISSED_COUNT_KEY = "push_dismissed_count";
 const DISMISS_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7일
+const NOTIFICATION_ENABLED_KEY = "push_notification_enabled";
 
 export function usePushNotification({
     crewId,
@@ -27,6 +31,8 @@ export function usePushNotification({
         NotificationPermission | "unsupported"
     >("unsupported");
     const [isTokenRegistered, setIsTokenRegistered] = useState(false);
+    const [isNotificationEnabled, setIsNotificationEnabled] =
+        useState(false);
     const [shouldShowBanner, setShouldShowBanner] = useState(false);
 
     const isSupported =
@@ -41,11 +47,18 @@ export function usePushNotification({
         const currentPermission = Notification.permission;
         setPermission(currentPermission);
 
+        // localStorage에서 알림 활성화 상태 읽기
+        const savedEnabled =
+            localStorage.getItem(NOTIFICATION_ENABLED_KEY);
+
         // 이미 권한이 허용된 경우 배너 숨기고
         // 토큰 미등록 시 자동으로 재등록 시도
         if (currentPermission === "granted") {
+            // 사용자가 명시적으로 끈 적이 없으면 활성 상태
+            const enabled = savedEnabled !== "false";
+            setIsNotificationEnabled(enabled);
             setShouldShowBanner(false);
-            if (!isTokenRegistered && crewId) {
+            if (enabled && !isTokenRegistered && crewId) {
                 (async () => {
                     try {
                         await navigator.serviceWorker.register(
@@ -143,6 +156,44 @@ export function usePushNotification({
         }
     }, [isSupported, crewId]);
 
+    // 토큰 해제 (알림 끄기)
+    const unregisterToken = useCallback(async (): Promise<boolean> => {
+        try {
+            const token = await getFCMToken();
+            if (token) {
+                await fetch("/api/push/token", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token }),
+                });
+            }
+            setIsTokenRegistered(false);
+            setIsNotificationEnabled(false);
+            localStorage.setItem(NOTIFICATION_ENABLED_KEY, "false");
+            return true;
+        } catch {
+            return false;
+        }
+    }, []);
+
+    // 토글 핸들러 (ON/OFF 전환)
+    const toggleNotification = useCallback(async () => {
+        if (isNotificationEnabled) {
+            // 켜져 있으면 끄기
+            await unregisterToken();
+        } else {
+            // 꺼져 있으면 켜기
+            const success = await requestPermission();
+            if (success) {
+                setIsNotificationEnabled(true);
+                localStorage.setItem(
+                    NOTIFICATION_ENABLED_KEY,
+                    "true"
+                );
+            }
+        }
+    }, [isNotificationEnabled, unregisterToken, requestPermission]);
+
     // "나중에" 클릭
     const dismissBanner = useCallback(() => {
         const count = parseInt(
@@ -157,7 +208,10 @@ export function usePushNotification({
         isSupported,
         permission,
         isTokenRegistered,
+        isNotificationEnabled,
         requestPermission,
+        unregisterToken,
+        toggleNotification,
         dismissBanner,
         shouldShowBanner,
     };

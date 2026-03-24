@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo, useCallback, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Settings, LogOut, ChevronRight } from 'lucide-react';
@@ -69,8 +69,17 @@ AdminButton.displayName = 'AdminButton';
 
 const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, activityData, userId }) => {
     const router = useRouter();
-    const { isSupported, permission, requestPermission } =
-        usePushNotification({ crewId: userProfile?.crewId ?? null });
+    const {
+        isSupported,
+        permission,
+        isNotificationEnabled,
+        toggleNotification,
+    } = usePushNotification({ crewId: userProfile?.crewId ?? null });
+
+    // hydration 안전: 클라이언트 마운트 후에만 isSupported 사용
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+    const showNotificationToggle = mounted && isSupported;
 
     const handleLogout = useCallback(async () => {
         try {
@@ -209,18 +218,14 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                 <SectionLabel>설정</SectionLabel>
                 <div className="space-y-2">
                     {/* 푸시 알림 토글 */}
-                    {isSupported && (
+                    {showNotificationToggle && (
                         <div className="flex items-center justify-between rounded-rh-lg bg-rh-bg-surface h-[52px] px-4">
                             <span className="text-sm font-medium text-white">
                                 푸시 알림
                             </span>
                             <Switch
-                                checked={permission === "granted"}
-                                onCheckedChange={() => {
-                                    if (permission !== "granted") {
-                                        requestPermission();
-                                    }
-                                }}
+                                checked={isNotificationEnabled}
+                                onCheckedChange={toggleNotification}
                                 disabled={permission === "denied"}
                             />
                         </div>

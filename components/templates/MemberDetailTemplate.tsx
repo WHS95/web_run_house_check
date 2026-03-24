@@ -3,9 +3,9 @@
 import React, { memo, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Settings, LogOut } from 'lucide-react';
-import { Bell, BellOff } from 'lucide-react';
+import { Settings, LogOut, ChevronRight } from 'lucide-react';
 import { createBrowserClient } from '@supabase/ssr';
+import { Switch } from '@/components/ui/switch';
 import { getFCMToken } from '@/lib/firebase/client';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import SectionLabel from '@/components/atoms/SectionLabel';
@@ -59,7 +59,7 @@ ErrorState.displayName = 'ErrorState';
 const AdminButton = memo(() => (
     <Link
         href="/admin2"
-        className="flex items-center justify-center w-10 h-10 rounded-rh-md bg-rh-bg-surface hover:bg-rh-bg-muted transition-colors"
+        className="flex items-center justify-center w-10 h-10 rounded-rh-md bg-rh-bg-primary hover:bg-rh-bg-muted transition-colors"
         title="크루관리"
     >
         <Settings size={20} className="text-rh-text-secondary" />
@@ -205,39 +205,46 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                     )}
                 </div>
 
-                {/* 알림 설정 */}
-                {isSupported && (
-                    <div className="rounded-rh-md bg-rh-bg-surface p-4">
-                        <h3 className="text-rh-title3 font-semibold text-white mb-3">알림 설정</h3>
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                {permission === "granted" ? (
-                                    <Bell className="h-5 w-5 text-rh-accent" />
-                                ) : (
-                                    <BellOff className="h-5 w-5 text-rh-text-tertiary" />
-                                )}
-                                <div>
-                                    <p className="text-rh-body text-white">푸시 알림</p>
-                                    <p className="text-rh-caption text-rh-text-secondary">
-                                        {permission === "granted"
-                                            ? "알림이 켜져 있습니다"
-                                            : permission === "denied"
-                                            ? "브라우저 설정에서 알림을 허용해주세요"
-                                            : "출석·공지 알림을 받을 수 있어요"}
-                                    </p>
-                                </div>
-                            </div>
-                            {permission !== "granted" && permission !== "denied" && (
-                                <button
-                                    onClick={requestPermission}
-                                    className="rounded-rh-md bg-rh-accent px-4 py-2 text-rh-caption font-semibold text-white"
-                                >
-                                    알림 켜기
-                                </button>
-                            )}
+                {/* 설정 */}
+                <SectionLabel>설정</SectionLabel>
+                <div className="space-y-2">
+                    {/* 푸시 알림 토글 */}
+                    {isSupported && (
+                        <div className="flex items-center justify-between rounded-rh-lg bg-rh-bg-surface h-[52px] px-4">
+                            <span className="text-sm font-medium text-white">
+                                푸시 알림
+                            </span>
+                            <Switch
+                                checked={permission === "granted"}
+                                onCheckedChange={() => {
+                                    if (permission !== "granted") {
+                                        requestPermission();
+                                    }
+                                }}
+                                disabled={permission === "denied"}
+                            />
                         </div>
-                    </div>
-                )}
+                    )}
+
+                    {/* 내정보 변경 */}
+                    <Link
+                        href="/mypage/edit"
+                        className="flex items-center justify-between rounded-rh-lg bg-rh-bg-surface px-4 py-3"
+                    >
+                        <div className="flex flex-col gap-0.5">
+                            <span className="text-sm font-medium text-white">
+                                내정보 변경
+                            </span>
+                            <span className="text-xs text-rh-text-tertiary">
+                                이름, 연락처 등 개인정보 수정
+                            </span>
+                        </div>
+                        <ChevronRight
+                            size={18}
+                            className="text-rh-text-muted"
+                        />
+                    </Link>
+                </div>
 
                 {/* 로그아웃 버튼 */}
                 <button

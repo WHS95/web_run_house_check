@@ -16,7 +16,7 @@ const UltraFastRankingTemplate = nextDynamic(
     }
 );
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata = {
     title: "랭킹 | RUNHOUSE",

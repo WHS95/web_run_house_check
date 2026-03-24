@@ -28,43 +28,12 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
 }) => {
   const router = useRouter();
 
-  // 추가 프리페치 (네비게이션 직전)
-  const prefetchRoute = useCallback(
-    (href: string) => {
-      // 한번 더 프리페치 (네비게이션 직전 최신화)
-      router.prefetch(href);
-
-      // 관련 API도 미리 호출 (중요한 경우만)
-      if (href === "/ranking") {
-        // 한국 시간 기준으로 현재 날짜 생성
-        const now = new Date();
-        const koreaOffset = 9 * 60; // 9시간(분 단위)
-        const currentDate = new Date(
-          now.getTime() + (koreaOffset - now.getTimezoneOffset()) * 60000
-        );
-        fetch(
-          `/api/ranking?year=${currentDate.getFullYear()}&month=${
-            currentDate.getMonth() + 1
-          }&prefetch=true`,
-          {
-            method: "GET",
-            cache: "force-cache",
-          }
-        ).catch(() => {});
-      }
-    },
-    [router]
-  );
-
   const navigate = useCallback(
     (href: string) => {
-      // 네비게이션 직전 추가 프리페치
-      prefetchRoute(href);
-
-      // 바로 네비게이션 수행 (애니메이션 없음)
+      // 프리페치는 BottomNavigation mount 시 1회 처리됨
       router.push(href);
     },
-    [router, prefetchRoute]
+    [router]
   );
 
   return (

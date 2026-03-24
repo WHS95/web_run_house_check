@@ -10,12 +10,7 @@ import {
     CircleDot,
     ChevronRight,
 } from "lucide-react";
-import dynamic from "next/dynamic";
-
-const PageHeader = dynamic(
-    () => import("@/components/organisms/common/PageHeader"),
-    { ssr: true }
-);
+import PageHeader from "@/components/organisms/common/PageHeader";
 
 const menuItems = [
     {

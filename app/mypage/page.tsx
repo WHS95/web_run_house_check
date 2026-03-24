@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 const MemberDetailTemplate = dynamic(
   () => import("@/components/templates/MemberDetailTemplate"),
   {
-    ssr: false,
+    ssr: true,
     loading: () => <MyPageSkeleton />,
   }
 );

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
 import NavigationIcon, {
     NavigationIconType,
 } from "@/components/atoms/NavigationIcon";
@@ -84,45 +83,35 @@ const BottomNavigation: React.FC = () => {
         };
     }, []);
 
-    /* 페이지 프리페치 */
+    /* 페이지 프리페치 — mount 시 1회만 실행 */
     useEffect(() => {
         PREFETCH_ROUTES.forEach((route) => {
-            if (
-                route !== pathname &&
-                (!pathname.startsWith("/calculator") ||
-                    route !== pathname)
-            ) {
-                router.prefetch(route);
-            }
+            router.prefetch(route);
         });
-    }, [pathname, router]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [router]);
 
-    /* API 프리페치 */
+    /* API 프리페치 — mount 시 1회만 실행 */
     useEffect(() => {
-        const prefetchAPIs = async () => {
-            if (pathname !== "/") {
-                fetch("/api/ranking?prefetch=true", {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+
+        // 두 요청을 병렬로 실행
+        Promise.all([
+            fetch("/api/ranking?prefetch=true", {
+                method: "GET",
+                cache: "force-cache",
+            }).catch(() => {}),
+            fetch(
+                `/api/ranking?year=${year}&month=${month}&prefetch=true`,
+                {
                     method: "GET",
                     cache: "force-cache",
-                }).catch(() => {});
-            }
-
-            if (pathname !== "/ranking") {
-                const currentDate = new Date();
-                fetch(
-                    `/api/ranking?year=${currentDate.getFullYear()}&month=${
-                        currentDate.getMonth() + 1
-                    }&prefetch=true`,
-                    {
-                        method: "GET",
-                        cache: "force-cache",
-                    },
-                ).catch(() => {});
-            }
-        };
-
-        prefetchAPIs();
-    }, [pathname]);
+                }
+            ).catch(() => {}),
+        ]);
+    }, []);
 
     /* 활성 경로 판단 (pendingHref 우선) */
     const isActivePath = useCallback(
@@ -177,17 +166,6 @@ const BottomNavigation: React.FC = () => {
             <div className="flex items-center justify-around h-16 max-w-md mx-auto pt-2">
                 {navigationItems.map((item) => (
                     <div key={item.type} className="relative">
-                        {/* 숨겨진 프리페치 링크 */}
-                        <Link
-                            href={item.href}
-                            prefetch={true}
-                            className="hidden"
-                            aria-hidden="true"
-                        >
-                            {item.label}
-                        </Link>
-
-                        {/* 네비게이션 아이템 */}
                         <NavItem
                             type={item.type}
                             label={item.label}

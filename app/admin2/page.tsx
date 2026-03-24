@@ -3,32 +3,8 @@ import { getAdminAuth } from "@/lib/admin2/auth";
 import { getDashboardStats } from "@/lib/admin2/queries";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import SectionLabel from "@/components/atoms/SectionLabel";
-import MenuListItem from "@/components/molecules/MenuListItem";
-import DashboardMonthNav from "./components/DashboardMonthNav";
-import DashboardStatCards from "./components/DashboardStatCards";
-
-const menuItems = [
-    {
-        title: "회원 관리",
-        subtitle: "48명 · 활성 45명",
-        href: "/admin2/user",
-    },
-    {
-        title: "출석 관리",
-        subtitle: "이번 달 출석 기록",
-        href: "/admin2/attendance",
-    },
-    {
-        title: "통계 분석",
-        subtitle: "요일별 · 장소별 참여율",
-        href: "/admin2/analyze",
-    },
-    {
-        title: "설정",
-        subtitle: "장소 · 운영진 · 초대코드",
-        href: "/admin2/settings",
-    },
-];
+import AdminStatCard from "./components/ui/AdminStatCard";
+import DashboardContent from "./components/DashboardContent";
 
 // 월 선택은 searchParams로 처리 (RSC 친화적)
 export default async function Admin2DashboardPage({
@@ -39,48 +15,38 @@ export default async function Admin2DashboardPage({
     const { crewId } = await getAdminAuth();
     const params = await searchParams;
     const now = new Date();
-    const year = params.year ? parseInt(params.year) : now.getFullYear();
-    const month = params.month ? parseInt(params.month) : now.getMonth() + 1;
+    const year = params.year
+        ? parseInt(params.year)
+        : now.getFullYear();
+    const month = params.month
+        ? parseInt(params.month)
+        : now.getMonth() + 1;
 
     return (
-        <>
-            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="관리자 대시보드"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                />
-            </div>
+        <div className="flex flex-col min-h-screen bg-rh-bg-primary">
+            <PageHeader
+                title="관리자 대시보드"
+                backLink=""
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+            />
             <div className="flex-1 px-4 pt-4 pb-4 space-y-5">
-                <DashboardMonthNav year={year} month={month} />
-
-                <Suspense fallback={<StatCardsSkeleton />}>
-                    <DashboardStatCardsServer
+                <Suspense
+                    fallback={<DashboardSkeleton year={year} month={month} />}
+                >
+                    <DashboardContentServer
                         crewId={crewId}
                         year={year}
                         month={month}
                     />
                 </Suspense>
-
-                {/* 관리 메뉴 — .pen Screen/AdminDashboard */}
-                <SectionLabel>관리 메뉴</SectionLabel>
-                <div className="space-y-2">
-                    {menuItems.map((item) => (
-                        <MenuListItem
-                            key={item.href}
-                            title={item.title}
-                            subtitle={item.subtitle}
-                            href={item.href}
-                        />
-                    ))}
-                </div>
             </div>
-        </>
+        </div>
     );
 }
 
-// 서버 컴포넌트: 데이터 fetch 후 props 전달
-async function DashboardStatCardsServer({
+// 서버 컴포넌트: 데이터 fetch 후 클라이언트에 전달
+async function DashboardContentServer({
     crewId,
     year,
     month,
@@ -91,24 +57,60 @@ async function DashboardStatCardsServer({
 }) {
     const stats = await getDashboardStats(crewId, year, month);
     return (
-        <DashboardStatCards
+        <DashboardContent
+            year={year}
+            month={month}
             totalMembers={stats.totalMembers}
-            monthlyParticipationCount={stats.monthlyParticipationCount}
+            monthlyParticipationCount={
+                stats.monthlyParticipationCount
+            }
             monthlyHostCount={stats.monthlyHostCount}
         />
     );
 }
 
-function StatCardsSkeleton() {
+// 스켈레톤 (정적, animate-pulse 사용 금지)
+function DashboardSkeleton({
+    year,
+    month,
+}: {
+    year: number;
+    month: number;
+}) {
     return (
-        <div className="flex gap-3">
-            {[1, 2, 3].map((i) => (
-                <div
-                    key={i}
-                    className="flex-1 h-[90px] bg-rh-bg-surface rounded-[12px]"
-                />
-            ))}
-        </div>
+        <>
+            {/* MonthNav 자리 */}
+            <div className="flex items-center justify-center h-10">
+                <span className="text-base font-semibold text-white">
+                    {year}년 {month}월
+                </span>
+            </div>
+
+            {/* StatCards 스켈레톤 */}
+            <div className="flex gap-3">
+                {[1, 2, 3].map((i) => (
+                    <div
+                        key={i}
+                        className={
+                            "flex-1 h-[90px]"
+                            + " bg-rh-bg-surface rounded-xl"
+                        }
+                    />
+                ))}
+            </div>
+
+            {/* 관리 메뉴 스켈레톤 */}
+            <div className="h-4 w-16 bg-rh-bg-surface rounded" />
+            <div className="space-y-2">
+                {[1, 2, 3, 4].map((i) => (
+                    <div
+                        key={i}
+                        className={
+                            "h-[60px] bg-rh-bg-surface rounded-xl"
+                        }
+                    />
+                ))}
+            </div>
+        </>
     );
 }
-

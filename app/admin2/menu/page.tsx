@@ -1,6 +1,11 @@
+// app/admin2/menu/page.tsx
 import PageHeader from "@/components/organisms/common/PageHeader";
-import MenuListItem from "@/components/molecules/MenuListItem";
-import SectionLabel from "@/components/atoms/SectionLabel";
+import { AdminListItem } from "@/app/admin2/components/ui";
+import {
+    AnimatedList,
+    AnimatedItem,
+} from "@/components/atoms/AnimatedList";
+import FadeIn from "@/components/atoms/FadeIn";
 
 const menuItems = [
     {
@@ -33,26 +38,31 @@ const menuItems = [
 export default function AdminMenuPage() {
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
+            <div className="sticky top-0 z-50 bg-rh-bg-surface">
                 <PageHeader
                     title="메뉴"
                     iconColor="white"
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
-                <SectionLabel>관리 기능</SectionLabel>
-                <div className="space-y-2">
-                    {menuItems.map((item) => (
-                        <MenuListItem
-                            key={item.href}
-                            title={item.title}
-                            subtitle={item.subtitle}
-                            href={item.href}
-                        />
-                    ))}
+            <FadeIn>
+                <div className="flex-1 px-4 pt-4 pb-4 space-y-5">
+                    <span className="text-[11px] font-semibold text-rh-text-tertiary uppercase tracking-widest">
+                        관리 기능
+                    </span>
+                    <AnimatedList className="space-y-2">
+                        {menuItems.map((item) => (
+                            <AnimatedItem key={item.href}>
+                                <AdminListItem
+                                    title={item.title}
+                                    subtitle={item.subtitle}
+                                    href={item.href}
+                                />
+                            </AnimatedItem>
+                        ))}
+                    </AnimatedList>
                 </div>
-            </div>
+            </FadeIn>
         </>
     );
 }

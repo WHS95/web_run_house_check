@@ -1,4 +1,5 @@
 import PageHeader from "@/components/organisms/common/PageHeader";
+import NoticeManagement from "./components/NoticeManagement";
 
 export default function AdminNoticePage() {
     return (
@@ -11,11 +12,7 @@ export default function AdminNoticePage() {
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <div className="flex-1 flex items-center justify-center">
-                <p className="text-rh-text-secondary text-sm">
-                    준비 중입니다
-                </p>
-            </div>
+            <NoticeManagement />
         </>
     );
 }

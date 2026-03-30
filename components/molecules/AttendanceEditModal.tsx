@@ -21,7 +21,8 @@ interface AttendanceEditModalProps {
     location: string;
     isHost: boolean;
   }) => Promise<void>;
-  crewId?: string; // 크루 ID 추가
+  crewId?: string;
+  onDelete?: (recordId: string) => void;
 }
 
 const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
@@ -30,6 +31,7 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
   attendance,
   onSave,
   crewId,
+  onDelete,
 }) => {
   const [formData, setFormData] = useState({
     checkInTime: attendance.checkInTime,
@@ -295,6 +297,17 @@ const AttendanceEditModal: React.FC<AttendanceEditModalProps> = ({
             {isLoading ? "저장 중..." : "저장"}
           </Button>
         </div>
+
+        {/* 삭제 버튼 */}
+        {onDelete && (
+          <button
+            type='button'
+            onClick={() => onDelete(attendance.id)}
+            className='w-full mt-3 py-2.5 text-sm font-medium text-rh-status-error hover:bg-rh-status-error/10 rounded-xl transition-colors'
+          >
+            출석 기록 삭제
+          </button>
+        )}
       </div>
     </div>
   );

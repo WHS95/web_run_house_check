@@ -9,6 +9,7 @@ export interface AttendanceRecordWithUser {
     attendance_timestamp: string;
     location: string;
     exercise_type_id: number;
+    exercise_type_name: string;
     is_host: boolean;
     deleted_at: string | null;
     users: { first_name: string; last_name: string | null };
@@ -60,18 +61,33 @@ export const getMonthlyAttendance = cache(
         const { data, error } = await supabase
             .schema("attendance")
             .from("attendance_records")
-            .select("*")
+            .select(`
+                *,
+                exercise_types!attendance_records_exercise_type_id_fkey (
+                    name
+                )
+            `)
             .eq("crew_id", crewId)
             .is("deleted_at", null)
-            .gte("attendance_timestamp", `${startDate}T00:00:00Z`)
-            .lte("attendance_timestamp", `${endDate}T23:59:59Z`)
-            .order("attendance_timestamp", { ascending: false });
+            .gte(
+                "attendance_timestamp",
+                `${startDate}T00:00:00Z`,
+            )
+            .lte(
+                "attendance_timestamp",
+                `${endDate}T23:59:59Z`,
+            )
+            .order("attendance_timestamp", {
+                ascending: false,
+            });
 
         if (error) throw new Error("출석 데이터 조회 실패");
 
         // 유저 이름 조회
         const userIds = Array.from(
-            new Set((data || []).map((r: any) => r.user_id))
+            new Set(
+                (data || []).map((r: any) => r.user_id),
+            ),
         );
         const { data: usersData } = await supabase
             .schema("attendance")
@@ -81,7 +97,10 @@ export const getMonthlyAttendance = cache(
 
         const userMap: Record<
             string,
-            { first_name: string; last_name: string | null }
+            {
+                first_name: string;
+                last_name: string | null;
+            }
         > = {};
         (usersData || []).forEach((u: any) => {
             userMap[u.id] = {
@@ -90,20 +109,25 @@ export const getMonthlyAttendance = cache(
             };
         });
 
-        return (data || []).map((r: any): AttendanceRecordWithUser => ({
-            id: r.id,
-            user_id: r.user_id,
-            crew_id: r.crew_id,
-            attendance_timestamp: r.attendance_timestamp,
-            location: r.location,
-            exercise_type_id: r.exercise_type_id,
-            is_host: r.is_host,
-            deleted_at: r.deleted_at,
-            users: userMap[r.user_id] || {
-                first_name: "이름 없음",
-                last_name: null,
-            },
-        }));
+        return (data || []).map(
+            (r: any): AttendanceRecordWithUser => ({
+                id: r.id,
+                user_id: r.user_id,
+                crew_id: r.crew_id,
+                attendance_timestamp:
+                    r.attendance_timestamp,
+                location: r.location,
+                exercise_type_id: r.exercise_type_id,
+                exercise_type_name:
+                    r.exercise_types?.name || "기타",
+                is_host: r.is_host,
+                deleted_at: r.deleted_at,
+                users: userMap[r.user_id] || {
+                    first_name: "이름 없음",
+                    last_name: null,
+                },
+            }),
+        );
     }
 );
 

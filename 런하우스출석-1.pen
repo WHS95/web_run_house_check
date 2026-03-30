@@ -20696,6 +20696,591 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "p0rTq",
+      "x": 1800,
+      "y": 0,
+      "name": "Screen/MyPage",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg-primary",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "utVPh",
+          "type": "ref",
+          "ref": "MGLbz",
+          "width": "fill_container",
+          "name": "Header",
+          "x": 0,
+          "y": 0,
+          "descendants": {
+            "bCL8Z": {
+              "content": "MY"
+            },
+            "m1wGl": {
+              "type": "frame",
+              "id": "OV1zi",
+              "name": "settingsIcon",
+              "width": 40,
+              "height": 40,
+              "fill": "$bg-primary",
+              "cornerRadius": "$radius-md",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "CBTx7",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "settings",
+                  "iconFontFamily": "lucide",
+                  "fill": "$text-secondary"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "ElGEK",
+          "name": "Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "dmeue",
+              "name": "Profile",
+              "width": "fill_container",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "edLQI",
+                  "name": "Avatar",
+                  "width": 64,
+                  "height": 64,
+                  "fill": "$accent-blue",
+                  "cornerRadius": "$radius-full",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YpClc",
+                      "fill": "$text-primary",
+                      "content": "김",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "6rYlR",
+                  "name": "ProfileInfo",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "iu9Y6",
+                      "fill": "$text-primary",
+                      "content": "김런너 (1990)",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "QBRhI",
+                      "fill": "$text-secondary",
+                      "content": "RunHouse Crew · 멤버",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "gGpay",
+              "name": "Stats",
+              "width": "fill_container",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WtG6O",
+                  "name": "StatTotal",
+                  "width": "fill_container",
+                  "height": 84,
+                  "fill": "$bg-surface",
+                  "cornerRadius": "$radius-md",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "v2tO1",
+                      "fill": "$accent-blue",
+                      "content": "24",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Pk43k",
+                      "fill": "$text-secondary",
+                      "content": "총 출석",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "xMxem",
+                  "name": "StatMonth",
+                  "width": "fill_container",
+                  "height": 84,
+                  "fill": "$bg-surface",
+                  "cornerRadius": "$radius-md",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "zYKwz",
+                      "fill": "$accent-blue",
+                      "content": "8",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "iUzXo",
+                      "fill": "$text-secondary",
+                      "content": "이번 달",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "tnH1h",
+                  "name": "StatCreated",
+                  "width": "fill_container",
+                  "height": 84,
+                  "fill": "$bg-surface",
+                  "cornerRadius": "$radius-md",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Us3rA",
+                      "fill": "$accent-blue",
+                      "content": "3",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "dnsex",
+                      "fill": "$text-secondary",
+                      "content": "개설 횟수",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "uKH3M",
+              "name": "SectionLabel",
+              "fill": "$text-secondary",
+              "content": "활동 기록",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "08YTs",
+              "name": "ActivityList",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "id": "upHu1",
+                  "type": "ref",
+                  "ref": "AfJMV",
+                  "width": "fill_container",
+                  "name": "Activity1",
+                  "x": 0,
+                  "y": 0,
+                  "descendants": {
+                    "iK6WV": {
+                      "content": "3월 22일 (토)"
+                    },
+                    "ZiZFM": {
+                      "content": "한강공원 · 러닝 · 19:00"
+                    },
+                    "6ZrnJ": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "id": "vMNT1",
+                  "type": "ref",
+                  "ref": "AfJMV",
+                  "width": "fill_container",
+                  "name": "Activity2",
+                  "x": 0,
+                  "y": 71,
+                  "descendants": {
+                    "iK6WV": {
+                      "content": "3월 20일 (목)"
+                    },
+                    "ZiZFM": {
+                      "content": "올림픽공원 · 러닝 · 20:00"
+                    },
+                    "6ZrnJ": {
+                      "enabled": false
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "Ma7FZ",
+              "name": "SettingsLabel",
+              "fill": "$text-secondary",
+              "content": "설정",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "oQFug",
+              "name": "SettingsGroup",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "id": "uUJ8V",
+                  "type": "ref",
+                  "ref": "5Hrnv",
+                  "width": "fill_container",
+                  "name": "NotificationToggle",
+                  "x": 0,
+                  "y": 0,
+                  "descendants": {
+                    "gLrOb": {
+                      "content": "푸시 알림"
+                    }
+                  }
+                },
+                {
+                  "id": "Loudp",
+                  "type": "ref",
+                  "ref": "AfJMV",
+                  "width": "fill_container",
+                  "name": "EditProfile",
+                  "x": 0,
+                  "y": 60,
+                  "descendants": {
+                    "iK6WV": {
+                      "content": "내정보 변경"
+                    },
+                    "ZiZFM": {
+                      "content": "이름, 연락처 등 개인정보 수정"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "grhDG",
+              "name": "LogoutButton",
+              "width": "fill_container",
+              "height": 48,
+              "fill": "$bg-surface",
+              "cornerRadius": "$radius-lg",
+              "gap": 8,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "HcYTp",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "log-out",
+                  "iconFontFamily": "lucide",
+                  "fill": "$status-error"
+                },
+                {
+                  "type": "text",
+                  "id": "Uwqwh",
+                  "fill": "$status-error",
+                  "content": "로그아웃",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "T4ZPK",
+          "type": "ref",
+          "ref": "metZY",
+          "width": "fill_container",
+          "name": "BottomNav",
+          "x": 0,
+          "y": 780,
+          "descendants": {
+            "fl3KD": {
+              "fill": "$text-muted"
+            },
+            "MQKPf": {
+              "fill": "$text-muted",
+              "fontWeight": "500"
+            },
+            "YTWJc": {
+              "fill": "$accent-blue"
+            },
+            "90ugr": {
+              "fill": "$accent-blue",
+              "fontWeight": "600"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "9Ep9x",
+      "x": 2250,
+      "y": 0,
+      "name": "Screen/MyPage-EditProfile",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg-primary",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "dGaYx",
+          "type": "ref",
+          "ref": "MGLbz",
+          "width": "fill_container",
+          "name": "Header",
+          "x": 0,
+          "y": 0,
+          "descendants": {
+            "pdGRj": {
+              "enabled": true,
+              "y": 1
+            },
+            "bCL8Z": {
+              "content": "내정보 변경",
+              "x": 36
+            },
+            "m1wGl": {
+              "height": "fit_content(0)",
+              "width": "fit_content(0)"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "t9YUp",
+          "name": "Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            24,
+            16,
+            16,
+            16
+          ],
+          "children": [
+            {
+              "id": "itVsU",
+              "type": "ref",
+              "ref": "4FISI",
+              "width": "fill_container",
+              "name": "NameField",
+              "x": 16,
+              "y": 24,
+              "descendants": {
+                "2iAUJ": {
+                  "content": "이름"
+                },
+                "bun9m": {
+                  "width": "fill_container"
+                },
+                "bun9m/XAq1K": {
+                  "content": "김런너"
+                }
+              }
+            },
+            {
+              "id": "yhzuG",
+              "type": "ref",
+              "ref": "4FISI",
+              "width": "fill_container",
+              "name": "PhoneField",
+              "x": 16,
+              "y": 119,
+              "descendants": {
+                "2iAUJ": {
+                  "content": "연락처"
+                },
+                "bun9m": {
+                  "width": "fill_container"
+                },
+                "bun9m/XAq1K": {
+                  "content": "010-1234-5678"
+                }
+              }
+            },
+            {
+              "id": "Iua5U",
+              "type": "ref",
+              "ref": "4FISI",
+              "width": "fill_container",
+              "name": "EmailField",
+              "x": 16,
+              "y": 214,
+              "descendants": {
+                "2iAUJ": {
+                  "content": "이메일"
+                },
+                "bun9m": {
+                  "width": "fill_container"
+                },
+                "bun9m/XAq1K": {
+                  "content": "runner@email.com",
+                  "fill": "$text-tertiary"
+                },
+                "01sdh": {
+                  "enabled": true,
+                  "content": "이메일은 변경할 수 없습니다"
+                }
+              }
+            },
+            {
+              "id": "kbaMl",
+              "type": "ref",
+              "ref": "4FISI",
+              "width": "fill_container",
+              "name": "BirthYearField",
+              "x": 16,
+              "y": 331,
+              "descendants": {
+                "2iAUJ": {
+                  "content": "출생연도"
+                },
+                "bun9m": {
+                  "width": "fill_container"
+                },
+                "bun9m/XAq1K": {
+                  "content": "1990"
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "lRvBH",
+              "name": "Spacer",
+              "width": "fill_container",
+              "height": "fill_container"
+            },
+            {
+              "id": "D3RW1",
+              "type": "ref",
+              "ref": "lAuUw",
+              "width": "fill_container",
+              "name": "SaveButton",
+              "x": 16,
+              "y": 728,
+              "descendants": {
+                "7Em1l": {
+                  "enabled": false
+                },
+                "LH7Mp": {
+                  "x": 153,
+                  "content": "저장하기"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "A6aB6",
+      "x": 1800,
+      "y": -50,
+      "name": "labelMyPage",
+      "fill": "#FFFFFF",
+      "content": "마이페이지 (사용자 화면)",
+      "fontFamily": "Inter",
+      "fontSize": 24,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "yOo2r",
+      "x": 1800,
+      "y": -20,
+      "name": "sublabelMyPage",
+      "fill": "#8899AA",
+      "content": "마이페이지 · 내정보 변경",
+      "fontFamily": "Inter",
+      "fontSize": 13,
+      "fontWeight": "normal"
     }
   ],
   "variables": {

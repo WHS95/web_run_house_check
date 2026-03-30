@@ -1,4 +1,3 @@
-// app/admin2/menu/page.tsx
 import PageHeader from "@/components/organisms/common/PageHeader";
 import { AdminListItem } from "@/app/admin2/components/ui";
 import {
@@ -17,6 +16,11 @@ const menuItems = [
         title: "설정",
         subtitle: "장소 · 운영진 · 초대코드",
         href: "/admin2/settings",
+    },
+    {
+        title: "러닝 장소 관리",
+        subtitle: "러닝 장소 추가 · 수정 · 삭제",
+        href: "/admin2/settings?tab=location",
     },
     {
         title: "공지사항 관리",

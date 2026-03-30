@@ -222,8 +222,8 @@ export default function AdminGradeRecommendations({
                                     <span className="bg-rh-bg-muted rounded-full px-2 py-0.5 text-xs text-rh-text-secondary">
                                         {rec.current_grade_name}
                                     </span>
-                                    <ArrowRight className="w-3.5 h-3.5 text-green-400" />
-                                    <span className="bg-green-500/10 rounded-full px-2 py-0.5 text-xs text-green-400 font-semibold">
+                                    <ArrowRight className="w-3.5 h-3.5 text-rh-accent" />
+                                    <span className="bg-rh-accent/10 rounded-full px-2 py-0.5 text-xs text-rh-accent font-semibold">
                                         {rec.recommended_grade_name}
                                     </span>
                                 </div>

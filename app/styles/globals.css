@@ -436,6 +436,24 @@
             0 0 0 4px rgba(102, 159, 242, 0.1);
     }
 
+    /* === 네이티브 터치 피드백 (iOS+Android 공통) === */
+    /* 모든 버튼·터치 가능 요소에 눌림 효과 */
+    button,
+    [role="button"],
+    .ios-grouped-list-item,
+    a[href] {
+        -webkit-tap-highlight-color: transparent;
+        transition: transform 0.1s ease, opacity 0.1s ease;
+    }
+
+    button:active,
+    [role="button"]:active,
+    .ios-grouped-list-item:active,
+    a[href]:active {
+        transform: scale(0.97);
+        opacity: 0.8;
+    }
+
     /* === 네이티브 스크롤 === */
     .native-scroll {
         -webkit-overflow-scrolling: touch;

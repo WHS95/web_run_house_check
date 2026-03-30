@@ -429,7 +429,7 @@ export default function AdminGradeSettings({
                     }}
                     className={`relative w-11 h-6 rounded-full transition-colors ${
                         formData.can_host
-                            ? "bg-green-500"
+                            ? "bg-rh-accent"
                             : "bg-rh-bg-muted"
                     }`}
                 >
@@ -468,7 +468,7 @@ export default function AdminGradeSettings({
     // 로딩 스켈레톤
     if (isLoading) {
         return (
-            <div className="space-y-3 animate-pulse">
+            <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
                     <div
                         key={i}
@@ -547,11 +547,11 @@ export default function AdminGradeSettings({
                                                         "미지정"}
                                                 </span>
                                                 {grade.can_host ? (
-                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/10 text-green-400">
+                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-rh-status-success/10 text-rh-status-success">
                                                         호스트 가능
                                                     </span>
                                                 ) : (
-                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-red-500/10 text-red-400">
+                                                    <span className="px-2 py-0.5 text-xs rounded-full bg-rh-status-error/10 text-rh-status-error">
                                                         호스트 불가
                                                     </span>
                                                 )}
@@ -601,7 +601,7 @@ export default function AdminGradeSettings({
                                                 setOpenMenuId(null);
                                                 handleDeleteGrade(grade.id);
                                             }}
-                                            className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-rh-bg-surface transition-colors"
+                                            className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-rh-status-error hover:bg-rh-bg-surface transition-colors"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
                                             삭제

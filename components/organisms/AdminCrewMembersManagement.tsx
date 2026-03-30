@@ -288,17 +288,17 @@ export default function AdminCrewMembersManagement({
 
   if (loading) {
     return (
-      <div className='space-y-3 animate-pulse'>
+      <div className='space-y-3'>
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className='bg-rh-bg-surface rounded-rh-lg p-4'
+            className='bg-rh-bg-surface rounded-xl p-4'
           >
             <div className='flex items-center space-x-3'>
-              <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
-              <div className='flex-1 space-y-1'>
-                <div className='h-[1rem] bg-rh-bg-muted rounded w-[120px]'></div>
-                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-1/2'></div>
+              <div className='w-10 h-10 bg-rh-bg-muted rounded-full'></div>
+              <div className='flex-1 space-y-1.5'>
+                <div className='h-4 bg-rh-bg-muted rounded w-24'></div>
+                <div className='h-3 bg-rh-bg-muted rounded w-16'></div>
               </div>
             </div>
           </div>

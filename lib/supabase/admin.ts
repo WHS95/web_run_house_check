@@ -441,6 +441,7 @@ export interface UserForAdmin {
   join_date: string | null;
   status: string | null; // NULL이면 활성, 'suspended' 등이면 비활성
   last_attendance_date: string | null;
+  attendance_count?: number;
   crew_grade_id?: number | null;
 }
 

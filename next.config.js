@@ -9,7 +9,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: [
       "@radix-ui/react-dialog",
-      "@radix-ui/react-dropdown-menu", 
+      "@radix-ui/react-dropdown-menu",
       "@radix-ui/react-avatar",
       "@radix-ui/react-scroll-area",
       "@radix-ui/react-separator",
@@ -17,6 +17,9 @@ const nextConfig = {
       "@radix-ui/react-tooltip",
       "lucide-react",
       "framer-motion",
+      "react-hook-form",
+      "@hookform/resolvers",
+      "zod",
     ],
     turbo: {
       rules: {
@@ -115,6 +118,26 @@ const nextConfig = {
       // 폰트 및 CSS 캐싱
       {
         source: "/fonts/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // 이미지 자산 장기 캐싱
+      {
+        source: "/:path*.(png|jpg|jpeg|webp|avif|svg|ico)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // JS/CSS 번들 캐싱
+      {
+        source: "/_next/static/(.*)",
         headers: [
           {
             key: "Cache-Control",

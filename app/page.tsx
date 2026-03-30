@@ -1,18 +1,7 @@
 import React, { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import dynamic from "next/dynamic";
 import ClientHomePage from "@/components/pages/ClientHomePage";
-import LoadingSpinner from "@/components/atoms/LoadingSpinner";
-
-// 동적 로딩으로 번들 크기 최적화 (클라이언트 전용)
-const EnhancedHomeTemplate = dynamic(
-  () => import("@/components/templates/EnhancedHomeTemplate"),
-  {
-    ssr: false,
-    loading: () => <LoadingSpinner size='sm' color='white' />,
-  }
-);
 
 // 서버 컴포넌트로 초기 데이터 로딩 최적화
 async function getInitialHomeData() {

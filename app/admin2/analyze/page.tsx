@@ -159,7 +159,7 @@ export default async function Admin2AnalyzePage({
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
+            <div className="flex-1 px-4 pt-4 pb-4 space-y-5">
                 <YearMonthSelector year={year} month={month} />
 
                 <Suspense fallback={<AnalyticsSkeleton />}>
@@ -189,9 +189,9 @@ async function AnalyticsChartsServer({
     const overallStats = computeOverallStats(analytics);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-5">
             {/* 요일별 참여율 */}
-            <div className="bg-rh-bg-surface rounded-rh-md p-4">
+            <div className="bg-rh-bg-surface rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-semibold text-white">
                         요일별 참여율
@@ -212,7 +212,7 @@ async function AnalyticsChartsServer({
             </div>
 
             {/* 장소별 참여율 */}
-            <div className="bg-rh-bg-surface rounded-rh-md p-4">
+            <div className="bg-rh-bg-surface rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-semibold text-white">
                         장소별 참여율
@@ -233,7 +233,7 @@ async function AnalyticsChartsServer({
             </div>
 
             {/* 전체 대비 출석 현황 */}
-            <div className="bg-rh-bg-surface rounded-rh-md p-4">
+            <div className="bg-rh-bg-surface rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-semibold text-white">
                         전체 대비 출석 현황
@@ -258,11 +258,11 @@ async function AnalyticsChartsServer({
 
 function AnalyticsSkeleton() {
     return (
-        <div className="space-y-4">
+        <div className="space-y-5">
             {[1, 2, 3].map((i) => (
                 <div
                     key={i}
-                    className="bg-rh-bg-surface rounded-rh-md p-4 h-[200px]"
+                    className="bg-rh-bg-surface rounded-xl p-4 h-[200px]"
                 />
             ))}
         </div>

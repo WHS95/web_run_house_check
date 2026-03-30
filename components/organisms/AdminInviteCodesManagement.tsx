@@ -264,14 +264,14 @@ export default function AdminInviteCodesManagement({
 
   if (isLoading) {
     return (
-      <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
-        <div className='p-4 space-y-3 animate-pulse'>
-          <div className='bg-rh-bg-muted/20 rounded-rh-lg p-4'>
+      <div className='bg-rh-bg-surface rounded-xl shadow-sm overflow-hidden'>
+        <div className='p-4 space-y-3'>
+          <div className='bg-rh-bg-muted/20 rounded-xl p-4'>
             <div className='flex items-center space-x-3'>
-              <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
+              <div className='w-12 h-12 bg-rh-bg-muted rounded-full'></div>
               <div className='flex-1 space-y-1'>
-                <div className='h-[1rem] bg-rh-bg-muted rounded w-[120px]'></div>
-                <div className='h-[0.875rem] bg-rh-bg-muted rounded w-1/2'></div>
+                <div className='h-4 bg-rh-bg-muted rounded w-[120px]'></div>
+                <div className='h-3.5 bg-rh-bg-muted rounded w-1/2'></div>
               </div>
             </div>
           </div>
@@ -281,13 +281,13 @@ export default function AdminInviteCodesManagement({
   }
 
   return (
-    <div className='bg-rh-bg-surface rounded-rh-lg shadow-sm overflow-hidden'>
+    <div className='bg-rh-bg-surface rounded-xl shadow-sm overflow-hidden'>
       {/* 헤더 */}
       <div className='p-4 border-b border-rh-border'>
         <div className='flex justify-between items-center'>
           <div className='flex items-center space-x-2'>
-            <Ticket className='w-[1.25rem] h-[1.25rem] text-rh-accent' />
-            <span className='text-[1.125rem] font-bold text-white'>
+            <Ticket className='w-5 h-5 text-rh-accent' />
+            <span className='text-lg font-bold text-white'>
               초대코드 관리
             </span>
           </div>
@@ -297,7 +297,7 @@ export default function AdminInviteCodesManagement({
                 haptic.light();
                 setIsEditing(true);
               }}
-              className='px-3 py-3 bg-rh-accent hover:bg-rh-accent-hover/80 text-white rounded-rh-lg text-[0.875rem] font-medium transition-colors active:scale-95 disabled:opacity-50'
+              className='px-3 py-3 bg-rh-accent hover:bg-rh-accent-hover/80 text-white rounded-xl text-sm font-medium transition-colors active:scale-95 disabled:opacity-50'
               disabled={isEditing}
             >
               <Plus className='w-[1rem] h-[1rem]' />
@@ -309,9 +309,9 @@ export default function AdminInviteCodesManagement({
       <div className='p-4 space-y-3'>
         {/* 초대코드 생성/수정 폼 */}
         {isEditing && (
-          <div className='border border-rh-accent bg-rh-accent/20 rounded-rh-lg p-4 space-y-2'>
+          <div className='border border-rh-accent bg-rh-accent/20 rounded-xl p-4 space-y-2'>
             <div>
-              <label className='block mb-2 text-[0.875rem] font-medium text-white'>
+              <label className='block mb-2 text-sm font-medium text-white'>
                 초대코드 *
               </label>
               <div className='flex space-x-2'>
@@ -434,7 +434,7 @@ export default function AdminInviteCodesManagement({
                     size='sm'
                     onClick={handleRegenerateInviteCode}
                     disabled={actionLoading}
-                    className='p-2 text-orange-400 hover:bg-orange-500/20'
+                    className='p-2 text-rh-status-warning hover:bg-rh-status-warning/20'
                   >
                     <Shuffle className='w-4 h-4' />
                   </Button>

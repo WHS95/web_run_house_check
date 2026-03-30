@@ -25,11 +25,11 @@ interface AdminGradeAssignmentProps {
 }
 
 const avatarColors = [
-    "bg-blue-500/20 text-blue-400",
-    "bg-green-500/20 text-green-400",
-    "bg-red-500/20 text-red-400",
-    "bg-amber-500/20 text-amber-400",
-    "bg-purple-500/20 text-purple-400",
+    "bg-rh-accent/20 text-rh-accent",
+    "bg-rh-status-success/20 text-rh-status-success",
+    "bg-rh-status-error/20 text-rh-status-error",
+    "bg-rh-status-warning/20 text-rh-status-warning",
+    "bg-rh-bg-muted/40 text-rh-text-secondary",
 ];
 
 function getAvatarColor(index: number): string {

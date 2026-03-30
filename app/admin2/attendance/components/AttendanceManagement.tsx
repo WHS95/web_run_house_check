@@ -1,24 +1,22 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, {
+    useState,
+    useMemo,
+    useCallback,
+    memo,
+} from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+    AnimatedList,
+    AnimatedItem,
+} from "@/components/atoms/AnimatedList";
 import {
-    Search,
-    MoreVertical,
-    MapPin,
-    Clock,
-    Edit,
-    UserPlus,
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
-import MonthNavigator from "@/components/molecules/MonthNavigator";
+    AdminMonthNav,
+    AdminSmallButton,
+    AdminAlertDialog,
+    AttendanceRow,
+} from "@/app/admin2/components/ui";
 import AttendanceEditModal from "@/components/molecules/AttendanceEditModal";
 import BulkAttendanceManagement from "@/components/organisms/BulkAttendanceManagement";
 import type { AttendanceRecord } from "@/lib/supabase/admin";
@@ -33,36 +31,103 @@ interface Props {
     day: number;
 }
 
-// raw 레코드를 AttendanceRecord로 변환
-function toAttendanceRecord(r: AttendanceRecordWithUser): AttendanceRecord {
+/* ── 유틸 ── */
+function toAttendanceRecord(
+    r: AttendanceRecordWithUser,
+): AttendanceRecord {
     return {
         id: r.id,
         userId: r.user_id,
-        userName: r.users?.first_name || "이름 없음",
+        userName:
+            r.users?.first_name || "이름 없음",
         checkInTime: r.attendance_timestamp,
         location: r.location || "",
-        exerciseType: "",
+        exerciseType: r.exercise_type_name || "기타",
         status: "present",
         isHost: r.is_host,
         deletedAt: r.deleted_at,
     };
 }
 
-// 날짜를 YYYY-MM-DD로 포맷
 function formatDateStr(date: Date) {
     const y = date.getFullYear();
-    const m = (date.getMonth() + 1).toString().padStart(2, "0");
+    const m = (date.getMonth() + 1)
+        .toString()
+        .padStart(2, "0");
     const d = date.getDate().toString().padStart(2, "0");
     return `${y}-${m}-${d}`;
 }
 
-// KST 날짜 추출 (UTC timestamp → 한국 날짜)
 function getKSTDateStr(timestamp: string): string {
     const utcDate = new Date(timestamp);
-    const kstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+    const kstDate = new Date(
+        utcDate.getTime() + 9 * 60 * 60 * 1000,
+    );
     return formatDateStr(kstDate);
 }
 
+function getKSTTime(timestamp: string): string {
+    const utcDate = new Date(timestamp);
+    const kstDate = new Date(
+        utcDate.getTime() + 9 * 60 * 60 * 1000,
+    );
+    return kstDate.toLocaleTimeString("ko-KR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    });
+}
+
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+/* ── 캘린더 셀 ── */
+const CalendarCell = memo(function CalendarCell({
+    date,
+    isCurrentMonth,
+    isSelected,
+    isToday,
+    count,
+    onSelect,
+}: {
+    date: Date;
+    isCurrentMonth: boolean;
+    isSelected: boolean;
+    isToday: boolean;
+    count: number;
+    onSelect: (day: number) => void;
+}) {
+    return (
+        <button
+            onClick={() => {
+                if (isCurrentMonth)
+                    onSelect(date.getDate());
+            }}
+            className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-xs transition-colors ${
+                !isCurrentMonth
+                    ? "text-rh-text-muted/30"
+                    : isSelected
+                      ? "bg-rh-accent text-white"
+                      : isToday
+                        ? "bg-rh-accent/20 text-rh-accent"
+                        : "text-white hover:bg-rh-bg-muted/30"
+            }`}
+            disabled={!isCurrentMonth}
+        >
+            <span className="font-medium">
+                {date.getDate()}
+            </span>
+            {count > 0 && isCurrentMonth && (
+                <span
+                    className={`text-[9px] leading-none ${isSelected ? "text-white/80" : "text-rh-accent"}`}
+                >
+                    {count}
+                </span>
+            )}
+        </button>
+    );
+});
+
+/* ── 메인 ── */
 export default function AttendanceManagement({
     initialRecords,
     crewId,
@@ -75,131 +140,160 @@ export default function AttendanceManagement({
 
     const [records, setRecords] = useState(initialRecords);
     const [selectedDay, setSelectedDay] = useState(day);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] =
+        useState(false);
     const [selectedAttendance, setSelectedAttendance] =
         useState<AttendanceRecord | null>(null);
     const [showBulk, setShowBulk] = useState(false);
-    const [isDeletingRecord, setIsDeletingRecord] = useState<string | null>(
-        null
-    );
+    const [isDeletingRecord, setIsDeletingRecord] =
+        useState<string | null>(null);
+    const [deleteDialog, setDeleteDialog] = useState<{
+        open: boolean;
+        recordId: string;
+    }>({ open: false, recordId: "" });
 
-    // 레코드를 날짜별로 그룹화 (KST 기준)
+    /* 날짜별 그룹화 */
     const attendanceByDate = useMemo(() => {
-        const map: Record<string, AttendanceRecordWithUser[]> = {};
+        const map: Record<
+            string,
+            AttendanceRecordWithUser[]
+        > = {};
         records.forEach((r) => {
-            const dateStr = getKSTDateStr(r.attendance_timestamp);
+            const dateStr = getKSTDateStr(
+                r.attendance_timestamp,
+            );
             if (!map[dateStr]) map[dateStr] = [];
             map[dateStr].push(r);
         });
         return map;
     }, [records]);
 
-    // 날짜별 카운트 (캘린더 표시용)
     const dateCounts = useMemo(() => {
         const map: Record<string, number> = {};
-        Object.entries(attendanceByDate).forEach(([date, recs]) => {
-            map[date] = recs.length;
-        });
+        Object.entries(attendanceByDate).forEach(
+            ([date, recs]) => {
+                map[date] = recs.length;
+            },
+        );
         return map;
     }, [attendanceByDate]);
 
-    // 선택된 날짜의 출석 데이터
+    /* 선택 날짜 출석 */
     const selectedDateStr = `${year}-${month.toString().padStart(2, "0")}-${selectedDay.toString().padStart(2, "0")}`;
-    const selectedDateRecords = useMemo(() => {
-        const recs = attendanceByDate[selectedDateStr] || [];
-        return recs.map(toAttendanceRecord);
-    }, [attendanceByDate, selectedDateStr]);
+    const selectedDateRecords = useMemo(
+        () =>
+            (attendanceByDate[selectedDateStr] || []).map(
+                toAttendanceRecord,
+            ),
+        [attendanceByDate, selectedDateStr],
+    );
 
-    // 검색 필터
-    const filteredRecords = useMemo(() => {
-        if (!searchTerm) return selectedDateRecords;
-        const term = searchTerm.toLowerCase();
-        return selectedDateRecords.filter(
-            (r) =>
-                r.userName.toLowerCase().includes(term) ||
-                r.location.toLowerCase().includes(term)
-        );
-    }, [selectedDateRecords, searchTerm]);
+    /* 요일 문자열 */
+    const dayOfWeek = useMemo(() => {
+        const d = new Date(year, month - 1, selectedDay);
+        return WEEKDAYS[d.getDay()];
+    }, [year, month, selectedDay]);
 
-    // 모임 그룹화 (장소 + 시간)
-    const groupedMeetings = useMemo(() => {
-        const groups: Record<string, AttendanceRecord[]> = {};
-        filteredRecords.forEach((r) => {
-            const time = new Date(r.checkInTime).toLocaleTimeString("ko-KR", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-            });
-            const key = `${r.location}_${time}`;
-            if (!groups[key]) groups[key] = [];
-            groups[key].push(r);
-        });
-        return Object.entries(groups).map(([key, recs]) => {
-            const [location, time] = key.split("_");
-            return { location, time, records: recs };
-        });
-    }, [filteredRecords]);
-
-    // 월 네비게이션
-    const handlePrevMonth = () => {
+    /* 월 네비게이션 */
+    const handlePrevMonth = useCallback(() => {
         const m = month <= 1 ? 12 : month - 1;
         const y = month <= 1 ? year - 1 : year;
-        router.push(`${pathname}?year=${y}&month=${m}&day=1`);
-    };
-    const handleNextMonth = () => {
+        router.push(
+            `${pathname}?year=${y}&month=${m}&day=1`,
+        );
+    }, [month, year, router, pathname]);
+
+    const handleNextMonth = useCallback(() => {
         const m = month >= 12 ? 1 : month + 1;
         const y = month >= 12 ? year + 1 : year;
-        router.push(`${pathname}?year=${y}&month=${m}&day=1`);
-    };
+        router.push(
+            `${pathname}?year=${y}&month=${m}&day=1`,
+        );
+    }, [month, year, router, pathname]);
 
-    // 캘린더 생성
-    const firstDay = new Date(year, month - 1, 1);
-    const lastDay = new Date(year, month, 0);
-    const startDayOfWeek = firstDay.getDay();
+    /* 캘린더 데이터 */
+    const calendarDays = useMemo(() => {
+        const firstDay = new Date(year, month - 1, 1);
+        const lastDay = new Date(year, month, 0);
+        const startDayOfWeek = firstDay.getDay();
+        const days: {
+            date: Date;
+            isCurrentMonth: boolean;
+        }[] = [];
 
-    const calendarDays: { date: Date; isCurrentMonth: boolean }[] = [];
-    // 이전 달
-    for (let i = startDayOfWeek - 1; i >= 0; i--) {
-        const d = new Date(firstDay);
-        d.setDate(d.getDate() - i - 1);
-        calendarDays.push({ date: d, isCurrentMonth: false });
-    }
-    // 현재 달
-    for (let d = 1; d <= lastDay.getDate(); d++) {
-        calendarDays.push({
-            date: new Date(year, month - 1, d),
-            isCurrentMonth: true,
-        });
-    }
-    // 다음 달 (6주까지)
-    const remaining = 42 - calendarDays.length;
-    for (let d = 1; d <= remaining; d++) {
-        calendarDays.push({
-            date: new Date(year, month, d),
-            isCurrentMonth: false,
-        });
-    }
+        for (let i = startDayOfWeek - 1; i >= 0; i--) {
+            const d = new Date(firstDay);
+            d.setDate(d.getDate() - i - 1);
+            days.push({
+                date: d,
+                isCurrentMonth: false,
+            });
+        }
+        for (let d = 1; d <= lastDay.getDate(); d++) {
+            days.push({
+                date: new Date(year, month - 1, d),
+                isCurrentMonth: true,
+            });
+        }
+        const remaining = 42 - days.length;
+        for (let d = 1; d <= remaining; d++) {
+            days.push({
+                date: new Date(year, month, d),
+                isCurrentMonth: false,
+            });
+        }
+        return days;
+    }, [year, month]);
 
-    const handleDeleteRecord = async (recordId: string) => {
+    const today = useMemo(() => new Date(), []);
+
+    /* 삭제 */
+    const handleDeleteConfirm = useCallback(async () => {
+        const { recordId } = deleteDialog;
+        setDeleteDialog({ open: false, recordId: "" });
         setIsDeletingRecord(recordId);
         try {
-            const { success } = await deleteAttendanceRecord(recordId);
+            const { success } =
+                await deleteAttendanceRecord(recordId);
             if (success) {
-                setRecords((prev) => prev.filter((r) => r.id !== recordId));
+                setRecords((prev) =>
+                    prev.filter((r) => r.id !== recordId),
+                );
             }
         } finally {
             setIsDeletingRecord(null);
         }
-    };
+    }, [deleteDialog]);
 
-    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+    /* 행 클릭 → 수정 모달 */
+    const handleRowClick = useCallback(
+        (record: AttendanceRecord) => {
+            setSelectedAttendance(record);
+            setEditModalOpen(true);
+        },
+        [],
+    );
+
+    /* detail 문자열 생성: 장소 · 운동종류 · 시간 */
+    const buildDetail = useCallback(
+        (record: AttendanceRecord) => {
+            const time = getKSTTime(record.checkInTime);
+            return [
+                record.location,
+                record.exerciseType,
+                time,
+            ]
+                .filter(Boolean)
+                .join(" · ");
+        },
+        [],
+    );
 
     return (
         <>
             <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
                 {/* 월 네비게이터 */}
-                <MonthNavigator
+                <AdminMonthNav
                     year={year}
                     month={month}
                     onPrev={handlePrevMonth}
@@ -207,9 +301,9 @@ export default function AttendanceManagement({
                 />
 
                 {/* 캘린더 그리드 */}
-                <div className="bg-rh-bg-surface rounded-[12px] p-3">
+                <div className="bg-rh-bg-surface rounded-xl p-3">
                     <div className="grid grid-cols-7 gap-1 mb-2">
-                        {weekdays.map((d) => (
+                        {WEEKDAYS.map((d) => (
                             <div
                                 key={d}
                                 className="text-center text-[11px] font-medium text-rh-text-tertiary py-1"
@@ -219,179 +313,107 @@ export default function AttendanceManagement({
                         ))}
                     </div>
                     <div className="grid grid-cols-7 gap-1">
-                        {calendarDays.map(({ date, isCurrentMonth }, idx) => {
-                            const dateStr = formatDateStr(date);
-                            const count = dateCounts[dateStr] || 0;
-                            const isSelected =
-                                isCurrentMonth &&
-                                date.getDate() === selectedDay;
-                            const today = new Date();
-                            const isToday =
-                                isCurrentMonth &&
-                                date.getDate() === today.getDate() &&
-                                month === today.getMonth() + 1 &&
-                                year === today.getFullYear();
+                        {calendarDays.map(
+                            (
+                                {
+                                    date,
+                                    isCurrentMonth,
+                                },
+                                idx,
+                            ) => {
+                                const dateStr =
+                                    formatDateStr(date);
+                                const count =
+                                    dateCounts[
+                                        dateStr
+                                    ] || 0;
+                                const isSelected =
+                                    isCurrentMonth &&
+                                    date.getDate() ===
+                                        selectedDay;
+                                const isToday =
+                                    isCurrentMonth &&
+                                    date.getDate() ===
+                                        today.getDate() &&
+                                    month ===
+                                        today.getMonth() +
+                                            1 &&
+                                    year ===
+                                        today.getFullYear();
 
-                            return (
-                                <button
-                                    key={idx}
-                                    onClick={() => {
-                                        if (isCurrentMonth)
-                                            setSelectedDay(date.getDate());
-                                    }}
-                                    className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-xs transition-colors ${
-                                        !isCurrentMonth
-                                            ? "text-rh-text-muted/30"
-                                            : isSelected
-                                              ? "bg-rh-accent text-white"
-                                              : isToday
-                                                ? "bg-rh-accent/20 text-rh-accent"
-                                                : "text-white hover:bg-rh-bg-muted/30"
-                                    }`}
-                                    disabled={!isCurrentMonth}
-                                >
-                                    <span className="font-medium">
-                                        {date.getDate()}
-                                    </span>
-                                    {count > 0 && isCurrentMonth && (
-                                        <span
-                                            className={`text-[9px] leading-none ${isSelected ? "text-white/80" : "text-rh-accent"}`}
-                                        >
-                                            {count}
-                                        </span>
-                                    )}
-                                </button>
-                            );
-                        })}
+                                return (
+                                    <CalendarCell
+                                        key={idx}
+                                        date={date}
+                                        isCurrentMonth={
+                                            isCurrentMonth
+                                        }
+                                        isSelected={
+                                            isSelected
+                                        }
+                                        isToday={
+                                            isToday
+                                        }
+                                        count={count}
+                                        onSelect={
+                                            setSelectedDay
+                                        }
+                                    />
+                                );
+                            },
+                        )}
                     </div>
                 </div>
 
-                {/* 선택 날짜 출석 현황 */}
+                {/* 날짜 라벨 + 일괄등록 */}
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white">
-                        {month}월 {selectedDay}일 출석 현황
-                        <span className="ml-1 text-rh-text-secondary">
-                            ({selectedDateRecords.length}명)
-                        </span>
+                        {month}월 {selectedDay}일 (
+                        {dayOfWeek}) 출석 현황
                     </h3>
-                    <button
+                    <AdminSmallButton
                         onClick={() => setShowBulk(true)}
-                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-rh-accent rounded-rh-md"
                     >
-                        <UserPlus className="w-3 h-3" />
-                        일괄등록
-                    </button>
+                        일괄 등록
+                    </AdminSmallButton>
                 </div>
 
-                {/* 검색바 */}
-                {selectedDateRecords.length > 0 && (
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2" />
-                        <Input
-                            placeholder="이름 또는 장소 검색"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 h-10 text-white bg-rh-bg-surface border border-rh-border rounded-rh-md placeholder:text-rh-text-secondary text-sm"
-                        />
-                    </div>
-                )}
-
-                {/* 모임별 출석 리스트 */}
-                {groupedMeetings.length > 0 ? (
-                    <div className="space-y-3">
-                        {groupedMeetings.map((group, gIdx) => (
-                            <div
-                                key={gIdx}
-                                className="bg-rh-bg-surface rounded-[12px] overflow-hidden"
-                            >
-                                {/* 모임 헤더 */}
-                                <div className="flex items-center gap-2 px-4 py-2.5 border-b border-rh-border">
-                                    <MapPin className="w-3.5 h-3.5 text-rh-accent" />
-                                    <span className="text-xs font-medium text-white">
-                                        {group.location}
-                                    </span>
-                                    <Clock className="w-3.5 h-3.5 text-rh-text-tertiary ml-2" />
-                                    <span className="text-xs text-rh-text-secondary">
-                                        {group.time}
-                                    </span>
-                                    <Badge className="ml-auto text-[10px] px-1.5 py-0 bg-rh-accent/20 text-rh-accent hover:bg-rh-accent/20">
-                                        {group.records.length}명
-                                    </Badge>
-                                </div>
-
-                                {/* 멤버 리스트 */}
-                                <div className="divide-y divide-rh-border/50">
-                                    {group.records.map((record) => (
-                                        <div
-                                            key={record.id}
-                                            className="flex items-center gap-3 px-4 py-2.5"
-                                        >
-                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-rh-accent flex items-center justify-center text-xs font-semibold text-white">
-                                                {record.userName.charAt(0)}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <span className="text-sm text-white">
-                                                    {record.userName}
-                                                </span>
-                                                {record.isHost && (
-                                                    <Badge className="ml-1.5 text-[9px] px-1 py-0 bg-rh-status-success/20 text-rh-status-success hover:bg-rh-status-success/20">
-                                                        호스트
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <button className="p-1">
-                                                        <MoreVertical className="w-4 h-4 text-rh-text-secondary" />
-                                                    </button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent
-                                                    align="end"
-                                                    className="border-0 bg-rh-bg-surface"
-                                                >
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            setSelectedAttendance(
-                                                                record
-                                                            );
-                                                            setEditModalOpen(
-                                                                true
-                                                            );
-                                                        }}
-                                                        className="text-white hover:bg-rh-bg-muted"
-                                                    >
-                                                        <Edit className="mr-2 w-4 h-4" />
-                                                        수정
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() =>
-                                                            handleDeleteRecord(
-                                                                record.id
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            isDeletingRecord ===
-                                                            record.id
-                                                        }
-                                                        className="text-rh-status-error hover:bg-rh-bg-muted"
-                                                    >
-                                                        {isDeletingRecord ===
-                                                        record.id
-                                                            ? "삭제 중..."
-                                                            : "삭제"}
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                {/* 출석 리스트 — .pen AttendanceRow 사용 */}
+                {selectedDateRecords.length > 0 ? (
+                    <AnimatedList className="space-y-2">
+                        {selectedDateRecords.map(
+                            (record) => (
+                                <AnimatedItem
+                                    key={record.id}
+                                >
+                                    <AttendanceRow
+                                        name={
+                                            record.userName
+                                        }
+                                        detail={buildDetail(
+                                            record,
+                                        )}
+                                        status="present"
+                                        badgeText={
+                                            record.isHost
+                                                ? "운영진"
+                                                : undefined
+                                        }
+                                        onClick={() =>
+                                            handleRowClick(
+                                                record,
+                                            )
+                                        }
+                                    />
+                                </AnimatedItem>
+                            ),
+                        )}
+                    </AnimatedList>
                 ) : (
                     <div className="py-8 text-center">
                         <p className="text-rh-text-secondary text-sm">
-                            해당 날짜에 출석 기록이 없습니다.
+                            해당 날짜에 출석 기록이
+                            없습니다.
                         </p>
                     </div>
                 )}
@@ -412,12 +434,39 @@ export default function AttendanceManagement({
                         setSelectedAttendance(null);
                         router.refresh();
                     }}
+                    onDelete={(recordId) => {
+                        setEditModalOpen(false);
+                        setSelectedAttendance(null);
+                        setDeleteDialog({
+                            open: true,
+                            recordId,
+                        });
+                    }}
                 />
             )}
 
+            {/* 삭제 확인 다이얼로그 */}
+            <AdminAlertDialog
+                open={deleteDialog.open}
+                onClose={() =>
+                    setDeleteDialog({
+                        open: false,
+                        recordId: "",
+                    })
+                }
+                onConfirm={handleDeleteConfirm}
+                title="출석 기록을 삭제하시겠습니까?"
+                description="삭제된 기록은 복구할 수 없습니다."
+                cancelLabel="취소"
+                confirmLabel="삭제"
+                confirmVariant="danger"
+            />
+
             {/* 일괄 등록 */}
             {showBulk && (
-                <BulkAttendanceManagement crewId={crewId} />
+                <BulkAttendanceManagement
+                    crewId={crewId}
+                />
             )}
         </>
     );

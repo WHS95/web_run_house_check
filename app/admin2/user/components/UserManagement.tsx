@@ -1,23 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-    Search,
-    MoreVertical,
-    ArrowUpDown,
-    Edit,
-    ChevronRight,
-    Filter,
-} from "lucide-react";
+import React, { useState, useCallback, useMemo, memo } from "react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import UserEditModal from "@/components/molecules/UserEditModal";
+import {
+    AnimatedList,
+    AnimatedItem,
+} from "@/components/atoms/AnimatedList";
+import {
+    AdminSearchBar,
+    AdminBadge,
+    AdminSmallButton,
+    AdminModal,
+    AdminAlertDialog,
+    AdminLabeledInput,
+} from "@/app/admin2/components/ui";
 import {
     UserForAdmin,
     updateUserStatus,
@@ -27,21 +28,39 @@ import {
 interface UserManagementProps {
     initialUsers: UserForAdmin[];
     crewId: string;
-    gradeMap?: Record<string, { name: string; sort_order: number }>;
+    gradeMap?: Record<
+        string,
+        { name: string; sort_order: number }
+    >;
 }
 
-const getDaysAgo = (dateString: string | null): string => {
-    if (!dateString) return "출석 기록 없음";
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const targetDate = new Date(dateString);
-    targetDate.setHours(0, 0, 0, 0);
-    const diffDays = Math.floor(
-        (today.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    if (diffDays === 0) return "오늘";
-    if (diffDays > 0) return `${diffDays}일 전`;
-    return `${Math.abs(diffDays)}일 후`;
+/* ── 초성 검색 유틸 ── */
+const CHOSUNG = [
+    "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ",
+    "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ",
+    "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ",
+];
+
+const getChosung = (str: string): string => {
+    return [...str]
+        .map((ch) => {
+            const code = ch.charCodeAt(0) - 0xac00;
+            if (code < 0 || code > 11171) return ch;
+            return CHOSUNG[Math.floor(code / 588)];
+        })
+        .join("");
+};
+
+const isChosungOnly = (str: string): boolean =>
+    [...str].every((ch) => CHOSUNG.includes(ch));
+
+const matchesChosung = (
+    text: string,
+    query: string,
+): boolean => {
+    if (!isChosungOnly(query)) return false;
+    const textChosung = getChosung(text);
+    return textChosung.includes(query);
 };
 
 const formatDate = (dateString: string | null) => {
@@ -50,97 +69,273 @@ const formatDate = (dateString: string | null) => {
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
 };
 
+/* ── 유저 카드 ── */
+const UserCard = memo(function UserCard({
+    user,
+    active,
+    gradeMap,
+    onTap,
+}: {
+    user: UserForAdmin;
+    active: boolean;
+    gradeMap?: UserManagementProps["gradeMap"];
+    onTap: (user: UserForAdmin) => void;
+}) {
+    const gradeName =
+        gradeMap &&
+        user.crew_grade_id &&
+        gradeMap[String(user.crew_grade_id)]?.name;
+
+    return (
+        <button
+            type="button"
+            className="flex items-center gap-3 rounded-xl bg-rh-bg-surface px-4 py-3 w-full text-left"
+            onClick={() => onTap(user)}
+        >
+            {/* 아바타 */}
+            <div
+                className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold text-white ${
+                    active
+                        ? "bg-rh-accent"
+                        : "bg-rh-bg-muted"
+                }`}
+            >
+                {(user.first_name || "?").charAt(0)}
+            </div>
+
+            {/* 이름 + 메타 */}
+            <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                <span className="text-sm font-medium text-white truncate">
+                    {user.first_name || "이름 없음"}
+                </span>
+                <span className="text-[11px] text-rh-text-tertiary truncate">
+                    가입:{" "}
+                    {formatDate(
+                        user.join_date || user.created_at,
+                    )}{" "}
+                    · 출석{" "}
+                    {user.attendance_count ?? 0}회
+                </span>
+            </div>
+
+            {/* 뱃지 */}
+            <div className="shrink-0">
+                {gradeName ? (
+                    <AdminBadge variant="accent">
+                        {gradeName}
+                    </AdminBadge>
+                ) : (
+                    <AdminBadge
+                        variant={active ? "outline" : "muted"}
+                    >
+                        {active ? "활성" : "비활성"}
+                    </AdminBadge>
+                )}
+            </div>
+        </button>
+    );
+});
+
+/* ── 편집 모달 내부 폼 ── */
+function EditForm({
+    user,
+    onSave,
+    onClose,
+}: {
+    user: UserForAdmin;
+    onSave: (data: {
+        first_name: string;
+        phone: string;
+        birth_year: number;
+    }) => Promise<void>;
+    onClose: () => void;
+}) {
+    const [name, setName] = useState(
+        user.first_name || "",
+    );
+    const [phone, setPhone] = useState(user.phone || "");
+    const [birthYear, setBirthYear] = useState(
+        String(
+            user.birth_year || new Date().getFullYear() - 30,
+        ),
+    );
+    const [saving, setSaving] = useState(false);
+
+    const handleSave = useCallback(async () => {
+        setSaving(true);
+        try {
+            await onSave({
+                first_name: name,
+                phone,
+                birth_year: parseInt(birthYear),
+            });
+        } finally {
+            setSaving(false);
+        }
+    }, [name, phone, birthYear, onSave]);
+
+    return (
+        <>
+            <div className="flex flex-col gap-4">
+                <AdminLabeledInput
+                    label="이름"
+                    value={name}
+                    onChange={setName}
+                    placeholder="이름을 입력하세요"
+                />
+                <AdminLabeledInput
+                    label="연락처"
+                    value={phone}
+                    onChange={setPhone}
+                    placeholder="010-0000-0000"
+                    type="tel"
+                />
+                <AdminLabeledInput
+                    label="출생연도"
+                    value={birthYear}
+                    onChange={setBirthYear}
+                    placeholder="1990"
+                    type="number"
+                />
+                <AdminLabeledInput
+                    label="가입일"
+                    value={new Date(
+                        user.created_at,
+                    ).toLocaleDateString("ko-KR")}
+                    onChange={() => {}}
+                    placeholder=""
+                />
+            </div>
+            <div className="flex gap-2 pt-2">
+                <button
+                    className="flex-1 py-3 rounded-xl bg-rh-bg-muted text-white text-sm font-medium"
+                    onClick={onClose}
+                    disabled={saving}
+                >
+                    취소
+                </button>
+                <button
+                    className="flex-1 py-3 rounded-xl bg-rh-accent text-white text-sm font-medium"
+                    onClick={handleSave}
+                    disabled={saving}
+                >
+                    {saving ? "저장 중..." : "저장"}
+                </button>
+            </div>
+        </>
+    );
+}
+
+/* ── 메인 컴포넌트 ── */
 export default function UserManagement({
     initialUsers,
     crewId,
     gradeMap,
 }: UserManagementProps) {
     const [searchTerm, setSearchTerm] = useState("");
-    const [statusFilter, setStatusFilter] = useState("전체");
-    const [sortBy, setSortBy] = useState("lastAttendance");
-    const [sortOrder, setSortOrder] = useState("desc");
+    const [statusFilter, setStatusFilter] =
+        useState("전체");
     const [users, setUsers] = useState(initialUsers);
-    const [isUpdating, setIsUpdating] = useState<string | null>(null);
-    const [editModalOpen, setEditModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<UserForAdmin | null>(
-        null
-    );
-    const [expandedUsers, setExpandedUsers] = useState<Set<string>>(
-        new Set()
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [editModalOpen, setEditModalOpen] =
+        useState(false);
+    const [selectedUser, setSelectedUser] =
+        useState<UserForAdmin | null>(null);
+    const [confirmDialog, setConfirmDialog] = useState<{
+        open: boolean;
+        userId: string;
+        active: boolean;
+    }>({ open: false, userId: "", active: false });
+
+    const isUserActive = useCallback(
+        (user: UserForAdmin) =>
+            user.status === "ACTIVE" || user.status === null,
+        [],
     );
 
-    const isUserActive = (user: UserForAdmin) =>
-        user.status === "ACTIVE" || user.status === null;
+    /* 검색 (초성 검색 포함) */
+    const matchesSearch = useCallback(
+        (user: UserForAdmin, term: string) => {
+            if (!term) return true;
+            const lower = term.toLowerCase();
+            const name = user.first_name || "";
+            const phone = user.phone || "";
+            const email = user.email || "";
 
-    const sortUsers = (list: UserForAdmin[]) =>
-        [...list].sort((a, b) => {
-            switch (sortBy) {
-                case "lastAttendance": {
-                    const aD = a.last_attendance_date
-                        ? new Date(a.last_attendance_date).getTime()
-                        : 0;
-                    const bD = b.last_attendance_date
-                        ? new Date(b.last_attendance_date).getTime()
-                        : 0;
-                    return sortOrder === "desc" ? bD - aD : aD - bD;
-                }
-                case "joinDate": {
-                    const aJ = new Date(
-                        a.join_date || a.created_at
-                    ).getTime();
-                    const bJ = new Date(
-                        b.join_date || b.created_at
-                    ).getTime();
-                    return sortOrder === "desc" ? bJ - aJ : aJ - bJ;
-                }
-                case "name": {
-                    const aN = a.first_name || "이름 없음";
-                    const bN = b.first_name || "이름 없음";
-                    return sortOrder === "asc"
-                        ? aN.localeCompare(bN)
-                        : bN.localeCompare(aN);
-                }
-                default:
-                    return 0;
+            if (
+                name.toLowerCase().includes(lower) ||
+                phone.includes(term) ||
+                email.toLowerCase().includes(lower)
+            ) {
+                return true;
             }
-        });
 
-    const searchFilteredUsers = users.filter((user) => {
-        const term = searchTerm.toLowerCase();
-        return (
-            (user.first_name || "").toLowerCase().includes(term) ||
-            (user.phone || "").includes(searchTerm) ||
-            (user.email || "").toLowerCase().includes(term)
+            // 초성 검색
+            if (matchesChosung(name, term)) {
+                return true;
+            }
+
+            return false;
+        },
+        [],
+    );
+
+    const filteredUsers = useMemo(() => {
+        const searched = users.filter((user) =>
+            matchesSearch(user, searchTerm),
         );
-    });
 
-    const statusCounts = {
-        전체: searchFilteredUsers.length,
-        활성: searchFilteredUsers.filter((u) => isUserActive(u)).length,
-        비활성: searchFilteredUsers.filter((u) => !isUserActive(u)).length,
-    };
-
-    const filteredUsers = sortUsers(
-        searchFilteredUsers.filter((user) => {
+        return searched.filter((user) => {
             const active = isUserActive(user);
             return (
                 statusFilter === "전체" ||
                 (statusFilter === "활성" && active) ||
                 (statusFilter === "비활성" && !active)
             );
-        })
+        });
+    }, [
+        users,
+        searchTerm,
+        statusFilter,
+        matchesSearch,
+        isUserActive,
+    ]);
+
+    const statusCounts = useMemo(() => {
+        const searched = users.filter((user) =>
+            matchesSearch(user, searchTerm),
+        );
+        return {
+            전체: searched.length,
+            활성: searched.filter((u) => isUserActive(u))
+                .length,
+            비활성: searched.filter(
+                (u) => !isUserActive(u),
+            ).length,
+        };
+    }, [users, searchTerm, matchesSearch, isUserActive]);
+
+    const handleCardTap = useCallback(
+        (user: UserForAdmin) => {
+            setSelectedUser(user);
+            setEditModalOpen(true);
+        },
+        [],
     );
 
-    const handleToggleUserStatus = async (userId: string) => {
-        setIsUpdating(userId);
+    const handleToggleStatus = useCallback(async () => {
+        const { userId, active } = confirmDialog;
+        setConfirmDialog((prev) => ({
+            ...prev,
+            open: false,
+        }));
+        setIsUpdating(true);
         try {
-            const currentUser = users.find((u) => u.id === userId);
-            if (!currentUser) return;
-            const newStatus = !isUserActive(currentUser);
+            const newStatus = !active;
             const { error } = await updateUserStatus(
                 userId,
                 crewId,
-                newStatus
+                newStatus,
             );
             if (error) {
                 alert("사용자 상태 변경에 실패했습니다.");
@@ -151,378 +346,197 @@ export default function UserManagement({
                     u.id === userId
                         ? {
                               ...u,
-                              status: newStatus ? "ACTIVE" : "SUSPENDED",
+                              status: newStatus
+                                  ? "ACTIVE"
+                                  : "SUSPENDED",
                           }
-                        : u
-                )
+                        : u,
+                ),
             );
         } catch {
-            alert("사용자 상태 변경 중 오류가 발생했습니다.");
+            alert(
+                "사용자 상태 변경 중 오류가 발생했습니다.",
+            );
         } finally {
-            setIsUpdating(null);
+            setIsUpdating(false);
         }
-    };
+    }, [confirmDialog, crewId]);
 
-    const handleSaveUserInfo = async (userData: {
-        first_name: string;
-        phone: string;
-        birth_year: number;
-    }) => {
-        if (!selectedUser) return;
-        try {
-            const { error } = await updateUserInfo(
-                selectedUser.id,
-                userData
-            );
-            if (error) {
-                alert("사용자 정보 수정에 실패했습니다.");
-                return;
+    const handleSaveUserInfo = useCallback(
+        async (userData: {
+            first_name: string;
+            phone: string;
+            birth_year: number;
+        }) => {
+            if (!selectedUser) return;
+            try {
+                const { error } = await updateUserInfo(
+                    selectedUser.id,
+                    userData,
+                );
+                if (error) {
+                    alert(
+                        "사용자 정보 수정에 실패했습니다.",
+                    );
+                    return;
+                }
+                setUsers((prev) =>
+                    prev.map((u) =>
+                        u.id === selectedUser.id
+                            ? { ...u, ...userData }
+                            : u,
+                    ),
+                );
+                setEditModalOpen(false);
+                setSelectedUser(null);
+            } catch {
+                alert(
+                    "사용자 정보 수정 중 오류가 발생했습니다.",
+                );
             }
-            setUsers((prev) =>
-                prev.map((u) =>
-                    u.id === selectedUser.id ? { ...u, ...userData } : u
-                )
-            );
-            setEditModalOpen(false);
-            setSelectedUser(null);
-        } catch {
-            alert("사용자 정보 수정 중 오류가 발생했습니다.");
-        }
-    };
+        },
+        [selectedUser],
+    );
 
-    const handleSort = (newSortBy: string) => {
-        if (sortBy === newSortBy) {
-            setSortOrder(sortOrder === "desc" ? "asc" : "desc");
-        } else {
-            setSortBy(newSortBy);
-            setSortOrder("desc");
-        }
-    };
-
-    const toggleExpansion = (userId: string) => {
-        setExpandedUsers((prev) => {
-            const next = new Set(prev);
-            if (next.has(userId)) next.delete(userId);
-            else next.add(userId);
-            return next;
-        });
-    };
-
-    const getSortLabel = () => {
-        const dir = sortOrder === "desc" ? "↓" : "↑";
-        switch (sortBy) {
-            case "lastAttendance":
-                return `참석 ${dir}`;
-            case "joinDate":
-                return `가입 ${dir}`;
-            case "name":
-                return `이름 ${dir}`;
-            default:
-                return "정렬";
-        }
-    };
+    const displayCount =
+        statusCounts[
+            statusFilter as keyof typeof statusCounts
+        ];
 
     return (
         <>
-            {/* 검색 및 필터 */}
-            <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-10 bg-rh-bg-primary px-4 pt-4 pb-2 space-y-3">
-                <div className="relative">
-                    <Search className="absolute left-4 top-1/2 w-4 h-4 text-rh-text-secondary transform -translate-y-1/2" />
-                    <Input
-                        placeholder="검색어를 입력하세요"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-11 h-12 text-white bg-rh-bg-surface border border-rh-border rounded-rh-md placeholder:text-rh-text-secondary"
-                    />
-                </div>
+            {/* 검색 + 필터 (sticky) */}
+            <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-10 bg-rh-bg-primary px-4 pt-4 pb-2 space-y-4">
+                <AdminSearchBar
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    placeholder="검색어를 입력하세요"
+                />
 
-                <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-rh-text-secondary">
+                <div className="flex items-center justify-between">
+                    <span className="text-[13px] text-rh-text-secondary">
                         전체{" "}
-                        <span className="text-white">
-                            {
-                                statusCounts[
-                                    statusFilter as keyof typeof statusCounts
-                                ]
-                            }
-                            명
+                        <span className="text-white font-medium">
+                            {displayCount}명
                         </span>
                     </span>
 
-                    <div className="flex items-center gap-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-rh-bg-surface border border-rh-border rounded-rh-md">
-                                    <ArrowUpDown className="w-3 h-3" />
-                                    {getSortLabel()}
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="end"
-                                className="border-0 bg-rh-bg-surface"
-                            >
-                                {[
-                                    { key: "lastAttendance", label: "참석" },
-                                    { key: "joinDate", label: "가입" },
-                                    { key: "name", label: "이름" },
-                                ].map((opt) => (
-                                    <DropdownMenuItem
-                                        key={opt.key}
-                                        onClick={() => handleSort(opt.key)}
-                                        className="text-white hover:bg-rh-bg-muted"
-                                    >
-                                        {opt.label}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-rh-accent rounded-rh-md">
-                                    <Filter className="w-3 h-3" />
-                                    필터
-                                    {statusFilter !== "전체" && (
-                                        <span className="ml-1 opacity-80">
-                                            ({statusFilter})
+                    {/* 필터 */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <AdminSmallButton>
+                                필터
+                            </AdminSmallButton>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="end"
+                            className="border-0 bg-rh-bg-surface"
+                        >
+                            {(
+                                [
+                                    "전체",
+                                    "활성",
+                                    "비활성",
+                                ] as const
+                            ).map((status) => (
+                                <DropdownMenuItem
+                                    key={status}
+                                    onClick={() =>
+                                        setStatusFilter(
+                                            status,
+                                        )
+                                    }
+                                    className={`text-white hover:bg-rh-bg-muted ${statusFilter === status ? "bg-rh-accent/20 font-medium" : ""}`}
+                                >
+                                    <div className="flex justify-between items-center w-full">
+                                        <span>
+                                            {status}
                                         </span>
-                                    )}
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="end"
-                                className="border-0 bg-rh-bg-surface"
-                            >
-                                {(
-                                    ["전체", "활성", "비활성"] as const
-                                ).map((status) => (
-                                    <DropdownMenuItem
-                                        key={status}
-                                        onClick={() =>
-                                            setStatusFilter(status)
-                                        }
-                                        className={`text-white hover:bg-rh-bg-muted ${statusFilter === status ? "bg-rh-accent font-medium" : ""}`}
-                                    >
-                                        <div className="flex justify-between items-center w-full">
-                                            <span>{status}</span>
-                                            <span className="ml-2 text-rh-text-secondary">
-                                                {statusCounts[status]}
-                                            </span>
-                                        </div>
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                                        <span className="ml-2 text-rh-text-secondary">
+                                            {
+                                                statusCounts[
+                                                    status
+                                                ]
+                                            }
+                                        </span>
+                                    </div>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
-            {/* 사용자 목록 */}
-            <div className="px-4 py-3">
-                <div className="space-y-2">
-                    {filteredUsers.map((user) => {
-                        const isExpanded = expandedUsers.has(user.id);
-                        const active = isUserActive(user);
-
-                        return (
-                            <div
-                                key={user.id}
-                                className="bg-rh-bg-surface rounded-rh-md px-4 py-3"
-                            >
-                                <div
-                                    className="flex items-center gap-3 cursor-pointer"
-                                    onClick={() => toggleExpansion(user.id)}
-                                >
-                                    {/* 아바타 */}
-                                    <div
-                                        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold text-white ${active ? "bg-rh-accent" : "bg-rh-bg-muted"}`}
-                                    >
-                                        {(
-                                            user.first_name || "?"
-                                        ).charAt(0)}
-                                    </div>
-
-                                    {/* 이름 + 등급 + 부가정보 */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-1.5">
-                                            <h3 className="text-sm font-semibold text-white truncate">
-                                                {user.first_name ||
-                                                    "이름 없음"}
-                                            </h3>
-                                            {gradeMap &&
-                                                user.crew_grade_id &&
-                                                gradeMap[
-                                                    String(
-                                                        user.crew_grade_id
-                                                    )
-                                                ] && (
-                                                    <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-rh-accent/20 text-rh-accent flex-shrink-0">
-                                                        {
-                                                            gradeMap[
-                                                                String(
-                                                                    user.crew_grade_id
-                                                                )
-                                                            ].name
-                                                        }
-                                                    </span>
-                                                )}
-                                        </div>
-                                        <p className="text-xs text-rh-text-secondary truncate">
-                                            가입:{" "}
-                                            {formatDate(
-                                                user.join_date ||
-                                                    user.created_at
-                                            )}{" "}
-                                            · 최근:{" "}
-                                            {getDaysAgo(
-                                                user.last_attendance_date
-                                            )}
-                                        </p>
-                                    </div>
-
-                                    {/* 상태 뱃지 + 액션 */}
-                                    <div className="flex items-center gap-2 flex-shrink-0">
-                                        <Badge
-                                            className={`text-xs px-2 py-0.5 ${active ? "bg-rh-accent/20 text-rh-accent hover:bg-rh-accent/20" : "bg-rh-bg-muted text-rh-text-secondary hover:bg-rh-bg-muted"}`}
-                                        >
-                                            {active ? "활성" : "비활성"}
-                                        </Badge>
-                                        <ChevronRight
-                                            className={`w-4 h-4 text-rh-text-secondary transition-transform duration-200 ${isExpanded ? "rotate-90" : "rotate-0"}`}
-                                        />
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <button
-                                                    className="p-1"
-                                                    onClick={(e) =>
-                                                        e.stopPropagation()
-                                                    }
-                                                    disabled={
-                                                        isUpdating ===
-                                                        user.id
-                                                    }
-                                                >
-                                                    <MoreVertical className="w-4 h-4 text-rh-text-secondary" />
-                                                </button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent
-                                                align="end"
-                                                className="border-0 bg-rh-bg-surface"
-                                            >
-                                                <DropdownMenuItem
-                                                    onClick={() => {
-                                                        setSelectedUser(
-                                                            user
-                                                        );
-                                                        setEditModalOpen(
-                                                            true
-                                                        );
-                                                    }}
-                                                    className="text-white hover:bg-rh-bg-muted"
-                                                >
-                                                    <Edit className="mr-2 w-4 h-4" />
-                                                    정보 수정
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() =>
-                                                        handleToggleUserStatus(
-                                                            user.id
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        isUpdating ===
-                                                        user.id
-                                                    }
-                                                    className="text-white hover:bg-rh-bg-muted"
-                                                >
-                                                    {isUpdating === user.id
-                                                        ? "처리 중..."
-                                                        : active
-                                                          ? "비활성화"
-                                                          : "활성화"}
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                </div>
-
-                                {/* 상세 정보 */}
-                                <div
-                                    className={`overflow-hidden transition-all duration-300 ${isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
-                                >
-                                    <div className="pt-3 mt-3 border-t border-rh-border">
-                                        <div className="grid grid-cols-1 gap-3 text-sm text-rh-text-secondary sm:grid-cols-2">
-                                            <div className="flex justify-between">
-                                                <span className="text-white">
-                                                    연락처
-                                                </span>
-                                                <span className="text-right break-all">
-                                                    {user.phone ||
-                                                        user.email ||
-                                                        "연락처 없음"}
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-white">
-                                                    가입일
-                                                </span>
-                                                <span className="text-right">
-                                                    {formatDate(
-                                                        user.join_date ||
-                                                            user.created_at
-                                                    )}
-                                                </span>
-                                            </div>
-                                            {user.birth_year && (
-                                                <div className="flex justify-between">
-                                                    <span className="text-white">
-                                                        출생연도
-                                                    </span>
-                                                    <span className="text-right">
-                                                        {user.birth_year}
-                                                    </span>
-                                                </div>
-                                            )}
-                                            <div className="flex justify-between">
-                                                <span className="text-white">
-                                                    최근 참석일
-                                                </span>
-                                                <span className="text-right">
-                                                    {user.last_attendance_date
-                                                        ? formatDate(
-                                                              user.last_attendance_date
-                                                          )
-                                                        : "출석 기록 없음"}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {filteredUsers.length === 0 && (
+            {/* 유저 리스트 */}
+            <div className="px-4 pb-4">
+                {filteredUsers.length > 0 ? (
+                    <AnimatedList className="space-y-2">
+                        {filteredUsers.map((user) => (
+                            <AnimatedItem key={user.id}>
+                                <UserCard
+                                    user={user}
+                                    active={isUserActive(
+                                        user,
+                                    )}
+                                    gradeMap={gradeMap}
+                                    onTap={handleCardTap}
+                                />
+                            </AnimatedItem>
+                        ))}
+                    </AnimatedList>
+                ) : (
                     <div className="py-8 text-center">
-                        <p className="text-rh-text-secondary">
+                        <p className="text-rh-text-secondary text-sm">
                             검색 결과가 없습니다.
                         </p>
                     </div>
                 )}
             </div>
 
-            {selectedUser && (
-                <UserEditModal
-                    isOpen={editModalOpen}
-                    onClose={() => {
-                        setEditModalOpen(false);
-                        setSelectedUser(null);
-                    }}
-                    user={selectedUser}
-                    onSave={handleSaveUserInfo}
-                />
-            )}
+            {/* 편집 모달 */}
+            <AdminModal
+                open={editModalOpen}
+                onClose={() => {
+                    setEditModalOpen(false);
+                    setSelectedUser(null);
+                }}
+                title="사용자 정보 수정"
+            >
+                {selectedUser && (
+                    <EditForm
+                        user={selectedUser}
+                        onSave={handleSaveUserInfo}
+                        onClose={() => {
+                            setEditModalOpen(false);
+                            setSelectedUser(null);
+                        }}
+                    />
+                )}
+            </AdminModal>
+
+            {/* 상태 변경 확인 다이얼로그 */}
+            <AdminAlertDialog
+                open={confirmDialog.open}
+                onClose={() =>
+                    setConfirmDialog((prev) => ({
+                        ...prev,
+                        open: false,
+                    }))
+                }
+                onConfirm={handleToggleStatus}
+                title={
+                    confirmDialog.active
+                        ? "비활성화하시겠습니까?"
+                        : "활성화하시겠습니까?"
+                }
+                description={
+                    confirmDialog.active
+                        ? "해당 회원이 비활성 상태로 전환됩니다."
+                        : "해당 회원이 활성 상태로 전환됩니다."
+                }
+                cancelLabel="취소"
+                confirmLabel="확인"
+            />
         </>
     );
 }

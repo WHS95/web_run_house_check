@@ -1,5 +1,6 @@
 "use client";
 import { memo, useCallback } from "react";
+import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface AdminModalProps {
@@ -43,9 +44,17 @@ const AdminModal = memo(function AdminModal({
                         transition={{ duration: 0.2 }}
                     >
                         {title && (
-                            <h3 className="text-base font-semibold text-white">
-                                {title}
-                            </h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-base font-semibold text-white">
+                                    {title}
+                                </h3>
+                                <button
+                                    onClick={onClose}
+                                    className="text-rh-text-secondary"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
                         )}
                         <div>{children}</div>
                         {footer && <div>{footer}</div>}

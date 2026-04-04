@@ -630,11 +630,15 @@
     pointer-events: none;
 }
 
-/* 앱 시작 시 깜빡임 방지 */
+/* 앱 시작 시 깜빡임 방지 + iOS 키보드 스크롤 고정 방지 */
 html, body {
     background-color: #0F1318 !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
+    /* iOS 키보드 닫힘 후 viewport 밀림 방지 */
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* === 모바일 뷰포트 래퍼 (데스크탑에서 폰 형태) === */

@@ -196,3 +196,110 @@ export const getCrewSettingsData = cache(async (crewId: string) => {
         locations: locationsResult.data || [],
     };
 });
+
+// 상세 분석용 확장 데이터 (유저 이름 + is_host 포함)
+export interface AnalyticsDetailRecord {
+    id: string;
+    user_id: string;
+    attendance_timestamp: string;
+    location: string;
+    is_host: boolean;
+    user_name: string;
+}
+
+export const getAnalyticsDetailData = cache(
+    async (
+        crewId: string,
+        year: number,
+        month: number,
+    ) => {
+        const supabase = await createClient();
+        const monthStr = month
+            .toString()
+            .padStart(2, "0");
+        const startDate = `${year}-${monthStr}-01`;
+        const lastDay = new Date(
+            year,
+            month,
+            0,
+        ).getDate();
+        const endDate = `${year}-${monthStr}-${lastDay.toString().padStart(2, "0")}`;
+
+        const [attendanceResult, membersResult] =
+            await Promise.all([
+                supabase
+                    .schema("attendance")
+                    .from("attendance_records")
+                    .select(
+                        "id, user_id, attendance_timestamp, location, is_host",
+                    )
+                    .eq("crew_id", crewId)
+                    .is("deleted_at", null)
+                    .gte(
+                        "attendance_timestamp",
+                        `${startDate}T00:00:00Z`,
+                    )
+                    .lte(
+                        "attendance_timestamp",
+                        `${endDate}T23:59:59Z`,
+                    ),
+                supabase
+                    .schema("attendance")
+                    .from("user_crews")
+                    .select("user_id")
+                    .eq("crew_id", crewId),
+            ]);
+
+        if (attendanceResult.error)
+            throw new Error("출석 데이터 조회 실패");
+        if (membersResult.error)
+            throw new Error("멤버 데이터 조회 실패");
+
+        // 유저 이름 조회
+        const userIds = Array.from(
+            new Set([
+                ...(attendanceResult.data || []).map(
+                    (r: any) => r.user_id,
+                ),
+                ...(membersResult.data || []).map(
+                    (m: any) => m.user_id,
+                ),
+            ]),
+        );
+        const { data: usersData } = await supabase
+            .schema("attendance")
+            .from("users")
+            .select("id, first_name")
+            .in("id", userIds);
+
+        const userMap: Record<string, string> = {};
+        (usersData || []).forEach((u: any) => {
+            userMap[u.id] =
+                u.first_name || "이름 없음";
+        });
+
+        const records: AnalyticsDetailRecord[] = (
+            attendanceResult.data || []
+        ).map((r: any) => ({
+            id: r.id,
+            user_id: r.user_id,
+            attendance_timestamp:
+                r.attendance_timestamp,
+            location: r.location || "기타",
+            is_host: r.is_host || false,
+            user_name:
+                userMap[r.user_id] || "이름 없음",
+        }));
+
+        const memberIds = (
+            membersResult.data || []
+        ).map((m: any) => m.user_id);
+
+        return {
+            records,
+            memberIds,
+            totalMembers: memberIds.length,
+            userMap,
+        };
+    },
+);

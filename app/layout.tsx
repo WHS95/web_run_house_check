@@ -15,6 +15,7 @@ import ConditionalBottomNav from "@/components/ConditionalBottomNav";
 import { NavigationProvider } from "@/components/providers/NavigationProvider";
 import FCMForegroundProvider from "@/components/providers/FCMForegroundProvider";
 import SplashScreen from "@/components/molecules/common/SplashScreen";
+import KeyboardScrollFix from "@/components/providers/KeyboardScrollFix";
 
 import type { Metadata, Viewport } from "next";
 
@@ -107,6 +108,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         )} */}
         <NavigationProvider>
           <FCMForegroundProvider />
+          <KeyboardScrollFix />
           <div className="mobile-viewport-wrapper">
             <div className="mobile-viewport">
               <SplashScreen />

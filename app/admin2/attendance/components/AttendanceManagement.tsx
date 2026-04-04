@@ -7,21 +7,26 @@ import React, {
     memo,
 } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import dynamic from "next/dynamic";
 import {
     AnimatedList,
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
-import {
-    AdminMonthNav,
-    AdminSmallButton,
-    AdminAlertDialog,
-    AttendanceRow,
-} from "@/app/admin2/components/ui";
-import AttendanceEditModal from "@/components/molecules/AttendanceEditModal";
-import BulkAttendanceManagement from "@/components/organisms/BulkAttendanceManagement";
+import AdminSmallButton from "@/app/admin2/components/ui/AdminSmallButton";
+import AdminAlertDialog from "@/app/admin2/components/ui/AdminAlertDialog";
+import AttendanceRow from "@/app/admin2/components/ui/AttendanceRow";
+
+const AttendanceEditModal = dynamic(
+    () => import("@/components/molecules/AttendanceEditModal"),
+);
+const BulkAttendanceManagement = dynamic(
+    () => import("@/components/organisms/BulkAttendanceManagement"),
+);
 import type { AttendanceRecord } from "@/lib/supabase/admin";
 import { deleteAttendanceRecord } from "@/lib/supabase/admin";
 import type { AttendanceRecordWithUser } from "@/lib/admin2/queries";
+import { haptic } from "@/lib/haptic";
 
 interface Props {
     initialRecords: AttendanceRecordWithUser[];
@@ -86,6 +91,7 @@ const CalendarCell = memo(function CalendarCell({
     isCurrentMonth,
     isSelected,
     isToday,
+    isSaturday,
     count,
     onSelect,
 }: {
@@ -93,29 +99,41 @@ const CalendarCell = memo(function CalendarCell({
     isCurrentMonth: boolean;
     isSelected: boolean;
     isToday: boolean;
+    isSaturday: boolean;
     count: number;
     onSelect: (day: number) => void;
 }) {
+    /* .pen 기준 색상:
+       - 이전/다음 달: #475569 (text-rh-text-muted)
+       - 현재 달 일반: #FFFFFF
+       - 현재 달 토요일: #669FF2 (rh-accent)
+       - 선택됨: bg-rh-accent text-white
+       - 오늘: bg-rh-accent/20 text-rh-accent */
+    let cellClass =
+        "relative flex flex-col items-center justify-center h-9 rounded-lg text-[13px] transition-colors";
+
+    if (!isCurrentMonth) {
+        cellClass += " text-rh-text-muted";
+    } else if (isSelected) {
+        cellClass += " bg-rh-accent text-white";
+    } else if (isToday) {
+        cellClass += " bg-rh-accent/20 text-rh-accent";
+    } else if (isSaturday) {
+        cellClass += " text-rh-accent";
+    } else {
+        cellClass += " text-white hover:bg-rh-bg-muted/30";
+    }
+
     return (
         <button
             onClick={() => {
                 if (isCurrentMonth)
                     onSelect(date.getDate());
             }}
-            className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-xs transition-colors ${
-                !isCurrentMonth
-                    ? "text-rh-text-muted/30"
-                    : isSelected
-                      ? "bg-rh-accent text-white"
-                      : isToday
-                        ? "bg-rh-accent/20 text-rh-accent"
-                        : "text-white hover:bg-rh-bg-muted/30"
-            }`}
+            className={cellClass}
             disabled={!isCurrentMonth}
         >
-            <span className="font-medium">
-                {date.getDate()}
-            </span>
+            <span>{date.getDate()}</span>
             {count > 0 && isCurrentMonth && (
                 <span
                     className={`text-[9px] leading-none ${isSelected ? "text-white/80" : "text-rh-accent"}`}
@@ -145,7 +163,7 @@ export default function AttendanceManagement({
     const [selectedAttendance, setSelectedAttendance] =
         useState<AttendanceRecord | null>(null);
     const [showBulk, setShowBulk] = useState(false);
-    const [isDeletingRecord, setIsDeletingRecord] =
+    const [, setIsDeletingRecord] =
         useState<string | null>(null);
     const [deleteDialog, setDeleteDialog] = useState<{
         open: boolean;
@@ -196,6 +214,7 @@ export default function AttendanceManagement({
 
     /* 월 네비게이션 */
     const handlePrevMonth = useCallback(() => {
+        haptic.light();
         const m = month <= 1 ? 12 : month - 1;
         const y = month <= 1 ? year - 1 : year;
         router.push(
@@ -204,6 +223,7 @@ export default function AttendanceManagement({
     }, [month, year, router, pathname]);
 
     const handleNextMonth = useCallback(() => {
+        haptic.light();
         const m = month >= 12 ? 1 : month + 1;
         const y = month >= 12 ? year + 1 : year;
         router.push(
@@ -291,27 +311,44 @@ export default function AttendanceManagement({
 
     return (
         <>
-            <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
-                {/* 월 네비게이터 */}
-                <AdminMonthNav
-                    year={year}
-                    month={month}
-                    onPrev={handlePrevMonth}
-                    onNext={handleNextMonth}
-                />
+            <div className="flex-1 px-4 pt-4 space-y-4">
+                {/* 월 네비게이터 — .pen aaMonthRow: h-36 gap-20 center */}
+                <div className="flex items-center justify-center gap-5 h-9">
+                    <button onClick={handlePrevMonth}>
+                        <ChevronLeft
+                            size={20}
+                            className="text-rh-text-secondary"
+                        />
+                    </button>
+                    <span className="text-base font-semibold text-white">
+                        {year}년 {month}월
+                    </span>
+                    <button onClick={handleNextMonth}>
+                        <ChevronRight
+                            size={20}
+                            className="text-rh-text-secondary"
+                        />
+                    </button>
+                </div>
 
-                {/* 캘린더 그리드 */}
+                {/* 캘린더 그리드 — .pen CalendarGrid: r-12 bg-surface p-12 gap-4 */}
                 <div className="bg-rh-bg-surface rounded-xl p-3">
-                    <div className="grid grid-cols-7 gap-1 mb-2">
-                        {WEEKDAYS.map((d) => (
+                    {/* 요일 헤더 — .pen calDays: h-28 space-around */}
+                    <div className="grid grid-cols-7 mb-1">
+                        {WEEKDAYS.map((d, i) => (
                             <div
                                 key={d}
-                                className="text-center text-[11px] font-medium text-rh-text-tertiary py-1"
+                                className={`text-center text-[11px] font-semibold py-1 ${
+                                    i === 6
+                                        ? "text-rh-accent"
+                                        : "text-rh-text-tertiary"
+                                }`}
                             >
                                 {d}
                             </div>
                         ))}
                     </div>
+                    {/* 날짜 셀 — .pen calWeek: h-36 space-around */}
                     <div className="grid grid-cols-7 gap-1">
                         {calendarDays.map(
                             (
@@ -340,6 +377,8 @@ export default function AttendanceManagement({
                                             1 &&
                                     year ===
                                         today.getFullYear();
+                                const isSaturday =
+                                    date.getDay() === 6;
 
                                 return (
                                     <CalendarCell
@@ -354,6 +393,9 @@ export default function AttendanceManagement({
                                         isToday={
                                             isToday
                                         }
+                                        isSaturday={
+                                            isSaturday
+                                        }
                                         count={count}
                                         onSelect={
                                             setSelectedDay
@@ -365,7 +407,7 @@ export default function AttendanceManagement({
                     </div>
                 </div>
 
-                {/* 날짜 라벨 + 일괄등록 */}
+                {/* 날짜 라벨 + 일괄등록 — .pen aaDetailLabel */}
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white">
                         {month}월 {selectedDay}일 (
@@ -378,7 +420,7 @@ export default function AttendanceManagement({
                     </AdminSmallButton>
                 </div>
 
-                {/* 출석 리스트 — .pen AttendanceRow 사용 */}
+                {/* 출석 리스트 — .pen DailyList: gap-8 vertical */}
                 {selectedDateRecords.length > 0 ? (
                     <AnimatedList className="space-y-2">
                         {selectedDateRecords.map(

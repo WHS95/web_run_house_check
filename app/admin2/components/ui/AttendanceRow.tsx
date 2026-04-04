@@ -34,7 +34,7 @@ const AttendanceRow = memo(function AttendanceRow({
                 <span className="text-sm font-semibold text-white">
                     {name}
                 </span>
-                <span className="text-xs text-rh-text-secondary">
+                <span className="text-xs text-rh-text-tertiary">
                     {detail}
                 </span>
             </div>

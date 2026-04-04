@@ -11,14 +11,12 @@ import {
     AnimatedList,
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
-import {
-    AdminSearchBar,
-    AdminBadge,
-    AdminSmallButton,
-    AdminModal,
-    AdminAlertDialog,
-    AdminLabeledInput,
-} from "@/app/admin2/components/ui";
+import AdminSearchBar from "@/app/admin2/components/ui/AdminSearchBar";
+import AdminBadge from "@/app/admin2/components/ui/AdminBadge";
+import AdminSmallButton from "@/app/admin2/components/ui/AdminSmallButton";
+import AdminModal from "@/app/admin2/components/ui/AdminModal";
+import AdminAlertDialog from "@/app/admin2/components/ui/AdminAlertDialog";
+import AdminLabeledInput from "@/app/admin2/components/ui/AdminLabeledInput";
 import {
     UserForAdmin,
     updateUserStatus,
@@ -42,7 +40,7 @@ const CHOSUNG = [
 ];
 
 const getChosung = (str: string): string => {
-    return [...str]
+    return Array.from(str)
         .map((ch) => {
             const code = ch.charCodeAt(0) - 0xac00;
             if (code < 0 || code > 11171) return ch;
@@ -52,7 +50,9 @@ const getChosung = (str: string): string => {
 };
 
 const isChosungOnly = (str: string): boolean =>
-    [...str].every((ch) => CHOSUNG.includes(ch));
+    Array.from(str).every((ch) =>
+        CHOSUNG.includes(ch),
+    );
 
 const matchesChosung = (
     text: string,

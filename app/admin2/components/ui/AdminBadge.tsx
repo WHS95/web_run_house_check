@@ -3,7 +3,7 @@ import { memo } from "react";
 type BadgeVariant = "accent" | "outline" | "muted";
 
 interface AdminBadgeProps {
-    children: string;
+    children: React.ReactNode;
     variant?: BadgeVariant;
 }
 

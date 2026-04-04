@@ -18,12 +18,12 @@ export default function ResultTable({ headers, rows }: ResultTableProps) {
 
     return (
         <div
-            className="rounded-xl overflow-hidden"
+            className="overflow-hidden rounded-xl"
             style={{ backgroundColor: "#2B3644" }}
         >
             <div
                 className="flex justify-between px-4 py-3"
-                style={{ backgroundColor: "#1D2530" }}
+                style={{ backgroundColor: "#2B3644" }}
             >
                 <span
                     className="text-[13px] font-semibold"

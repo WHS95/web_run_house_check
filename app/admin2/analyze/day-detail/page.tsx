@@ -522,7 +522,7 @@ function DayCard({
                         <AdminBadge
                             variant="muted"
                         >
-                            {day.count}명
+                            {String(day.count)}명
                         </AdminBadge>
                     )}
                 </div>

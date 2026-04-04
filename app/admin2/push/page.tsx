@@ -1,6 +1,10 @@
+import { getAdminAuth } from "@/lib/admin2/auth";
 import PageHeader from "@/components/organisms/common/PageHeader";
+import PushManagement from "./components/PushManagement";
 
-export default function AdminPushPage() {
+export default async function AdminPushPage() {
+    const { crewId } = await getAdminAuth();
+
     return (
         <>
             <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
@@ -11,11 +15,7 @@ export default function AdminPushPage() {
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <div className="flex-1 flex items-center justify-center">
-                <p className="text-rh-text-secondary text-sm">
-                    준비 중입니다
-                </p>
-            </div>
+            <PushManagement crewId={crewId} />
         </>
     );
 }

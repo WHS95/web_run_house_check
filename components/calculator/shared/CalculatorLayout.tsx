@@ -33,7 +33,7 @@ export default function CalculatorLayout({
             </div>
 
             {/* 콘텐츠 */}
-            <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4 space-y-5">
+            <div className="flex-1 px-4 pt-6 pb-4 space-y-5">
                 {children}
             </div>
         </div>

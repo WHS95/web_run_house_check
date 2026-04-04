@@ -190,7 +190,7 @@ const InviteCodesTab = memo(function InviteCodesTab({
     return (
         <div className="space-y-4">
             {/* 헤더 */}
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center">
                 <h3 className="text-sm font-semibold text-white">
                     초대코드 목록
                 </h3>
@@ -204,10 +204,10 @@ const InviteCodesTab = memo(function InviteCodesTab({
                 <AnimatedList className="space-y-3">
                     {codes.map((code) => (
                         <AnimatedItem key={code.id}>
-                            <div className="px-4 py-4 rounded-xl bg-rh-bg-surface space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-base font-bold text-white font-mono">
+                            <div className="px-4 py-4 space-y-3 rounded-xl bg-rh-bg-surface">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex gap-2 items-center">
+                                        <span className="font-mono text-base font-bold text-white">
                                             {
                                                 code.invite_code
                                             }
@@ -216,7 +216,7 @@ const InviteCodesTab = memo(function InviteCodesTab({
                                             활성
                                         </AdminBadge>
                                     </div>
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex gap-1 items-center">
                                         <button
                                             onClick={() =>
                                                 handleCopy(
@@ -273,7 +273,7 @@ const InviteCodesTab = memo(function InviteCodesTab({
 
             {/* 새 코드 생성 폼 */}
             {showForm && (
-                <div className="px-4 py-4 rounded-xl bg-rh-bg-surface border border-rh-accent space-y-3">
+                <div className="px-4 py-4 space-y-3 rounded-xl border bg-rh-bg-surface border-rh-accent">
                     <div className="flex gap-2">
                         <input
                             type="text"
@@ -290,7 +290,7 @@ const InviteCodesTab = memo(function InviteCodesTab({
                             }}
                             placeholder="7자리 영문+숫자"
                             maxLength={7}
-                            className="flex-1 h-11 px-4 rounded-lg bg-rh-bg-primary border border-rh-border text-sm text-white font-mono placeholder:text-rh-text-muted outline-none focus:border-rh-accent"
+                            className="flex-1 px-4 h-11 font-mono text-sm text-white rounded-lg border outline-none bg-rh-bg-primary border-rh-border placeholder:text-rh-text-muted focus:border-rh-accent"
                         />
                         <button
                             onClick={() => {
@@ -299,7 +299,7 @@ const InviteCodesTab = memo(function InviteCodesTab({
                                 );
                                 haptic.light();
                             }}
-                            className="h-11 px-3 rounded-lg bg-rh-bg-muted text-rh-text-secondary"
+                            className="px-3 h-11 rounded-lg bg-rh-bg-muted text-rh-text-secondary"
                         >
                             <Shuffle size={18} />
                         </button>
@@ -310,7 +310,7 @@ const InviteCodesTab = memo(function InviteCodesTab({
                                 setShowForm(false);
                                 setNewCode("");
                             }}
-                            className="flex-1 h-11 rounded-xl bg-rh-bg-muted text-sm font-medium text-white"
+                            className="flex-1 h-11 text-sm font-medium text-white rounded-xl bg-rh-bg-muted"
                         >
                             취소
                         </button>
@@ -320,7 +320,7 @@ const InviteCodesTab = memo(function InviteCodesTab({
                                 saving ||
                                 newCode.length !== 7
                             }
-                            className="flex-1 h-11 rounded-xl bg-rh-accent text-sm font-semibold text-white disabled:opacity-50"
+                            className="flex-1 h-11 text-sm font-semibold text-white rounded-xl bg-rh-accent disabled:opacity-50"
                         >
                             {saving
                                 ? "생성 중..."
@@ -330,18 +330,7 @@ const InviteCodesTab = memo(function InviteCodesTab({
                 </div>
             )}
 
-            {/* 새 코드 생성 버튼 */}
-            {!showForm && (
-                <button
-                    onClick={() => {
-                        haptic.light();
-                        setShowForm(true);
-                    }}
-                    className="w-full h-12 rounded-xl bg-rh-accent text-sm font-semibold text-white"
-                >
-                    + 새 코드 생성
-                </button>
-            )}
+
 
             {/* 재생성 확인 */}
             <AdminAlertDialog

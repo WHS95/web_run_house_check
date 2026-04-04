@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useMemo, memo } from "react";
+import { useState, useCallback, useMemo, useEffect, memo } from "react";
+import Link from "next/link";
 import {
     AnimatedList,
     AnimatedItem,
@@ -8,10 +9,7 @@ import {
 import FadeIn from "@/components/atoms/FadeIn";
 import {
     AdminSmallButton,
-    AdminModal,
     AdminAlertDialog,
-    AdminLabeledInput,
-    AdminSelect,
     NoticeCard,
 } from "@/app/admin2/components/ui";
 
@@ -60,49 +58,31 @@ const mockNotices: Notice[] = [
     },
 ];
 
-const typeOptions = [
-    { value: "공지", label: "공지" },
-    { value: "일반", label: "일반" },
-    { value: "중요", label: "중요" },
-];
-
 const NoticeManagement = memo(function NoticeManagement() {
     const [notices, setNotices] = useState<Notice[]>(mockNotices);
-    const [createModalOpen, setCreateModalOpen] =
-        useState(false);
     const [deleteDialog, setDeleteDialog] = useState<{
         open: boolean;
         noticeId: string;
     }>({ open: false, noticeId: "" });
 
-    // 새 공지 폼 상태
-    const [newType, setNewType] =
-        useState<NoticeType>("공지");
-    const [newTitle, setNewTitle] = useState("");
-    const [newDescription, setNewDescription] = useState("");
+    // sessionStorage에서 새 공지 수신
+    useEffect(() => {
+        const stored = sessionStorage.getItem("admin_new_notice");
+        if (stored) {
+            try {
+                const newNotice = JSON.parse(stored) as Notice;
+                setNotices((prev) => [newNotice, ...prev]);
+            } catch {
+                // 파싱 실패 시 무시
+            }
+            sessionStorage.removeItem("admin_new_notice");
+        }
+    }, []);
 
     const totalCount = useMemo(
         () => notices.length,
         [notices],
     );
-
-    const handleCreate = useCallback(() => {
-        if (!newTitle.trim()) return;
-        const now = new Date();
-        const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}`;
-        const newNotice: Notice = {
-            id: String(Date.now()),
-            type: newType,
-            title: newTitle.trim(),
-            description: newDescription.trim(),
-            date: dateStr,
-        };
-        setNotices((prev) => [newNotice, ...prev]);
-        setCreateModalOpen(false);
-        setNewType("공지");
-        setNewTitle("");
-        setNewDescription("");
-    }, [newType, newTitle, newDescription]);
 
     const handleDelete = useCallback(() => {
         setNotices((prev) =>
@@ -124,13 +104,11 @@ const NoticeManagement = memo(function NoticeManagement() {
                             {totalCount}건
                         </span>
                     </span>
-                    <AdminSmallButton
-                        onClick={() =>
-                            setCreateModalOpen(true)
-                        }
-                    >
-                        + 새 공지
-                    </AdminSmallButton>
+                    <Link href="/admin2/notice/write">
+                        <AdminSmallButton>
+                            + 새 공지
+                        </AdminSmallButton>
+                    </Link>
                 </div>
 
                 {/* 공지 리스트 */}
@@ -169,52 +147,6 @@ const NoticeManagement = memo(function NoticeManagement() {
                     </div>
                 )}
             </div>
-
-            {/* 새 공지 생성 모달 */}
-            <AdminModal
-                open={createModalOpen}
-                onClose={() => setCreateModalOpen(false)}
-                title="새 공지 작성"
-            >
-                <div className="flex flex-col gap-4">
-                    <AdminSelect
-                        label="유형"
-                        value={newType}
-                        onChange={(v) =>
-                            setNewType(v as NoticeType)
-                        }
-                        options={typeOptions}
-                    />
-                    <AdminLabeledInput
-                        label="제목"
-                        value={newTitle}
-                        onChange={setNewTitle}
-                        placeholder="공지 제목을 입력하세요"
-                    />
-                    <AdminLabeledInput
-                        label="내용"
-                        value={newDescription}
-                        onChange={setNewDescription}
-                        placeholder="공지 내용을 입력하세요"
-                    />
-                </div>
-                <div className="flex gap-2 pt-4">
-                    <button
-                        className="flex-1 py-3 rounded-xl bg-rh-bg-muted text-white text-sm font-medium"
-                        onClick={() =>
-                            setCreateModalOpen(false)
-                        }
-                    >
-                        취소
-                    </button>
-                    <button
-                        className="flex-1 py-3 rounded-xl bg-rh-accent text-white text-sm font-medium"
-                        onClick={handleCreate}
-                    >
-                        등록
-                    </button>
-                </div>
-            </AdminModal>
 
             {/* 삭제 확인 다이얼로그 */}
             <AdminAlertDialog

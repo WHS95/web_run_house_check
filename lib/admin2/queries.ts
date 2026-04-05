@@ -303,3 +303,101 @@ export const getAnalyticsDetailData = cache(
         };
     },
 );
+
+// ── 유저 상세 ───────────────────────────────────
+export interface CrewUserDetail {
+    user: {
+        id: string;
+        first_name: string;
+        email: string | null;
+        phone: string | null;
+        birth_year: number | null;
+        created_at: string;
+        join_date: string | null;
+        status: string | null;
+    };
+    role: "owner" | "admin" | "member";
+    attendance_count: number;
+    last_attendance_date: string | null;
+    hosted_count: number;
+}
+
+export const getCrewUserDetail = cache(
+    async (
+        crewId: string,
+        userId: string,
+    ): Promise<CrewUserDetail | null> => {
+        const supabase = await createClient();
+
+        // 1) 유저 기본정보
+        const { data: userData } = await supabase
+            .schema("attendance")
+            .from("users")
+            .select(
+                "id, first_name, email, phone, birth_year, created_at, status",
+            )
+            .eq("id", userId)
+            .maybeSingle();
+        if (!userData) return null;
+
+        // 2) user_crews: crew_role + joined_at
+        const { data: membership } = await supabase
+            .schema("attendance")
+            .from("user_crews")
+            .select("crew_role, joined_at")
+            .eq("user_id", userId)
+            .eq("crew_id", crewId)
+            .maybeSingle();
+        if (!membership) return null;
+
+        // 3) attendance_records: 전체 출석 + 최근 + 개설 횟수
+        const { data: attendance } = await supabase
+            .schema("attendance")
+            .from("attendance_records")
+            .select("attendance_timestamp, is_host")
+            .eq("user_id", userId)
+            .eq("crew_id", crewId)
+            .is("deleted_at", null)
+            .order("attendance_timestamp", {
+                ascending: false,
+            });
+
+        const rows = attendance || [];
+        const attendance_count = rows.length;
+        const last_attendance_date =
+            rows[0]?.attendance_timestamp ?? null;
+        const hosted_count = rows.filter(
+            (r: { is_host: boolean }) => r.is_host === true,
+        ).length;
+
+        // crew_role 매핑 (대소문자 혼재, CREW_MANAGER → admin)
+        const rawRole = (
+            membership.crew_role || ""
+        ).toUpperCase();
+        const role: CrewUserDetail["role"] =
+            rawRole === "OWNER"
+                ? "owner"
+                : rawRole === "CREW_MANAGER" ||
+                    rawRole === "ADMIN"
+                  ? "admin"
+                  : "member";
+
+        return {
+            user: {
+                id: userData.id,
+                first_name: userData.first_name,
+                email: userData.email,
+                phone: userData.phone,
+                birth_year: userData.birth_year,
+                created_at: userData.created_at,
+                join_date: membership.joined_at ?? null,
+                status: userData.status,
+            },
+            role,
+            attendance_count,
+            last_attendance_date,
+            hosted_count,
+        };
+    },
+);
+

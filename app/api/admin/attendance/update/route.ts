@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateAttendanceRecord } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { revalidateTag } from "next/cache";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
 
 export async function PUT(request: NextRequest) {
+  const guard = await assertAdmin("attendance.edit");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const body = await request.json();
     const { recordId, updates } = body;
@@ -50,10 +56,28 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // 대상 레코드의 crew_id 확인 (tenant 격리)
+    const supabase = await createClient();
+    const { data: rec } = await supabase
+      .schema("attendance")
+      .from("attendance_records")
+      .select("crew_id")
+      .eq("id", recordId)
+      .maybeSingle();
+    if (!rec || rec.crew_id !== guard.crewId) {
+      return NextResponse.json(
+        { success: false, message: "권한이 없습니다." },
+        { status: 403 }
+      );
+    }
+
     const { success, error } = await updateAttendanceRecord(
       recordId,
       validUpdates
     );
+    if (success) {
+      revalidateTag(`admin:attendance:${guard.crewId}`);
+    }
 
     if (!success || error) {
       //console.error("출석 기록 수정 실패:", error);

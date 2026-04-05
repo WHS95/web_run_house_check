@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDailyAttendanceDetails } from "@/lib/supabase/admin";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  const guard = await assertAdmin("attendance.edit");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const { searchParams } = new URL(request.url);
     const crewId = searchParams.get("crewId");
@@ -12,8 +16,15 @@ export async function GET(request: NextRequest) {
 
     if (!crewId || !date) {
       return NextResponse.json(
-        { error: "crewId와 date가 모두 필요합니다." },
+        { success: false, message: "crewId와 date가 모두 필요합니다." },
         { status: 400 }
+      );
+    }
+
+    if (crewId !== guard.crewId) {
+      return NextResponse.json(
+        { success: false, message: "권한이 없습니다." },
+        { status: 403 }
       );
     }
 

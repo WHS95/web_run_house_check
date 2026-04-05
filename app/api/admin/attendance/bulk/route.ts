@@ -1,31 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { revalidateTag } from "next/cache";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 export async function POST(request: NextRequest) {
+  const guard = await assertAdmin("attendance.create");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const supabase = await createClient();
-
-    // 사용자 인증 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "unauthorized",
-          message: "인증되지 않은 사용자입니다.",
-        },
-        { status: 401 }
-      );
-    }
 
     // 요청 데이터 파싱
     // users: Array<{ userId: string; isHost: boolean }>
     const { crewId, users, attendanceTimestamp, locationId, exerciseTypeId } =
       await request.json();
+
+    if (crewId !== guard.crewId) {
+      return NextResponse.json(
+        { success: false, message: "권한이 없습니다." },
+        { status: 403 }
+      );
+    }
 
     // 필수 데이터 검증
     if (
@@ -115,26 +110,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 관리자 권한 확인 (user_crews 테이블 사용)
-    const { data: roleCheck, error: roleError } = await supabase
-      .schema("attendance")
-      .from("user_crews")
-      .select("crew_role")
-      .eq("user_id", user.id)
-      .eq("crew_id", crewId)
-      .eq("crew_role", "CREW_MANAGER")
-      .single();
-
-    if (roleError || !roleCheck) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "forbidden",
-          message: "크루 운영진 권한이 필요합니다.",
-        },
-        { status: 403 }
-      );
-    }
     // console.log("attendanceTimestamp", attendanceTimestamp);
 
     // 일괄 출석 기록 생성
@@ -184,6 +159,8 @@ export async function POST(request: NextRequest) {
 
     // 성공적으로 생성된 기록 수 확인
     const createdCount = insertResult?.length || 0;
+
+    revalidateTag(`admin:attendance:${guard.crewId}`);
 
     return NextResponse.json({
       success: true,

@@ -1,7 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
 import FadeIn from "@/components/atoms/FadeIn";
-import AdminStatBox from "@/app/admin2/components/ui/AdminStatBox";
 import AdminBadge from "@/app/admin2/components/ui/AdminBadge";
 import AdminAlertDialog from "@/app/admin2/components/ui/AdminAlertDialog";
 import { Switch } from "@/components/ui/switch";
@@ -11,6 +10,34 @@ import type { CrewUserDetail } from "@/lib/admin2/queries";
 interface Props {
     detail: CrewUserDetail;
     crewId: string;
+}
+
+function StatCard({
+    value,
+    label,
+    valueSize = "lg",
+}: {
+    value: string;
+    label: string;
+    valueSize?: "sm" | "lg";
+}) {
+    return (
+        <div className="h-[76px] flex flex-col items-center justify-center gap-1 rounded-2xl bg-rh-bg-surface py-4 px-3">
+            <span
+                className={
+                    "font-bold text-white " +
+                    (valueSize === "lg"
+                        ? "text-xl"
+                        : "text-sm")
+                }
+            >
+                {value}
+            </span>
+            <span className="text-xs text-rh-text-secondary">
+                {label}
+            </span>
+        </div>
+    );
 }
 
 const formatDate = (d: string | null) => {
@@ -56,22 +83,20 @@ export default function UserDetail({
 
     return (
         <FadeIn>
-            <div className="flex-1 px-4 pt-4 pb-4 flex flex-col gap-6">
+            <div className="flex-1 px-4 pt-4 pb-4 flex flex-col gap-4">
                 {/* 프로필 카드 */}
-                <div className="rounded-2xl bg-rh-bg-surface p-6 flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 rounded-full bg-rh-accent flex items-center justify-center text-white text-xl font-semibold">
+                <div className="rounded-2xl bg-rh-bg-surface p-6 flex flex-col items-center gap-4">
+                    <div className="w-14 h-14 rounded-full bg-rh-accent flex items-center justify-center text-white text-[22px] font-bold">
                         {(user.first_name || "?").charAt(0)}
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg font-semibold text-white">
-                            {user.first_name || "이름 없음"}
-                        </span>
-                        {isStaff && (
-                            <AdminBadge variant="accent">
-                                운영진
-                            </AdminBadge>
-                        )}
-                    </div>
+                    <span className="text-lg font-bold text-white">
+                        {user.first_name || "이름 없음"}
+                    </span>
+                    {isStaff && (
+                        <AdminBadge variant="accent">
+                            운영진
+                        </AdminBadge>
+                    )}
                     <span className="text-xs text-rh-text-tertiary">
                         가입일:{" "}
                         {formatDate(
@@ -82,34 +107,35 @@ export default function UserDetail({
                 </div>
 
                 {/* 통계 */}
-                <div className="grid grid-cols-3 gap-2">
-                    <AdminStatBox
-                        label="최근 참여일"
+                <div className="grid grid-cols-3 gap-4">
+                    <StatCard
                         value={formatDate(
                             detail.last_attendance_date,
                         )}
+                        label="최근 참여일"
+                        valueSize="sm"
                     />
-                    <AdminStatBox
-                        label="전체 출석"
+                    <StatCard
                         value={`${detail.attendance_count}회`}
+                        label="전체 출석"
                     />
-                    <AdminStatBox
-                        label="모임 개설"
+                    <StatCard
                         value={`${detail.hosted_count}회`}
+                        label="모임 개설"
                     />
                 </div>
 
                 {/* 회원 관리 */}
-                <section className="flex flex-col gap-2">
-                    <h2 className="text-sm font-semibold text-white px-1">
+                <section className="flex flex-col gap-3">
+                    <h2 className="text-base font-semibold text-white px-1">
                         회원 관리
                     </h2>
-                    <div className="flex items-center justify-between rounded-xl bg-rh-bg-surface px-4 py-3">
+                    <div className="flex items-center justify-between rounded-xl bg-rh-bg-surface p-4">
                         <div className="flex flex-col gap-0.5">
                             <span className="text-sm font-medium text-white">
                                 멤버 활성 상태
                             </span>
-                            <span className="text-[11px] text-rh-text-tertiary">
+                            <span className="text-xs text-rh-text-tertiary">
                                 비활성 시 출석 체크가
                                 불가합니다
                             </span>

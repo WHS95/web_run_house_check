@@ -18,16 +18,30 @@ interface Member {
     name: string;
 }
 
-interface PushHistory {
+interface PushHistoryRow {
     id: string;
     title: string;
-    date: string;
-    target: string;
-    status: string;
+    target_mode: "all" | "select";
+    target_count: number;
+    success_count: number;
+    failure_count: number;
+    created_at: string;
 }
 
 interface PushManagementProps {
     crewId: string;
+}
+
+function formatHistoryDate(iso: string): string {
+    const d = new Date(iso);
+    return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+function formatHistoryTarget(row: PushHistoryRow): string {
+    const label = row.target_mode === "all" ? "전체 크루원" : "선택 크루원";
+    return `${label} · ${row.target_count}명`;
+}
+function formatHistoryStatus(row: PushHistoryRow): string {
+    return row.failure_count > 0 ? "일부 실패" : "발송 완료";
 }
 
 const PushManagement = memo(function PushManagement({
@@ -40,7 +54,7 @@ const PushManagement = memo(function PushManagement({
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const [isSending, setIsSending] = useState(false);
-    const [history, setHistory] = useState<PushHistory[]>([]);
+    const [history, setHistory] = useState<PushHistoryRow[]>([]);
 
     // 크루원 로드
     useEffect(() => {
@@ -57,6 +71,23 @@ const PushManagement = memo(function PushManagement({
                         }),
                     );
                     setMembers(list);
+                }
+            })
+            .catch(() => {});
+        return () => {
+            cancelled = true;
+        };
+    }, [crewId]);
+
+    // 발송 내역 로드
+    useEffect(() => {
+        let cancelled = false;
+        fetch(`/api/admin/push-history?crewId=${crewId}`)
+            .then((res) => res.json())
+            .then((json) => {
+                if (cancelled) return;
+                if (json?.success && Array.isArray(json.data)) {
+                    setHistory(json.data);
                 }
             })
             .catch(() => {});
@@ -125,6 +156,8 @@ const PushManagement = memo(function PushManagement({
     targetIdsRef.current = targetIds;
     const modeRef = useRef(mode);
     modeRef.current = mode;
+    const crewIdRef = useRef(crewId);
+    crewIdRef.current = crewId;
 
     const handleSend = useCallback(async () => {
         const currentTitle = titleRef.current.trim();
@@ -141,28 +174,19 @@ const PushManagement = memo(function PushManagement({
                     userIds: currentIds,
                     title: currentTitle,
                     body: currentBody,
+                    crewId: crewIdRef.current,
+                    targetMode: modeRef.current,
                 }),
             });
 
             const result = await res.json();
 
             if (res.ok && result.success) {
-                const now = new Date();
-                const dateStr = `${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}`;
-                const targetLabel =
-                    modeRef.current === "all"
-                        ? `전체 크루원 · ${result.targetCount}명`
-                        : `선택 크루원 · ${result.targetCount}명`;
-                setHistory((prev) => [
-                    {
-                        id: crypto.randomUUID(),
-                        title: currentTitle,
-                        date: dateStr,
-                        target: targetLabel,
-                        status: "발송 완료",
-                    },
-                    ...prev,
-                ]);
+                if (result.history) {
+                    setHistory((prev) =>
+                        [result.history as PushHistoryRow, ...prev].slice(0, 5),
+                    );
+                }
 
                 setTitle("");
                 setBody("");
@@ -285,9 +309,9 @@ const PushManagement = memo(function PushManagement({
                             <AnimatedItem key={item.id}>
                                 <PushHistoryItem
                                     title={item.title}
-                                    date={item.date}
-                                    target={item.target}
-                                    status={item.status}
+                                    date={formatHistoryDate(item.created_at)}
+                                    target={formatHistoryTarget(item)}
+                                    status={formatHistoryStatus(item)}
                                 />
                             </AnimatedItem>
                         ))}

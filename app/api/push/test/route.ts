@@ -121,10 +121,14 @@ export async function POST(request: Request) {
             userIds,
             title = "🏃 RunHouse 테스트",
             body: msgBody = "푸시 알림이 정상적으로 작동합니다!",
+            crewId,
+            targetMode,
         } = body as {
             userIds: string[];
             title?: string;
             body?: string;
+            crewId?: string;
+            targetMode?: "all" | "select";
         };
 
         if (!userIds || userIds.length === 0) {
@@ -164,12 +168,54 @@ export async function POST(request: Request) {
             webpush: { fcmOptions: { link: "/" } },
         });
 
+        // 발송 내역 저장 (crewId와 targetMode가 모두 있을 때만)
+        let historyRow:
+            | {
+                  id: string;
+                  title: string;
+                  target_mode: string;
+                  target_count: number;
+                  success_count: number;
+                  failure_count: number;
+                  created_at: string;
+              }
+            | null = null;
+
+        if (crewId && targetMode) {
+            const { data: insertedHistory, error: insertError } =
+                await supabase
+                    .schema("attendance")
+                    .from("push_history")
+                    .insert({
+                        crew_id: crewId,
+                        sent_by: user.id,
+                        title,
+                        target_mode: targetMode,
+                        target_count: userIds.length,
+                        success_count: response.successCount,
+                        failure_count: response.failureCount,
+                    })
+                    .select(
+                        "id, title, target_mode, target_count, " +
+                            "success_count, failure_count, created_at"
+                    )
+                    .single();
+
+            if (insertError) {
+                console.error("push_history 저장 실패:", insertError);
+            } else {
+                historyRow =
+                    insertedHistory as unknown as typeof historyRow;
+            }
+        }
+
         return NextResponse.json({
             success: true,
             targetCount: userIds.length,
             tokenCount: tokenStrings.length,
             successCount: response.successCount,
             failureCount: response.failureCount,
+            history: historyRow,
         });
     } catch (error) {
         console.error("푸시 테스트 에러:", error);

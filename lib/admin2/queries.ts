@@ -340,11 +340,11 @@ export const getCrewUserDetail = cache(
             .maybeSingle();
         if (!userData) return null;
 
-        // 2) user_crews: crew_role + joined_at
+        // 2) user_crews: crew_role + joined_at + status
         const { data: membership } = await supabase
             .schema("attendance")
             .from("user_crews")
-            .select("crew_role, joined_at")
+            .select("crew_role, joined_at, status")
             .eq("user_id", userId)
             .eq("crew_id", crewId)
             .maybeSingle();
@@ -391,7 +391,7 @@ export const getCrewUserDetail = cache(
                 birth_year: userData.birth_year,
                 created_at: userData.created_at,
                 join_date: membership.joined_at ?? null,
-                status: userData.status,
+                status: membership.status ?? userData.status,
             },
             role,
             attendance_count,

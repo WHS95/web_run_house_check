@@ -15,6 +15,22 @@ export interface AttendanceRecordWithUser {
     users: { first_name: string };
 }
 
+// 공지 목록 (서버 사이드 초기 prefetch용)
+export const getNoticesForAdmin = cache(async (crewId: string) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .schema("attendance")
+        .from("notices")
+        .select(
+            "id, crew_id, title, type, content, is_active, author_id, created_at, author:author_id(first_name)"
+        )
+        .eq("crew_id", crewId)
+        .order("created_at", { ascending: false })
+        .limit(100);
+    if (error) throw new Error("공지 조회 실패");
+    return data ?? [];
+});
+
 // Dashboard 통계 (서버 사이드, React.cache로 요청 내 중복 방지)
 export const getDashboardStats = cache(
     async (crewId: string, year?: number, month?: number) => {

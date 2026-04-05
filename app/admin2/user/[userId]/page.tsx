@@ -3,6 +3,7 @@ import { getAdminAuth } from "@/lib/admin2/auth";
 import { getCrewUserDetail } from "@/lib/admin2/queries";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import UserDetail from "./components/UserDetail";
+import UserDetailHeaderMenu from "./components/UserDetailHeaderMenu";
 
 interface PageProps {
     params: Promise<{ userId: string }>;
@@ -24,6 +25,11 @@ export default async function AdminUserDetailPage({
                     backLink="/admin2/user"
                     iconColor="white"
                     backgroundColor="bg-rh-bg-surface"
+                    rightAction={
+                        <UserDetailHeaderMenu
+                            user={detail.user}
+                        />
+                    }
                 />
             </div>
             <UserDetail detail={detail} crewId={crewId} />

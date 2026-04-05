@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { AdminLabeledInput } from "@/app/admin2/components/ui";
 import AdminModal from "@/app/admin2/components/ui/AdminModal";
 import FadeIn from "@/components/atoms/FadeIn";
-
-type NoticeType = "공지" | "일반" | "중요";
+import {
+    useAdminNotices,
+    type NoticeType,
+} from "@/lib/admin2/hooks/useAdminNotices";
 
 const categoryOptions: {
     value: NoticeType;
@@ -17,14 +19,9 @@ const categoryOptions: {
     { value: "중요", label: "중요" },
 ];
 
-interface Props {
-    crewId: string;
-}
-
-const NoticeWriteForm = memo(function NoticeWriteForm({
-    crewId,
-}: Props) {
+const NoticeWriteForm = memo(function NoticeWriteForm() {
     const router = useRouter();
+    const { createNotice } = useAdminNotices();
     const [type, setType] = useState<NoticeType>("공지");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -38,40 +35,23 @@ const NoticeWriteForm = memo(function NoticeWriteForm({
         if (!title.trim() || !description.trim()) return;
         setSubmitting(true);
         try {
-            const res = await fetch(
-                "/api/admin/notices",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        crewId,
-                        title: title.trim(),
-                        type,
-                        content: description.trim(),
-                    }),
-                },
-            );
-            const json = await res.json();
-            if (!json?.success || !json.data?.id) {
-                alert(
-                    json?.message ??
-                        "공지 등록에 실패했습니다.",
-                );
-                return;
-            }
-            setCreatedNoticeId(json.data.id);
+            const created = await createNotice({
+                title: title.trim(),
+                type,
+                content: description.trim(),
+            });
+            setCreatedNoticeId(created.id);
         } catch (e) {
-            console.error(
-                "[notice write] submit failed:",
-                e,
+            console.error("[notice write] submit failed:", e);
+            alert(
+                e instanceof Error
+                    ? e.message
+                    : "공지 등록에 실패했습니다."
             );
-            alert("공지 등록에 실패했습니다.");
         } finally {
             setSubmitting(false);
         }
-    }, [crewId, title, type, description]);
+    }, [createNotice, title, type, description]);
 
     // 모달 "확인" → 푸시 발송 후 목록으로 이동
     const handleConfirmPush = useCallback(async () => {

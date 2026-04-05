@@ -1,9 +1,7 @@
 import PageHeader from "@/components/organisms/common/PageHeader";
 import NoticeWriteForm from "./components/NoticeWriteForm";
-import { getAdminAuth } from "@/lib/admin2/auth";
 
-export default async function AdminNoticeWritePage() {
-    const { crewId } = await getAdminAuth();
+export default function AdminNoticeWritePage() {
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
@@ -14,7 +12,7 @@ export default async function AdminNoticeWritePage() {
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <NoticeWriteForm crewId={crewId} />
+            <NoticeWriteForm />
         </div>
     );
 }

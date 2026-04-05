@@ -3,39 +3,112 @@
 import { useState, useCallback, memo } from "react";
 import { useRouter } from "next/navigation";
 import { AdminLabeledInput } from "@/app/admin2/components/ui";
+import AdminModal from "@/app/admin2/components/ui/AdminModal";
 import FadeIn from "@/components/atoms/FadeIn";
 
 type NoticeType = "공지" | "일반" | "중요";
 
-const categoryOptions: { value: NoticeType; label: string }[] = [
+const categoryOptions: {
+    value: NoticeType;
+    label: string;
+}[] = [
     { value: "공지", label: "공지" },
     { value: "일반", label: "일반" },
     { value: "중요", label: "중요" },
 ];
 
-const NoticeWriteForm = memo(function NoticeWriteForm() {
+interface Props {
+    crewId: string;
+}
+
+const NoticeWriteForm = memo(function NoticeWriteForm({
+    crewId,
+}: Props) {
     const router = useRouter();
     const [type, setType] = useState<NoticeType>("공지");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    // 등록 성공 후 생성된 공지 ID (푸시 발송 대상)
+    const [createdNoticeId, setCreatedNoticeId] =
+        useState<string | null>(null);
+    const [pushing, setPushing] = useState(false);
 
-    const handleSubmit = useCallback(() => {
-        if (!title.trim()) return;
-        const now = new Date();
-        const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}`;
-        const notice = {
-            id: String(Date.now()),
-            type,
-            title: title.trim(),
-            description: description.trim(),
-            date: dateStr,
-        };
-        sessionStorage.setItem(
-            "admin_new_notice",
-            JSON.stringify(notice),
-        );
-        router.push("/admin2/notice");
-    }, [type, title, description, router]);
+    const handleSubmit = useCallback(async () => {
+        if (!title.trim() || !description.trim()) return;
+        setSubmitting(true);
+        try {
+            const res = await fetch(
+                "/api/admin/notices",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        crewId,
+                        title: title.trim(),
+                        type,
+                        content: description.trim(),
+                    }),
+                },
+            );
+            const json = await res.json();
+            if (!json?.success || !json.data?.id) {
+                alert(
+                    json?.message ??
+                        "공지 등록에 실패했습니다.",
+                );
+                return;
+            }
+            setCreatedNoticeId(json.data.id);
+        } catch (e) {
+            console.error(
+                "[notice write] submit failed:",
+                e,
+            );
+            alert("공지 등록에 실패했습니다.");
+        } finally {
+            setSubmitting(false);
+        }
+    }, [crewId, title, type, description]);
+
+    // 모달 "확인" → 푸시 발송 후 목록으로 이동
+    const handleConfirmPush = useCallback(async () => {
+        if (!createdNoticeId || pushing) return;
+        setPushing(true);
+        try {
+            const res = await fetch(
+                `/api/admin/notices/${createdNoticeId}/push`,
+                { method: "POST" },
+            );
+            const json = await res.json();
+            if (!json?.success) {
+                alert(
+                    json?.message ??
+                        "푸시 발송에 실패했습니다. 공지는 등록되었습니다.",
+                );
+            }
+        } catch (e) {
+            console.error(
+                "[notice write] push failed:",
+                e,
+            );
+            alert(
+                "푸시 발송에 실패했습니다. 공지는 등록되었습니다.",
+            );
+        } finally {
+            setPushing(false);
+            setCreatedNoticeId(null);
+            router.push("/admin2/notice");
+            router.refresh();
+        }
+    }, [createdNoticeId, pushing, router]);
+
+    const canSubmit =
+        !!title.trim() &&
+        !!description.trim() &&
+        !submitting;
 
     return (
         <FadeIn>
@@ -84,7 +157,9 @@ const NoticeWriteForm = memo(function NoticeWriteForm() {
                             placeholder="공지사항 내용을 입력하세요"
                             value={description}
                             onChange={(e) =>
-                                setDescription(e.target.value)
+                                setDescription(
+                                    e.target.value,
+                                )
                             }
                         />
                     </div>
@@ -96,12 +171,46 @@ const NoticeWriteForm = memo(function NoticeWriteForm() {
                         type="button"
                         className="w-full py-4 rounded-xl bg-rh-accent text-white text-[15px] font-medium disabled:opacity-50"
                         onClick={handleSubmit}
-                        disabled={!title.trim()}
+                        disabled={!canSubmit}
                     >
-                        공지사항 등록
+                        {submitting
+                            ? "등록 중..."
+                            : "공지사항 등록"}
                     </button>
                 </div>
             </div>
+
+            {/* 등록 완료 + 푸시 발송 확인 모달 */}
+            <AdminModal
+                open={!!createdNoticeId}
+                onClose={() => {
+                    // 모달 닫기 = 푸시 발송 없이 목록으로 이동
+                    if (pushing) return;
+                    setCreatedNoticeId(null);
+                    router.push("/admin2/notice");
+                    router.refresh();
+                }}
+                title="공지 등록 완료"
+                footer={
+                    <button
+                        type="button"
+                        className="w-full py-3 rounded-xl bg-rh-accent text-white text-sm font-semibold disabled:opacity-50"
+                        onClick={handleConfirmPush}
+                        disabled={pushing}
+                    >
+                        {pushing
+                            ? "푸시 발송 중..."
+                            : "확인 (푸시 발송)"}
+                    </button>
+                }
+            >
+                <p className="text-[14px] text-rh-text-secondary leading-relaxed">
+                    공지가 정상적으로 등록되었습니다.
+                    <br />
+                    확인 버튼을 누르면 크루원 전체에게
+                    푸시 알림이 발송됩니다.
+                </p>
+            </AdminModal>
         </FadeIn>
     );
 });

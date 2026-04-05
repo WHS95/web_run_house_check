@@ -1,5 +1,5 @@
 {
-  "version": "2.9",
+  "version": "2.10",
   "children": [
     {
       "type": "frame",
@@ -19786,9 +19786,9 @@
     {
       "type": "frame",
       "id": "4Dw5J",
-      "x": 0,
-      "y": 11802,
-      "name": "Screen/Map",
+      "x": 895,
+      "y": 11800,
+      "name": "Screen/Map (Expanded)",
       "clip": true,
       "width": 390,
       "height": 844,
@@ -20133,7 +20133,7 @@
           "type": "frame",
           "id": "8MAwa",
           "x": 326,
-          "y": 770,
+          "y": 498,
           "name": "MyLocationFAB",
           "width": 48,
           "height": 48,
@@ -20168,14 +20168,157 @@
               "fill": "$accent-blue"
             }
           ]
+        },
+        {
+          "type": "frame",
+          "id": "mpadX",
+          "x": 0,
+          "y": 554,
+          "name": "LocationListPanel",
+          "width": 390,
+          "fill": "$bg-primary",
+          "cornerRadius": [
+            20,
+            20,
+            0,
+            0
+          ],
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#00000040",
+            "offset": {
+              "x": 0,
+              "y": -4
+            },
+            "blur": 16
+          },
+          "layout": "vertical",
+          "padding": [
+            16,
+            16,
+            20,
+            16
+          ],
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 2,
+              "id": "41NiA",
+              "layoutPosition": "absolute",
+              "x": 177,
+              "y": 8,
+              "name": "HandleBar",
+              "fill": "$text-muted",
+              "width": 36,
+              "height": 4
+            },
+            {
+              "type": "frame",
+              "id": "XdIE9",
+              "name": "SectionHeader",
+              "width": "fill_container",
+              "padding": [
+                12,
+                0,
+                8,
+                0
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "mGYp0",
+                  "name": "headerTitle",
+                  "fill": "$text-primary",
+                  "content": "장소 목록",
+                  "fontFamily": "Inter",
+                  "fontSize": 15,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "H0dHl",
+                  "name": "headerCount",
+                  "fill": "$text-tertiary",
+                  "content": "3개",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "oePT7",
+              "name": "LocationList",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "id": "DDYIy",
+                  "type": "ref",
+                  "ref": "AfJMV",
+                  "width": "fill_container",
+                  "name": "item1",
+                  "x": 0,
+                  "y": 0,
+                  "descendants": {
+                    "iK6WV": {
+                      "content": "여의도공원"
+                    },
+                    "ZiZFM": {
+                      "content": "서울 영등포구 여의도동"
+                    }
+                  }
+                },
+                {
+                  "id": "rEOh7",
+                  "type": "ref",
+                  "ref": "AfJMV",
+                  "width": "fill_container",
+                  "name": "item2",
+                  "x": 0,
+                  "y": 71,
+                  "descendants": {
+                    "iK6WV": {
+                      "content": "한강공원"
+                    },
+                    "ZiZFM": {
+                      "content": "서울 마포구 상수동"
+                    }
+                  }
+                },
+                {
+                  "id": "BUw6n",
+                  "type": "ref",
+                  "ref": "AfJMV",
+                  "width": "fill_container",
+                  "name": "item3",
+                  "x": 0,
+                  "y": 142,
+                  "descendants": {
+                    "iK6WV": {
+                      "content": "올림픽공원"
+                    },
+                    "ZiZFM": {
+                      "content": "서울 송파구 방이동"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     },
     {
       "type": "frame",
       "id": "sjLfx",
-      "x": 450,
-      "y": 11802,
+      "x": 4,
+      "y": 11800,
       "name": "Screen/Map-BottomSheet",
       "clip": true,
       "width": 390,
@@ -20718,6 +20861,12 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "0qxCx": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 16,
+              "y": 17
+            },
             "bCL8Z": {
               "content": "MY"
             },
@@ -20948,12 +21097,20 @@
                   "name": "Activity1",
                   "x": 0,
                   "y": 0,
+                  "height": "fit_content",
                   "descendants": {
+                    "1qzx8": {
+                      "width": "fill_container",
+                      "height": "fit_content",
+                      "x": 16,
+                      "y": 12
+                    },
                     "iK6WV": {
                       "content": "3월 22일 (토)"
                     },
                     "ZiZFM": {
-                      "content": "한강공원 · 러닝 · 19:00"
+                      "content": "한강공원 · 러닝 · 19:00",
+                      "y": 22
                     },
                     "6ZrnJ": {
                       "enabled": false
@@ -20968,12 +21125,20 @@
                   "name": "Activity2",
                   "x": 0,
                   "y": 71,
+                  "height": "fit_content",
                   "descendants": {
+                    "1qzx8": {
+                      "width": "fill_container",
+                      "height": "fit_content",
+                      "x": 16,
+                      "y": 12
+                    },
                     "iK6WV": {
                       "content": "3월 20일 (목)"
                     },
                     "ZiZFM": {
-                      "content": "올림픽공원 · 러닝 · 20:00"
+                      "content": "올림픽공원 · 러닝 · 20:00",
+                      "y": 22
                     },
                     "6ZrnJ": {
                       "enabled": false
@@ -21010,7 +21175,9 @@
                   "y": 0,
                   "descendants": {
                     "gLrOb": {
-                      "content": "푸시 알림"
+                      "content": "푸시 알림",
+                      "x": 16,
+                      "y": 16
                     }
                   }
                 },
@@ -21022,12 +21189,24 @@
                   "name": "EditProfile",
                   "x": 0,
                   "y": 60,
+                  "height": "fit_content",
                   "descendants": {
+                    "1qzx8": {
+                      "width": "fill_container",
+                      "height": "fit_content",
+                      "x": 16,
+                      "y": 12
+                    },
                     "iK6WV": {
                       "content": "내정보 변경"
                     },
                     "ZiZFM": {
-                      "content": "이름, 연락처 등 개인정보 수정"
+                      "content": "이름, 연락처 등 개인정보 수정",
+                      "y": 22
+                    },
+                    "6ZrnJ": {
+                      "x": 324,
+                      "y": 22.5
                     }
                   }
                 }
@@ -21076,19 +21255,55 @@
           "x": 0,
           "y": 780,
           "descendants": {
+            "MeuIn": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 37.75,
+              "y": 8
+            },
             "fl3KD": {
               "fill": "$text-muted"
             },
             "MQKPf": {
               "fill": "$text-muted",
-              "fontWeight": "500"
+              "fontWeight": "500",
+              "x": 6,
+              "y": 26
+            },
+            "x0jQk": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 135.25,
+              "y": 8
+            },
+            "CxFMN": {
+              "x": 1.5,
+              "y": 26
+            },
+            "3jNJN": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 232.75,
+              "y": 8
+            },
+            "yx2Yv": {
+              "x": 1.5,
+              "y": 26
+            },
+            "g23Ww": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 330.25,
+              "y": 8
             },
             "YTWJc": {
               "fill": "$accent-blue"
             },
             "90ugr": {
               "fill": "$accent-blue",
-              "fontWeight": "600"
+              "fontWeight": "600",
+              "x": 1.5,
+              "y": 26
             }
           }
         }
@@ -21115,6 +21330,12 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "0qxCx": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 16,
+              "y": 15
+            },
             "pdGRj": {
               "enabled": true,
               "y": 1
@@ -21125,7 +21346,9 @@
             },
             "m1wGl": {
               "height": "fit_content(0)",
-              "width": "fit_content(0)"
+              "width": "fit_content(0)",
+              "x": 374,
+              "y": 28
             }
           }
         },
@@ -21152,15 +21375,18 @@
               "name": "NameField",
               "x": 16,
               "y": 24,
+              "height": "fit_content",
               "descendants": {
                 "2iAUJ": {
                   "content": "이름"
                 },
                 "bun9m": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "y": 23
                 },
                 "bun9m/XAq1K": {
-                  "content": "김런너"
+                  "content": "김런너",
+                  "y": 14
                 }
               }
             },
@@ -21172,15 +21398,18 @@
               "name": "PhoneField",
               "x": 16,
               "y": 119,
+              "height": "fit_content",
               "descendants": {
                 "2iAUJ": {
                   "content": "연락처"
                 },
                 "bun9m": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "y": 23
                 },
                 "bun9m/XAq1K": {
-                  "content": "010-1234-5678"
+                  "content": "010-1234-5678",
+                  "y": 15.5
                 }
               }
             },
@@ -21192,20 +21421,24 @@
               "name": "EmailField",
               "x": 16,
               "y": 214,
+              "height": "fit_content",
               "descendants": {
                 "2iAUJ": {
                   "content": "이메일"
                 },
                 "bun9m": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "y": 23
                 },
                 "bun9m/XAq1K": {
                   "content": "runner@email.com",
-                  "fill": "$text-tertiary"
+                  "fill": "$text-tertiary",
+                  "y": 15.5
                 },
                 "01sdh": {
                   "enabled": true,
-                  "content": "이메일은 변경할 수 없습니다"
+                  "content": "이메일은 변경할 수 없습니다",
+                  "y": 77
                 }
               }
             },
@@ -21217,15 +21450,18 @@
               "name": "BirthYearField",
               "x": 16,
               "y": 331,
+              "height": "fit_content",
               "descendants": {
                 "2iAUJ": {
                   "content": "출생연도"
                 },
                 "bun9m": {
-                  "width": "fill_container"
+                  "width": "fill_container",
+                  "y": 23
                 },
                 "bun9m/XAq1K": {
-                  "content": "1990"
+                  "content": "1990",
+                  "y": 15.5
                 }
               }
             },
@@ -21250,7 +21486,8 @@
                 },
                 "LH7Mp": {
                   "x": 153,
-                  "content": "저장하기"
+                  "content": "저장하기",
+                  "y": 12
                 }
               }
             }
@@ -21281,6 +21518,458 @@
       "fontFamily": "Inter",
       "fontSize": 13,
       "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "ksYHL",
+      "x": 450,
+      "y": 11800,
+      "name": "Screen/Map (Collapsed)",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg-primary",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "UnENJ",
+          "x": 0,
+          "y": 0,
+          "name": "MapArea",
+          "width": 390,
+          "height": 844,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#1A2E44",
+                "position": 0
+              },
+              {
+                "color": "#2B4060",
+                "position": 0.5
+              },
+              {
+                "color": "#1D3050",
+                "position": 1
+              }
+            ]
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "line",
+              "id": "TTHGM",
+              "x": 0,
+              "y": 200,
+              "name": "GridH",
+              "width": 390,
+              "height": 0,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFFFFF10"
+              }
+            },
+            {
+              "type": "line",
+              "id": "oLCin",
+              "x": 0,
+              "y": 400,
+              "name": "GridH",
+              "width": 390,
+              "height": 0,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFFFFF10"
+              }
+            },
+            {
+              "type": "line",
+              "id": "KoiMh",
+              "x": 0,
+              "y": 600,
+              "name": "GridH",
+              "width": 390,
+              "height": 0,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFFFFF10"
+              }
+            },
+            {
+              "type": "line",
+              "id": "QWhHQ",
+              "x": 130,
+              "y": 0,
+              "name": "GridV",
+              "width": 0,
+              "height": 844,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFFFFF10"
+              }
+            },
+            {
+              "type": "line",
+              "id": "3R3Kp",
+              "x": 260,
+              "y": 0,
+              "name": "GridV",
+              "width": 0,
+              "height": 844,
+              "stroke": {
+                "thickness": 1,
+                "fill": "#FFFFFF10"
+              }
+            },
+            {
+              "type": "frame",
+              "id": "6oUvc",
+              "x": 100,
+              "y": 280,
+              "name": "Marker1",
+              "width": 32,
+              "height": 32,
+              "fill": "$accent-blue",
+              "cornerRadius": 100,
+              "stroke": {
+                "align": "inside",
+                "thickness": 3,
+                "fill": "#FFFFFF"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "OCCPr",
+                  "x": 8,
+                  "y": 8,
+                  "name": "Dot",
+                  "fill": "#FFFFFF",
+                  "width": 10,
+                  "height": 10
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "eMXDO",
+              "x": 240,
+              "y": 380,
+              "name": "Marker2",
+              "width": 32,
+              "height": 32,
+              "fill": "$accent-blue",
+              "cornerRadius": 100,
+              "stroke": {
+                "align": "inside",
+                "thickness": 3,
+                "fill": "#FFFFFF"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "Qi3IB",
+                  "x": 8,
+                  "y": 8,
+                  "name": "Dot",
+                  "fill": "#FFFFFF",
+                  "width": 10,
+                  "height": 10
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ToTgh",
+              "x": 170,
+              "y": 500,
+              "name": "Marker3",
+              "width": 32,
+              "height": 32,
+              "fill": "$accent-blue",
+              "cornerRadius": 100,
+              "stroke": {
+                "align": "inside",
+                "thickness": 3,
+                "fill": "#FFFFFF"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "hTa70",
+                  "x": 8,
+                  "y": 8,
+                  "name": "Dot",
+                  "fill": "#FFFFFF",
+                  "width": 10,
+                  "height": 10
+                }
+              ]
+            },
+            {
+              "type": "ellipse",
+              "id": "phVX6",
+              "x": 180,
+              "y": 340,
+              "name": "MyLocationPulse",
+              "fill": "#669FF226",
+              "width": 40,
+              "height": 40
+            },
+            {
+              "type": "ellipse",
+              "id": "YeDdO",
+              "x": 193,
+              "y": 353,
+              "name": "MyLocationDot",
+              "fill": "$accent-blue",
+              "width": 14,
+              "height": 14,
+              "stroke": {
+                "align": "outside",
+                "thickness": 3,
+                "fill": "#FFFFFF"
+              }
+            },
+            {
+              "type": "text",
+              "id": "K1oQG",
+              "x": 78,
+              "y": 260,
+              "name": "Label1",
+              "fill": "$text-primary",
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#00000080",
+                "offset": {
+                  "x": 0,
+                  "y": 1
+                },
+                "blur": 3
+              },
+              "content": "여의도공원",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "wdtTa",
+              "x": 224,
+              "y": 360,
+              "name": "Label2",
+              "fill": "$text-primary",
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#00000080",
+                "offset": {
+                  "x": 0,
+                  "y": 1
+                },
+                "blur": 3
+              },
+              "content": "한강공원",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "gZpvi",
+              "x": 148,
+              "y": 480,
+              "name": "Label3",
+              "fill": "$text-primary",
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#00000080",
+                "offset": {
+                  "x": 0,
+                  "y": 1
+                },
+                "blur": 3
+              },
+              "content": "올림픽공원",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "6wBYx",
+          "x": 0,
+          "y": 0,
+          "name": "TranslucentHeader",
+          "width": 390,
+          "height": 56,
+          "fill": "#2B364480",
+          "effect": {
+            "type": "background_blur",
+            "radius": 20
+          },
+          "gap": 12,
+          "padding": [
+            0,
+            16
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "ZeZtQ",
+              "name": "BackBtn",
+              "width": 36,
+              "height": 36,
+              "fill": "#2B364499",
+              "cornerRadius": 100,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "wZPT1",
+                  "x": 8,
+                  "y": 8,
+                  "name": "BackIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "chevron-left",
+                  "iconFontFamily": "lucide",
+                  "fill": "$text-primary"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "9FsQ0",
+              "name": "Title",
+              "fill": "$text-primary",
+              "content": "러닝 장소",
+              "fontFamily": "Inter",
+              "fontSize": 17,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "OXg4h",
+          "x": 326,
+          "y": 720,
+          "name": "MyLocationFAB",
+          "width": 48,
+          "height": 48,
+          "fill": "$bg-surface",
+          "cornerRadius": 100,
+          "stroke": {
+            "thickness": 1,
+            "fill": "$border-default"
+          },
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#00000033",
+            "offset": {
+              "x": 0,
+              "y": 2
+            },
+            "blur": 8
+          },
+          "layout": "none",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "CRVJw",
+              "x": 13,
+              "y": 13,
+              "name": "LocateIcon",
+              "width": 22,
+              "height": 22,
+              "iconFontName": "locate-fixed",
+              "iconFontFamily": "lucide",
+              "fill": "$accent-blue"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VqO9i",
+          "x": 0,
+          "y": 788,
+          "name": "ListButton",
+          "width": 390,
+          "fill": "$bg-surface",
+          "cornerRadius": [
+            16,
+            16,
+            0,
+            0
+          ],
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#00000030",
+            "offset": {
+              "x": 0,
+              "y": -2
+            },
+            "blur": 12
+          },
+          "gap": 8,
+          "padding": [
+            14,
+            20
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "xXSKN",
+              "name": "btnIcon",
+              "width": 18,
+              "height": 18,
+              "iconFontName": "list",
+              "iconFontFamily": "lucide",
+              "fill": "$accent-blue"
+            },
+            {
+              "type": "text",
+              "id": "Mei3N",
+              "name": "btnText",
+              "fill": "$text-primary",
+              "content": "장소 목록 보기",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "600"
+            },
+            {
+              "type": "icon_font",
+              "id": "3u2BA",
+              "name": "btnChevron",
+              "width": 16,
+              "height": 16,
+              "iconFontName": "chevron-up",
+              "iconFontFamily": "lucide",
+              "fill": "$text-tertiary"
+            }
+          ]
+        }
+      ]
     }
   ],
   "variables": {

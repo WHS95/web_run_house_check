@@ -56,7 +56,9 @@ async function getNotificationsData() {
             supabase
                 .schema("attendance")
                 .from("notices")
-                .select("*, author:author_id(first_name)")
+                .select(
+                    "id, title, type, content, is_active, created_at, author:author_id(first_name)"
+                )
                 .eq("crew_id", crewId)
                 .order("created_at", { ascending: false })
                 .limit(30),
@@ -79,9 +81,19 @@ async function getNotificationsData() {
             .eq("crew_id", crewId)
             .eq("is_read", false);
 
+        // Supabase FK 조인은 author를 배열로 반환 → 단일 객체로 정규화
+        const normalizedNotices = (
+            noticesResult.data ?? []
+        ).map((n: any) => ({
+            ...n,
+            author: Array.isArray(n.author)
+                ? (n.author[0] ?? null)
+                : (n.author ?? null),
+        }));
+
         return {
             crewId,
-            notices: noticesResult.data ?? [],
+            notices: normalizedNotices,
             notifications: notificationsResult.data ?? [],
             unreadCount: unreadCount ?? 0,
         };

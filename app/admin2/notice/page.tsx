@@ -1,7 +1,9 @@
 import PageHeader from "@/components/organisms/common/PageHeader";
 import NoticeManagement from "./components/NoticeManagement";
+import { getAdminAuth } from "@/lib/admin2/auth";
 
-export default function AdminNoticePage() {
+export default async function AdminNoticePage() {
+    const { crewId } = await getAdminAuth();
     return (
         <>
             <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
@@ -12,7 +14,7 @@ export default function AdminNoticePage() {
                     backgroundColor="bg-rh-bg-surface"
                 />
             </div>
-            <NoticeManagement />
+            <NoticeManagement crewId={crewId} />
         </>
     );
 }

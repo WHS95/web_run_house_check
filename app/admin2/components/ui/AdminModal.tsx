@@ -1,5 +1,6 @@
 "use client";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,11 +23,41 @@ const AdminModal = memo(function AdminModal({
         onClose();
     }, [onClose]);
 
-    return (
+    // 포털 마운트: SSR 시 document가 없으므로 클라이언트에서만 활성화
+    const [mounted, setMounted] = useState(false);
+    const [container, setContainer] =
+        useState<HTMLElement | null>(null);
+
+    useEffect(() => {
+        setMounted(true);
+        // mobile-viewport를 포털 타겟으로 사용 (없으면 body)
+        const target =
+            (document.querySelector(
+                ".mobile-viewport",
+            ) as HTMLElement | null) || document.body;
+        setContainer(target);
+    }, []);
+
+    // 모달 열림 시 배경 스크롤 방지
+    useEffect(() => {
+        if (!open) return;
+        const main = document.querySelector(
+            ".main-content",
+        ) as HTMLElement | null;
+        const prev = main?.style.overflow;
+        if (main) main.style.overflow = "hidden";
+        return () => {
+            if (main) main.style.overflow = prev || "";
+        };
+    }, [open]);
+
+    if (!mounted || !container) return null;
+
+    const modal = (
         <AnimatePresence>
             {open && (
                 <motion.div
-                    className="absolute inset-0 z-[100] flex items-center justify-center"
+                    className="absolute inset-0 z-[100] flex items-center justify-center p-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -37,7 +68,7 @@ const AdminModal = memo(function AdminModal({
                         onClick={handleBackdrop}
                     />
                     <motion.div
-                        className="relative z-10 w-[320px] rounded-2xl bg-rh-bg-surface p-6 flex flex-col gap-5"
+                        className="relative z-10 w-full max-w-[320px] max-h-[calc(100%-2rem)] overflow-y-auto rounded-2xl bg-rh-bg-surface p-6 flex flex-col gap-5"
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
@@ -63,6 +94,8 @@ const AdminModal = memo(function AdminModal({
             )}
         </AnimatePresence>
     );
+
+    return createPortal(modal, container);
 });
 
 export default AdminModal;

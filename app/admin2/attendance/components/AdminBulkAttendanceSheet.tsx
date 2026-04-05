@@ -7,7 +7,7 @@ import {
     useCallback,
     memo,
 } from "react";
-import { ChevronLeft, Check, Calendar, Clock } from "lucide-react";
+import { ChevronLeft, Check, Calendar, Timer } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import AdminSelect from "@/app/admin2/components/ui/AdminSelect";
 import AdminTabBar from "@/app/admin2/components/ui/AdminTabBar";
@@ -25,18 +25,17 @@ interface LocationRow {
     name: string;
 }
 
+interface ExerciseTypeRow {
+    id: number;
+    name: string;
+}
+
 interface Props {
     crewId: string;
     initialDate: string; // YYYY-MM-DD
     onClose: () => void;
     onSuccess: () => void;
 }
-
-const EXERCISE_TABS = [
-    { key: "running", label: "러닝" },
-    { key: "walking", label: "걷기" },
-    { key: "etc", label: "기타" },
-];
 
 function getBirthSuffix(year: number | null): string {
     if (!year) return "";
@@ -46,8 +45,22 @@ function getBirthSuffix(year: number | null): string {
 function getNowKSTTime(): string {
     const d = new Date();
     const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-    return kst.toISOString().slice(11, 16);
+    const hh = kst.getUTCHours().toString().padStart(2, "0");
+    const mm = kst.getUTCMinutes();
+    /* 10분 단위 내림 정렬 (TIME_OPTIONS와 매칭) */
+    const mmRounded = (Math.floor(mm / 10) * 10)
+        .toString()
+        .padStart(2, "0");
+    return `${hh}:${mmRounded}`;
 }
+
+/* 시간 옵션: 10분 단위 (/attendance 페이지와 동일) */
+const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) =>
+    ["00", "10", "20", "30", "40", "50"].map((m) => ({
+        value: `${h.toString().padStart(2, "0")}:${m}`,
+        label: `${h.toString().padStart(2, "0")}:${m}`,
+    })),
+).flat();
 
 function AdminBulkAttendanceSheet({
     crewId,
@@ -58,7 +71,10 @@ function AdminBulkAttendanceSheet({
     const [date, setDate] = useState(initialDate);
     const [time, setTime] = useState(getNowKSTTime);
     const [locationId, setLocationId] = useState("");
-    const [exerciseTab, setExerciseTab] = useState("running");
+    const [exerciseTypeId, setExerciseTypeId] = useState("");
+    const [exerciseTypes, setExerciseTypes] = useState<
+        ExerciseTypeRow[]
+    >([]);
     const [locations, setLocations] = useState<LocationRow[]>([]);
     const [users, setUsers] = useState<UserRow[]>([]);
     const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -82,11 +98,18 @@ function AdminBulkAttendanceSheet({
                 if (uJson?.success && Array.isArray(uJson.data)) {
                     setUsers(uJson.data);
                 }
-                if (sJson?.success && sJson.data?.locations) {
-                    const locs: LocationRow[] = sJson.data.locations;
+                if (sJson?.success && sJson.data) {
+                    const locs: LocationRow[] =
+                        sJson.data.locations || [];
                     setLocations(locs);
                     if (locs.length > 0) {
                         setLocationId(String(locs[0].id));
+                    }
+                    const exTypes: ExerciseTypeRow[] =
+                        sJson.data.exerciseTypes || [];
+                    setExerciseTypes(exTypes);
+                    if (exTypes.length > 0) {
+                        setExerciseTypeId(String(exTypes[0].id));
                     }
                 }
             } finally {
@@ -147,6 +170,10 @@ function AdminBulkAttendanceSheet({
             alert("출석 장소를 선택해주세요.");
             return;
         }
+        if (!exerciseTypeId) {
+            alert("운동 종류를 선택해주세요.");
+            return;
+        }
         if (!date || !time) {
             alert("출석 날짜와 시간을 모두 선택해주세요.");
             return;
@@ -168,6 +195,7 @@ function AdminBulkAttendanceSheet({
                 })),
                 attendanceTimestamp,
                 locationId: parseInt(locationId, 10),
+                exerciseTypeId: parseInt(exerciseTypeId, 10),
             };
             const res = await fetch(
                 "/api/admin/attendance/bulk",
@@ -203,6 +231,7 @@ function AdminBulkAttendanceSheet({
         selected,
         hostIds,
         locationId,
+        exerciseTypeId,
         date,
         time,
         crewId,
@@ -216,6 +245,15 @@ function AdminBulkAttendanceSheet({
                 label: l.name,
             })),
         [locations],
+    );
+
+    const exerciseTabs = useMemo(
+        () =>
+            exerciseTypes.map((e) => ({
+                key: String(e.id),
+                label: e.name,
+            })),
+        [exerciseTypes],
     );
 
     return (
@@ -243,7 +281,8 @@ function AdminBulkAttendanceSheet({
                 className="flex-1 overflow-y-auto px-4 pt-5 pb-4 space-y-4"
                 style={{ overscrollBehavior: "contain" }}
             >
-                {/* 날짜 */}
+                {/* 날짜 — /attendance 와 동일 패턴
+                    (ios-date-input이 네이티브 picker 아이콘 숨김) */}
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-medium text-rh-text-secondary">
                         날짜
@@ -255,33 +294,46 @@ function AdminBulkAttendanceSheet({
                             onChange={(e) =>
                                 setDate(e.target.value)
                             }
-                            className="w-full h-12 px-4 pr-10 rounded-lg bg-rh-bg-surface border border-rh-border text-sm text-white outline-none focus:border-rh-accent transition-colors"
+                            className="ios-date-input border border-rh-border text-sm text-white focus:border-rh-accent"
                         />
-                        <Calendar
-                            size={18}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-rh-text-muted pointer-events-none"
-                        />
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                            <Calendar
+                                size={18}
+                                className="text-rh-text-muted"
+                            />
+                        </div>
                     </div>
                 </div>
 
-                {/* 시간 */}
+                {/* 시간 — /attendance 와 동일 패턴
+                    (10분 단위 select + Timer 아이콘) */}
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-medium text-rh-text-secondary">
                         시간
                     </label>
                     <div className="relative">
-                        <input
-                            type="time"
+                        <select
                             value={time}
                             onChange={(e) =>
                                 setTime(e.target.value)
                             }
-                            className="w-full h-12 px-4 pr-10 rounded-lg bg-rh-bg-surface border border-rh-border text-sm text-white outline-none focus:border-rh-accent transition-colors"
-                        />
-                        <Clock
-                            size={18}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-rh-text-muted pointer-events-none"
-                        />
+                            className="w-full h-12 px-4 pr-10 rounded-lg bg-rh-bg-surface border border-rh-border text-sm text-white appearance-none outline-none focus:border-rh-accent transition-colors"
+                        >
+                            {TIME_OPTIONS.map((opt) => (
+                                <option
+                                    key={opt.value}
+                                    value={opt.value}
+                                >
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                            <Timer
+                                size={18}
+                                className="text-rh-text-muted"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -298,16 +350,24 @@ function AdminBulkAttendanceSheet({
                     }
                 />
 
-                {/* 운동 종류 */}
+                {/* 운동 종류 — DB 조회 (crew_exercise_types) */}
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-medium text-rh-text-secondary">
                         운동 종류
                     </label>
-                    <AdminTabBar
-                        tabs={EXERCISE_TABS}
-                        activeTab={exerciseTab}
-                        onTabChange={setExerciseTab}
-                    />
+                    {isLoading ? (
+                        <div className="h-10 rounded-lg bg-rh-bg-surface" />
+                    ) : exerciseTabs.length === 0 ? (
+                        <div className="h-10 flex items-center px-4 rounded-lg bg-rh-bg-surface text-xs text-rh-text-secondary">
+                            등록된 운동 종류가 없습니다.
+                        </div>
+                    ) : (
+                        <AdminTabBar
+                            tabs={exerciseTabs}
+                            activeTab={exerciseTypeId}
+                            onTabChange={setExerciseTypeId}
+                        />
+                    )}
                 </div>
 
                 {/* 출석 회원 선택 */}

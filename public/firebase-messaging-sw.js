@@ -33,10 +33,41 @@ messaging.onBackgroundMessage((payload) => {
     self.registration.showNotification(title, options);
 });
 
-// 알림 클릭
+// 알림 클릭 → data.url로 이동 (deep-link)
+// 이미 열린 탭이 있으면 해당 탭을 focus 후 경로 이동, 없으면 새 창.
 self.addEventListener("notificationclick", (event) => {
     event.notification.close();
-    if (event.action !== "close") {
-        event.waitUntil(clients.openWindow("/"));
-    }
+    if (event.action === "close") return;
+
+    const data = event.notification.data || {};
+    const targetUrl = data.url || "/";
+
+    event.waitUntil(
+        (async () => {
+            const allClients = await clients.matchAll({
+                type: "window",
+                includeUncontrolled: true,
+            });
+
+            // 동일 origin 탭이 있으면 focus + navigate
+            for (const client of allClients) {
+                try {
+                    const clientUrl = new URL(client.url);
+                    const selfUrl = new URL(self.location.origin);
+                    if (clientUrl.origin === selfUrl.origin) {
+                        await client.focus();
+                        if ("navigate" in client) {
+                            await client.navigate(targetUrl);
+                        }
+                        return;
+                    }
+                } catch {
+                    // URL 파싱 실패는 무시
+                }
+            }
+
+            // 열린 탭이 없으면 새 창으로 열기
+            await clients.openWindow(targetUrl);
+        })()
+    );
 });

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCrewLocations, getCrewById } from "@/lib/supabase/admin";
+import {
+  getCrewLocations,
+  getCrewById,
+  getCrewExerciseTypes,
+} from "@/lib/supabase/admin";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
@@ -49,11 +53,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 크루 운동 종류 목록 조회
+    const { data: exerciseTypes, error: exerciseTypesError } =
+      await getCrewExerciseTypes(crewId);
+
+    if (exerciseTypesError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "운동 종류 정보를 가져오는데 실패했습니다.",
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       data: {
         crewData,
         locations: locations || [],
+        exerciseTypes: exerciseTypes || [],
       },
     });
   } catch (error) {

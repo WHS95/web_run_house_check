@@ -1,7 +1,15 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect, memo } from "react";
+import {
+    useState,
+    useCallback,
+    useMemo,
+    useEffect,
+    useRef,
+    memo,
+} from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
     AnimatedList,
     AnimatedItem,
@@ -10,18 +18,21 @@ import FadeIn from "@/components/atoms/FadeIn";
 import {
     AdminSmallButton,
     AdminAlertDialog,
+    AdminSearchBar,
     NoticeCard,
 } from "@/app/admin2/components/ui";
 
 type NoticeType = "공지" | "일반" | "중요";
 type BadgeVariant = "accent" | "outline" | "muted";
 
-interface Notice {
+interface NoticeRow {
     id: string;
+    title: string | null;
     type: NoticeType;
-    title: string;
-    description: string;
-    date: string;
+    content: string;
+    is_active: boolean;
+    created_at: string;
+    author: { first_name: string } | null;
 }
 
 const typeToBadgeVariant: Record<NoticeType, BadgeVariant> = {
@@ -30,72 +41,132 @@ const typeToBadgeVariant: Record<NoticeType, BadgeVariant> = {
     중요: "outline",
 };
 
-// TODO: Supabase 연동 시 실제 데이터로 교체
-const mockNotices: Notice[] = [
-    {
-        id: "1",
-        type: "공지",
-        title: "3월 넷째주 러닝 장소 변경 안내",
-        description:
-            "이번 주 토요일 러닝은 한강공원 반포지구에서 여의도공원으로 변경되었습니다.",
-        date: "2026.03.20",
-    },
-    {
-        id: "2",
-        type: "일반",
-        title: "신규 크루원 환영합니다!",
-        description:
-            "이번 달 새로 합류한 크루원 3명을 소개합니다! 다함께 환영해주세요.",
-        date: "2026.03.15",
-    },
-    {
-        id: "3",
-        type: "중요",
-        title: "출석 체크 방식 변경 안내",
-        description:
-            "3월부터 GPS 기반 자동 출석 체크가 도입됩니다. 앱 위치 권한을 허용해주세요.",
-        date: "2026.02.10",
-    },
-];
+const formatDate = (iso: string): string => {
+    const d = new Date(iso);
+    return `${d.getFullYear()}.${String(
+        d.getMonth() + 1,
+    ).padStart(2, "0")}.${String(d.getDate()).padStart(
+        2,
+        "0",
+    )}`;
+};
 
-const NoticeManagement = memo(function NoticeManagement() {
-    const [notices, setNotices] = useState<Notice[]>(mockNotices);
+interface Props {
+    crewId: string;
+}
+
+const NoticeManagement = memo(function NoticeManagement({
+    crewId,
+}: Props) {
+    const router = useRouter();
+    const [notices, setNotices] = useState<NoticeRow[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchInput, setSearchInput] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
     const [deleteDialog, setDeleteDialog] = useState<{
         open: boolean;
         noticeId: string;
     }>({ open: false, noticeId: "" });
+    const [deleting, setDeleting] = useState(false);
 
-    // sessionStorage에서 새 공지 수신
+    // 검색어 debounce
+    const debounceRef = useRef<ReturnType<
+        typeof setTimeout
+    > | null>(null);
     useEffect(() => {
-        const stored = sessionStorage.getItem("admin_new_notice");
-        if (stored) {
-            try {
-                const newNotice = JSON.parse(stored) as Notice;
-                setNotices((prev) => [newNotice, ...prev]);
-            } catch {
-                // 파싱 실패 시 무시
+        if (debounceRef.current)
+            clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            setSearchQuery(searchInput.trim());
+        }, 300);
+        return () => {
+            if (debounceRef.current)
+                clearTimeout(debounceRef.current);
+        };
+    }, [searchInput]);
+
+    // 공지 목록 조회
+    const fetchNotices = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const params = new URLSearchParams({ crewId });
+            if (searchQuery) params.set("q", searchQuery);
+            const res = await fetch(
+                `/api/admin/notices?${params.toString()}`,
+                { cache: "no-store" },
+            );
+            const json = await res.json();
+            if (json?.success && Array.isArray(json.data)) {
+                setNotices(json.data);
+            } else {
+                setNotices([]);
             }
-            sessionStorage.removeItem("admin_new_notice");
+        } catch (e) {
+            console.error("[notice list] fetch failed:", e);
+            setNotices([]);
+        } finally {
+            setIsLoading(false);
         }
-    }, []);
+    }, [crewId, searchQuery]);
+
+    useEffect(() => {
+        fetchNotices();
+    }, [fetchNotices]);
 
     const totalCount = useMemo(
         () => notices.length,
         [notices],
     );
 
-    const handleDelete = useCallback(() => {
-        setNotices((prev) =>
-            prev.filter(
-                (n) => n.id !== deleteDialog.noticeId,
-            ),
-        );
-        setDeleteDialog({ open: false, noticeId: "" });
+    const handleCardClick = useCallback(
+        (id: string) => {
+            router.push(`/admin2/notice/${id}`);
+        },
+        [router],
+    );
+
+    const handleDelete = useCallback(async () => {
+        const noticeId = deleteDialog.noticeId;
+        if (!noticeId) return;
+        setDeleting(true);
+        try {
+            const res = await fetch("/api/admin/notices", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ noticeId }),
+            });
+            const json = await res.json();
+            if (json?.success) {
+                setNotices((prev) =>
+                    prev.filter((n) => n.id !== noticeId),
+                );
+            } else {
+                alert(
+                    json?.message ??
+                        "공지 삭제에 실패했습니다.",
+                );
+            }
+        } catch (e) {
+            console.error("[notice delete] failed:", e);
+            alert("공지 삭제에 실패했습니다.");
+        } finally {
+            setDeleting(false);
+            setDeleteDialog({ open: false, noticeId: "" });
+        }
     }, [deleteDialog.noticeId]);
 
     return (
         <FadeIn>
             <div className="flex-1 px-4 pt-4 pb-4 space-y-4">
+                {/* 검색바 */}
+                <AdminSearchBar
+                    value={searchInput}
+                    onChange={setSearchInput}
+                    placeholder="제목 또는 내용 검색"
+                />
+
                 {/* 헤더: 전체 N건 + 새 공지 */}
                 <div className="flex items-center justify-between">
                     <span className="text-[13px] text-rh-text-secondary">
@@ -112,37 +183,73 @@ const NoticeManagement = memo(function NoticeManagement() {
                 </div>
 
                 {/* 공지 리스트 */}
-                {notices.length > 0 ? (
+                {isLoading ? (
+                    <div className="space-y-3">
+                        <div className="h-[108px] rounded-xl bg-rh-bg-surface" />
+                        <div className="h-[108px] rounded-xl bg-rh-bg-surface" />
+                    </div>
+                ) : notices.length > 0 ? (
                     <AnimatedList className="space-y-3">
                         {notices.map((notice) => (
-                            <AnimatedItem key={notice.id}>
-                                <NoticeCard
-                                    badge={notice.type}
-                                    badgeVariant={
-                                        typeToBadgeVariant[
-                                            notice.type
-                                        ]
-                                    }
-                                    date={notice.date}
-                                    title={notice.title}
-                                    description={
-                                        notice.description
-                                    }
-                                    onClick={() =>
-                                        setDeleteDialog({
-                                            open: true,
-                                            noticeId:
+                            <AnimatedItem
+                                key={notice.id}
+                            >
+                                <div className="relative">
+                                    <NoticeCard
+                                        badge={notice.type}
+                                        badgeVariant={
+                                            typeToBadgeVariant[
+                                                notice.type
+                                            ]
+                                        }
+                                        date={formatDate(
+                                            notice.created_at,
+                                        )}
+                                        title={
+                                            notice.title ||
+                                            notice.content.slice(
+                                                0,
+                                                30,
+                                            )
+                                        }
+                                        description={
+                                            notice.content
+                                        }
+                                        onClick={() =>
+                                            handleCardClick(
                                                 notice.id,
-                                        })
-                                    }
-                                />
+                                            )
+                                        }
+                                    />
+                                    <button
+                                        type="button"
+                                        aria-label="삭제"
+                                        className="absolute top-2 right-2 h-8 w-8 flex items-center justify-center text-rh-text-tertiary hover:text-rh-status-error"
+                                        onClick={(
+                                            e,
+                                        ) => {
+                                            e.stopPropagation();
+                                            setDeleteDialog(
+                                                {
+                                                    open: true,
+                                                    noticeId:
+                                                        notice.id,
+                                                },
+                                            );
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
                             </AnimatedItem>
                         ))}
                     </AnimatedList>
                 ) : (
                     <div className="py-12 text-center">
                         <p className="text-rh-text-secondary text-sm">
-                            등록된 공지사항이 없습니다.
+                            {searchQuery
+                                ? "검색 결과가 없습니다."
+                                : "등록된 공지사항이 없습니다."}
                         </p>
                     </div>
                 )}
@@ -161,7 +268,9 @@ const NoticeManagement = memo(function NoticeManagement() {
                 title="공지사항을 삭제하시겠습니까?"
                 description="이 작업은 되돌릴 수 없습니다."
                 cancelLabel="취소"
-                confirmLabel="삭제"
+                confirmLabel={
+                    deleting ? "삭제 중..." : "삭제"
+                }
                 confirmVariant="danger"
             />
         </FadeIn>

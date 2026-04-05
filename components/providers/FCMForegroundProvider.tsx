@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { onForegroundMessage } from "@/lib/firebase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell } from "lucide-react";
@@ -8,9 +9,11 @@ import { Bell } from "lucide-react";
 interface ForegroundNotification {
     title: string;
     body: string;
+    url?: string;
 }
 
 export default function FCMForegroundProvider() {
+    const router = useRouter();
     const [notification, setNotification] =
         useState<ForegroundNotification | null>(null);
 
@@ -18,21 +21,35 @@ export default function FCMForegroundProvider() {
         setNotification(null);
     }, []);
 
+    const handleClick = useCallback(() => {
+        // 토스트 클릭 시 deep-link 이동 후 토스트 닫기
+        if (notification?.url) {
+            router.push(notification.url);
+        }
+        setNotification(null);
+    }, [notification, router]);
+
     useEffect(() => {
         const unsubscribe = onForegroundMessage(
             (payload: unknown) => {
                 // data-only 메시지: title/body는 data 필드에서 읽는다.
                 const p = payload as {
                     notification?: { title?: string; body?: string };
-                    data?: { title?: string; body?: string };
+                    data?: {
+                        title?: string;
+                        body?: string;
+                        url?: string;
+                    };
                 };
                 const title =
                     p?.data?.title || p?.notification?.title;
                 const body = p?.data?.body || p?.notification?.body;
+                const url = p?.data?.url;
                 if (title || body) {
                     setNotification({
                         title: title || "런하우스",
                         body: body || "새로운 알림이 있습니다.",
+                        url,
                     });
                 }
             }
@@ -56,7 +73,7 @@ export default function FCMForegroundProvider() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -40 }}
                     className="fixed top-4 left-4 right-4 z-[9999] cursor-pointer"
-                    onClick={handleClose}
+                    onClick={handleClick}
                 >
                     <div className="rounded-rh-lg bg-rh-bg-surface border border-rh-border p-4 shadow-lg">
                         <div className="flex items-start gap-3">

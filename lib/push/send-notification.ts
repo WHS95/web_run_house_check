@@ -88,6 +88,9 @@ export async function sendNotification(
         const tokenStrings = tokens.map((t) => t.token);
         const chunks = chunkArray(tokenStrings, 500);
 
+        // deep-link 대상 경로: payload.data.url 우선, 없으면 "/"
+        const clickLink = payload.data?.url ?? "/";
+
         for (const chunk of chunks) {
             // data-only 메시지: notification 필드를 포함하면 브라우저가
             // 자동 표시 + onBackgroundMessage 중복 표시되어 알림이
@@ -102,7 +105,7 @@ export async function sendNotification(
                 },
                 webpush: {
                     fcmOptions: {
-                        link: "/",
+                        link: clickLink,
                     },
                 },
             });

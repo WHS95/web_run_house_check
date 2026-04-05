@@ -12,7 +12,7 @@ export interface AttendanceRecordWithUser {
     exercise_type_name: string;
     is_host: boolean;
     deleted_at: string | null;
-    users: { first_name: string; last_name: string | null };
+    users: { first_name: string };
 }
 
 // Dashboard 통계 (서버 사이드, React.cache로 요청 내 중복 방지)
@@ -83,31 +83,38 @@ export const getMonthlyAttendance = cache(
 
         if (error) throw new Error("출석 데이터 조회 실패");
 
-        // 유저 이름 조회
+        // 유저 이름 조회 (attendance.users 에는 last_name 컬럼이 없음)
         const userIds = Array.from(
             new Set(
                 (data || []).map((r: any) => r.user_id),
             ),
         );
-        const { data: usersData } = await supabase
-            .schema("attendance")
-            .from("users")
-            .select("id, first_name, last_name")
-            .in("id", userIds);
-
-        const userMap: Record<
+        let userMap: Record<
             string,
-            {
-                first_name: string;
-                last_name: string | null;
-            }
+            { first_name: string }
         > = {};
-        (usersData || []).forEach((u: any) => {
-            userMap[u.id] = {
-                first_name: u.first_name,
-                last_name: u.last_name,
-            };
-        });
+        if (userIds.length > 0) {
+            const {
+                data: usersData,
+                error: usersError,
+            } = await supabase
+                .schema("attendance")
+                .from("users")
+                .select("id, first_name")
+                .in("id", userIds);
+            if (usersError) {
+                console.error(
+                    "[getMonthlyAttendance] users query failed:",
+                    usersError,
+                );
+            }
+            (usersData || []).forEach((u: any) => {
+                userMap[u.id] = {
+                    first_name:
+                        u.first_name || "이름 없음",
+                };
+            });
+        }
 
         return (data || []).map(
             (r: any): AttendanceRecordWithUser => ({
@@ -124,7 +131,6 @@ export const getMonthlyAttendance = cache(
                 deleted_at: r.deleted_at,
                 users: userMap[r.user_id] || {
                     first_name: "이름 없음",
-                    last_name: null,
                 },
             }),
         );

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // 요청 데이터 파싱
     // users: Array<{ userId: string; isHost: boolean }>
-    const { crewId, users, attendanceTimestamp, locationId } =
+    const { crewId, users, attendanceTimestamp, locationId, exerciseTypeId } =
       await request.json();
 
     // 필수 데이터 검증
@@ -50,12 +50,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!attendanceTimestamp || !locationId) {
+    if (!attendanceTimestamp || !locationId || !exerciseTypeId) {
       return NextResponse.json(
         {
           success: false,
           error: "invalid_data",
-          message: "출석 시간과 장소를 선택해주세요.",
+          message: "출석 시간·장소·운동 종류를 모두 선택해주세요.",
         },
         { status: 400 }
       );
@@ -82,24 +82,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // // 기본 운동 종류 조회 (첫 번째 운동 종류를 기본값으로 사용)
-    // const { data: exerciseType, error: exerciseError } = await supabase
-    //   .schema("attendance")
-    //   .from("exercise_types")
-    //   .select("id")
-    //   .limit(1)
-    //   .single();
+    // 운동 종류 유효성 검증 (크루에 등록된 운동 종류인지 확인)
+    const parsedExerciseTypeId = parseInt(String(exerciseTypeId), 10);
+    if (isNaN(parsedExerciseTypeId)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "invalid_exercise_type",
+          message: "유효하지 않은 운동 종류입니다.",
+        },
+        { status: 400 }
+      );
+    }
 
-    // if (exerciseError || !exerciseType) {
-    //   return NextResponse.json(
-    //     {
-    //       success: false,
-    //       error: "no_exercise_type",
-    //       message: "운동 종류를 찾을 수 없습니다.",
-    //     },
-    //     { status: 500 }
-    //   );
-    // }
+    const { data: crewExerciseType, error: crewExerciseTypeError } =
+      await supabase
+        .schema("attendance")
+        .from("crew_exercise_types")
+        .select("exercise_type_id")
+        .eq("crew_id", crewId)
+        .eq("exercise_type_id", parsedExerciseTypeId)
+        .single();
+
+    if (crewExerciseTypeError || !crewExerciseType) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "invalid_exercise_type",
+          message: "크루에 등록되지 않은 운동 종류입니다.",
+        },
+        { status: 400 }
+      );
+    }
 
     // 관리자 권한 확인 (user_crews 테이블 사용)
     const { data: roleCheck, error: roleError } = await supabase
@@ -131,7 +145,7 @@ export async function POST(request: NextRequest) {
       crew_id: crewId,
       attendance_timestamp: attendanceTimestamp, // attendance_timestamp 사용
       location: locationData.name, // location은 text 타입으로 장소명 저장
-      exercise_type_id: 1, //exerciseType.id, // 필수 필드 TODO 지금은 러닝만 고정으로 해서 나중에 고도화때 운동타입도 선택가능하게
+      exercise_type_id: parsedExerciseTypeId,
       is_host: u.isHost,
     }));
 

@@ -80,8 +80,6 @@ function getKSTTime(timestamp: string): string {
 }
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
-/* 스크롤 임계값: 이 값 이상 스크롤되면 달력이 접힘 */
-const COLLAPSE_THRESHOLD = 40;
 
 /* ── 캘린더 셀 ── */
 const CalendarCell = memo(function CalendarCell({
@@ -195,21 +193,35 @@ export default function AttendanceManagement({
         recordId: string;
     }>({ open: false, recordId: "" });
 
-    /* 스크롤 → 달력 접힘 상태 (main-content 스크롤 감지) */
-    const [isCollapsed, setIsCollapsed] = useState(false);
-
-    /* 그룹 아코디언 펼침 상태 (key: `${location}|${time}`) */
+    /* 그룹 아코디언 펼침 상태 (key: `${location}|${time}`)
+       달력 모드(월간/주간)는 이 상태에서 자동 파생됨 */
     const [expandedGroups, setExpandedGroups] = useState<
         Set<string>
     >(new Set());
-    const toggleGroup = useCallback((key: string) => {
-        setExpandedGroups((prev) => {
-            const next = new Set(prev);
-            if (next.has(key)) next.delete(key);
-            else next.add(key);
-            return next;
-        });
-    }, []);
+    const toggleGroup = useCallback(
+        (key: string, rowEl?: HTMLElement | null) => {
+            setExpandedGroups((prev) => {
+                const next = new Set(prev);
+                if (next.has(key)) next.delete(key);
+                else next.add(key);
+                return next;
+            });
+            /* 열릴 때 현재 아코디언 카드가 헤더 아래로 오도록 스크롤 정렬 */
+            if (rowEl) {
+                requestAnimationFrame(() => {
+                    rowEl.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                    });
+                });
+            }
+        },
+        [],
+    );
+
+    /* 달력 모드: 아코디언이 하나라도 열리면 주간 뷰로 자동 축소
+       → 참여자 리스트를 위한 수직 공간 확보 */
+    const isCollapsed = expandedGroups.size > 0;
 
     /* hydration 안전: 오늘 날짜는 mount 후 계산 */
     const [mounted, setMounted] = useState(false);
@@ -365,53 +377,19 @@ export default function AttendanceManagement({
         );
     }, [calendarDays, selectedDay]);
 
-    /* 스크롤 리스너: rAF 스로틀 + 단방향 트리거(접힘만) */
-    useEffect(() => {
-        const el = document.querySelector(
-            ".main-content",
-        ) as HTMLElement | null;
-        if (!el) return;
-        let rafId = 0;
-        const onScroll = () => {
-            if (rafId) return;
-            rafId = requestAnimationFrame(() => {
-                rafId = 0;
-                if (el.scrollTop > COLLAPSE_THRESHOLD) {
-                    setIsCollapsed((prev) =>
-                        prev ? prev : true,
-                    );
-                }
-            });
-        };
-        el.addEventListener("scroll", onScroll, {
-            passive: true,
-        });
-        return () => {
-            el.removeEventListener("scroll", onScroll);
-            if (rafId) cancelAnimationFrame(rafId);
-        };
-    }, []);
-
-    /* 수동 펼침 시 스크롤이 임계값 위에 있으면 즉시 재접힘되는 것을 방지
-       → 달력 상단으로 스크롤 리셋 */
-    useEffect(() => {
-        if (isCollapsed) return;
-        const el = document.querySelector(
-            ".main-content",
-        ) as HTMLElement | null;
-        if (el && el.scrollTop > COLLAPSE_THRESHOLD) {
-            el.scrollTop = 0;
-        }
-    }, [isCollapsed]);
-
-    /* 달 변경 시 스크롤 리셋 → 달력 펼침 */
+    /* 달 변경 시: 아코디언 모두 닫고 스크롤 리셋 */
     useEffect(() => {
         const el = document.querySelector(
             ".main-content",
         ) as HTMLElement | null;
         if (el) el.scrollTop = 0;
-        setIsCollapsed(false);
+        setExpandedGroups(new Set());
     }, [year, month]);
+
+    /* 날짜 변경 시: 아코디언 닫기 (이전 날짜의 그룹 키가 달라질 수 있음) */
+    useEffect(() => {
+        setExpandedGroups(new Set());
+    }, [selectedDay]);
 
     /* 삭제 */
     const handleDeleteConfirm = useCallback(async () => {
@@ -505,6 +483,15 @@ export default function AttendanceManagement({
                 - 제목+일괄등록 행도 함께 sticky되어 항상 노출 */}
             <div
                 className="sticky top-[calc(env(safe-area-inset-top)+56px)] z-20 px-4 pt-4 bg-rh-bg-primary"
+                style={{
+                    /* 전역 .main-content .sticky GPU 레이어 최적화 오버라이드:
+                       내부 높이 변경 시 iOS compositor 레이어 재생성으로
+                       흔들림 발생 → transform/will-change 제거 */
+                    transform: "none",
+                    willChange: "auto",
+                    backfaceVisibility: "visible",
+                    contain: "layout style",
+                }}
             >
                 <AdminMonthNav
                     year={year}
@@ -529,12 +516,14 @@ export default function AttendanceManagement({
                         ))}
                     </div>
 
-                    {/* 월간 / 주간 전환 — 즉시 스위치 (애니메이션 없음)
-                        sticky wrapper 내부에서 height 애니메이션 시
-                        iOS sticky 재계산과 충돌하여 "흔들림" 발생 → 제거 */}
+                    {/* 월간 / 주간 전환
+                        - 이벤트(아코디언 토글) 기반이므로 스크롤과 충돌 없음
+                        - 부드러운 height 전환으로 UX 개선 */}
                     <div
                         style={{
                             height: isCollapsed ? 44 : 284,
+                            transition:
+                                "height 220ms cubic-bezier(0.32, 0.72, 0, 1)",
                         }}
                         className="overflow-hidden"
                     >
@@ -550,13 +539,20 @@ export default function AttendanceManagement({
                 </div>
 
                 {/* 날짜 라벨 + 일괄등록 (달력과 함께 sticky 유지)
-                    - 라벨 탭 → 달력 펼침/접힘 토글 */}
+                    - 라벨 탭 → 모든 아코디언 닫기 (= 달력 월간으로 복귀)
+                    - 아코디언이 닫혀 있으면 버튼 비활성 */}
                 <div className="flex items-center justify-between py-3">
                     <button
-                        onClick={() =>
-                            setIsCollapsed((p) => !p)
-                        }
-                        className="flex items-center gap-1.5 text-sm font-semibold text-white"
+                        type="button"
+                        onClick={() => {
+                            if (isCollapsed) {
+                                setExpandedGroups(
+                                    new Set(),
+                                );
+                            }
+                        }}
+                        disabled={!isCollapsed}
+                        className="flex items-center gap-1.5 text-sm font-semibold text-white disabled:opacity-100"
                     >
                         <span>
                             {month}월 {selectedDay}일 (
@@ -602,12 +598,22 @@ export default function AttendanceManagement({
                                     key={key}
                                     className="rounded-xl bg-rh-bg-surface overflow-hidden"
                                 >
-                                    {/* 아코디언 헤더: 장소 · 시간 · 참여자수 */}
+                                    {/* 아코디언 헤더: 장소 · 시간 · 참여자수
+                                        - 열릴 때 해당 카드를 스크롤 최상단으로 정렬 */}
                                     <button
-                                        onClick={() =>
-                                            toggleGroup(key)
-                                        }
-                                        className="w-full flex items-center gap-2 px-4 py-3 text-left"
+                                        onClick={(e) => {
+                                            const section =
+                                                e.currentTarget.closest(
+                                                    "section",
+                                                ) as HTMLElement | null;
+                                            toggleGroup(
+                                                key,
+                                                isExpanded
+                                                    ? null
+                                                    : section,
+                                            );
+                                        }}
+                                        className="w-full flex items-center gap-2 px-4 py-3 text-left active:bg-rh-bg-muted/20 transition-colors"
                                     >
                                         <div className="flex-1 flex items-center gap-2 min-w-0">
                                             <h4 className="text-sm font-semibold text-white truncate">
@@ -679,20 +685,14 @@ export default function AttendanceManagement({
                                 </section>
                             );
                         })}
-                        {/* 스크롤 여유 공간 (접힘 트리거용, 임계 40px 초과) */}
-                        <div className="h-12" />
                     </div>
                 ) : (
-                    <>
-                        <div className="py-8 text-center">
-                            <p className="text-rh-text-secondary text-sm">
-                                해당 날짜에 출석 기록이
-                                없습니다.
-                            </p>
-                        </div>
-                        {/* 스크롤 여유 공간 (접힘 트리거용) */}
-                        <div className="h-[60vh]" />
-                    </>
+                    <div className="py-8 text-center">
+                        <p className="text-rh-text-secondary text-sm">
+                            해당 날짜에 출석 기록이
+                            없습니다.
+                        </p>
+                    </div>
                 )}
             </div>
 

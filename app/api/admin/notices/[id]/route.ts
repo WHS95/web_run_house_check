@@ -4,7 +4,7 @@ import {
     createServerClient,
     type CookieOptions,
 } from "@supabase/ssr";
-import { getAdminAuth } from "@/lib/admin2/auth";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -43,22 +43,9 @@ export async function GET(
     }
 
     // 관리자 권한 + 크루 격리 검증
-    let adminCrewId: string;
-    try {
-        const auth = await getAdminAuth();
-        adminCrewId = auth.crewId;
-    } catch {
-        return NextResponse.json(
-            { success: false, message: "관리자 권한이 필요합니다." },
-            { status: 403 },
-        );
-    }
-    if (!adminCrewId) {
-        return NextResponse.json(
-            { success: false, message: "관리자 권한이 필요합니다." },
-            { status: 403 },
-        );
-    }
+    const guard = await assertAdmin("notice.update");
+    if (isGuardFailure(guard)) return guard;
+    const adminCrewId = guard.crewId;
 
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase

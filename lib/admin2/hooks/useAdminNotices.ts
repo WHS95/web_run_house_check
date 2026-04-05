@@ -24,12 +24,6 @@ export interface CreateNoticeInput {
     type: NoticeType;
 }
 
-export interface UpdateNoticeInput {
-    title?: string;
-    content?: string;
-    type?: NoticeType;
-}
-
 export function useAdminNotices(search?: string) {
     const { crewId, invalidate } = useAdmin();
     const key = adminKey.notices(crewId, search);
@@ -77,32 +71,11 @@ export function useAdminNotices(search?: string) {
         [mutate, invalidate]
     );
 
-    const updateNotice = useCallback(
-        async (
-            noticeId: string,
-            input: UpdateNoticeInput
-        ): Promise<NoticeRow> => {
-            const res = await fetch(`/api/admin/notices/${noticeId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(input),
-            });
-            const json = await res.json();
-            if (!json?.success) {
-                throw new Error(json?.message || "공지 수정 실패");
-            }
-            await invalidate("notices");
-            return json.data as NoticeRow;
-        },
-        [invalidate]
-    );
-
     return {
         notices: data ?? [],
         isLoading,
         error,
         createNotice,
-        updateNotice,
         deleteNotice,
         refresh: () => mutate(),
     };

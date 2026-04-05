@@ -5,16 +5,10 @@ import React, {
     useMemo,
     useCallback,
     useEffect,
-    useRef,
     memo,
 } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import {
-    AnimatedList,
-    AnimatedItem,
-} from "@/components/atoms/AnimatedList";
 import AdminSmallButton from "@/app/admin2/components/ui/AdminSmallButton";
 import AdminAlertDialog from "@/app/admin2/components/ui/AdminAlertDialog";
 import AdminMonthNav from "@/app/admin2/components/ui/AdminMonthNav";
@@ -203,23 +197,18 @@ export default function AttendanceManagement({
 
     /* 스크롤 → 달력 접힘 상태 (main-content 스크롤 감지) */
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-    /* 상단 sticky 래퍼(달력+제목행)의 실제 높이를
-       측정해 그룹 헤더의 sticky top 값으로 사용한다.
-       달력 접힘/펼침에 따라 높이가 달라지므로
-       ResizeObserver로 실시간 추적한다. */
-    const [stickyHeight, setStickyHeight] = useState(0);
-    useEffect(() => {
-        const el = sentinelRef.current;
-        if (!el) return;
-        const update = () => {
-            setStickyHeight(el.offsetHeight);
-        };
-        update();
-        const ro = new ResizeObserver(update);
-        ro.observe(el);
-        return () => ro.disconnect();
+    /* 그룹 아코디언 펼침 상태 (key: `${location}|${time}`) */
+    const [expandedGroups, setExpandedGroups] = useState<
+        Set<string>
+    >(new Set());
+    const toggleGroup = useCallback((key: string) => {
+        setExpandedGroups((prev) => {
+            const next = new Set(prev);
+            if (next.has(key)) next.delete(key);
+            else next.add(key);
+            return next;
+        });
     }, []);
 
     /* hydration 안전: 오늘 날짜는 mount 후 계산 */
@@ -376,27 +365,44 @@ export default function AttendanceManagement({
         );
     }, [calendarDays, selectedDay]);
 
-    /* 스크롤 리스너: main-content의 스크롤 감지 → 접힘만 트리거
-       (펼침은 사용자 탭/월 변경 시에만 수행하여 의도치 않게 되돌아가는 현상 방지) */
+    /* 스크롤 리스너: rAF 스로틀 + 단방향 트리거(접힘만) */
     useEffect(() => {
         const el = document.querySelector(
             ".main-content",
         ) as HTMLElement | null;
         if (!el) return;
+        let rafId = 0;
         const onScroll = () => {
-            const top = el.scrollTop;
-            setIsCollapsed((prev) => {
-                if (!prev && top > COLLAPSE_THRESHOLD)
-                    return true;
-                return prev;
+            if (rafId) return;
+            rafId = requestAnimationFrame(() => {
+                rafId = 0;
+                if (el.scrollTop > COLLAPSE_THRESHOLD) {
+                    setIsCollapsed((prev) =>
+                        prev ? prev : true,
+                    );
+                }
             });
         };
         el.addEventListener("scroll", onScroll, {
             passive: true,
         });
-        return () =>
+        return () => {
             el.removeEventListener("scroll", onScroll);
+            if (rafId) cancelAnimationFrame(rafId);
+        };
     }, []);
+
+    /* 수동 펼침 시 스크롤이 임계값 위에 있으면 즉시 재접힘되는 것을 방지
+       → 달력 상단으로 스크롤 리셋 */
+    useEffect(() => {
+        if (isCollapsed) return;
+        const el = document.querySelector(
+            ".main-content",
+        ) as HTMLElement | null;
+        if (el && el.scrollTop > COLLAPSE_THRESHOLD) {
+            el.scrollTop = 0;
+        }
+    }, [isCollapsed]);
 
     /* 달 변경 시 스크롤 리셋 → 달력 펼침 */
     useEffect(() => {
@@ -498,7 +504,6 @@ export default function AttendanceManagement({
                 - bg-rh-bg-primary: 스크롤 시 아래 콘텐츠가 비쳐 보이지 않도록
                 - 제목+일괄등록 행도 함께 sticky되어 항상 노출 */}
             <div
-                ref={sentinelRef}
                 className="sticky top-[calc(env(safe-area-inset-top)+56px)] z-20 px-4 pt-4 bg-rh-bg-primary"
             >
                 <AdminMonthNav
@@ -524,20 +529,12 @@ export default function AttendanceManagement({
                         ))}
                     </div>
 
-                    {/* 월간 / 주간 전환 (height 애니메이션) */}
-                    {/* 월간 6주(44px × 6 + gap 4px × 5 = 284)
-                        / 주간 1주(44px) — 인원 마커가 주간에도
-                        노출되므로 h-11 셀 높이에 맞춤 */}
-                    <motion.div
-                        animate={{
-                            height: isCollapsed
-                                ? 44
-                                : 284,
-                        }}
-                        initial={false}
-                        transition={{
-                            duration: 0.25,
-                            ease: "easeOut",
+                    {/* 월간 / 주간 전환 — 즉시 스위치 (애니메이션 없음)
+                        sticky wrapper 내부에서 height 애니메이션 시
+                        iOS sticky 재계산과 충돌하여 "흔들림" 발생 → 제거 */}
+                    <div
+                        style={{
+                            height: isCollapsed ? 44 : 284,
                         }}
                         className="overflow-hidden"
                     >
@@ -549,7 +546,7 @@ export default function AttendanceManagement({
                                 renderCell(cd, i),
                             )}
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* 날짜 라벨 + 일괄등록 (달력과 함께 sticky 유지)
@@ -593,73 +590,95 @@ export default function AttendanceManagement({
 
             {/* 콘텐츠 영역: 리스트 */}
             <div className="px-4 pt-2 pb-4">
-                {/* 출석 리스트 — (장소, 시간) 기준 그룹화 */}
+                {/* 출석 리스트 — (장소, 시간) 아코디언 */}
                 {selectedDateRecords.length > 0 ? (
-                    <div className="space-y-5">
-                        {groupedRecords.map((group) => (
-                            <section
-                                key={`${group.location}|${group.time}`}
-                                className="space-y-2 relative"
-                            >
-                                {/* 그룹 헤더: 장소 · 시간
-                                    네이티브 iOS section header 패턴:
-                                    sticky로 스크롤 시 상단 고정되고,
-                                    다음 그룹 헤더가 밀어올린다.
-                                    top 값은 상단 sticky 래퍼(달력+제목행)의
-                                    실제 높이를 ResizeObserver로 측정해 사용.
-                                    bg-rh-bg-primary로 스크롤 시 아래 리스트
-                                    내용이 비치지 않도록 한다. */}
-                                <div
-                                    className="sticky z-10 bg-rh-bg-primary flex items-center gap-2 px-1 py-2"
-                                    style={{
-                                        top: `calc(env(safe-area-inset-top) + 56px + ${stickyHeight}px)`,
-                                    }}
+                    <div className="space-y-2">
+                        {groupedRecords.map((group) => {
+                            const key = `${group.location}|${group.time}`;
+                            const isExpanded =
+                                expandedGroups.has(key);
+                            return (
+                                <section
+                                    key={key}
+                                    className="rounded-xl bg-rh-bg-surface overflow-hidden"
                                 >
-                                    <h4 className="text-sm font-semibold text-rh-text-secondary">
-                                        {group.location} ·{" "}
-                                        {group.time}
-                                    </h4>
-                                    <span className="text-xs text-rh-text-tertiary">
-                                        {
-                                            group.records
-                                                .length
+                                    {/* 아코디언 헤더: 장소 · 시간 · 참여자수 */}
+                                    <button
+                                        onClick={() =>
+                                            toggleGroup(key)
                                         }
-                                        명
-                                    </span>
-                                </div>
-                                <AnimatedList className="space-y-2">
-                                    {group.records.map(
-                                        (record) => (
-                                            <AnimatedItem
-                                                key={
-                                                    record.id
+                                        className="w-full flex items-center gap-2 px-4 py-3 text-left"
+                                    >
+                                        <div className="flex-1 flex items-center gap-2 min-w-0">
+                                            <h4 className="text-sm font-semibold text-white truncate">
+                                                {
+                                                    group.location
+                                                }{" "}
+                                                ·{" "}
+                                                {group.time}
+                                            </h4>
+                                            <span className="text-xs text-rh-text-tertiary shrink-0">
+                                                {
+                                                    group
+                                                        .records
+                                                        .length
                                                 }
-                                            >
-                                                <AttendanceRow
-                                                    name={
-                                                        record.userName
-                                                    }
-                                                    detail={buildDetail(
-                                                        record,
-                                                    )}
-                                                    status="present"
-                                                    badgeText={
-                                                        record.isHost
-                                                            ? "운영진"
-                                                            : undefined
-                                                    }
-                                                    onClick={() =>
-                                                        handleRowClick(
+                                                명
+                                            </span>
+                                        </div>
+                                        <svg
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className={`text-rh-text-tertiary shrink-0 transition-transform duration-200 ${
+                                                isExpanded
+                                                    ? "rotate-180"
+                                                    : ""
+                                            }`}
+                                        >
+                                            <polyline points="6 9 12 15 18 9" />
+                                        </svg>
+                                    </button>
+                                    {isExpanded && (
+                                        <div className="px-2 pb-2 space-y-2">
+                                            {group.records.map(
+                                                (
+                                                    record,
+                                                ) => (
+                                                    <AttendanceRow
+                                                        key={
+                                                            record.id
+                                                        }
+                                                        name={
+                                                            record.userName
+                                                        }
+                                                        detail={buildDetail(
                                                             record,
-                                                        )
-                                                    }
-                                                />
-                                            </AnimatedItem>
-                                        ),
+                                                        )}
+                                                        status="present"
+                                                        badgeText={
+                                                            record.isHost
+                                                                ? "운영진"
+                                                                : undefined
+                                                        }
+                                                        onClick={() =>
+                                                            handleRowClick(
+                                                                record,
+                                                            )
+                                                        }
+                                                    />
+                                                ),
+                                            )}
+                                        </div>
                                     )}
-                                </AnimatedList>
-                            </section>
-                        ))}
+                                </section>
+                            );
+                        })}
                         {/* 스크롤 여유 공간 (접힘 트리거용, 임계 40px 초과) */}
                         <div className="h-12" />
                     </div>

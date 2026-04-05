@@ -151,10 +151,16 @@ export async function POST(request: Request) {
 
         // 동일 토큰 중복 제거 (같은 유저가 여러 크루에 등록된 경우)
         const tokenStrings = Array.from(new Set(tokens.map((t) => t.token)));
+        // data-only 메시지: notification 필드를 포함하면 브라우저가 자동
+        // 표시 + onBackgroundMessage 중복 표시되어 알림이 2번 나간다.
+        // 제목/본문은 data에 담아 서비스 워커가 직접 표시한다.
         const response = await messaging.sendEachForMulticast({
             tokens: tokenStrings,
-            notification: { title, body: msgBody },
-            data: { type: "announcement" },
+            data: {
+                type: "announcement",
+                title,
+                body: msgBody,
+            },
             webpush: { fcmOptions: { link: "/" } },
         });
 

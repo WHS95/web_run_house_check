@@ -12,15 +12,18 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// 백그라운드 메시지 핸들러
+// 백그라운드 메시지 핸들러 (data-only 메시지 기준)
+// 서버에서 notification 페이로드 없이 data만 보내므로 브라우저의
+// 자동 표시가 발생하지 않고, 여기서 단 한 번만 표시한다.
 messaging.onBackgroundMessage((payload) => {
-    const title = payload.notification?.title || "런하우스";
+    const data = payload.data || {};
+    const title = data.title || "런하우스";
     const options = {
-        body: payload.notification?.body || "새로운 알림이 있습니다.",
+        body: data.body || "새로운 알림이 있습니다.",
         icon: "/android-chrome-192x192.png",
         badge: "/favicon-32x32.png",
         vibrate: [100, 50, 100],
-        data: payload.data,
+        data,
         actions: [
             { action: "open", title: "확인하기" },
             { action: "close", title: "닫기" },

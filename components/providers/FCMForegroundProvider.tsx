@@ -21,15 +21,18 @@ export default function FCMForegroundProvider() {
     useEffect(() => {
         const unsubscribe = onForegroundMessage(
             (payload: unknown) => {
+                // data-only 메시지: title/body는 data 필드에서 읽는다.
                 const p = payload as {
                     notification?: { title?: string; body?: string };
+                    data?: { title?: string; body?: string };
                 };
-                if (p?.notification) {
+                const title =
+                    p?.data?.title || p?.notification?.title;
+                const body = p?.data?.body || p?.notification?.body;
+                if (title || body) {
                     setNotification({
-                        title: p.notification.title || "런하우스",
-                        body:
-                            p.notification.body ||
-                            "새로운 알림이 있습니다.",
+                        title: title || "런하우스",
+                        body: body || "새로운 알림이 있습니다.",
                     });
                 }
             }

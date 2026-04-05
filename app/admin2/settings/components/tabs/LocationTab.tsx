@@ -25,6 +25,7 @@ import {
     AnimatedList,
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
+import MapPickerSheet from "../MapPickerSheet";
 
 /* ── 상수 ── */
 const CLS_CARD =
@@ -67,6 +68,8 @@ const LocationTab = memo(function LocationTab({
     const [deleteConfirm, setDeleteConfirm] =
         useState(false);
     const [saving, setSaving] = useState(false);
+    const [mapPickerOpen, setMapPickerOpen] =
+        useState(false);
 
     /* 검색 필터링 */
     const filteredLocations = useMemo(() => {
@@ -272,6 +275,33 @@ const LocationTab = memo(function LocationTab({
         []
     );
 
+    /* 지도 피커 핸들러 */
+    const openMapPicker = useCallback(() => {
+        haptic.light();
+        setMapPickerOpen(true);
+    }, []);
+    const closeMapPicker = useCallback(() => {
+        setMapPickerOpen(false);
+    }, []);
+    const handlePickPosition = useCallback(
+        (pos: { lat: number; lng: number }) => {
+            setFormData((p) => ({
+                ...p,
+                latitude: pos.lat.toFixed(6),
+                longitude: pos.lng.toFixed(6),
+            }));
+        },
+        []
+    );
+
+    /* 현재 폼에서 선택된 좌표 (지도 피커 초기값) */
+    const pickerInitial = useMemo(() => {
+        const lat = parseFloat(formData.latitude);
+        const lng = parseFloat(formData.longitude);
+        if (isNaN(lat) || isNaN(lng)) return null;
+        return { lat, lng };
+    }, [formData.latitude, formData.longitude]);
+
     /* ────── 폼 뷰 ────── */
     if (viewMode === "form") {
         return (
@@ -296,19 +326,44 @@ const LocationTab = memo(function LocationTab({
                             채워집니다
                         </p>
 
-                        {/* 지도 플레이스홀더 */}
-                        <div className="flex flex-col items-center justify-center gap-2 h-[172px] rounded-[10px] bg-rh-bg-surface">
+                        {/* 지도 플레이스홀더 / 선택 미리보기 */}
+                        <button
+                            type="button"
+                            onClick={openMapPicker}
+                            className="flex flex-col items-center justify-center gap-2 h-[172px] w-full rounded-[10px] bg-rh-bg-surface"
+                        >
                             <MapPin
                                 size={20}
                                 color="#8BB5F5"
                             />
-                            <span className="text-sm text-rh-text-secondary">
-                                지도 위치를 선택해
-                                주세요
-                            </span>
-                        </div>
+                            {pickerInitial ? (
+                                <div className="text-center">
+                                    <p className="text-sm font-medium text-white">
+                                        선택된 위치
+                                    </p>
+                                    <p className="text-xs text-rh-text-secondary mt-0.5">
+                                        {pickerInitial.lat.toFixed(
+                                            6
+                                        )}
+                                        {", "}
+                                        {pickerInitial.lng.toFixed(
+                                            6
+                                        )}
+                                    </p>
+                                </div>
+                            ) : (
+                                <span className="text-sm text-rh-text-secondary">
+                                    지도 위치를 선택해
+                                    주세요
+                                </span>
+                            )}
+                        </button>
 
-                        <button className="w-full h-11 rounded-xl bg-rh-accent text-sm font-semibold text-white">
+                        <button
+                            type="button"
+                            onClick={openMapPicker}
+                            className="w-full h-11 rounded-xl bg-rh-accent text-sm font-semibold text-white"
+                        >
                             지도에서 위치 선택
                         </button>
                     </div>
@@ -381,6 +436,13 @@ const LocationTab = memo(function LocationTab({
                     cancelLabel="취소"
                     confirmLabel="삭제"
                     confirmVariant="danger"
+                />
+
+                <MapPickerSheet
+                    open={mapPickerOpen}
+                    onClose={closeMapPicker}
+                    onConfirm={handlePickPosition}
+                    initialPosition={pickerInitial}
                 />
             </div>
         );

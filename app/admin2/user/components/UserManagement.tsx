@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useMemo, memo } from "react";
 import { useRouter } from "next/navigation";
+import { SWRConfig } from "swr";
 import {
     AnimatedList,
     AnimatedItem,
@@ -15,10 +16,12 @@ import SortFilterSheet, {
     type StatusFilter,
 } from "./SortFilterSheet";
 import { UserForAdmin } from "@/lib/supabase/admin";
+import { useAdminUsers } from "@/lib/admin2/hooks/useAdminUsers";
 
 interface UserManagementProps {
     initialUsers: UserForAdmin[];
     crewId: string;
+    fallback: Record<string, unknown>;
     gradeMap?: Record<
         string,
         { name: string; sort_order: number }
@@ -131,9 +134,26 @@ const UserCard = memo(function UserCard({
 /* ── 메인 컴포넌트 ── */
 export default function UserManagement({
     initialUsers,
-    crewId,
+    fallback,
     gradeMap,
 }: UserManagementProps) {
+    return (
+        <SWRConfig value={{ fallback }}>
+            <UserManagementInner
+                initialUsers={initialUsers}
+                gradeMap={gradeMap}
+            />
+        </SWRConfig>
+    );
+}
+
+function UserManagementInner({
+    initialUsers,
+    gradeMap,
+}: {
+    initialUsers: UserForAdmin[];
+    gradeMap?: UserManagementProps["gradeMap"];
+}) {
     const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] =
@@ -143,7 +163,8 @@ export default function UserManagement({
     const [sortDir, setSortDir] =
         useState<SortDir>("desc");
     const [sheetOpen, setSheetOpen] = useState(false);
-    const [users] = useState(initialUsers);
+    const { users: swrUsers } = useAdminUsers();
+    const users = swrUsers.length > 0 ? swrUsers : initialUsers;
 
     const isUserActive = useCallback(
         (user: UserForAdmin) =>

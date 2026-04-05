@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getAdminAuth } from "@/lib/admin2/auth";
 import { getCrewUsers } from "@/lib/admin2/queries";
+import { adminKey } from "@/lib/admin2/swr-keys";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import UserManagement from "./components/UserManagement";
 
@@ -26,7 +27,13 @@ export default async function Admin2UserPage() {
 
 async function UserListServer({ crewId }: { crewId: string }) {
     const users = await getCrewUsers(crewId);
-    return <UserManagement initialUsers={users} crewId={crewId} />;
+    return (
+        <UserManagement
+            initialUsers={users}
+            crewId={crewId}
+            fallback={{ [adminKey.users(crewId)]: users }}
+        />
+    );
 }
 
 function UserListSkeleton() {

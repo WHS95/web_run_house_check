@@ -20,8 +20,8 @@ import AttendanceRow from "@/app/admin2/components/ui/AttendanceRow";
 const AttendanceEditModal = dynamic(
     () => import("@/components/molecules/AttendanceEditModal"),
 );
-const BulkAttendanceManagement = dynamic(
-    () => import("@/components/organisms/BulkAttendanceManagement"),
+const AdminBulkAttendanceSheet = dynamic(
+    () => import("./AdminBulkAttendanceSheet"),
 );
 import type { AttendanceRecord } from "@/lib/supabase/admin";
 import { deleteAttendanceRecord } from "@/lib/supabase/admin";
@@ -506,8 +506,14 @@ export default function AttendanceManagement({
 
             {/* 일괄 등록 */}
             {showBulk && (
-                <BulkAttendanceManagement
+                <AdminBulkAttendanceSheet
                     crewId={crewId}
+                    initialDate={selectedDateStr}
+                    onClose={() => setShowBulk(false)}
+                    onSuccess={() => {
+                        setShowBulk(false);
+                        router.refresh();
+                    }}
                 />
             )}
         </>

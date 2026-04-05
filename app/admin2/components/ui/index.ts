@@ -17,3 +17,4 @@ export { default as AttendanceRow } from "./AttendanceRow";
 export { default as AdminProgressBar } from "./AdminProgressBar";
 export { default as AdminStatBox } from "./AdminStatBox";
 export { default as AdminFilterPill } from "./AdminFilterPill";
+export { default as AdminCheckbox } from "./AdminCheckbox";

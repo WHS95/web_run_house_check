@@ -23,15 +23,22 @@ export async function POST(request: NextRequest) {
     }
 
     // 요청 데이터 파싱
-    const { crewId, userIds, attendanceTimestamp, locationId } =
+    // users: Array<{ userId: string; isHost: boolean }>
+    const { crewId, users, attendanceTimestamp, locationId } =
       await request.json();
 
     // 필수 데이터 검증
     if (
       !crewId ||
-      !userIds ||
-      !Array.isArray(userIds) ||
-      userIds.length === 0
+      !users ||
+      !Array.isArray(users) ||
+      users.length === 0 ||
+      users.some(
+        (u: unknown) =>
+          !u ||
+          typeof (u as { userId?: unknown }).userId !== "string" ||
+          typeof (u as { isHost?: unknown }).isHost !== "boolean"
+      )
     ) {
       return NextResponse.json(
         {
@@ -117,13 +124,15 @@ export async function POST(request: NextRequest) {
     // console.log("attendanceTimestamp", attendanceTimestamp);
 
     // 일괄 출석 기록 생성
-    const attendanceRecords = userIds.map((userId: string) => ({
-      user_id: userId,
+    const attendanceRecords = (
+      users as Array<{ userId: string; isHost: boolean }>
+    ).map((u) => ({
+      user_id: u.userId,
       crew_id: crewId,
       attendance_timestamp: attendanceTimestamp, // attendance_timestamp 사용
       location: locationData.name, // location은 text 타입으로 장소명 저장
       exercise_type_id: 1, //exerciseType.id, // 필수 필드 TODO 지금은 러닝만 고정으로 해서 나중에 고도화때 운동타입도 선택가능하게
-      is_host: false, // 일괄 처리에서는 기본적으로 false
+      is_host: u.isHost,
     }));
 
     const { data: insertResult, error: insertError } = await supabase

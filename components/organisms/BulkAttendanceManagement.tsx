@@ -218,7 +218,10 @@ export default function BulkAttendanceManagement({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           crewId,
-          userIds: Array.from(selectedUsers),
+          users: Array.from(selectedUsers).map((userId) => ({
+            userId,
+            isHost: false,
+          })),
           attendanceTimestamp: attendanceTimestamp,
           locationId: parseInt(attendanceData.location),
         }),

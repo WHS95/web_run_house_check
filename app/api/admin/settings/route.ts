@@ -4,22 +4,30 @@ import {
   getCrewById,
   getCrewExerciseTypes,
 } from "@/lib/supabase/admin";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  const guard = await assertAdmin("crew.update");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const { searchParams } = new URL(request.url);
     const crewId = searchParams.get("crewId");
 
     if (!crewId) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "crewId가 필요합니다.",
-        },
+        { success: false, message: "crewId가 필요합니다." },
         { status: 400 }
+      );
+    }
+
+    if (crewId !== guard.crewId) {
+      return NextResponse.json(
+        { success: false, message: "권한이 없습니다." },
+        { status: 403 }
       );
     }
 

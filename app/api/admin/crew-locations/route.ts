@@ -4,17 +4,29 @@ import {
   createCrewLocation,
 } from "@/lib/supabase/admin";
 import { CrewLocationCreateData } from "@/lib/types/crew-locations";
+import { revalidateTag } from "next/cache";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 // GET: 크루의 모든 활동장소 조회
 export async function GET(request: NextRequest) {
+  const guard = await assertAdmin("location.manage");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const { searchParams } = new URL(request.url);
     const crewId = searchParams.get("crew_id");
 
     if (!crewId) {
       return NextResponse.json(
-        { success: false, error: "crew_id가 필요합니다." },
+        { success: false, message: "crew_id가 필요합니다." },
         { status: 400 }
+      );
+    }
+
+    if (crewId !== guard.crewId) {
+      return NextResponse.json(
+        { success: false, message: "권한이 없습니다." },
+        { status: 403 }
       );
     }
 
@@ -42,6 +54,9 @@ export async function GET(request: NextRequest) {
 
 // POST: 새로운 활동장소 생성
 export async function POST(request: NextRequest) {
+  const guard = await assertAdmin("location.manage");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const body = await request.json();
     const { crew_id, name, description, latitude, longitude }: CrewLocationCreateData = body;
@@ -49,11 +64,18 @@ export async function POST(request: NextRequest) {
     // 필수 필드 검증
     if (!crew_id || !name || latitude === undefined || longitude === undefined) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: "crew_id, name, latitude, longitude는 필수입니다." 
+        {
+          success: false,
+          message: "crew_id, name, latitude, longitude는 필수입니다.",
         },
         { status: 400 }
+      );
+    }
+
+    if (crew_id !== guard.crewId) {
+      return NextResponse.json(
+        { success: false, message: "권한이 없습니다." },
+        { status: 403 }
       );
     }
 
@@ -78,6 +100,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    revalidateTag(`admin:settings:${guard.crewId}`);
 
     return NextResponse.json(
       { success: true, data },

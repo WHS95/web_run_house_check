@@ -3,18 +3,17 @@
 import React, { useState, useCallback, useMemo, memo } from "react";
 import { useRouter } from "next/navigation";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
     AnimatedList,
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
 import AdminSearchBar from "@/app/admin2/components/ui/AdminSearchBar";
 import AdminBadge from "@/app/admin2/components/ui/AdminBadge";
 import AdminSmallButton from "@/app/admin2/components/ui/AdminSmallButton";
+import SortFilterSheet, {
+    type SortKey,
+    type SortDir,
+    type StatusFilter,
+} from "./SortFilterSheet";
 import { UserForAdmin } from "@/lib/supabase/admin";
 
 interface UserManagementProps {
@@ -138,7 +137,12 @@ export default function UserManagement({
     const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] =
-        useState("전체");
+        useState<StatusFilter>("전체");
+    const [sortKey, setSortKey] =
+        useState<SortKey>("lastAttendance");
+    const [sortDir, setSortDir] =
+        useState<SortDir>("desc");
+    const [sheetOpen, setSheetOpen] = useState(false);
     const [users] = useState(initialUsers);
 
     const isUserActive = useCallback(
@@ -178,8 +182,7 @@ export default function UserManagement({
         const searched = users.filter((user) =>
             matchesSearch(user, searchTerm),
         );
-
-        return searched.filter((user) => {
+        const statused = searched.filter((user) => {
             const active = isUserActive(user);
             return (
                 statusFilter === "전체" ||
@@ -187,10 +190,35 @@ export default function UserManagement({
                 (statusFilter === "비활성" && !active)
             );
         });
+        const m = sortDir === "asc" ? 1 : -1;
+        return [...statused].sort((a, b) => {
+            if (sortKey === "name") {
+                return (
+                    (a.first_name || "").localeCompare(
+                        b.first_name || "",
+                        "ko",
+                    ) * m
+                );
+            }
+            if (sortKey === "lastAttendance") {
+                const av = a.last_attendance_date || "";
+                const bv = b.last_attendance_date || "";
+                return (
+                    (av < bv ? -1 : av > bv ? 1 : 0) * m
+                );
+            }
+            return (
+                ((a.attendance_count ?? 0) -
+                    (b.attendance_count ?? 0)) *
+                m
+            );
+        });
     }, [
         users,
         searchTerm,
         statusFilter,
+        sortKey,
+        sortDir,
         matchesSearch,
         isUserActive,
     ]);
@@ -239,49 +267,11 @@ export default function UserManagement({
                         </span>
                     </span>
 
-                    {/* 필터 */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <AdminSmallButton>
-                                필터
-                            </AdminSmallButton>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align="end"
-                            className="border-0 bg-rh-bg-surface"
-                        >
-                            {(
-                                [
-                                    "전체",
-                                    "활성",
-                                    "비활성",
-                                ] as const
-                            ).map((status) => (
-                                <DropdownMenuItem
-                                    key={status}
-                                    onClick={() =>
-                                        setStatusFilter(
-                                            status,
-                                        )
-                                    }
-                                    className={`text-white hover:bg-rh-bg-muted ${statusFilter === status ? "bg-rh-accent/20 font-medium" : ""}`}
-                                >
-                                    <div className="flex justify-between items-center w-full">
-                                        <span>
-                                            {status}
-                                        </span>
-                                        <span className="ml-2 text-rh-text-secondary">
-                                            {
-                                                statusCounts[
-                                                    status
-                                                ]
-                                            }
-                                        </span>
-                                    </div>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <AdminSmallButton
+                        onClick={() => setSheetOpen(true)}
+                    >
+                        필터
+                    </AdminSmallButton>
                 </div>
             </div>
 
@@ -311,6 +301,19 @@ export default function UserManagement({
                 )}
             </div>
 
+            <SortFilterSheet
+                open={sheetOpen}
+                onClose={() => setSheetOpen(false)}
+                sortKey={sortKey}
+                sortDir={sortDir}
+                statusFilter={statusFilter}
+                onApply={(next) => {
+                    setSortKey(next.sortKey);
+                    setSortDir(next.sortDir);
+                    setStatusFilter(next.statusFilter);
+                    setSheetOpen(false);
+                }}
+            />
         </>
     );
 }

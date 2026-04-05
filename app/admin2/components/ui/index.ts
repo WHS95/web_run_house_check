@@ -18,3 +18,8 @@ export { default as AdminProgressBar } from "./AdminProgressBar";
 export { default as AdminStatBox } from "./AdminStatBox";
 export { default as AdminFilterPill } from "./AdminFilterPill";
 export { default as AdminCheckbox } from "./AdminCheckbox";
+export { default as AdminAvatar } from "./AdminAvatar";
+export { default as AdminSegmentedControl } from "./AdminSegmentedControl";
+export { default as AdminMemberChip } from "./AdminMemberChip";
+export { default as AdminMemberPickerSheet } from "./AdminMemberPickerSheet";
+export type { PickerMember } from "./AdminMemberPickerSheet";

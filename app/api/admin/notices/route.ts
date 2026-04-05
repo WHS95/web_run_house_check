@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { revalidateTag } from "next/cache";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -30,16 +32,24 @@ const createSupabaseServerClient = async () => {
 
 // 크루 공지 목록 조회 (+ 제목/내용 기반 검색)
 export async function GET(request: NextRequest) {
+    const guard = await assertAdmin("notice.create");
+    if (isGuardFailure(guard)) return guard;
+
     const supabase = await createSupabaseServerClient();
     const crewId = request.nextUrl.searchParams.get("crewId");
-    const q = request.nextUrl.searchParams
-        .get("q")
-        ?.trim();
+    const q = request.nextUrl.searchParams.get("q")?.trim();
 
     if (!crewId) {
         return NextResponse.json(
             { success: false, message: "크루 ID가 필요합니다." },
             { status: 400 }
+        );
+    }
+
+    if (crewId !== guard.crewId) {
+        return NextResponse.json(
+            { success: false, message: "권한이 없습니다." },
+            { status: 403 }
         );
     }
 
@@ -81,18 +91,10 @@ export async function GET(request: NextRequest) {
 
 // 새 공지 작성
 export async function POST(request: Request) {
+    const guard = await assertAdmin("notice.create");
+    if (isGuardFailure(guard)) return guard;
+
     const supabase = await createSupabaseServerClient();
-
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        return NextResponse.json(
-            { success: false, message: "인증이 필요합니다." },
-            { status: 401 }
-        );
-    }
 
     const body = await request.json();
     const { crewId, title, content, type } = body as {
@@ -102,18 +104,20 @@ export async function POST(request: Request) {
         type?: string;
     };
 
-    if (
-        !crewId ||
-        !title?.trim() ||
-        !content?.trim()
-    ) {
+    if (!crewId || !title?.trim() || !content?.trim()) {
         return NextResponse.json(
             {
                 success: false,
-                message:
-                    "크루 ID, 제목, 공지 내용이 필요합니다.",
+                message: "크루 ID, 제목, 공지 내용이 필요합니다.",
             },
             { status: 400 }
+        );
+    }
+
+    if (crewId !== guard.crewId) {
+        return NextResponse.json(
+            { success: false, message: "권한이 없습니다." },
+            { status: 403 }
         );
     }
 
@@ -136,7 +140,7 @@ export async function POST(request: Request) {
         .from("notices")
         .insert({
             crew_id: crewId,
-            author_id: user.id,
+            author_id: guard.userId,
             title: title.trim(),
             type: noticeType,
             content: content.trim(),
@@ -155,29 +159,20 @@ export async function POST(request: Request) {
         );
     }
 
+    revalidateTag(`admin:notices:${guard.crewId}`);
+
     // 푸시 발송은 클라이언트가 모달 확인 후 별도 엔드포인트로 트리거함
     // (POST /api/admin/notices/[id]/push)
 
-    return NextResponse.json(
-        { success: true, data },
-        { status: 201 }
-    );
+    return NextResponse.json({ success: true, data }, { status: 201 });
 }
 
 // 공지 비활성화
 export async function DELETE(request: Request) {
+    const guard = await assertAdmin("notice.delete");
+    if (isGuardFailure(guard)) return guard;
+
     const supabase = await createSupabaseServerClient();
-
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        return NextResponse.json(
-            { success: false, message: "인증이 필요합니다." },
-            { status: 401 }
-        );
-    }
 
     const body = await request.json();
     const { noticeId } = body;
@@ -189,6 +184,21 @@ export async function DELETE(request: Request) {
         );
     }
 
+    // 대상 공지가 현재 관리자 소속 크루인지 검증
+    const { data: target } = await supabase
+        .schema("attendance")
+        .from("notices")
+        .select("crew_id")
+        .eq("id", noticeId)
+        .maybeSingle();
+
+    if (!target || target.crew_id !== guard.crewId) {
+        return NextResponse.json(
+            { success: false, message: "권한이 없습니다." },
+            { status: 403 }
+        );
+    }
+
     const { error } = await supabase
         .schema("attendance")
         .from("notices")
@@ -196,10 +206,7 @@ export async function DELETE(request: Request) {
         .eq("id", noticeId);
 
     if (error) {
-        console.error(
-            "[notices DELETE] update failed:",
-            error
-        );
+        console.error("[notices DELETE] update failed:", error);
         return NextResponse.json(
             {
                 success: false,
@@ -208,6 +215,8 @@ export async function DELETE(request: Request) {
             { status: 500 }
         );
     }
+
+    revalidateTag(`admin:notices:${guard.crewId}`);
 
     return NextResponse.json({ success: true });
 }

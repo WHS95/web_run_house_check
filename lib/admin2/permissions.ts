@@ -13,7 +13,10 @@ export type AdminAction =
     | "attendance.edit"
     | "attendance.delete"
     | "grade.manage"
-    | "location.manage";
+    | "location.manage"
+    | "analytics.view"
+    | "inviteCode.manage"
+    | "pushHistory.view";
 
 const MATRIX: Record<AdminAction, AdminRole[]> = {
     "notice.create": ["owner", "admin"],
@@ -29,6 +32,9 @@ const MATRIX: Record<AdminAction, AdminRole[]> = {
     "attendance.delete": ["owner", "admin"],
     "grade.manage": ["owner", "admin"],
     "location.manage": ["owner", "admin"],
+    "analytics.view": ["owner", "admin"],
+    "inviteCode.manage": ["owner", "admin"],
+    "pushHistory.view": ["owner", "admin"],
 };
 
 export function can(role: AdminRole, action: AdminAction): boolean {

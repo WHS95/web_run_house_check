@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+    const guard = await assertAdmin("pushHistory.view");
+    if (isGuardFailure(guard)) return guard;
+
     try {
         const { searchParams } = new URL(request.url);
         const crewId = searchParams.get("crewId");
@@ -19,21 +23,17 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const supabase = await createClient();
-
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
+        if (crewId !== guard.crewId) {
             return NextResponse.json(
                 {
                     success: false,
-                    error: "인증이 필요합니다.",
+                    error: "권한이 없습니다.",
                 },
-                { status: 401 }
+                { status: 403 }
             );
         }
+
+        const supabase = await createClient();
 
         const { data, error } = await supabase
             .schema("attendance")

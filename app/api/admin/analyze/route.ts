@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-admin";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
@@ -403,6 +404,9 @@ async function getMemberAttendanceStatus(
 }
 
 export async function GET(request: NextRequest) {
+  const guard = await assertAdmin("analytics.view");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const { searchParams } = new URL(request.url);
     const crewId = searchParams.get("crewId");
@@ -413,6 +417,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { error: "crewId가 필요합니다." },
         { status: 400 }
+      );
+    }
+
+    if (crewId !== guard.crewId) {
+      return NextResponse.json(
+        { error: "권한이 없습니다." },
+        { status: 403 }
       );
     }
 

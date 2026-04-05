@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 // 초대코드 조회 (크루별 단일 코드)
 export async function GET(request: NextRequest) {
+  const guard = await assertAdmin("inviteCode.manage");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const { searchParams } = new URL(request.url);
     const crewId = searchParams.get("crewId");
@@ -14,37 +18,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
-    // 현재 사용자 인증 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (crewId !== guard.crewId) {
       return NextResponse.json(
-        { success: false, error: "인증이 필요합니다." },
-        { status: 401 }
-      );
-    }
-
-    // 사용자 권한 확인 (크루 운영진인지 확인)
-    const { data: roleCheck } = await supabase
-      .schema("attendance")
-      .from("user_crews")
-      .select("crew_role")
-      .eq("user_id", user.id)
-      .eq("crew_id", crewId)
-      .eq("crew_role", "CREW_MANAGER")
-      .single();
-
-    if (!roleCheck) {
-      return NextResponse.json(
-        { success: false, error: "크루 운영진 권한이 필요합니다." },
+        { success: false, error: "권한이 없습니다." },
         { status: 403 }
       );
     }
+
+    const supabase = await createClient();
 
     // 해당 크루의 초대코드 조회
     const { data: inviteCode, error } = await supabase
@@ -55,8 +36,6 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error && error.code !== "PGRST116") {
-      // PGRST116: 데이터가 없음
-      //console.error("초대코드 조회 오류:", error);
       return NextResponse.json(
         { success: false, error: "초대코드 조회 중 오류가 발생했습니다." },
         { status: 500 }
@@ -68,7 +47,6 @@ export async function GET(request: NextRequest) {
       data: inviteCode || null,
     });
   } catch (error) {
-    //console.error("초대코드 조회 API 오류:", error);
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }
@@ -78,6 +56,9 @@ export async function GET(request: NextRequest) {
 
 // 초대코드 생성 또는 수정
 export async function POST(request: NextRequest) {
+  const guard = await assertAdmin("inviteCode.manage");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const body = await request.json();
     const { crewId, description, inviteCode: customInviteCode } = body;
@@ -89,37 +70,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
-    // 현재 사용자 인증 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (crewId !== guard.crewId) {
       return NextResponse.json(
-        { success: false, error: "인증이 필요합니다." },
-        { status: 401 }
-      );
-    }
-
-    // 사용자 권한 확인 (크루 운영진인지 확인)
-    const { data: roleCheck } = await supabase
-      .schema("attendance")
-      .from("user_crews")
-      .select("crew_role")
-      .eq("user_id", user.id)
-      .eq("crew_id", crewId)
-      .eq("crew_role", "CREW_MANAGER")
-      .single();
-
-    if (!roleCheck) {
-      return NextResponse.json(
-        { success: false, error: "크루 운영진 권한이 필요합니다." },
+        { success: false, error: "권한이 없습니다." },
         { status: 403 }
       );
     }
+
+    const supabase = await createClient();
 
     // 기존 초대코드 확인
     const { data: existingCode } = await supabase
@@ -141,7 +99,6 @@ export async function POST(request: NextRequest) {
 
     // 커스텀 초대코드 검증
     const validateCustomCode = (code: string) => {
-      // 정확히 7자리, 영문 대문자와 숫자만 허용
       const regex = /^[A-Z0-9]{7}$/;
       return regex.test(code);
     };
@@ -149,7 +106,6 @@ export async function POST(request: NextRequest) {
     let newInviteCode;
 
     if (customInviteCode && customInviteCode.trim()) {
-      // 사용자가 직접 입력한 코드 사용
       const trimmedCode = customInviteCode.trim().toUpperCase();
 
       if (!validateCustomCode(trimmedCode)) {
@@ -162,7 +118,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // 중복 검사 (현재 크루 제외)
       const { data: duplicate } = await supabase
         .schema("attendance")
         .from("crew_invite_codes")
@@ -182,11 +137,9 @@ export async function POST(request: NextRequest) {
 
       newInviteCode = trimmedCode;
     } else {
-      // 랜덤 코드 생성
       let attempts = 0;
       const maxAttempts = 10;
 
-      // 중복되지 않는 코드 생성
       do {
         newInviteCode = generateInviteCode();
         const { data: duplicate } = await supabase
@@ -212,11 +165,10 @@ export async function POST(request: NextRequest) {
       crew_id: crewId,
       invite_code: newInviteCode,
       description: description || null,
-      created_by: user.id,
+      created_by: guard.userId,
     };
 
     if (existingCode) {
-      // 기존 코드 업데이트
       const { data, error } = await supabase
         .schema("attendance")
         .from("crew_invite_codes")
@@ -229,7 +181,6 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
-        //console.error("초대코드 수정 오류:", error);
         return NextResponse.json(
           { success: false, error: "초대코드 수정 중 오류가 발생했습니다." },
           { status: 500 }
@@ -242,7 +193,6 @@ export async function POST(request: NextRequest) {
         message: "초대코드가 수정되었습니다.",
       });
     } else {
-      // 새 코드 생성
       const { data, error } = await supabase
         .schema("attendance")
         .from("crew_invite_codes")
@@ -251,7 +201,6 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
-        //console.error("초대코드 생성 오류:", error);
         return NextResponse.json(
           { success: false, error: "초대코드 생성 중 오류가 발생했습니다." },
           { status: 500 }
@@ -265,7 +214,6 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    //console.error("초대코드 생성/수정 API 오류:", error);
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }
@@ -275,6 +223,9 @@ export async function POST(request: NextRequest) {
 
 // 초대코드 삭제 (재생성을 위한)
 export async function DELETE(request: NextRequest) {
+  const guard = await assertAdmin("inviteCode.manage");
+  if (isGuardFailure(guard)) return guard;
+
   try {
     const { searchParams } = new URL(request.url);
     const codeId = searchParams.get("codeId");
@@ -287,19 +238,6 @@ export async function DELETE(request: NextRequest) {
     }
 
     const supabase = await createClient();
-
-    // 현재 사용자 인증 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: "인증이 필요합니다." },
-        { status: 401 }
-      );
-    }
 
     // 초대코드 정보를 먼저 조회하여 crewId 확인
     const { data: codeInfo } = await supabase
@@ -316,19 +254,9 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // 사용자 권한 확인 (크루 운영진인지 확인)
-    const { data: roleCheck } = await supabase
-      .schema("attendance")
-      .from("user_crews")
-      .select("crew_role")
-      .eq("user_id", user.id)
-      .eq("crew_id", codeInfo.crew_id)
-      .eq("crew_role", "CREW_MANAGER")
-      .single();
-
-    if (!roleCheck) {
+    if (codeInfo.crew_id !== guard.crewId) {
       return NextResponse.json(
-        { success: false, error: "크루 운영진 권한이 필요합니다." },
+        { success: false, error: "권한이 없습니다." },
         { status: 403 }
       );
     }
@@ -341,7 +269,6 @@ export async function DELETE(request: NextRequest) {
       .eq("id", parseInt(codeId));
 
     if (error) {
-      //console.error("초대코드 삭제 오류:", error);
       return NextResponse.json(
         { success: false, error: "초대코드 삭제 중 오류가 발생했습니다." },
         { status: 500 }
@@ -353,7 +280,6 @@ export async function DELETE(request: NextRequest) {
       message: "초대코드가 삭제되었습니다.",
     });
   } catch (error) {
-    //console.error("초대코드 삭제 API 오류:", error);
     return NextResponse.json(
       { success: false, error: "서버 오류가 발생했습니다." },
       { status: 500 }

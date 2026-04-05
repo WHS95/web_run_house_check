@@ -1,63 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/server";
+import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
 
 export const dynamic = "force-dynamic";
 
-const createSupabaseServerClient = async () => {
-    const cookieStore = await cookies();
-    return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value;
-                },
-                set(name: string, value: string, options: any) {},
-                remove(name: string, options: any) {},
-            },
-        }
-    );
-};
-
-async function checkAdminAuth(supabase: any, crewId: string) {
-    const {
-        data: { user },
-        error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-        return {
-            error: NextResponse.json(
-                { error: "인증이 필요합니다." },
-                { status: 401 }
-            ),
-        };
-    }
-
-    const { data: adminCheck } = await supabase
-        .schema("attendance")
-        .from("user_crews")
-        .select("crew_role")
-        .eq("user_id", user.id)
-        .eq("crew_id", crewId)
-        .eq("crew_role", "CREW_MANAGER")
-        .single();
-
-    if (!adminCheck) {
-        return {
-            error: NextResponse.json(
-                { error: "크루 운영진 권한이 필요합니다." },
-                { status: 403 }
-            ),
-        };
-    }
-
-    return { user };
-}
-
 export async function GET(request: NextRequest) {
+    const guard = await assertAdmin("grade.manage");
+    if (isGuardFailure(guard)) return guard;
+
     try {
         const { searchParams } = new URL(request.url);
         const crewId = searchParams.get("crewId");
@@ -69,33 +19,14 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const supabase = await createSupabaseServerClient();
-
-        const {
-            data: { user },
-            error: authError,
-        } = await supabase.auth.getUser();
-        if (authError || !user) {
+        if (crewId !== guard.crewId) {
             return NextResponse.json(
-                { error: "인증이 필요합니다." },
-                { status: 401 }
-            );
-        }
-
-        const { data: adminCheck } = await supabase
-            .schema("attendance")
-            .from("user_crews")
-            .select("crew_role")
-            .eq("user_id", user.id)
-            .eq("crew_id", crewId)
-            .eq("crew_role", "CREW_MANAGER")
-            .single();
-        if (!adminCheck) {
-            return NextResponse.json(
-                { error: "크루 운영진 권한이 필요합니다." },
+                { error: "권한이 없습니다." },
                 { status: 403 }
             );
         }
+
+        const supabase = await createClient();
 
         const { data: grades, error } = await supabase
             .schema("attendance")
@@ -137,6 +68,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    const guard = await assertAdmin("grade.manage");
+    if (isGuardFailure(guard)) return guard;
+
     try {
         const body = await request.json();
         const {
@@ -158,33 +92,14 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const supabase = await createSupabaseServerClient();
-
-        const {
-            data: { user },
-            error: authError,
-        } = await supabase.auth.getUser();
-        if (authError || !user) {
+        if (crewId !== guard.crewId) {
             return NextResponse.json(
-                { error: "인증이 필요합니다." },
-                { status: 401 }
-            );
-        }
-
-        const { data: adminCheck } = await supabase
-            .schema("attendance")
-            .from("user_crews")
-            .select("crew_role")
-            .eq("user_id", user.id)
-            .eq("crew_id", crewId)
-            .eq("crew_role", "CREW_MANAGER")
-            .single();
-        if (!adminCheck) {
-            return NextResponse.json(
-                { error: "크루 운영진 권한이 필요합니다." },
+                { error: "권한이 없습니다." },
                 { status: 403 }
             );
         }
+
+        const supabase = await createClient();
 
         const { data: newGrade, error } = await supabase
             .schema("attendance")
@@ -220,6 +135,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+    const guard = await assertAdmin("grade.manage");
+    if (isGuardFailure(guard)) return guard;
+
     try {
         const body = await request.json();
         const { gradeId, crewId, ...fields } = body;
@@ -231,33 +149,14 @@ export async function PATCH(request: NextRequest) {
             );
         }
 
-        const supabase = await createSupabaseServerClient();
-
-        const {
-            data: { user },
-            error: authError,
-        } = await supabase.auth.getUser();
-        if (authError || !user) {
+        if (crewId !== guard.crewId) {
             return NextResponse.json(
-                { error: "인증이 필요합니다." },
-                { status: 401 }
-            );
-        }
-
-        const { data: adminCheck } = await supabase
-            .schema("attendance")
-            .from("user_crews")
-            .select("crew_role")
-            .eq("user_id", user.id)
-            .eq("crew_id", crewId)
-            .eq("crew_role", "CREW_MANAGER")
-            .single();
-        if (!adminCheck) {
-            return NextResponse.json(
-                { error: "크루 운영진 권한이 필요합니다." },
+                { error: "권한이 없습니다." },
                 { status: 403 }
             );
         }
+
+        const supabase = await createClient();
 
         const fieldMap: Record<string, string> = {
             nameOverride: "name_override",
@@ -290,6 +189,7 @@ export async function PATCH(request: NextRequest) {
             .from("crew_grades")
             .update(updateData)
             .eq("id", gradeId)
+            .eq("crew_id", crewId)
             .select()
             .single();
 
@@ -310,6 +210,9 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const guard = await assertAdmin("grade.manage");
+    if (isGuardFailure(guard)) return guard;
+
     try {
         const body = await request.json();
         const { gradeId, crewId } = body;
@@ -321,39 +224,21 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        const supabase = await createSupabaseServerClient();
-
-        const {
-            data: { user },
-            error: authError,
-        } = await supabase.auth.getUser();
-        if (authError || !user) {
+        if (crewId !== guard.crewId) {
             return NextResponse.json(
-                { error: "인증이 필요합니다." },
-                { status: 401 }
-            );
-        }
-
-        const { data: adminCheck } = await supabase
-            .schema("attendance")
-            .from("user_crews")
-            .select("crew_role")
-            .eq("user_id", user.id)
-            .eq("crew_id", crewId)
-            .eq("crew_role", "CREW_MANAGER")
-            .single();
-        if (!adminCheck) {
-            return NextResponse.json(
-                { error: "크루 운영진 권한이 필요합니다." },
+                { error: "권한이 없습니다." },
                 { status: 403 }
             );
         }
+
+        const supabase = await createClient();
 
         const { error } = await supabase
             .schema("attendance")
             .from("crew_grades")
             .update({ is_active: false })
-            .eq("id", gradeId);
+            .eq("id", gradeId)
+            .eq("crew_id", crewId);
 
         if (error) {
             return NextResponse.json(

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
     CircleCheckBig,
     Award,
@@ -12,6 +13,8 @@ import PageHeader from "@/components/organisms/common/PageHeader";
 
 interface Notice {
     id: string;
+    title?: string | null;
+    type?: "공지" | "일반" | "중요";
     content: string;
     is_active: boolean;
     created_at: string;
@@ -40,6 +43,7 @@ const NotificationsTemplate: React.FC<NotificationsTemplateProps> = ({
     initialNotifications,
     initialUnreadCount,
 }) => {
+    const router = useRouter();
     const [mounted, setMounted] = useState(false);
     const [activeTab, setActiveTab] = useState<"notice" | "alert">(
         "notice"
@@ -221,6 +225,11 @@ const NotificationsTemplate: React.FC<NotificationsTemplateProps> = ({
                     <NoticeTab
                         notices={notices}
                         formatDate={formatDate}
+                        onNoticeClick={(id) =>
+                            router.push(
+                                `/notifications/notice/${id}`,
+                            )
+                        }
                     />
                 ) : (
                     <AlertTab
@@ -239,9 +248,11 @@ const NotificationsTemplate: React.FC<NotificationsTemplateProps> = ({
 function NoticeTab({
     notices,
     formatDate,
+    onNoticeClick,
 }: {
     notices: Notice[];
     formatDate: (d: string) => string;
+    onNoticeClick: (id: string) => void;
 }) {
     if (notices.length === 0) {
         return (
@@ -259,11 +270,13 @@ function NoticeTab({
     return (
         <div className="px-4 py-3 space-y-3">
             {notices.map((notice) => (
-                <div
+                <button
                     key={notice.id}
-                    className={`flex rounded-rh-lg bg-rh-bg-surface overflow-hidden ${
-                        notice.is_active ? "" : ""
-                    }`}
+                    type="button"
+                    onClick={() =>
+                        onNoticeClick(notice.id)
+                    }
+                    className="flex w-full text-left rounded-rh-lg bg-rh-bg-surface overflow-hidden transition-opacity active:opacity-70"
                 >
                     {/* 활성 공지 좌측 바 */}
                     {notice.is_active && (
@@ -274,8 +287,13 @@ function NoticeTab({
                             notice.is_active ? "pl-3" : ""
                         }`}
                     >
+                        {notice.title && (
+                            <p className="text-[14px] font-semibold text-white leading-snug mb-1">
+                                {notice.title}
+                            </p>
+                        )}
                         <p
-                            className={`text-sm leading-relaxed ${
+                            className={`text-sm leading-relaxed line-clamp-1 break-all ${
                                 notice.is_active
                                     ? "text-white"
                                     : "text-rh-text-secondary"
@@ -301,7 +319,7 @@ function NoticeTab({
                             </span>
                         </div>
                     </div>
-                </div>
+                </button>
             ))}
         </div>
     );

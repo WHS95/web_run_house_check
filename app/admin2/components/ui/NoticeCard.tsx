@@ -34,7 +34,7 @@ const NoticeCard = memo(function NoticeCard({
             <span className="text-[15px] font-semibold text-white">
                 {title}
             </span>
-            <p className="text-[13px] text-rh-text-secondary leading-[1.4]">
+            <p className="text-[13px] text-rh-text-secondary leading-[1.4] line-clamp-1 break-all">
                 {description}
             </p>
         </button>

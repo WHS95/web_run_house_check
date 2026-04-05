@@ -19,7 +19,6 @@ import ActivityListItem from '../molecules/ActivityListItem';
 import SectionLabel from '../atoms/SectionLabel';
 import { AnimatedList, AnimatedItem } from '../atoms/AnimatedList';
 import PushPermissionBanner from '../molecules/PushPermissionBanner';
-import NoticeListSheet from '../molecules/NoticeListSheet';
 
 import { usePushNotification } from '@/hooks/usePushNotification';
 import { useOfflineAttendance } from '@/hooks/useOfflineAttendance';
@@ -64,7 +63,6 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
     const { queueCount, isOnline, isFlushing } = useOfflineAttendance();
 
     const [isNoticeSheetOpen, setIsNoticeSheetOpen] = useState(false);
-    const [isNoticeListOpen, setIsNoticeListOpen] = useState(false);
     const [notices, setNotices] = useState<Notice[]>([]);
     const [noticesLoading, setNoticesLoading] = useState(false);
     const [noticeTitle, setNoticeTitle] = useState<string | null>(null);
@@ -166,14 +164,14 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
             {/* ── ScrollContent ── */}
             <div className="flex-1 overflow-y-auto px-4 pt-4 scroll-area-bottom space-y-5">
                 {/* 공지 카드 (제목만 노출) */}
-                {(noticeTitle || noticeText) && (
+                {noticeTitle && (
                     <button
-                        onClick={() => setIsNoticeListOpen(true)}
+                        onClick={() => router.push('/notifications')}
                         className="flex w-full items-center gap-2.5 rounded-rh-lg bg-rh-bg-surface px-4 h-12 text-left"
                     >
                         <Megaphone className="h-4 w-4 shrink-0 text-rh-accent" />
                         <p className="text-[13px] text-white truncate">
-                            {noticeTitle ?? noticeText}
+                            {noticeTitle}
                         </p>
                     </button>
                 )}
@@ -330,14 +328,6 @@ const EnhancedHomeTemplate: React.FC<EnhancedHomeTemplateProps> = ({
                 )}
             </AnimatePresence>
 
-            {/* 공지사항 리스트 바텀시트 */}
-            {crewId && (
-                <NoticeListSheet
-                    isOpen={isNoticeListOpen}
-                    onClose={() => setIsNoticeListOpen(false)}
-                    crewId={crewId}
-                />
-            )}
         </div>
     );
 };

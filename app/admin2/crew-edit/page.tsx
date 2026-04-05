@@ -47,7 +47,7 @@ async function CrewEditDataServer({
                 maxMembers: crew?.max_members || 50,
                 createdAt: crew?.created_at || "",
                 currentMembers: stats.totalMembers,
-                logoUrl: crew?.logo_url || null,
+                logoUrl: crew?.profile_image_url || null,
             }}
         />
     );

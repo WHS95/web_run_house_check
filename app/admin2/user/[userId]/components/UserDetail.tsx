@@ -22,18 +22,18 @@ function StatCard({
     valueSize?: "sm" | "lg";
 }) {
     return (
-        <div className="h-[76px] flex flex-col items-center justify-center gap-1 rounded-2xl bg-rh-bg-surface py-4 px-3">
+        <div className="h-[76px] min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl bg-rh-bg-surface py-4 px-2">
             <span
                 className={
-                    "font-bold text-white " +
+                    "font-bold text-white whitespace-nowrap tabular-nums leading-none " +
                     (valueSize === "lg"
                         ? "text-xl"
-                        : "text-sm")
+                        : "text-[13px]")
                 }
             >
                 {value}
             </span>
-            <span className="text-xs text-rh-text-secondary">
+            <span className="text-xs text-rh-text-secondary whitespace-nowrap">
                 {label}
             </span>
         </div>
@@ -107,7 +107,7 @@ export default function UserDetail({
                 </div>
 
                 {/* 통계 */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2">
                     <StatCard
                         value={formatDate(
                             detail.last_attendance_date,

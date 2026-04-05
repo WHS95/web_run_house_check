@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import PopupNotification, {
@@ -144,13 +144,14 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   const [locationMessage, setLocationMessage] = useState("");
   const [canAttendByLocation, setCanAttendByLocation] = useState(true); // 위치 기반 출석 가능 여부
 
-  // 초기 폼 데이터
+  // 초기 폼 데이터 (SSR/CSR 일치 위해 날짜/시간은 빈 값으로 시작 후 mount에서 설정)
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState(() => {
     if (initialFormData) {
       return {
         name: initialFormData.userName,
-        date: getTodayString(),
-        time: getCurrentTime(),
+        date: "",
+        time: "",
         location: initialFormData.locationOptions[0]?.value || "",
         exerciseType: initialFormData.exerciseOptions[0]?.value || "",
         isHost: "아니오",
@@ -158,13 +159,23 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
     }
     return {
       name: "",
-      date: getTodayString(),
-      time: getCurrentTime(),
+      date: "",
+      time: "",
       location: "",
       exerciseType: "",
       isHost: "아니오",
     };
   });
+
+  // 마운트 후 클라이언트 기준 현재 날짜/시간 설정 (hydration 불일치 방지)
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      date: getTodayString(),
+      time: getCurrentTime(),
+    }));
+    setMounted(true);
+  }, []);
 
   const handleFormChange = useCallback((field: string, value: string) => {
     if (field === "date") {

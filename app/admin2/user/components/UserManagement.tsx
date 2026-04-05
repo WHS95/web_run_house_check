@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useMemo, memo } from "react";
+import { useRouter } from "next/navigation";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,14 +15,7 @@ import {
 import AdminSearchBar from "@/app/admin2/components/ui/AdminSearchBar";
 import AdminBadge from "@/app/admin2/components/ui/AdminBadge";
 import AdminSmallButton from "@/app/admin2/components/ui/AdminSmallButton";
-import AdminModal from "@/app/admin2/components/ui/AdminModal";
-import AdminAlertDialog from "@/app/admin2/components/ui/AdminAlertDialog";
-import UserEditForm from "./UserEditForm";
-import {
-    UserForAdmin,
-    updateUserStatus,
-    updateUserInfo,
-} from "@/lib/supabase/admin";
+import { UserForAdmin } from "@/lib/supabase/admin";
 
 interface UserManagementProps {
     initialUsers: UserForAdmin[];
@@ -141,20 +135,11 @@ export default function UserManagement({
     crewId,
     gradeMap,
 }: UserManagementProps) {
+    const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] =
         useState("전체");
-    const [users, setUsers] = useState(initialUsers);
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [editModalOpen, setEditModalOpen] =
-        useState(false);
-    const [selectedUser, setSelectedUser] =
-        useState<UserForAdmin | null>(null);
-    const [confirmDialog, setConfirmDialog] = useState<{
-        open: boolean;
-        userId: string;
-        active: boolean;
-    }>({ open: false, userId: "", active: false });
+    const [users] = useState(initialUsers);
 
     const isUserActive = useCallback(
         (user: UserForAdmin) =>
@@ -226,85 +211,9 @@ export default function UserManagement({
 
     const handleCardTap = useCallback(
         (user: UserForAdmin) => {
-            setSelectedUser(user);
-            setEditModalOpen(true);
+            router.push(`/admin2/user/${user.id}`);
         },
-        [],
-    );
-
-    const handleToggleStatus = useCallback(async () => {
-        const { userId, active } = confirmDialog;
-        setConfirmDialog((prev) => ({
-            ...prev,
-            open: false,
-        }));
-        setIsUpdating(true);
-        try {
-            const newStatus = !active;
-            const { error } = await updateUserStatus(
-                userId,
-                crewId,
-                newStatus,
-            );
-            if (error) {
-                alert("사용자 상태 변경에 실패했습니다.");
-                return;
-            }
-            setUsers((prev) =>
-                prev.map((u) =>
-                    u.id === userId
-                        ? {
-                              ...u,
-                              status: newStatus
-                                  ? "ACTIVE"
-                                  : "SUSPENDED",
-                          }
-                        : u,
-                ),
-            );
-        } catch {
-            alert(
-                "사용자 상태 변경 중 오류가 발생했습니다.",
-            );
-        } finally {
-            setIsUpdating(false);
-        }
-    }, [confirmDialog, crewId]);
-
-    const handleSaveUserInfo = useCallback(
-        async (userData: {
-            first_name: string;
-            phone: string;
-            birth_year: number;
-        }) => {
-            if (!selectedUser) return;
-            try {
-                const { error } = await updateUserInfo(
-                    selectedUser.id,
-                    userData,
-                );
-                if (error) {
-                    alert(
-                        "사용자 정보 수정에 실패했습니다.",
-                    );
-                    return;
-                }
-                setUsers((prev) =>
-                    prev.map((u) =>
-                        u.id === selectedUser.id
-                            ? { ...u, ...userData }
-                            : u,
-                    ),
-                );
-                setEditModalOpen(false);
-                setSelectedUser(null);
-            } catch {
-                alert(
-                    "사용자 정보 수정 중 오류가 발생했습니다.",
-                );
-            }
-        },
-        [selectedUser],
+        [router],
     );
 
     const displayCount =
@@ -402,50 +311,6 @@ export default function UserManagement({
                 )}
             </div>
 
-            {/* 편집 모달 */}
-            <AdminModal
-                open={editModalOpen}
-                onClose={() => {
-                    setEditModalOpen(false);
-                    setSelectedUser(null);
-                }}
-                title="사용자 정보 수정"
-            >
-                {selectedUser && (
-                    <UserEditForm
-                        user={selectedUser}
-                        onSave={handleSaveUserInfo}
-                        onClose={() => {
-                            setEditModalOpen(false);
-                            setSelectedUser(null);
-                        }}
-                    />
-                )}
-            </AdminModal>
-
-            {/* 상태 변경 확인 다이얼로그 */}
-            <AdminAlertDialog
-                open={confirmDialog.open}
-                onClose={() =>
-                    setConfirmDialog((prev) => ({
-                        ...prev,
-                        open: false,
-                    }))
-                }
-                onConfirm={handleToggleStatus}
-                title={
-                    confirmDialog.active
-                        ? "비활성화하시겠습니까?"
-                        : "활성화하시겠습니까?"
-                }
-                description={
-                    confirmDialog.active
-                        ? "해당 회원이 비활성 상태로 전환됩니다."
-                        : "해당 회원이 활성 상태로 전환됩니다."
-                }
-                cancelLabel="취소"
-                confirmLabel="확인"
-            />
         </>
     );
 }

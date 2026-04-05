@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { verifyAdminAuth } from "@/lib/admin-auth";
-
+import { getAdminAuth } from "@/lib/admin2/auth";
+import { AdminProvider } from "./providers/AdminProvider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,11 +14,10 @@ export default async function Admin2Layout({
 }: {
     children: ReactNode;
 }) {
-    await verifyAdminAuth();
-
+    const auth = await getAdminAuth();
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
-            {children}
+            <AdminProvider value={auth}>{children}</AdminProvider>
         </div>
     );
 }

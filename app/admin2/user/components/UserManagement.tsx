@@ -109,11 +109,10 @@ const UserCard = memo(function UserCard({
                     {user.first_name || "이름 없음"}
                 </span>
                 <span className="text-[11px] text-rh-text-tertiary truncate">
-                    가입:{" "}
-                    {formatDate(
-                        user.join_date || user.created_at,
-                    )}{" "}
-                    · 출석{" "}
+                    {user.last_attendance_date
+                        ? `최근 참여일: ${formatDate(user.last_attendance_date)}`
+                        : "참여 기록 없음"}
+                    {" · 출석 "}
                     {user.attendance_count ?? 0}회
                 </span>
             </div>

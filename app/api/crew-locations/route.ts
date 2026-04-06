@@ -25,19 +25,17 @@ export async function GET(request: NextRequest) {
 
         if (!crewId) {
             // crew_id가 없으면 users 테이블의 verified_crew_id에서 가져오기
-            const { data: userData } = await supabase
+            const { data: userData, error: userError } = await supabase
+                .schema("attendance")
                 .from("users")
-                .select("verified_crew_id, is_crew_verified")
+                .select("verified_crew_id")
                 .eq("id", user.id)
                 .single();
 
-            if (!userData?.is_crew_verified || !userData?.verified_crew_id) {
+            if (userError || !userData) {
                 return NextResponse.json(
-                    {
-                        success: false,
-                        error: "크루에 소속되어 있지 않습니다.",
-                    },
-                    { status: 404 }
+                    { success: false, error: userError?.message },
+                    { status: 500 }
                 );
             }
 

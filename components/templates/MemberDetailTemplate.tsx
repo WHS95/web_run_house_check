@@ -9,7 +9,6 @@ import { Switch } from '@/components/ui/switch';
 import { getFCMToken } from '@/lib/firebase/client';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import SectionLabel from '@/components/atoms/SectionLabel';
-import MenuListItem from '@/components/molecules/MenuListItem';
 
 import { usePushNotification } from '@/hooks/usePushNotification';
 
@@ -130,20 +129,6 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
         }).length;
     }, [activityData.activities]);
 
-    const formatActivityDate = (dateStr: string) => {
-        const d = new Date(dateStr);
-        const month = d.getMonth() + 1;
-        const day = d.getDate();
-        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-        const weekday = weekdays[d.getDay()];
-        return `${month}월 ${day}일 (${weekday})`;
-    };
-
-    const formatActivityTime = (dateStr: string) => {
-        const d = new Date(dateStr);
-        return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-    };
-
     if (!userProfile) {
         return <ErrorState />;
     }
@@ -165,11 +150,19 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
             <div className="flex-1 px-4 pt-4 pb-4 space-y-5">
                 {/* Profile */}
                 <div className="flex items-center gap-4">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-rh-accent">
-                        <span className="text-2xl font-bold text-white">
-                            {userProfile.firstName?.charAt(0) ?? '?'}
-                        </span>
-                    </div>
+                    {userProfile.profileImageUrl ? (
+                        <img
+                            src={userProfile.profileImageUrl}
+                            alt="프로필"
+                            className="h-16 w-16 rounded-full object-cover"
+                        />
+                    ) : (
+                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-rh-accent">
+                            <span className="text-2xl font-bold text-white">
+                                {userProfile.firstName?.charAt(0) ?? '?'}
+                            </span>
+                        </div>
+                    )}
                     <div className="flex flex-col gap-1">
                         <span className="text-xl font-semibold text-white">{displayName}</span>
                         <span className="text-[13px] text-rh-text-secondary">
@@ -192,26 +185,6 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                         <span className="text-2xl font-bold text-rh-accent">{activityData.meetingsCreatedCount}</span>
                         <span className="text-xs font-medium text-rh-text-secondary">개설 횟수</span>
                     </div>
-                </div>
-
-                {/* Section Label */}
-                <SectionLabel>활동 기록</SectionLabel>
-
-                {/* Activity History - ListItem style */}
-                <div className="space-y-2">
-                    {activityData.activities.length > 0 ? (
-                        activityData.activities.map((activity, index) => (
-                            <MenuListItem
-                                key={index}
-                                title={formatActivityDate(activity.date)}
-                                subtitle={`${activity.location} · ${activity.exerciseType} · ${formatActivityTime(activity.date)}`}
-                            />
-                        ))
-                    ) : (
-                        <div className="flex items-center justify-center rounded-rh-md bg-rh-bg-surface py-10">
-                            <p className="text-sm text-rh-text-tertiary">활동 기록이 없습니다</p>
-                        </div>
-                    )}
                 </div>
 
                 {/* 설정 */}

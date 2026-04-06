@@ -366,3 +366,56 @@ Please design the project with a clean, modern, and consistent iOS-style interfa
 	•	Design interactions to feel natural and intuitive on smartphones
 
 The result should feel like a native iOS web app: elegant, lightweight, and user-focused.
+
+## 하네스: RunHouse 개발
+
+**목표:** .pen 디자인 기반의 프로덕션 품질 기능 구현을 에이전트 파이프라인으로 자동화
+
+**에이전트 팀:**
+| 에이전트 | 역할 |
+|---------|------|
+| design-analyst | .pen 디자인 파일에서 구현 스펙 추출 |
+| feature-builder | 페이지/컴포넌트/API 코드 구현 |
+| qa-inspector | 경계면 교차 비교, 빌드 검증, 규칙 준수 확인 |
+| db-architect | Supabase 마이그레이션, RPC 함수, 쿼리 최적화 |
+
+**스킬:**
+| 스킬 | 용도 | 사용 에이전트 |
+|------|------|-------------|
+| runhouse-orchestrator | 에이전트 파이프라인 조율 | 오케스트레이터 (메인) |
+| design-analysis | .pen 디자인 스펙 추출 | design-analyst |
+| feature-building | 코드 구현 패턴 및 규칙 | feature-builder |
+| qa-inspection | 통합 품질 검증 워크플로우 | qa-inspector |
+| db-architecture | DB 설계/마이그레이션 패턴 | db-architect |
+
+**실행 규칙:**
+- 기능 구현, 페이지 개발, 컴포넌트 작성, API 개발, DB 변경, 디자인 구현 등 개발 작업 요청 시 `runhouse-orchestrator` 스킬을 통해 에이전트로 처리하라
+- 단순 질문/확인/설정 변경은 에이전트 없이 직접 응답해도 무방
+- 모든 에이전트는 `model: "opus"` 사용
+- 중간 산출물: `_workspace/` 디렉토리
+
+**디렉토리 구조:**
+```
+.claude/
+├── agents/
+│   ├── design-analyst.md
+│   ├── feature-builder.md
+│   ├── qa-inspector.md
+│   └── db-architect.md
+└── skills/
+    ├── runhouse-orchestrator/
+    │   └── SKILL.md
+    ├── design-analysis/
+    │   └── SKILL.md
+    ├── feature-building/
+    │   └── SKILL.md
+    ├── qa-inspection/
+    │   └── SKILL.md
+    └── db-architecture/
+        └── SKILL.md
+```
+
+**변경 이력:**
+| 날짜 | 변경 내용 | 대상 | 사유 |
+|------|----------|------|------|
+| 2026-04-06 | 초기 구성 | 전체 | 하네스 신규 구축 |

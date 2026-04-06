@@ -5,9 +5,11 @@ import React, {
     useEffect,
     useMemo,
     useCallback,
+    useRef,
 } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
+import { Camera } from "lucide-react";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import FadeIn from "@/components/atoms/FadeIn";
 
@@ -16,6 +18,7 @@ interface ProfileForm {
     phone: string;
     birthYear: string;
     email: string;
+    profileImageUrl: string | null;
 }
 
 const EditProfileSkeleton = React.memo(() => (
@@ -42,10 +45,13 @@ export default function EditProfilePage() {
         phone: "",
         birthYear: "",
         email: "",
+        profileImageUrl: null,
     });
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const supabase = useMemo(
         () =>
@@ -73,7 +79,7 @@ export default function EditProfilePage() {
                     .schema("attendance")
                     .from("users")
                     .select(
-                        "first_name, phone, birth_year, email"
+                        "first_name, phone, birth_year, email, profile_image_url"
                     )
                     .eq("id", user.id)
                     .single();
@@ -87,6 +93,8 @@ export default function EditProfilePage() {
                         ? String(data.birth_year)
                         : "",
                     email: data.email ?? "",
+                    profileImageUrl:
+                        data.profile_image_url ?? null,
                 });
             } catch {
                 alert("프로필 정보를 불러올 수 없습니다.");
@@ -97,6 +105,86 @@ export default function EditProfilePage() {
         };
         loadProfile();
     }, [supabase, router]);
+
+    const handleImageUpload = useCallback(
+        async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files?.[0];
+            if (!file || !userId) return;
+
+            // 5MB 제한
+            if (file.size > 5 * 1024 * 1024) {
+                alert("이미지는 5MB 이하만 업로드 가능합니다.");
+                return;
+            }
+
+            // 이미지 타입 확인
+            if (!file.type.startsWith("image/")) {
+                alert("이미지 파일만 업로드 가능합니다.");
+                return;
+            }
+
+            setIsUploading(true);
+            try {
+                const ext = file.name.split(".").pop()
+                    ?? "jpg";
+                const filePath =
+                    `profiles/${userId}.${ext}`;
+
+                // 기존 이미지 삭제 (에러 무시)
+                await supabase.storage
+                    .from("image")
+                    .remove([filePath])
+                    .catch(() => {});
+
+                // 새 이미지 업로드
+                const { error: uploadError } =
+                    await supabase.storage
+                        .from("image")
+                        .upload(filePath, file, {
+                            upsert: true,
+                            cacheControl: "0",
+                        });
+
+                if (uploadError) throw uploadError;
+
+                // public URL 가져오기
+                const { data: urlData } =
+                    supabase.storage
+                        .from("image")
+                        .getPublicUrl(filePath);
+
+                const publicUrl =
+                    `${urlData.publicUrl}?t=${Date.now()}`;
+
+                // DB 업데이트
+                const { error: dbError } = await supabase
+                    .schema("attendance")
+                    .from("users")
+                    .update({
+                        profile_image_url: publicUrl,
+                    })
+                    .eq("id", userId);
+
+                if (dbError) throw dbError;
+
+                setForm((prev) => ({
+                    ...prev,
+                    profileImageUrl: publicUrl,
+                }));
+            } catch {
+                alert(
+                    "이미지 업로드 중 오류가 발생했습니다."
+                );
+            } finally {
+                setIsUploading(false);
+                // input 초기화 (같은 파일 재선택 가능)
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
+            }
+        },
+        [userId, supabase]
+    );
 
     const handleChange = useCallback(
         (field: keyof ProfileForm) =>
@@ -174,6 +262,54 @@ export default function EditProfilePage() {
                 </div>
 
                 <div className="flex-1 px-4 pt-6 pb-4 flex flex-col gap-6">
+                    {/* 프로필 사진 */}
+                    <div className="flex flex-col items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                fileInputRef.current?.click()
+                            }
+                            disabled={isUploading}
+                            className="relative group"
+                        >
+                            {form.profileImageUrl ? (
+                                <img
+                                    src={
+                                        form.profileImageUrl
+                                    }
+                                    alt="프로필"
+                                    className="h-20 w-20 rounded-full object-cover border-2 border-rh-border"
+                                />
+                            ) : (
+                                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-rh-accent border-2 border-rh-border">
+                                    <span className="text-3xl font-bold text-white">
+                                        {form.firstName
+                                            ?.charAt(0) ??
+                                            "?"}
+                                    </span>
+                                </div>
+                            )}
+                            <div className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-rh-bg-surface border border-rh-border">
+                                <Camera
+                                    size={14}
+                                    className="text-rh-text-secondary"
+                                />
+                            </div>
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                        />
+                        {isUploading && (
+                            <span className="text-xs text-rh-text-tertiary">
+                                업로드 중...
+                            </span>
+                        )}
+                    </div>
+
                     {/* 이름 */}
                     <label className="flex flex-col gap-1.5">
                         <span className="text-xs font-medium text-rh-text-secondary">

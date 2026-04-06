@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         const { data, error } = await supabase
             .schema("attendance")
             .from("crew_locations")
-            .select("*")
+            .select("id, name, description, latitude, longitude, is_active")
             .eq("crew_id", crewId)
             .eq("is_active", true)
             .order("created_at", { ascending: true });

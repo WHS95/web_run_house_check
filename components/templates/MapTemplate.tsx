@@ -33,6 +33,20 @@ type BottomUIState =
     | { type: "expanded" }
     | { type: "detail"; location: CrewLocation };
 
+// 인라인 객체 호이스팅 (매 렌더마다 재생성 방지)
+const DRAG_CONSTRAINTS_TOP = { top: 0 };
+const SPRING_FAST = {
+    type: "spring" as const,
+    damping: 25,
+    stiffness: 300,
+};
+const SPRING_MEDIUM = {
+    type: "spring" as const,
+    damping: 28,
+    stiffness: 300,
+};
+const FADE_TRANSITION = { duration: 0.2 };
+
 export default function MapTemplate() {
     const router = useRouter();
     const mapRef = useRef<HTMLDivElement>(null);
@@ -54,6 +68,7 @@ export default function MapTemplate() {
 
     const selectedLocation =
         bottomUI.type === "detail" ? bottomUI.location : null;
+    const selectedLocationIdRef = useRef<number | null>(null);
 
     const { location: myLocation, getCurrentLocation } =
         useGeolocation();
@@ -154,7 +169,43 @@ export default function MapTemplate() {
         );
     }, [isMapReady]);
 
-    // 마커 렌더링
+    // 마커 아이콘 생성 헬퍼
+    const createMarkerIcon = useCallback(
+        (isSelected: boolean) => {
+            const size = isSelected ? 40 : 32;
+            const dotSize = isSelected ? 14 : 10;
+            return {
+                content: `
+                    <div style="
+                        width: ${size}px;
+                        height: ${size}px;
+                        background: #669FF2;
+                        border-radius: 50%;
+                        border: 3px solid white;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.2s ease;
+                        ${isSelected ? "box-shadow: 0 2px 12px #669FF266;" : "box-shadow: 0 2px 8px rgba(0,0,0,0.3);"}
+                    ">
+                        <div style="
+                            width: ${dotSize}px;
+                            height: ${dotSize}px;
+                            background: white;
+                            border-radius: 50%;
+                        "></div>
+                    </div>
+                `,
+                anchor: new window.naver.maps.Point(
+                    size / 2,
+                    size / 2
+                ),
+            };
+        },
+        []
+    );
+
+    // 마커 생성 (locations 변경 시에만)
     useEffect(() => {
         const map = mapInstanceRef.current;
         if (!map || !isMapReady || locations.length === 0)
@@ -178,42 +229,13 @@ export default function MapTemplate() {
             );
             bounds.extend(position);
 
-            const isSelected =
-                selectedLocation?.id === loc.id;
-            const size = isSelected ? 40 : 32;
-            const dotSize = isSelected ? 14 : 10;
-
             const marker = new window.naver.maps.Marker({
                 position,
                 map,
-                icon: {
-                    content: `
-                        <div style="
-                            width: ${size}px;
-                            height: ${size}px;
-                            background: #669FF2;
-                            border-radius: 50%;
-                            border: 3px solid white;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            transition: all 0.2s ease;
-                            ${isSelected ? "box-shadow: 0 2px 12px #669FF266;" : "box-shadow: 0 2px 8px rgba(0,0,0,0.3);"}
-                        ">
-                            <div style="
-                                width: ${dotSize}px;
-                                height: ${dotSize}px;
-                                background: white;
-                                border-radius: 50%;
-                            "></div>
-                        </div>
-                    `,
-                    anchor: new window.naver.maps.Point(
-                        size / 2,
-                        size / 2
-                    ),
-                },
+                icon: createMarkerIcon(false),
             });
+
+            (marker as any)._locationId = loc.id;
 
             window.naver.maps.Event.addListener(
                 marker,
@@ -230,16 +252,31 @@ export default function MapTemplate() {
             markersRef.current.push(marker);
         });
 
-        // 선택된 장소가 없을 때만 bounds 조정
-        if (!selectedLocation && locations.length > 0) {
-            map.fitBounds(bounds, {
-                top: 80,
-                right: 40,
-                bottom: 80,
-                left: 40,
-            });
-        }
-    }, [isMapReady, locations, selectedLocation]);
+        map.fitBounds(bounds, {
+            top: 80,
+            right: 40,
+            bottom: 80,
+            left: 40,
+        });
+    }, [isMapReady, locations, createMarkerIcon]);
+
+    // 선택 상태 변경 시 아이콘만 업데이트 (마커 재생성 없음)
+    useEffect(() => {
+        const selectedId = selectedLocation?.id ?? null;
+        const prevId = selectedLocationIdRef.current;
+        if (selectedId === prevId) return;
+
+        markersRef.current.forEach((marker) => {
+            const id = (marker as any)._locationId;
+            if (id === prevId || id === selectedId) {
+                marker.setIcon(
+                    createMarkerIcon(id === selectedId)
+                );
+            }
+        });
+
+        selectedLocationIdRef.current = selectedId;
+    }, [selectedLocation, createMarkerIcon]);
 
     // 내 위치 마커
     useEffect(() => {
@@ -439,11 +476,7 @@ export default function MapTemplate() {
                             initial={{ y: 60 }}
                             animate={{ y: 0 }}
                             exit={{ y: 60 }}
-                            transition={{
-                                type: "spring",
-                                damping: 25,
-                                stiffness: 300,
-                            }}
+                            transition={SPRING_FAST}
                             onClick={() =>
                                 setBottomUI({
                                     type: "expanded",
@@ -489,13 +522,9 @@ export default function MapTemplate() {
                             initial={{ y: 300 }}
                             animate={{ y: 0 }}
                             exit={{ y: 300 }}
-                            transition={{
-                                type: "spring",
-                                damping: 28,
-                                stiffness: 300,
-                            }}
+                            transition={SPRING_MEDIUM}
                             drag="y"
-                            dragConstraints={{ top: 0 }}
+                            dragConstraints={DRAG_CONSTRAINTS_TOP}
                             dragElastic={0.1}
                             onDragEnd={(_, info) => {
                                 if (info.offset.y > 80) {
@@ -644,9 +673,7 @@ export default function MapTemplate() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                transition={{
-                                    duration: 0.2,
-                                }}
+                                transition={FADE_TRANSITION}
                                 className="absolute inset-0"
                                 style={{
                                     zIndex: 2001,
@@ -666,15 +693,9 @@ export default function MapTemplate() {
                                 initial={{ y: "100%" }}
                                 animate={{ y: 0 }}
                                 exit={{ y: "100%" }}
-                                transition={{
-                                    type: "spring",
-                                    damping: 28,
-                                    stiffness: 300,
-                                }}
+                                transition={SPRING_MEDIUM}
                                 drag="y"
-                                dragConstraints={{
-                                    top: 0,
-                                }}
+                                dragConstraints={DRAG_CONSTRAINTS_TOP}
                                 dragElastic={0.1}
                                 onDragEnd={(_, info) => {
                                     if (

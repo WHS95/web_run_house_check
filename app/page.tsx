@@ -3,6 +3,61 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ClientHomePage from "@/components/pages/ClientHomePage";
 
+/** 홈 페이지 스켈레톤 — 실제 레이아웃과 동일한 구조 */
+function HomePageSkeleton() {
+  return (
+    <div className="flex flex-col min-h-screen bg-rh-bg-primary">
+      {/* 헤더 스켈레톤 */}
+      <header className="sticky top-0 z-50 flex items-center justify-between px-4 h-14 pt-safe bg-rh-bg-primary">
+        <div className="flex flex-col gap-1">
+          <div className="h-3 w-24 rounded bg-rh-bg-surface" />
+          <div className="h-5 w-36 rounded bg-rh-bg-surface" />
+        </div>
+        <div className="h-10 w-10 rounded-rh-md bg-rh-bg-surface" />
+      </header>
+
+      <div className="flex-1 px-4 pt-4 pb-6 space-y-5">
+        {/* 공지 카드 스켈레톤 */}
+        <div className="h-12 rounded-rh-lg bg-rh-bg-surface" />
+
+        {/* 빠른 액션 3개 */}
+        <div className="flex gap-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex-1 h-[72px] rounded-rh-lg bg-rh-bg-surface"
+            />
+          ))}
+        </div>
+
+        {/* 러닝 장소 카드 */}
+        <div className="h-[62px] rounded-rh-lg bg-rh-bg-surface" />
+
+        {/* 나의 최근 활동 섹션 */}
+        <div className="h-4 w-28 rounded bg-rh-bg-surface" />
+        <div className="h-[100px] rounded-rh-lg bg-rh-bg-surface" />
+
+        {/* 최근 크루 활동 섹션 */}
+        <div className="h-4 w-28 rounded bg-rh-bg-surface" />
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center px-4 h-14 rounded-rh-lg bg-rh-bg-surface"
+            >
+              <div className="h-8 w-8 rounded-full bg-rh-bg-muted" />
+              <div className="flex-1 ml-3 space-y-1">
+                <div className="h-3.5 w-20 rounded bg-rh-bg-muted" />
+                <div className="h-3 w-32 rounded bg-rh-bg-muted" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // 서버 컴포넌트로 초기 데이터 로딩 최적화
 async function getInitialHomeData() {
   try {
@@ -55,45 +110,91 @@ async function getInitialHomeData() {
       exerciseType: string;
       time: string;
     }> = [];
+    let myAttendanceDays: Array<{
+      date: string;
+      count: number;
+    }> = [];
 
     if (crewId) {
-      const { data: records } = await supabase
-        .schema("attendance")
-        .from("attendance_records")
-        .select(`
-          id,
-          location,
-          attendance_timestamp,
-          exercise_type_id,
-          user:user_id ( first_name ),
-          exercise_type:exercise_type_id ( name )
-        `)
-        .eq("crew_id", crewId)
-        .is("deleted_at", null)
-        .order("attendance_timestamp", { ascending: false })
-        .limit(10);
+      // 크루 최근 활동 + 나의 히트맵을 병렬로 조회
+      const twoWeeksAgo = new Date();
+      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+      const twoWeeksAgoStr = twoWeeksAgo.toISOString();
 
-      if (records) {
-        recentActivities = records.map((r: Record<string, unknown>) => {
-          const ts = new Date(r.attendance_timestamp as string);
-          const hours = ts.getHours().toString().padStart(2, "0");
-          const minutes = ts.getMinutes().toString().padStart(2, "0");
-          const userObj = r.user as Record<string, string> | null;
-          const exerciseObj = r.exercise_type as Record<string, string> | null;
-          return {
-            id: r.id as string,
-            userName: userObj?.first_name ?? "멤버",
-            location: (r.location as string) ?? "",
-            exerciseType: exerciseObj?.name ?? "",
-            time: `${hours}:${minutes}`,
-          };
+      const [recentResult, heatmapResult] = await Promise.all([
+        // 크루 최근 활동 10건
+        supabase
+          .schema("attendance")
+          .from("attendance_records")
+          .select(`
+            id,
+            location,
+            attendance_timestamp,
+            exercise_type_id,
+            user:user_id ( first_name ),
+            exercise_type:exercise_type_id ( name )
+          `)
+          .eq("crew_id", crewId)
+          .is("deleted_at", null)
+          .order("attendance_timestamp", { ascending: false })
+          .limit(10),
+        // 나의 최근 2주 출석 기록 (히트맵용)
+        supabase
+          .schema("attendance")
+          .from("attendance_records")
+          .select("attendance_timestamp")
+          .eq("crew_id", crewId)
+          .eq("user_id", user.id)
+          .is("deleted_at", null)
+          .gte("attendance_timestamp", twoWeeksAgoStr)
+          .order("attendance_timestamp", { ascending: true }),
+      ]);
+
+      if (recentResult.data) {
+        recentActivities = recentResult.data.map(
+          (r: Record<string, unknown>) => {
+            const ts = new Date(r.attendance_timestamp as string);
+            const hours = ts.getHours().toString().padStart(2, "0");
+            const minutes = ts.getMinutes().toString().padStart(2, "0");
+            const userObj = r.user as Record<string, string> | null;
+            const exerciseObj = r.exercise_type as Record<
+              string,
+              string
+            > | null;
+            return {
+              id: r.id as string,
+              userName: userObj?.first_name ?? "멤버",
+              location: (r.location as string) ?? "",
+              exerciseType: exerciseObj?.name ?? "",
+              time: `${hours}:${minutes}`,
+            };
+          }
+        );
+      }
+
+      if (heatmapResult.data) {
+        const dayMap = new Map<string, number>();
+        heatmapResult.data.forEach((r: Record<string, unknown>) => {
+          const d = new Date(r.attendance_timestamp as string);
+          const key =
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0");
+          dayMap.set(key, (dayMap.get(key) ?? 0) + 1);
         });
+        myAttendanceDays = Array.from(dayMap, ([date, count]) => ({
+          date,
+          count,
+        }));
       }
     }
 
     return {
       pageData: functionResult.data,
       recentActivities,
+      myAttendanceDays,
     };
   } catch (error) {
     // 오류 발생 시 기본 데이터 반환
@@ -105,6 +206,7 @@ async function getInitialHomeData() {
         noticeText: null,
       },
       recentActivities: [],
+      myAttendanceDays: [],
     };
   }
 }
@@ -125,19 +227,12 @@ export default async function HomePage() {
   // 클라이언트 컴포넌트에 초기 데이터 전달
   return (
     <Suspense
-      fallback={
-        <div className='flex items-center justify-center min-h-screen bg-rh-bg-primary'>
-          <div className='flex space-x-2'>
-            <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-            <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-            <div className='w-2 h-2 bg-white rounded-full splash-dot'></div>
-          </div>
-        </div>
-      }
+      fallback={<HomePageSkeleton />}
     >
       <ClientHomePage
         initialData={initialData.pageData!}
         recentActivities={initialData.recentActivities ?? []}
+        myAttendanceDays={initialData.myAttendanceDays ?? []}
       />
     </Suspense>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { memo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import EnhancedHomeTemplate from "@/components/templates/EnhancedHomeTemplate";
 import PopupNotification, {
@@ -23,14 +23,21 @@ interface RecentActivity {
   time: string;
 }
 
+interface AttendanceDay {
+  date: string;
+  count: number;
+}
+
 interface ClientHomePageProps {
   initialData: HomePageData;
   recentActivities?: RecentActivity[];
+  myAttendanceDays?: AttendanceDay[];
 }
 
-const ClientHomePage: React.FC<ClientHomePageProps> = ({
+const ClientHomePage = memo<ClientHomePageProps>(({
   initialData,
   recentActivities = [],
+  myAttendanceDays = [],
 }) => {
   const router = useRouter();
   const [pageData] = useState<HomePageData>(initialData);
@@ -85,6 +92,7 @@ const ClientHomePage: React.FC<ClientHomePageProps> = ({
         rankName='Beginer'
         noticeText={pageData.noticeText}
         recentActivities={recentActivities}
+        myAttendanceDays={myAttendanceDays}
       />
       
       {/* 알림 */}
@@ -99,6 +107,8 @@ const ClientHomePage: React.FC<ClientHomePageProps> = ({
       )}
     </>
   );
-};
+});
+
+ClientHomePage.displayName = 'ClientHomePage';
 
 export default ClientHomePage;

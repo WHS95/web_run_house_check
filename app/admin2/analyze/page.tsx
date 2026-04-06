@@ -6,6 +6,8 @@ import {
 import PageHeader
     from "@/components/organisms/common/PageHeader";
 import FadeIn from "@/components/atoms/FadeIn";
+import BottomSpacer
+    from "@/components/atoms/BottomSpacer";
 import YearMonthSelector
     from "./components/YearMonthSelector";
 import DayBarChart
@@ -152,7 +154,7 @@ export default async function Admin2AnalyzePage({
             <div
                 className={
                     "flex-1 px-4"
-                    + " pb-4 space-y-5"
+                    + " space-y-5"
                 }
             >
                 <Suspense
@@ -219,6 +221,10 @@ async function AnalyticsChartsServer({
                     }
                     year={year}
                     month={month}
+                />
+                <BottomSpacer
+                    stickyArea={100}
+                    lastCard={210}
                 />
             </div>
         </FadeIn>

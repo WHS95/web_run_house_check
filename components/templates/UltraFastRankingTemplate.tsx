@@ -181,7 +181,7 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
   return (
     <div className="flex flex-col h-screen bg-rh-bg-primary text-white">
       <div className="shrink-0 bg-rh-bg-primary pt-safe">
-        <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-surface" />
+        <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-primary" />
       </div>
 
       {/* Sticky 영역: 스크롤 밖 */}

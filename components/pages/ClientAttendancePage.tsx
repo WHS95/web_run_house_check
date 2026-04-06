@@ -377,7 +377,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           title='출석 체크'
           iconColor='white'
           borderColor='rh-border'
-          backgroundColor='bg-rh-bg-surface'
+          backgroundColor='bg-rh-bg-primary'
         />
       </div>
 

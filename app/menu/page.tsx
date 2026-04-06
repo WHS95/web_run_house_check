@@ -69,7 +69,7 @@ export default function MenuPage() {
                 title="러닝 계산기"
                 iconColor="white"
                 borderColor="rh-border"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
 
             <div className="overflow-y-auto flex-1 px-4 pt-4 pb-4">

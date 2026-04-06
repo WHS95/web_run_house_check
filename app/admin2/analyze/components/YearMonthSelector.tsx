@@ -5,9 +5,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
 
-// 월 라벨: 10월 이상은 숫자만 표시 (.pen 디자인 준수)
+// 월 라벨: 숫자만 표시
 function monthLabel(m: number) {
-    return m <= 9 ? `${m}월` : `${m}`;
+    return `${m}`;
 }
 
 export default function YearMonthSelector({

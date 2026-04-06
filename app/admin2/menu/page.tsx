@@ -8,11 +8,6 @@ import FadeIn from "@/components/atoms/FadeIn";
 
 const menuItems = [
     {
-        title: "통계 분석",
-        subtitle: "요일별 · 장소별 참여율",
-        href: "/admin2/analyze",
-    },
-    {
         title: "설정",
         subtitle: "장소 · 운영진 · 초대코드",
         href: "/admin2/settings",

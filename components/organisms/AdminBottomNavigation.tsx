@@ -3,7 +3,7 @@
 import React, { memo, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import {
-    LayoutDashboard,
+    BarChart3,
     CalendarCheck,
     Users,
     ArrowRightLeft,
@@ -24,15 +24,14 @@ interface AdminNavItem {
 
 const adminNavItems: AdminNavItem[] = [
     {
-        label: "대시보드",
-        href: "/admin2",
-        icon: LayoutDashboard,
-        matchExact: true,
-    },
-    {
         label: "출석",
         href: "/admin2/attendance",
         icon: CalendarCheck,
+    },
+    {
+        label: "통계",
+        href: "/admin2/analyze",
+        icon: BarChart3,
     },
     {
         label: "회원",

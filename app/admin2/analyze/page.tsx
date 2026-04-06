@@ -144,16 +144,25 @@ export default async function Admin2AnalyzePage({
                     }
                 />
             </div>
+            {/* 년도/월 선택 — 스크롤 시 상단 고정 */}
             <div
                 className={
-                    "flex-1 px-4 pt-4"
-                    + " pb-4 space-y-5"
+                    "sticky top-14 z-40"
+                    + " bg-rh-bg-primary"
+                    + " px-4 pt-4 pb-2"
                 }
             >
                 <YearMonthSelector
                     year={year}
                     month={month}
                 />
+            </div>
+            <div
+                className={
+                    "flex-1 px-4"
+                    + " pb-4 space-y-5"
+                }
+            >
                 <Suspense
                     fallback={
                         <AnalyticsSkeleton />

@@ -137,7 +137,7 @@ async function getInitialHomeData() {
           .eq("crew_id", crewId)
           .is("deleted_at", null)
           .order("attendance_timestamp", { ascending: false })
-          .limit(10),
+          .limit(3),
         // 나의 최근 2주 출석 기록 (히트맵용)
         supabase
           .schema("attendance")
@@ -154,6 +154,8 @@ async function getInitialHomeData() {
         recentActivities = recentResult.data.map(
           (r: Record<string, unknown>) => {
             const ts = new Date(r.attendance_timestamp as string);
+            const month = ts.getMonth() + 1;
+            const day = ts.getDate();
             const hours = ts.getHours().toString().padStart(2, "0");
             const minutes = ts.getMinutes().toString().padStart(2, "0");
             const userObj = r.user as Record<string, string> | null;
@@ -166,7 +168,7 @@ async function getInitialHomeData() {
               userName: userObj?.first_name ?? "멤버",
               location: (r.location as string) ?? "",
               exerciseType: exerciseObj?.name ?? "",
-              time: `${hours}:${minutes}`,
+              time: `${month}/${day} ${hours}:${minutes}`,
             };
           }
         );

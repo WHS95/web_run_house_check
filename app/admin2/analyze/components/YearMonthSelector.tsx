@@ -41,6 +41,23 @@ export default function YearMonthSelector({
         [router, pathname],
     );
 
+    /* 이전/다음 월 이동 */
+    const goPrevMonth = useCallback(() => {
+        if (month === 1) {
+            navigate(year - 1, 12);
+        } else {
+            navigate(year, month - 1);
+        }
+    }, [year, month, navigate]);
+
+    const goNextMonth = useCallback(() => {
+        if (month === 12) {
+            navigate(year + 1, 1);
+        } else {
+            navigate(year, month + 1);
+        }
+    }, [year, month, navigate]);
+
     /* sentinel이 viewport 밖으로 나가면 stuck */
     useEffect(() => {
         const el = sentinelRef.current;
@@ -163,7 +180,7 @@ export default function YearMonthSelector({
                 </div>
             </div>
 
-            {/* ── 축소 모드 (1줄) ── */}
+            {/* ── 축소 모드 (< 2026년 6월 >) ── */}
             <div
                 className={
                     "transition-all duration-300"
@@ -176,90 +193,42 @@ export default function YearMonthSelector({
             >
                 <div
                     className={
-                        "flex items-center gap-1.5"
-                        + " bg-rh-bg-surface"
-                        + " rounded-[12px]"
-                        + " h-9 p-1"
+                        "flex items-center"
+                        + " justify-between"
+                        + " h-9"
                     }
                 >
-                    {/* 연도 < > */}
                     <button
-                        onClick={() =>
-                            navigate(year - 1, month)
-                        }
+                        onClick={goPrevMonth}
                         className={
-                            "shrink-0 p-0.5"
+                            "p-1"
                             + " text-rh-text-tertiary"
                         }
                     >
                         <ChevronLeft
-                            className="w-4 h-4"
+                            className="w-5 h-5"
                         />
                     </button>
                     <span
                         className={
-                            "shrink-0 text-[13px]"
-                            + " font-bold text-white"
-                            + " min-w-[32px]"
-                            + " text-center"
+                            "text-[15px]"
+                            + " font-bold"
+                            + " text-white"
                         }
                     >
-                        {year}
+                        {year}년 {month}월
                     </span>
                     <button
-                        onClick={() =>
-                            navigate(year + 1, month)
-                        }
+                        onClick={goNextMonth}
                         className={
-                            "shrink-0 p-0.5"
+                            "p-1"
                             + " text-rh-text-tertiary"
                         }
                     >
                         <ChevronRight
-                            className="w-4 h-4"
+                            className="w-5 h-5"
                         />
                     </button>
-
-                    {/* 구분선 */}
-                    <div
-                        className={
-                            "w-px h-5 shrink-0"
-                            + " bg-rh-border"
-                        }
-                    />
-
-                    {/* 월 선택 */}
-                    <div
-                        className={
-                            "flex flex-1"
-                            + " gap-0.5"
-                        }
-                    >
-                        {monthOptions.map((m) => (
-                            <button
-                                key={m}
-                                onClick={() =>
-                                    navigate(year, m)
-                                }
-                                className={
-                                    "flex-1 flex"
-                                    + " items-center"
-                                    + " justify-center"
-                                    + " rounded-md"
-                                    + " text-[11px]"
-                                    + " font-medium"
-                                    + " transition-colors"
-                                    + (month === m
-                                        ? " bg-rh-accent"
-                                          + " text-white"
-                                          + " font-semibold"
-                                        : " text-rh-text-tertiary")
-                                }
-                            >
-                                {m}
-                            </button>
-                        ))}
-                    </div>
                 </div>
             </div>
         </>

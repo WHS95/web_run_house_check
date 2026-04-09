@@ -1,6 +1,14 @@
 "use client";
 
-import React, { useState, useCallback, useMemo, memo } from "react";
+import React, {
+    useState,
+    useCallback,
+    useMemo,
+    useEffect,
+    useRef,
+    memo,
+    useDeferredValue,
+} from "react";
 import { useRouter } from "next/navigation";
 import { SWRConfig } from "swr";
 import {
@@ -131,6 +139,52 @@ const UserCard = memo(function UserCard({
     );
 });
 
+/* ── 점진적 렌더링 훅 ── */
+const PAGE_SIZE = 20;
+
+function useIncrementalRender<T>(
+    items: T[],
+    pageSize: number = PAGE_SIZE,
+) {
+    const [visibleCount, setVisibleCount] =
+        useState(pageSize);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+
+    // 검색/필터 변경 시 리셋
+    useEffect(() => {
+        setVisibleCount(pageSize);
+    }, [items.length, pageSize]);
+
+    // IntersectionObserver로 무한 스크롤
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+        if (visibleCount >= items.length) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    setVisibleCount((prev) =>
+                        Math.min(
+                            prev + pageSize,
+                            items.length,
+                        ),
+                    );
+                }
+            },
+            { rootMargin: "200px" },
+        );
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, [items.length, visibleCount, pageSize]);
+
+    return {
+        visibleItems: items.slice(0, visibleCount),
+        sentinelRef,
+        hasMore: visibleCount < items.length,
+    };
+}
+
 /* ── 메인 컴포넌트 ── */
 export default function UserManagement({
     initialUsers,
@@ -147,6 +201,9 @@ export default function UserManagement({
     );
 }
 
+/* ── 애니메이션 제한 임계값 ── */
+const ANIMATED_LIST_THRESHOLD = 20;
+
 function UserManagementInner({
     initialUsers,
     gradeMap,
@@ -156,6 +213,8 @@ function UserManagementInner({
 }) {
     const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
+    // useDeferredValue로 검색 입력 시 UI 블로킹 방지
+    const deferredSearch = useDeferredValue(searchTerm);
     const [statusFilter, setStatusFilter] =
         useState<StatusFilter>("전체");
     const [sortKey, setSortKey] =
@@ -164,11 +223,14 @@ function UserManagementInner({
         useState<SortDir>("desc");
     const [sheetOpen, setSheetOpen] = useState(false);
     const { users: swrUsers } = useAdminUsers();
-    const users = swrUsers.length > 0 ? swrUsers : initialUsers;
+    const users = swrUsers.length > 0
+        ? swrUsers
+        : initialUsers;
 
     const isUserActive = useCallback(
         (user: UserForAdmin) =>
-            user.status === "ACTIVE" || user.status === null,
+            user.status === "ACTIVE"
+            || user.status === null,
         [],
     );
 
@@ -201,7 +263,7 @@ function UserManagementInner({
 
     const filteredUsers = useMemo(() => {
         const searched = users.filter((user) =>
-            matchesSearch(user, searchTerm),
+            matchesSearch(user, deferredSearch),
         );
         const statused = searched.filter((user) => {
             const active = isUserActive(user);
@@ -236,7 +298,7 @@ function UserManagementInner({
         });
     }, [
         users,
-        searchTerm,
+        deferredSearch,
         statusFilter,
         sortKey,
         sortDir,
@@ -246,7 +308,7 @@ function UserManagementInner({
 
     const statusCounts = useMemo(() => {
         const searched = users.filter((user) =>
-            matchesSearch(user, searchTerm),
+            matchesSearch(user, deferredSearch),
         );
         return {
             전체: searched.length,
@@ -256,7 +318,12 @@ function UserManagementInner({
                 (u) => !isUserActive(u),
             ).length,
         };
-    }, [users, searchTerm, matchesSearch, isUserActive]);
+    }, [
+        users,
+        deferredSearch,
+        matchesSearch,
+        isUserActive,
+    ]);
 
     const handleCardTap = useCallback(
         (user: UserForAdmin) => {
@@ -264,6 +331,13 @@ function UserManagementInner({
         },
         [router],
     );
+
+    // 점진적 렌더링 - 20개씩 로드
+    const {
+        visibleItems,
+        sentinelRef,
+        hasMore,
+    } = useIncrementalRender(filteredUsers);
 
     const displayCount =
         statusCounts[
@@ -299,26 +373,72 @@ function UserManagementInner({
             {/* 유저 리스트 */}
             <div className="px-4 pb-4">
                 {filteredUsers.length > 0 ? (
-                    <AnimatedList className="space-y-2">
-                        {filteredUsers.map((user) => (
-                            <AnimatedItem key={user.id}>
-                                <UserCard
-                                    user={user}
-                                    active={isUserActive(
-                                        user,
-                                    )}
-                                    gradeMap={gradeMap}
-                                    onTap={handleCardTap}
-                                />
-                            </AnimatedItem>
-                        ))}
-                    </AnimatedList>
+                    visibleItems.length <=
+                    ANIMATED_LIST_THRESHOLD ? (
+                        // 20명 이하: stagger 애니메이션 적용
+                        <AnimatedList className="space-y-2">
+                            {visibleItems.map((user) => (
+                                <AnimatedItem
+                                    key={user.id}
+                                >
+                                    <UserCard
+                                        user={user}
+                                        active={isUserActive(
+                                            user,
+                                        )}
+                                        gradeMap={
+                                            gradeMap
+                                        }
+                                        onTap={
+                                            handleCardTap
+                                        }
+                                    />
+                                </AnimatedItem>
+                            ))}
+                        </AnimatedList>
+                    ) : (
+                        // 20명 초과: 애니메이션 생략 +
+                        // content-visibility로 렌더링 최적화
+                        <div className="space-y-2">
+                            {visibleItems.map((user) => (
+                                <div
+                                    key={user.id}
+                                    style={{
+                                        contentVisibility:
+                                            "auto",
+                                        containIntrinsicSize:
+                                            "auto 56px",
+                                    }}
+                                >
+                                    <UserCard
+                                        user={user}
+                                        active={isUserActive(
+                                            user,
+                                        )}
+                                        gradeMap={
+                                            gradeMap
+                                        }
+                                        onTap={
+                                            handleCardTap
+                                        }
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )
                 ) : (
                     <div className="py-8 text-center">
                         <p className="text-rh-text-secondary text-sm">
                             검색 결과가 없습니다.
                         </p>
                     </div>
+                )}
+                {/* 무한 스크롤 센티널 */}
+                {hasMore && (
+                    <div
+                        ref={sentinelRef}
+                        className="h-px"
+                    />
                 )}
             </div>
 

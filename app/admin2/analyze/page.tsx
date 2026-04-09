@@ -121,13 +121,16 @@ export default async function Admin2AnalyzePage({
 }) {
     const { crewId } = await getAdminAuth();
     const params = await searchParams;
-    const now = new Date();
+    // 한국 시간 기준 현재 년/월
+    const kstNow = new Date(
+        Date.now() + 9 * 60 * 60 * 1000,
+    );
     const year = params.year
         ? parseInt(params.year)
-        : now.getFullYear();
+        : kstNow.getUTCFullYear();
     const month = params.month
         ? parseInt(params.month)
-        : now.getMonth() + 1;
+        : kstNow.getUTCMonth() + 1;
 
     return (
         <>

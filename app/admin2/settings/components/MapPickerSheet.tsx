@@ -6,7 +6,12 @@ import {
     useCallback,
     useEffect,
 } from "react";
-import { X, MapPin, Loader2 } from "lucide-react";
+import {
+    X,
+    MapPin,
+    Loader2,
+    LocateFixed,
+} from "lucide-react";
 import {
     motion,
     AnimatePresence,
@@ -53,6 +58,8 @@ const MapPickerSheet = memo(function MapPickerSheet({
     const [searchQuery, setSearchQuery] =
         useState("");
     const [searching, setSearching] =
+        useState(false);
+    const [locating, setLocating] =
         useState(false);
     const [error, setError] = useState<
         string | null
@@ -108,6 +115,42 @@ const MapPickerSheet = memo(function MapPickerSheet({
         onConfirm(position);
         onClose();
     }, [position, onConfirm, onClose]);
+
+    /* 현재 위치로 이동 */
+    const handleLocateMe = useCallback(() => {
+        if (!navigator.geolocation) {
+            setError(
+                "이 기기에서 위치 서비스를 " +
+                "사용할 수 없습니다."
+            );
+            return;
+        }
+        setLocating(true);
+        setError(null);
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const next = {
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude,
+                };
+                haptic.light();
+                setPosition(next);
+                setCenter(next);
+                setLocating(false);
+            },
+            () => {
+                setError(
+                    "현재 위치를 가져올 수 " +
+                    "없습니다."
+                );
+                setLocating(false);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 8000,
+            }
+        );
+    }, []);
 
     const markers: CrewLocation[] = position
         ? [
@@ -172,7 +215,7 @@ const MapPickerSheet = memo(function MapPickerSheet({
                                         }
                                     }}
                                     placeholder="시/구/동 단위로 검색 (예: 강남구 역삼동)"
-                                    className="flex-1 h-11 rounded-xl bg-rh-bg-surface px-4 text-sm text-white placeholder:text-rh-text-tertiary border border-rh-border focus:border-rh-accent outline-none"
+                                    className="flex-1 h-11 rounded-xl bg-rh-bg-surface px-4 text-sm text-white placeholder:text-[10px] placeholder:text-rh-text-tertiary border border-rh-border focus:border-rh-accent outline-none"
                                 />
                                 <button
                                     onClick={
@@ -202,7 +245,7 @@ const MapPickerSheet = memo(function MapPickerSheet({
                         </div>
 
                         {/* 지도 */}
-                        <div className="flex-1 px-4 min-h-0">
+                        <div className="relative flex-1 px-4 min-h-0">
                             <NaverMapContainer
                                 locations={markers}
                                 center={center}
@@ -212,6 +255,26 @@ const MapPickerSheet = memo(function MapPickerSheet({
                                 clickable={true}
                                 height="100%"
                             />
+                            {/* 현재 위치 버튼 */}
+                            <button
+                                type="button"
+                                onClick={handleLocateMe}
+                                disabled={locating}
+                                className="absolute right-7 bottom-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-rh-bg-surface shadow-lg border border-rh-border disabled:opacity-50"
+                                aria-label="내 위치로 이동"
+                            >
+                                {locating ? (
+                                    <Loader2
+                                        size={18}
+                                        className="animate-spin text-rh-accent"
+                                    />
+                                ) : (
+                                    <LocateFixed
+                                        size={18}
+                                        className="text-rh-accent"
+                                    />
+                                )}
+                            </button>
                         </div>
 
                         {/* 하단 확인 영역 */}

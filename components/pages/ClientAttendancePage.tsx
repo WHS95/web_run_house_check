@@ -15,65 +15,65 @@ import LoadingSpinner from "../atoms/LoadingSpinner";
 import FadeIn from "../atoms/FadeIn";
 import { useOfflineAttendance } from "@/hooks/useOfflineAttendance";
 
-// 현재 시간 계산 함수들
-// 한국 시간 기준으로 현재 시각을 10분 단위로 올림하여 반환하는 함수 (디폴트 시간용)
-const getCurrentTime = () => {
-  // 1. 현재 시각을 한국 시간으로 가져온다
+// 한국 시간 유틸: UTC+9 기준으로 안정적 계산
+const getKoreaDate = () => {
   const now = new Date();
-  const koreaTime = new Date(
-    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-  );
+  // UTC ms + 9시간 오프셋
+  const koreaMs =
+    now.getTime() +
+    now.getTimezoneOffset() * 60000 +
+    9 * 60 * 60000;
+  return new Date(koreaMs);
+};
 
-  // 2. 분 단위로 10분 단위 올림 처리
-  const currentMinutes = koreaTime.getMinutes();
-  const remainder = currentMinutes % 10;
-  let adjustedMinutes;
-  let adjustedHours = koreaTime.getHours();
-
-  // 무조건 올림 처리 (현재 시간이 정확히 10분 단위가 아니면 다음 10분 단위로 올림)
-  if (remainder === 0) {
-    adjustedMinutes = currentMinutes;
-  } else {
-    adjustedMinutes = currentMinutes + (10 - remainder);
+// 한국 시간 기준 현재 시각을 10분 단위로 올림 (디폴트 시간용)
+const getCurrentTime = () => {
+  const korea = getKoreaDate();
+  let h = korea.getHours();
+  let m = korea.getMinutes();
+  const remainder = m % 10;
+  if (remainder !== 0) {
+    m += 10 - remainder;
   }
-
-  // 60분을 넘으면 시간 조정
-  if (adjustedMinutes >= 60) {
-    adjustedHours = (adjustedHours + 1) % 24;
-    adjustedMinutes = 0;
+  if (m >= 60) {
+    h = (h + 1) % 24;
+    m = 0;
   }
-
-  // 3. "HH:mm" 형식으로 반환
-  return `${adjustedHours.toString().padStart(2, "0")}:${adjustedMinutes
+  return `${h.toString().padStart(2, "0")}:${m
     .toString()
     .padStart(2, "0")}`;
 };
 
 const getTodayString = () => {
-  const now = new Date();
-  const koreaTime = new Date(
-    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-  );
-  return koreaTime.toISOString().split("T")[0];
+  const korea = getKoreaDate();
+  const y = korea.getFullYear();
+  const m = (korea.getMonth() + 1).toString().padStart(2, "0");
+  const d = korea.getDate().toString().padStart(2, "0");
+  return `${y}-${m}-${d}`;
 };
 
 const isFutureDateTime = (date: string, time: string) => {
+  const [h, min] = time.split(":").map(Number);
+  const [y, mo, d] = date.split("-").map(Number);
+  // 선택된 시간을 분 단위로 변환
+  const selectedMinutes =
+    (y * 10000 + mo * 100 + d) * 1440 + h * 60 + min;
 
+  // 한국 현재 시간 + 2시간
+  const korea = getKoreaDate();
+  const maxTime = new Date(korea.getTime() + 2 * 60 * 60000);
+  const maxY = maxTime.getFullYear();
+  const maxMo = maxTime.getMonth() + 1;
+  const maxD = maxTime.getDate();
+  const maxMinutes =
+    (maxY * 10000 + maxMo * 100 + maxD) * 1440 +
+    maxTime.getHours() * 60 +
+    maxTime.getMinutes();
 
-  const selectedDateTime = new Date(`${date}T${time}:00`);
-
-  // 현재 한국 시간 + 2시간까지 허용
-  const now = new Date();
-  const koreaTime = new Date(
-    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-  );
-  const maxAllowedTime = new Date(koreaTime.getTime() + 2 * 60 * 60 * 1000); // 2시간 더하기
-
-
-
-  return selectedDateTime > maxAllowedTime;
+  return selectedMinutes > maxMinutes;
 };
 
+// 24시간 전체 10분 단위 옵션 (144개)
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) =>
   ["00", "10", "20", "30", "40", "50"].map((m) => ({
     value: `${h.toString().padStart(2, "0")}:${m}`,
@@ -81,27 +81,8 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) =>
   }))
 ).flat();
 
-const getAvailableTimeOptions = (selectedDate: string) => {
-  const today = getTodayString();
-  if (selectedDate !== today) {
-    return TIME_OPTIONS;
-  }
-
-  // 한국 시간 기준으로 현재 시간 + 2시간까지 선택 가능하도록 필터링
-  const now = new Date();
-  const koreaTime = new Date(
-    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-  );
-
-  // 현재 시간 + 2시간
-  const maxAllowedTime = new Date(koreaTime.getTime() + 2 * 60 * 60 * 1000);
-  const maxTimeString = `${maxAllowedTime
-    .getHours()
-    .toString()
-    .padStart(2, "0")}:${Math.floor(maxAllowedTime.getMinutes() / 10) * 10}`;
-
-  return TIME_OPTIONS.filter((option) => option.value <= maxTimeString);
-};
+/* 미등록 장소 고정 ID */
+const UNREGISTERED_LOCATION_ID = "unregistered";
 
 interface ClientAttendancePageProps {
   initialFormData?: {
@@ -178,26 +159,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   }, []);
 
   const handleFormChange = useCallback((field: string, value: string) => {
-    if (field === "date") {
-      setFormData((prev) => {
-        const newData = { ...prev, [field]: value };
-
-        if (value === getTodayString()) {
-          const availableOptions = getAvailableTimeOptions(value);
-          if (availableOptions.length > 0) {
-            // 현재 시간이 선택 가능한 옵션에 없으면 가장 최근 시간으로 설정
-            if (!availableOptions.find((opt) => opt.value === prev.time)) {
-              newData.time =
-                availableOptions[availableOptions.length - 1].value;
-            }
-          }
-        }
-
-        return newData;
-      });
-    } else {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    }
+    setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
   // 위치 상태 변경 핸들러
@@ -317,16 +279,27 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
     }
 
     // 위치 기반 출석이 활성화된 경우
-    if (initialFormData?.crewInfo?.location_based_attendance) {
+    // (미등록 장소 선택 시 위치 검증 스킵)
+    const isUnregistered =
+        formData.location
+            === UNREGISTERED_LOCATION_ID;
+    if (
+      initialFormData?.crewInfo
+        ?.location_based_attendance
+      && !isUnregistered
+    ) {
       // 위치 상태가 출석 불가능한 경우 출석 차단
       if (!canAttendByLocation) {
         haptic.error();
         setNotificationType("error");
-        setNotificationMessage(locationMessage || "현재 위치에서는 출석할 수 없습니다.");
+        setNotificationMessage(
+          locationMessage
+          || "현재 위치에서는 출석할 수 없습니다."
+        );
         setShowNotification(true);
         return;
       }
-      
+
       // 위치 검증 모달 표시
       setShowLocationModal(true);
       return;
@@ -334,12 +307,36 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
     // 위치 기반 출석이 비활성화된 경우 바로 제출
     proceedWithSubmission();
-  }, [isSubmitting, userId, userStatus, formData, initialFormData]);
+  }, [isSubmitting, userId, userStatus, formData, initialFormData, canAttendByLocation, locationMessage]);
 
-  const availableTimeOptions = useMemo(
-    () => getAvailableTimeOptions(formData.date),
-    [formData.date]
+  // 24시간 전체 옵션 (제출 시 isFutureDateTime으로 검증)
+  const availableTimeOptions = TIME_OPTIONS;
+
+  /* 미등록 장소 허용 시 장소 옵션에 추가 */
+  const locationOptionsWithUnregistered = useMemo(
+    () => {
+      const base =
+        initialFormData?.locationOptions || [];
+      if (
+        !initialFormData?.crewInfo
+          ?.allow_unregistered_location
+      ) {
+        return base;
+      }
+      return [
+        ...base,
+        {
+          value: UNREGISTERED_LOCATION_ID,
+          label: "미등록 장소",
+        },
+      ];
+    },
+    [initialFormData]
   );
+
+  /* 미등록 장소 선택 여부 */
+  const isUnregisteredLocation =
+    formData.location === UNREGISTERED_LOCATION_ID;
 
   // 에러 상태 처리
   if (error) {
@@ -457,11 +454,16 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 onChange={(e) => handleFormChange("location", e.target.value)}
                 className='text-white ios-select bg-rh-bg-surface border border-rh-border'
               >
-                {initialFormData!.locationOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
+                {locationOptionsWithUnregistered.map(
+                  (option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  )
+                )}
               </select>
               <div className='absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none'>
                 <ChevronDown className='w-[18px] h-[18px] text-rh-text-muted' />
@@ -531,12 +533,12 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           disabled={
             isSubmitting ||
             (userStatus && !userStatus.isActive) ||
-            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
+            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation && !isUnregisteredLocation)
           }
           className={`flex items-center justify-center rounded-[12px] h-[52px] w-full text-[16px] font-semibold text-white transition-all duration-200 active:scale-[0.97] hw-accelerated ${
             isSubmitting ||
             (userStatus && !userStatus.isActive) ||
-            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation)
+            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation && !isUnregisteredLocation)
               ? "bg-rh-bg-muted cursor-not-allowed"
               : "bg-rh-accent hover:bg-rh-accent-hover"
           }`}

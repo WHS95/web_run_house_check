@@ -48,6 +48,13 @@ async function SettingsDataServer({
             locationBasedAttendance={
                 crew?.location_based_attendance || false
             }
+            initialAccuracyRange={
+                crew?.accuracy_range ?? 200
+            }
+            allowUnregisteredLocation={
+                crew?.allow_unregistered_location
+                || false
+            }
             initialTab={activeTab}
         />
     );
@@ -57,7 +64,7 @@ function SettingsSkeleton() {
     return (
         <div className="flex-1 px-4 pt-4 space-y-3">
             <div className="bg-rh-bg-surface rounded-lg p-1 flex gap-1">
-                {[1, 2, 3, 4].map((i) => (
+                {[1, 2, 3].map((i) => (
                     <div
                         key={i}
                         className="flex-1 h-10 bg-rh-bg-muted rounded-lg"

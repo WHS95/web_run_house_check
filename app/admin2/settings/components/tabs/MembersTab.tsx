@@ -5,6 +5,7 @@ import {
     useState,
     useEffect,
     useCallback,
+    useMemo,
 } from "react";
 import {
     AdminSearchBar,
@@ -19,30 +20,33 @@ import {
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
 
+// API에서 반환하는 크루 멤버 타입
 interface CrewMember {
-    user_id: string;
-    first_name: string;
-    last_name: string | null;
-    role: string;
+    id: string;
+    first_name: string | null;
+    email: string | null;
+    phone: string | null;
+    birth_year: number | null;
+    profile_image_url: string | null;
     is_crew_verified: boolean;
-    email?: string;
-    joined_at?: string;
+    created_at: string;
+    crew_role: "OWNER" | "CREW_MANAGER" | "MEMBER";
 }
 
 interface MembersTabProps {
     crewId: string;
 }
 
-// 아바타 색상
+// 아바타 색상 (블루 톤 계열)
 const AVATAR_COLORS = [
-    "bg-blue-500",
-    "bg-emerald-500",
-    "bg-amber-500",
-    "bg-purple-500",
-    "bg-rose-500",
-    "bg-cyan-500",
+    "bg-rh-accent",
+    "bg-rh-status-success",
+    "bg-rh-status-warning",
+    "bg-rh-status-error",
+    "bg-rh-bg-muted",
 ];
 
+// 이름 기반 아바타 색상 결정
 function getAvatarColor(name: string) {
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -54,15 +58,52 @@ function getAvatarColor(name: string) {
     ];
 }
 
-function getDisplayName(m: CrewMember) {
-    return m.last_name
-        ? `${m.last_name}${m.first_name}`
-        : m.first_name;
+// "홍길동(95)" 형식의 표시 이름
+function getDisplayName(m: CrewMember): string {
+    const name = m.first_name || "이름없음";
+    if (m.birth_year) {
+        const yearSuffix = String(
+            m.birth_year
+        ).slice(-2);
+        return `${name}(${yearSuffix})`;
+    }
+    return name;
 }
 
-function getInitial(m: CrewMember) {
-    const name = getDisplayName(m);
+// 이름의 첫 글자 (아바타용)
+function getInitial(m: CrewMember): string {
+    const name = m.first_name || "?";
     return name.charAt(0);
+}
+
+// 역할 라벨
+function getRoleLabel(
+    role: CrewMember["crew_role"]
+): string {
+    switch (role) {
+        case "OWNER":
+            return "크루장";
+        case "CREW_MANAGER":
+            return "운영진";
+        case "MEMBER":
+            return "멤버";
+        default:
+            return "멤버";
+    }
+}
+
+// 역할 설명
+function getRoleDescription(
+    role: CrewMember["crew_role"]
+): string {
+    switch (role) {
+        case "OWNER":
+            return "크루장 · 전체 권한";
+        case "CREW_MANAGER":
+            return "운영진 · 출석/회원 관리";
+        default:
+            return "";
+    }
 }
 
 const MembersTab = memo(function MembersTab({
@@ -109,10 +150,8 @@ const MembersTab = memo(function MembersTab({
             haptic.medium();
 
             try {
-                const newRole =
-                    actionType === "promote"
-                        ? "admin"
-                        : "member";
+                const isAdmin =
+                    actionType === "promote";
                 const res = await fetch(
                     "/api/admin/crew-members",
                     {
@@ -123,21 +162,22 @@ const MembersTab = memo(function MembersTab({
                         },
                         body: JSON.stringify({
                             crewId,
-                            userId:
-                                actionTarget.user_id,
-                            role: newRole,
+                            userId: actionTarget.id,
+                            isAdmin,
                         }),
                     }
                 );
                 if (res.ok) {
                     haptic.success();
+                    // 로컬 상태 업데이트
                     setMembers((prev) =>
                         prev.map((m) =>
-                            m.user_id ===
-                            actionTarget.user_id
+                            m.id === actionTarget.id
                                 ? {
                                       ...m,
-                                      role: newRole,
+                                      crew_role: isAdmin
+                                          ? "CREW_MANAGER"
+                                          : "MEMBER",
                                   }
                                 : m
                         )
@@ -151,24 +191,38 @@ const MembersTab = memo(function MembersTab({
             }
         }, [actionTarget, actionType, crewId]);
 
-    // 필터링
-    const admins = members.filter(
-        (m) =>
-            m.role === "admin" ||
-            m.role === "owner"
-    );
-    const regularMembers = members.filter(
-        (m) => m.role === "member"
+    // 운영진 필터링 (OWNER, CREW_MANAGER)
+    const admins = useMemo(
+        () =>
+            members.filter(
+                (m) =>
+                    m.crew_role === "OWNER" ||
+                    m.crew_role === "CREW_MANAGER"
+            ),
+        [members]
     );
 
-    const filteredMembers = search
-        ? regularMembers.filter((m) =>
-              getDisplayName(m)
-                  .toLowerCase()
-                  .includes(search.toLowerCase())
-          )
-        : regularMembers;
+    // 일반 멤버 필터링
+    const regularMembers = useMemo(
+        () =>
+            members.filter(
+                (m) => m.crew_role === "MEMBER"
+            ),
+        [members]
+    );
 
+    // 검색 필터링
+    const filteredMembers = useMemo(() => {
+        if (!search) return regularMembers;
+        const term = search.toLowerCase();
+        return regularMembers.filter((m) =>
+            getDisplayName(m)
+                .toLowerCase()
+                .includes(term)
+        );
+    }, [regularMembers, search]);
+
+    // 로딩 스켈레톤 (정적, animate-pulse 금지)
     if (loading) {
         return (
             <div className="space-y-3">
@@ -187,7 +241,7 @@ const MembersTab = memo(function MembersTab({
 
     return (
         <div className="space-y-4">
-            {/* 운영진 목록 */}
+            {/* 운영진 섹션 */}
             <div className="space-y-3">
                 <div
                     className={
@@ -201,7 +255,7 @@ const MembersTab = memo(function MembersTab({
                             + " text-white"
                         }
                     >
-                        운영진 목록
+                        운영진
                     </h3>
                     <span
                         className={
@@ -209,7 +263,7 @@ const MembersTab = memo(function MembersTab({
                             + " text-rh-text-secondary"
                         }
                     >
-                        {admins.length}인
+                        {admins.length}명
                     </span>
                 </div>
 
@@ -218,11 +272,12 @@ const MembersTab = memo(function MembersTab({
                 >
                     {admins.map((m) => (
                         <AnimatedItem
-                            key={m.user_id}
+                            key={m.id}
                         >
                             <div
                                 onClick={
-                                    m.role !== "owner"
+                                    m.crew_role !==
+                                    "OWNER"
                                         ? () => {
                                               haptic.light();
                                               setActionTarget(
@@ -240,8 +295,8 @@ const MembersTab = memo(function MembersTab({
                                     + " px-4 py-3"
                                     + " rounded-xl"
                                     + " bg-rh-bg-surface"
-                                    + (m.role !==
-                                    "owner"
+                                    + (m.crew_role !==
+                                    "OWNER"
                                         ? " cursor-pointer"
                                         : "")
                                 }
@@ -253,6 +308,7 @@ const MembersTab = memo(function MembersTab({
                                         + " gap-3"
                                     }
                                 >
+                                    {/* 아바타 */}
                                     <div
                                         className={
                                             "w-10 h-10"
@@ -264,9 +320,8 @@ const MembersTab = memo(function MembersTab({
                                             + " text-sm"
                                             + " font-bold "
                                             + getAvatarColor(
-                                                  getDisplayName(
-                                                      m
-                                                  )
+                                                  m.first_name
+                                                  || ""
                                               )
                                         }
                                     >
@@ -293,14 +348,22 @@ const MembersTab = memo(function MembersTab({
                                                     m
                                                 )}
                                             </span>
-                                            {m.role ===
-                                            "owner" ? (
-                                                <AdminBadge variant="accent">
-                                                    크루장
+                                            {m.crew_role ===
+                                            "OWNER" ? (
+                                                <AdminBadge
+                                                    variant="accent"
+                                                >
+                                                    {getRoleLabel(
+                                                        m.crew_role
+                                                    )}
                                                 </AdminBadge>
                                             ) : (
-                                                <AdminBadge variant="outline">
-                                                    운영진
+                                                <AdminBadge
+                                                    variant="outline"
+                                                >
+                                                    {getRoleLabel(
+                                                        m.crew_role
+                                                    )}
                                                 </AdminBadge>
                                             )}
                                         </div>
@@ -310,10 +373,9 @@ const MembersTab = memo(function MembersTab({
                                                 + " text-rh-text-secondary"
                                             }
                                         >
-                                            {m.role ===
-                                            "owner"
-                                                ? "크루장 · 전체 권한"
-                                                : "운영진 · 출석/회원 관리"}
+                                            {getRoleDescription(
+                                                m.crew_role
+                                            )}
                                         </span>
                                     </div>
                                 </div>
@@ -325,16 +387,31 @@ const MembersTab = memo(function MembersTab({
 
             <AdminDivider />
 
-            {/* 멤버 목록 */}
+            {/* 멤버 섹션 */}
             <div className="space-y-3">
-                <h3
+                <div
                     className={
-                        "text-sm font-semibold"
-                        + " text-white"
+                        "flex items-center"
+                        + " justify-between"
                     }
                 >
-                    멤버 목록
-                </h3>
+                    <h3
+                        className={
+                            "text-sm font-semibold"
+                            + " text-white"
+                        }
+                    >
+                        멤버
+                    </h3>
+                    <span
+                        className={
+                            "text-xs"
+                            + " text-rh-text-secondary"
+                        }
+                    >
+                        {regularMembers.length}명
+                    </span>
+                </div>
                 <p
                     className={
                         "text-xs"
@@ -349,7 +426,7 @@ const MembersTab = memo(function MembersTab({
                 <AdminSearchBar
                     value={search}
                     onChange={setSearch}
-                    placeholder="검색어를 입력하세요"
+                    placeholder="이름으로 검색"
                 />
 
                 <AnimatedList
@@ -357,7 +434,7 @@ const MembersTab = memo(function MembersTab({
                 >
                     {filteredMembers.map((m) => (
                         <AnimatedItem
-                            key={m.user_id}
+                            key={m.id}
                         >
                             <div
                                 className={
@@ -376,6 +453,7 @@ const MembersTab = memo(function MembersTab({
                                         + " gap-3"
                                     }
                                 >
+                                    {/* 아바타 */}
                                     <div
                                         className={
                                             "w-10 h-10"
@@ -387,9 +465,8 @@ const MembersTab = memo(function MembersTab({
                                             + " text-sm"
                                             + " font-bold "
                                             + getAvatarColor(
-                                                  getDisplayName(
-                                                      m
-                                                  )
+                                                  m.first_name
+                                                  || ""
                                               )
                                         }
                                     >
@@ -397,20 +474,34 @@ const MembersTab = memo(function MembersTab({
                                             m
                                         )}
                                     </div>
-                                    <span
+                                    <div
                                         className={
-                                            "text-sm"
-                                            + " font-semibold"
-                                            + " text-white"
+                                            "flex"
+                                            + " items-center"
+                                            + " gap-2"
                                         }
                                     >
-                                        {getDisplayName(
-                                            m
-                                        )}
-                                    </span>
+                                        <span
+                                            className={
+                                                "text-sm"
+                                                + " font-semibold"
+                                                + " text-white"
+                                            }
+                                        >
+                                            {getDisplayName(
+                                                m
+                                            )}
+                                        </span>
+                                        <AdminBadge
+                                            variant="muted"
+                                        >
+                                            멤버
+                                        </AdminBadge>
+                                    </div>
                                 </div>
                                 <AdminSmallButton
                                     onClick={() => {
+                                        haptic.light();
                                         setActionTarget(
                                             m
                                         );
@@ -441,7 +532,7 @@ const MembersTab = memo(function MembersTab({
                 </AnimatedList>
             </div>
 
-            {/* 권한 변경 확인 */}
+            {/* 권한 변경 확인 다이얼로그 */}
             <AdminAlertDialog
                 open={
                     !!actionTarget && !!actionType

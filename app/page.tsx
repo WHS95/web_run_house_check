@@ -35,24 +35,7 @@ function HomePageSkeleton() {
 
         {/* 나의 최근 활동 섹션 */}
         <div className="h-4 w-28 rounded bg-rh-bg-surface" />
-        <div className="h-[100px] rounded-rh-lg bg-rh-bg-surface" />
-
-        {/* 최근 크루 활동 섹션 */}
-        <div className="h-4 w-28 rounded bg-rh-bg-surface" />
-        <div className="space-y-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex items-center px-4 h-14 rounded-rh-lg bg-rh-bg-surface"
-            >
-              <div className="h-8 w-8 rounded-full bg-rh-bg-muted" />
-              <div className="flex-1 ml-3 space-y-1">
-                <div className="h-3.5 w-20 rounded bg-rh-bg-muted" />
-                <div className="h-3 w-32 rounded bg-rh-bg-muted" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <div className="h-[200px] rounded-rh-lg bg-rh-bg-surface" />
       </div>
     </div>
   );
@@ -97,48 +80,48 @@ async function getInitialHomeData() {
           crewName: null,
           noticeText: null,
         },
-        recentActivities: [],
+        myAttendanceDays: [],
+        activeNotice: null,
+        myRanking: null,
       };
     }
 
-    // 최근 출석 기록 조회 (크루 내 최근 10건)
     const crewId = functionResult.data?.crewId;
-    let recentActivities: Array<{
-      id: string;
-      userName: string;
-      location: string;
-      exerciseType: string;
-      time: string;
-    }> = [];
     let myAttendanceDays: Array<{
       date: string;
       count: number;
     }> = [];
+    // 공지 데이터 (서버에서 미리 조회)
+    let activeNotice: {
+      id: string;
+      title: string;
+    } | null = null;
+    // 나의 이번달 순위
+    let myRanking: {
+      attendanceRank: number | null;
+      hostingRank: number | null;
+    } | null = null;
 
     if (crewId) {
-      // 크루 최근 활동 + 나의 히트맵을 병렬로 조회
-      const twoWeeksAgo = new Date();
-      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-      const twoWeeksAgoStr = twoWeeksAgo.toISOString();
+      // 4주 범위 (전후 2주)
+      const fourWeeksAgo = new Date();
+      fourWeeksAgo.setDate(
+          fourWeeksAgo.getDate() - 28
+      );
+      const fourWeeksAgoStr =
+          fourWeeksAgo.toISOString();
 
-      const [recentResult, heatmapResult] = await Promise.all([
-        // 크루 최근 활동 10건
-        supabase
-          .schema("attendance")
-          .from("attendance_records")
-          .select(`
-            id,
-            location,
-            attendance_timestamp,
-            exercise_type_id,
-            user:user_id ( first_name ),
-            exercise_type:exercise_type_id ( name )
-          `)
-          .eq("crew_id", crewId)
-          .is("deleted_at", null)
-          .order("attendance_timestamp", { ascending: false })
-          .limit(3),
-        // 나의 최근 2주 출석 기록 (히트맵용)
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+
+      // 히트맵 + 공지 + 랭킹을 병렬로 조회
+      const [
+          heatmapResult,
+          noticeResult,
+          rankingResult,
+      ] = await Promise.all([
+        // 나의 최근 4주 출석 기록 (히트맵용)
         supabase
           .schema("attendance")
           .from("attendance_records")
@@ -146,57 +129,104 @@ async function getInitialHomeData() {
           .eq("crew_id", crewId)
           .eq("user_id", user.id)
           .is("deleted_at", null)
-          .gte("attendance_timestamp", twoWeeksAgoStr)
-          .order("attendance_timestamp", { ascending: true }),
+          .gte(
+              "attendance_timestamp",
+              fourWeeksAgoStr
+          )
+          .order("attendance_timestamp", {
+              ascending: true,
+          }),
+        // 활성 공지 조회 (최신 1개)
+        supabase
+          .schema("attendance")
+          .from("notices")
+          .select("id, title")
+          .eq("crew_id", crewId)
+          .eq("is_active", true)
+          .order("created_at", {
+              ascending: false,
+          })
+          .limit(1)
+          .maybeSingle(),
+        // 이번달 랭킹 데이터
+        supabase
+          .schema("attendance")
+          .rpc("get_ranking_data_unified", {
+              p_user_id: user.id,
+              target_year: currentYear,
+              target_month: currentMonth,
+          }),
       ]);
-
-      if (recentResult.data) {
-        recentActivities = recentResult.data.map(
-          (r: Record<string, unknown>) => {
-            const ts = new Date(r.attendance_timestamp as string);
-            const month = ts.getMonth() + 1;
-            const day = ts.getDate();
-            const hours = ts.getHours().toString().padStart(2, "0");
-            const minutes = ts.getMinutes().toString().padStart(2, "0");
-            const userObj = r.user as Record<string, string> | null;
-            const exerciseObj = r.exercise_type as Record<
-              string,
-              string
-            > | null;
-            return {
-              id: r.id as string,
-              userName: userObj?.first_name ?? "멤버",
-              location: (r.location as string) ?? "",
-              exerciseType: exerciseObj?.name ?? "",
-              time: `${month}/${day} ${hours}:${minutes}`,
-            };
-          }
-        );
-      }
 
       if (heatmapResult.data) {
         const dayMap = new Map<string, number>();
-        heatmapResult.data.forEach((r: Record<string, unknown>) => {
-          const d = new Date(r.attendance_timestamp as string);
+        heatmapResult.data.forEach(
+            (r: Record<string, unknown>) => {
+          const d = new Date(
+              r.attendance_timestamp as string
+          );
           const key =
             d.getFullYear() +
             "-" +
-            String(d.getMonth() + 1).padStart(2, "0") +
+            String(
+                d.getMonth() + 1
+            ).padStart(2, "0") +
             "-" +
-            String(d.getDate()).padStart(2, "0");
-          dayMap.set(key, (dayMap.get(key) ?? 0) + 1);
+            String(
+                d.getDate()
+            ).padStart(2, "0");
+          dayMap.set(
+              key,
+              (dayMap.get(key) ?? 0) + 1
+          );
         });
-        myAttendanceDays = Array.from(dayMap, ([date, count]) => ({
-          date,
-          count,
-        }));
+        myAttendanceDays = Array.from(
+            dayMap,
+            ([date, count]) => ({
+                date,
+                count,
+            })
+        );
+      }
+
+      // 활성 공지가 있으면 저장
+      if (
+          noticeResult.data?.id &&
+          noticeResult.data?.title
+      ) {
+        activeNotice = {
+          id: noticeResult.data.id,
+          title: noticeResult.data.title,
+        };
+      }
+
+      // 랭킹에서 현재 유저의 순위 추출
+      if (rankingResult.data?.success) {
+        const rd = rankingResult.data.data;
+        const attItem =
+            rd?.attendanceRanking?.find(
+                (i: { is_current_user?: boolean }) =>
+                    i.is_current_user
+            );
+        const hostItem =
+            rd?.hostingRanking?.find(
+                (i: { is_current_user?: boolean }) =>
+                    i.is_current_user
+            );
+        myRanking = {
+          attendanceRank:
+              attItem?.rank ?? null,
+          hostingRank:
+              hostItem?.rank ?? null,
+        };
       }
     }
 
     return {
       pageData: functionResult.data,
-      recentActivities,
       myAttendanceDays,
+      activeNotice,
+      myRanking,
     };
   } catch (error) {
     // 오류 발생 시 기본 데이터 반환
@@ -207,8 +237,9 @@ async function getInitialHomeData() {
         crewName: null,
         noticeText: null,
       },
-      recentActivities: [],
       myAttendanceDays: [],
+      activeNotice: null,
+      myRanking: null,
     };
   }
 }
@@ -233,8 +264,15 @@ export default async function HomePage() {
     >
       <ClientHomePage
         initialData={initialData.pageData!}
-        recentActivities={initialData.recentActivities ?? []}
-        myAttendanceDays={initialData.myAttendanceDays ?? []}
+        myAttendanceDays={
+            initialData.myAttendanceDays ?? []
+        }
+        activeNotice={
+            initialData.activeNotice ?? null
+        }
+        myRanking={
+            initialData.myRanking ?? null
+        }
       />
     </Suspense>
   );

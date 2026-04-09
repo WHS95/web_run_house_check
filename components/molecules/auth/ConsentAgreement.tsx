@@ -99,10 +99,10 @@ const ConsentAgreement = memo<ConsentAgreementProps>(
       return (
         <div className='mt-2 space-y-1'>
           {errors?.termsOfService && (
-            <p className='text-xs text-red-500'>{errors.termsOfService}</p>
+            <p className='text-xs text-rh-status-error'>{errors.termsOfService}</p>
           )}
           {errors?.privacyConsent && (
-            <p className='text-xs text-red-500'>{errors.privacyConsent}</p>
+            <p className='text-xs text-rh-status-error'>{errors.privacyConsent}</p>
           )}
         </div>
       );

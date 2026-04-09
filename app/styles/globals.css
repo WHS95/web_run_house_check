@@ -76,7 +76,7 @@
         --muted-foreground: 215 16% 47%;
         --accent: 216 84% 67%;
         --accent-foreground: 0 0% 100%;
-        --destructive: 0 86% 71%;
+        --destructive: 213 42% 42%;
         --destructive-foreground: 0 0% 100%;
         --border: 218 19% 27%;
         --input: 213 22% 22%;
@@ -130,7 +130,7 @@
         --muted-foreground: 215 16% 47%;
         --accent: 216 84% 67%;
         --accent-foreground: 0 0% 100%;
-        --destructive: 0 86% 71%;
+        --destructive: 213 42% 42%;
         --destructive-foreground: 0 0% 100%;
         --border: 218 19% 27%;
         --input: 213 22% 22%;
@@ -256,7 +256,7 @@
 
     /* === iOS 네비게이션 바 === */
     .ios-nav-bar {
-        @apply fixed top-0 left-0 right-0 z-50;
+        @apply sticky top-0 left-0 right-0 z-50;
         height: 44px;
         background-color: rgba(28, 28, 30, 0.72);
         backdrop-filter: blur(20px);
@@ -266,7 +266,7 @@
 
     /* === iOS 탭 바 (z-40: 오버레이 z-50 아래) === */
     .ios-tab-bar {
-        @apply fixed bottom-0 left-0 right-0 z-40;
+        @apply shrink-0 z-40;
         background-color: rgba(28, 28, 30, 0.72);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -748,10 +748,6 @@ html, body {
         z-index: 9999;
     }
 
-    /* fixed 요소를 mobile-viewport 내에서 absolute로 변환 */
-    .mobile-viewport .ios-nav-bar {
-        position: absolute;
-    }
 
     /* 모든 fixed 포지셔닝을 absolute로 변환 */
     .mobile-viewport [class*="fixed"] {

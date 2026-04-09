@@ -125,11 +125,11 @@ const mockRecentAttendance: AttendanceRecord[] = [
 const getExerciseTypeColor = (type: string) => {
   switch (type) {
     case "러닝":
-      return "bg-blue-500";
+      return "bg-rh-accent";
     case "등산":
-      return "bg-green-500";
+      return "bg-rh-status-success";
     case "자전거":
-      return "bg-amber-500";
+      return "bg-rh-status-warning";
     default:
       return "bg-rh-bg-muted";
   }

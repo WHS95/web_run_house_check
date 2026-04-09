@@ -122,19 +122,19 @@ export default function InviteCodeCreateButton({
 
               {generatedCode ? (
                 <div className='mb-6'>
-                  <div className='p-4 mb-4 rounded-md bg-green-50'>
-                    <p className='mb-2 font-medium text-green-700'>
+                  <div className='p-4 mb-4 rounded-md bg-rh-status-success/10'>
+                    <p className='mb-2 font-medium text-rh-status-success'>
                       초대 코드가 생성되었습니다!
                     </p>
-                    <div className='flex items-center justify-between p-4 bg-white border border-green-300 rounded-md'>
-                      <code className='font-mono text-lg font-bold text-green-700'>
+                    <div className='flex items-center justify-between p-4 bg-white border border-rh-status-success/30 rounded-md'>
+                      <code className='font-mono text-lg font-bold text-rh-status-success'>
                         {generatedCode}
                       </code>
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(generatedCode);
                         }}
-                        className='text-sm text-green-600 hover:text-green-800'
+                        className='text-sm text-rh-status-success hover:text-rh-status-success/70'
                       >
                         복사
                       </button>
@@ -209,7 +209,7 @@ export default function InviteCodeCreateButton({
                   </div>
 
                   {error && (
-                    <div className='p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-md'>
+                    <div className='p-3 mb-4 text-sm text-rh-status-error bg-rh-status-error/10 rounded-md'>
                       {error}
                     </div>
                   )}

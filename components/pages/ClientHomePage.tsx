@@ -15,29 +15,33 @@ interface HomePageData {
   noticeText: string | null;
 }
 
-interface RecentActivity {
-  id: string;
-  userName: string;
-  location: string;
-  exerciseType: string;
-  time: string;
-}
-
 interface AttendanceDay {
   date: string;
   count: number;
 }
 
+interface ActiveNotice {
+  id: string;
+  title: string;
+}
+
+interface MyRanking {
+  attendanceRank: number | null;
+  hostingRank: number | null;
+}
+
 interface ClientHomePageProps {
   initialData: HomePageData;
-  recentActivities?: RecentActivity[];
   myAttendanceDays?: AttendanceDay[];
+  activeNotice?: ActiveNotice | null;
+  myRanking?: MyRanking | null;
 }
 
 const ClientHomePage = memo<ClientHomePageProps>(({
   initialData,
-  recentActivities = [],
   myAttendanceDays = [],
+  activeNotice = null,
+  myRanking = null,
 }) => {
   const router = useRouter();
   const [pageData] = useState<HomePageData>(initialData);
@@ -91,8 +95,9 @@ const ClientHomePage = memo<ClientHomePageProps>(({
         crewName={pageData.crewName}
         rankName='Beginer'
         noticeText={pageData.noticeText}
-        recentActivities={recentActivities}
         myAttendanceDays={myAttendanceDays}
+        activeNotice={activeNotice}
+        myRanking={myRanking}
       />
       
       {/* 알림 */}

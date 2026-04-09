@@ -42,7 +42,7 @@ const ManagerBottomNav: React.FC = () => {
   ];
 
   return (
-    <nav className='fixed bottom-0 left-0 right-0 bg-white border-t border-[#E3E3EA] flex h-16'>
+    <nav className='shrink-0 bg-white border-t border-[#E3E3EA] flex h-16'>
       {navItems.map((item) => (
         <NavItem
           key={item.href}

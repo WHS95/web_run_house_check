@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "./supabase-admin";
+import { createClient } from "./supabase/server";
 
 export interface AdminAuthResult {
   userId: string;

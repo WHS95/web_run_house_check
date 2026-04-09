@@ -107,7 +107,7 @@ export default function CrewCreateButton() {
                 </div>
 
                 {error && (
-                  <div className='mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm'>
+                  <div className='mb-4 p-3 bg-rh-status-error/10 text-rh-status-error rounded-md text-sm'>
                     {error}
                   </div>
                 )}

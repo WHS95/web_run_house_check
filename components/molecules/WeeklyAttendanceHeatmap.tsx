@@ -17,7 +17,8 @@ interface WeeklyAttendanceHeatmapProps {
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /**
- * 지난 2주간 출석 히트맵 (Mon-Sun × 2 rows)
+ * 최근 4주간 출석 히트맵 (Mon-Sun × 4 rows)
+ * 현재 일자 기준 전후 2주씩 표시
  * .pen 디자인: CalendarCard (bg-surface, rounded-xl, pad 12/8)
  */
 const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
@@ -42,28 +43,38 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
         const mondayOffset =
             dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
         const thisMonday = new Date(today);
-        thisMonday.setDate(today.getDate() + mondayOffset);
+        thisMonday.setDate(
+            today.getDate() + mondayOffset
+        );
 
-        // 지난주 월요일
-        const lastMonday = new Date(thisMonday);
-        lastMonday.setDate(thisMonday.getDate() - 7);
+        // 4주 범위: 2주 전 월요일 ~ 다음주 일요일
+        const startMonday = new Date(thisMonday);
+        startMonday.setDate(
+            thisMonday.getDate() - 14
+        );
+        const endSunday = new Date(thisMonday);
+        endSunday.setDate(
+            thisMonday.getDate() + 13
+        );
 
-        // 월 라벨 생성 (지난주~이번주 범위)
-        const lastMondayMonth = lastMonday.getMonth() + 1;
-        const todayMonth = today.getMonth() + 1;
+        // 월 라벨 생성
+        const startMonth =
+            startMonday.getMonth() + 1;
+        const endMonth = endSunday.getMonth() + 1;
         const year = today.getFullYear();
         const monthLabel =
-            lastMondayMonth === todayMonth
-                ? `${year}년 ${todayMonth}월`
-                : `${lastMondayMonth}월 – ${todayMonth}월`;
+            startMonth === endMonth
+                ? `${year}년 ${endMonth}월`
+                : `${startMonth}월 – ${endMonth}월`;
 
-        // 출석 날짜 Set
-        const attendanceSet = new Map<string, number>();
+        // 출석 날짜 Map
+        const attendanceSet =
+            new Map<string, number>();
         attendanceDays.forEach((d) => {
             attendanceSet.set(d.date, d.count);
         });
 
-        // 2주 배열 생성
+        // 4주 배열 생성
         const weeks: Array<
             Array<{
                 date: string;
@@ -72,9 +83,11 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
             }>
         > = [];
 
-        for (
-            let weekStart of [lastMonday, thisMonday]
-        ) {
+        for (let w = 0; w < 4; w++) {
+            const weekStart = new Date(startMonday);
+            weekStart.setDate(
+                startMonday.getDate() + w * 7
+            );
             const week: Array<{
                 date: string;
                 isToday: boolean;
@@ -82,23 +95,28 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
             }> = [];
             for (let i = 0; i < 7; i++) {
                 const d = new Date(weekStart);
-                d.setDate(weekStart.getDate() + i);
+                d.setDate(
+                    weekStart.getDate() + i
+                );
                 const dateStr =
                     d.getFullYear() +
                     '-' +
-                    String(d.getMonth() + 1).padStart(
-                        2,
-                        '0'
-                    ) +
+                    String(
+                        d.getMonth() + 1
+                    ).padStart(2, '0') +
                     '-' +
-                    String(d.getDate()).padStart(2, '0');
+                    String(
+                        d.getDate()
+                    ).padStart(2, '0');
                 const isFuture = d > today;
                 week.push({
                     date: dateStr,
                     isToday: dateStr === todayStr,
                     count: isFuture
                         ? 0
-                        : attendanceSet.get(dateStr) ?? 0,
+                        : attendanceSet.get(
+                              dateStr
+                          ) ?? 0,
                 });
             }
             weeks.push(week);
@@ -125,7 +143,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                     ))}
                 </div>
                 <div className="flex flex-col gap-1">
-                    {[0, 1].map((wi) => (
+                    {[0, 1, 2, 3].map((wi) => (
                         <div
                             key={wi}
                             className="flex justify-around"
@@ -155,7 +173,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                     {monthLabel}
                 </span>
                 <span className="text-[11px] text-rh-text-tertiary">
-                    최근 2주
+                    최근 4주
                 </span>
             </div>
 
@@ -172,7 +190,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                 ))}
             </div>
 
-            {/* 2주 히트맵 */}
+            {/* 4주 히트맵 */}
             <div className="flex flex-col gap-1">
                 {weeks.map((week, wi) => (
                     <div

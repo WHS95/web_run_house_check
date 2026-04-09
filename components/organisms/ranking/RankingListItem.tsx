@@ -6,6 +6,7 @@ interface RankingListItemProps {
     name: string;
     score: number;
     isCurrentUser?: boolean;
+    scoreLabel?: string;
 }
 
 const RankingListItem: React.FC<RankingListItemProps> = ({
@@ -13,6 +14,7 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
     name,
     score,
     isCurrentUser,
+    scoreLabel = "출석",
 }) => {
     const isFirst = rank === 1;
 
@@ -56,13 +58,13 @@ const RankingListItem: React.FC<RankingListItemProps> = ({
                         isFirst ? "text-white/75" : "text-rh-text-tertiary"
                     }`}
                 >
-                    출석 {score}회
+                    {scoreLabel} {score}회
                 </p>
             </div>
 
             {/* 1위 왕관 */}
             {isFirst && (
-                <Crown className="w-[22px] h-[22px] text-[#FBBF24]" />
+                <Crown className="w-[22px] h-[22px] text-rh-status-warning" />
             )}
         </div>
     );

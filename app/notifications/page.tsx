@@ -5,11 +5,21 @@ import nextDynamic from "next/dynamic";
 import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 
 const NotificationsTemplate = nextDynamic(
-    () => import("@/components/templates/NotificationsTemplate"),
+    () =>
+        import(
+            "@/components/templates/NotificationsTemplate"
+        ),
     {
         loading: () => (
-            <div className="flex justify-center items-center min-h-screen bg-rh-bg-primary">
-                <LoadingSpinner size="sm" color="white" />
+            <div
+                className="flex justify-center
+                    items-center min-h-screen
+                    bg-rh-bg-primary"
+            >
+                <LoadingSpinner
+                    size="sm"
+                    color="white"
+                />
             </div>
         ),
         ssr: true,
@@ -19,11 +29,12 @@ const NotificationsTemplate = nextDynamic(
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-    title: "알림 | RUNHOUSE",
-    description: "RUNHOUSE 알림 - 공지사항과 개인 알림을 확인하세요",
+    title: "공지 | RUNHOUSE",
+    description:
+        "RUNHOUSE 공지사항을 확인하세요",
 };
 
-async function getNotificationsData() {
+async function getNoticesData() {
     try {
         const supabase = await createClient();
 
@@ -51,59 +62,36 @@ async function getNotificationsData() {
 
         const crewId = userCrew.crew_id;
 
-        // 공지사항 + 개인 알림 병렬 조회
-        const [noticesResult, notificationsResult] = await Promise.all([
-            supabase
-                .schema("attendance")
-                .from("notices")
-                .select(
-                    "id, title, type, content, is_active, created_at, author:author_id(first_name)"
-                )
-                .eq("crew_id", crewId)
-                .order("created_at", { ascending: false })
-                .limit(30),
-            supabase
-                .schema("attendance")
-                .from("notifications")
-                .select("*")
-                .eq("user_id", user.id)
-                .eq("crew_id", crewId)
-                .order("created_at", { ascending: false })
-                .limit(30),
-        ]);
-
-        // 읽지 않은 알림 수
-        const { count: unreadCount } = await supabase
+        // 공지사항 조회
+        const { data: noticesRaw } = await supabase
             .schema("attendance")
-            .from("notifications")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", user.id)
+            .from("notices")
+            .select(
+                "id, title, type, content, is_active, created_at, author:author_id(first_name)"
+            )
             .eq("crew_id", crewId)
-            .eq("is_read", false);
+            .order("created_at", { ascending: false })
+            .limit(30);
 
-        // Supabase FK 조인은 author를 배열로 반환 → 단일 객체로 정규화
-        const normalizedNotices = (
-            noticesResult.data ?? []
-        ).map((n: any) => ({
-            ...n,
-            author: Array.isArray(n.author)
-                ? (n.author[0] ?? null)
-                : (n.author ?? null),
-        }));
+        // Supabase FK 조인은 author를 배열로 반환
+        // → 단일 객체로 정규화
+        const notices = (noticesRaw ?? []).map(
+            (n: any) => ({
+                ...n,
+                author: Array.isArray(n.author)
+                    ? (n.author[0] ?? null)
+                    : (n.author ?? null),
+            })
+        );
 
-        return {
-            crewId,
-            notices: normalizedNotices,
-            notifications: notificationsResult.data ?? [],
-            unreadCount: unreadCount ?? 0,
-        };
+        return { crewId, notices };
     } catch {
         return { needsAuth: true };
     }
 }
 
 export default async function NotificationsPage() {
-    const data = await getNotificationsData();
+    const data = await getNoticesData();
 
     if (data.needsAuth) {
         redirect("/auth/login");
@@ -112,16 +100,21 @@ export default async function NotificationsPage() {
     return (
         <Suspense
             fallback={
-                <div className="flex justify-center items-center min-h-screen bg-rh-bg-primary">
-                    <LoadingSpinner size="sm" color="white" />
+                <div
+                    className="flex justify-center
+                        items-center min-h-screen
+                        bg-rh-bg-primary"
+                >
+                    <LoadingSpinner
+                        size="sm"
+                        color="white"
+                    />
                 </div>
             }
         >
             <NotificationsTemplate
                 crewId={data.crewId!}
                 initialNotices={data.notices!}
-                initialNotifications={data.notifications!}
-                initialUnreadCount={data.unreadCount!}
             />
         </Suspense>
     );

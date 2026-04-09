@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useState, useEffect } from 'react';
+import React, { memo, useCallback, useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import nextDynamic from 'next/dynamic';
 import {
@@ -14,9 +14,7 @@ import {
     CloudUpload,
 } from 'lucide-react';
 import QuickActionButton from '../atoms/QuickActionButton';
-import ActivityListItem from '../molecules/ActivityListItem';
 import SectionLabel from '../atoms/SectionLabel';
-import { AnimatedList, AnimatedItem } from '../atoms/AnimatedList';
 import PushPermissionBanner from '../molecules/PushPermissionBanner';
 import WeeklyAttendanceHeatmap from '../molecules/WeeklyAttendanceHeatmap';
 import { usePushNotification } from '@/hooks/usePushNotification';
@@ -28,21 +26,14 @@ const NoticeBottomSheet = nextDynamic(
     { ssr: false }
 );
 
-interface Notice {
+interface ActiveNotice {
     id: string;
-    title?: string | null;
-    content: string;
-    created_at: string;
-    is_active: boolean;
-    author?: { first_name: string } | null;
+    title: string;
 }
 
-interface RecentActivity {
-    id: string;
-    userName: string;
-    location: string;
-    exerciseType: string;
-    time: string;
+interface MyRanking {
+    attendanceRank: number | null;
+    hostingRank: number | null;
 }
 
 interface AttendanceDay {
@@ -56,17 +47,22 @@ interface EnhancedHomeTemplateProps {
     rankName: string | null;
     crewName: string | null;
     noticeText: string | null;
-    recentActivities?: RecentActivity[];
     myAttendanceDays?: AttendanceDay[];
+    activeNotice?: ActiveNotice | null;
+    myRanking?: MyRanking | null;
 }
+
+// localStorage 키 상수
+const NOTICE_READ_KEY = 'rh_read_notice_id';
 
 const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
     username,
     crewId,
     crewName,
     noticeText,
-    recentActivities = [],
     myAttendanceDays = [],
+    activeNotice = null,
+    myRanking = null,
 }) => {
     const router = useRouter();
     const { shouldShowBanner, requestPermission, dismissBanner } =
@@ -76,27 +72,52 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
 
     const [isNoticeSheetOpen, setIsNoticeSheetOpen] =
         useState(false);
-    const [noticeTitle, setNoticeTitle] =
-        useState<string | null>(null);
 
-    // 활성 공지 제목 조회 (홈 상단 공지 카드에 표시)
+    // 공지 읽음 여부 (mounted 후 localStorage 확인)
+    const [mounted, setMounted] = useState(false);
+    const [isNoticeRead, setIsNoticeRead] =
+        useState(false);
+
     useEffect(() => {
-        if (!crewId) return;
-        let cancelled = false;
-        fetch(`/api/admin/notices?crewId=${crewId}`)
-            .then((res) => res.json())
-            .then((json) => {
-                if (cancelled || !json.success) return;
-                const list = (json.data ?? []) as Notice[];
-                const active =
-                    list.find((n) => n.is_active) ?? list[0];
-                if (active?.title) setNoticeTitle(active.title);
-            })
-            .catch(() => {});
-        return () => {
-            cancelled = true;
-        };
-    }, [crewId]);
+        setMounted(true);
+        if (activeNotice?.id) {
+            const readId = localStorage.getItem(
+                NOTICE_READ_KEY
+            );
+            setIsNoticeRead(
+                readId === activeNotice.id
+            );
+        }
+    }, [activeNotice?.id]);
+
+    // 공지 카드 표시 여부:
+    // 활성 공지가 있고, 아직 읽지 않은 경우
+    const showNotice = useMemo(() => {
+        if (!mounted) return !!activeNotice;
+        return !!activeNotice && !isNoticeRead;
+    }, [mounted, activeNotice, isNoticeRead]);
+
+    // 나의 순위 카드 표시 여부:
+    // 공지가 숨겨졌거나 공지가 없을 때
+    const showMyRanking = useMemo(() => {
+        if (!mounted) return false;
+        return !showNotice && myRanking !== null && (
+            myRanking.attendanceRank !== null ||
+            myRanking.hostingRank !== null
+        );
+    }, [mounted, showNotice, myRanking]);
+
+    // 공지 탭 → 읽음 처리 후 notifications로 이동
+    const handleNoticeTap = useCallback(() => {
+        if (activeNotice?.id) {
+            localStorage.setItem(
+                NOTICE_READ_KEY,
+                activeNotice.id
+            );
+            setIsNoticeRead(true);
+        }
+        router.push('/notifications');
+    }, [activeNotice?.id, router]);
 
     const handleNavigate = useCallback(
         (path: string) => {
@@ -159,18 +180,44 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
 
             {/* ── ScrollContent ── */}
             <div className="flex-1 px-4 pt-4 pb-6 space-y-5">
-                {/* 공지 카드 (제목만 노출) */}
-                {noticeTitle && (
+                {/* 공지 카드 (서버에서 미리 로드) */}
+                {showNotice && activeNotice && (
                     <button
-                        onClick={() =>
-                            router.push('/notifications')
-                        }
+                        onClick={handleNoticeTap}
                         className="flex w-full items-center gap-2.5 rounded-rh-lg bg-rh-bg-surface px-4 h-12 text-left"
                     >
                         <Megaphone className="h-4 w-4 shrink-0 text-rh-accent" />
-                        <p className="text-[13px] text-white truncate">
-                            {noticeTitle}
+                        <p className="flex-1 text-[13px] text-white truncate">
+                            {activeNotice.title}
                         </p>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-rh-text-muted" />
+                    </button>
+                )}
+
+                {/* 나의 이번달 순위 카드 */}
+                {showMyRanking && myRanking && (
+                    <button
+                        onClick={() =>
+                            handleNavigate('/ranking')
+                        }
+                        className="flex w-full items-center gap-2.5 rounded-rh-lg bg-rh-bg-surface px-4 h-12 text-left"
+                    >
+                        <Trophy className="h-4 w-4 shrink-0 text-rh-accent" />
+                        <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-semibold text-white">
+                                나의 이번달 순위
+                            </p>
+                            <p className="text-xs text-rh-text-secondary">
+                                {myRanking.attendanceRank
+                                    ? `출석 ${myRanking.attendanceRank}위`
+                                    : '출석 기록 없음'}
+                                {' · '}
+                                {myRanking.hostingRank
+                                    ? `개설 ${myRanking.hostingRank}위`
+                                    : '개설 기록 없음'}
+                            </p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-rh-text-muted" />
                     </button>
                 )}
 
@@ -224,27 +271,6 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
                     attendanceDays={myAttendanceDays}
                 />
 
-                {/* 최근 크루 활동 */}
-                <SectionLabel>최근 크루 활동</SectionLabel>
-
-                {recentActivities.length > 0 ? (
-                    <AnimatedList className="space-y-2">
-                        {recentActivities.map((a) => (
-                            <AnimatedItem key={a.id}>
-                                <ActivityListItem
-                                    name={a.userName}
-                                    meta={`${a.location} · ${a.exerciseType} · ${a.time}`}
-                                />
-                            </AnimatedItem>
-                        ))}
-                    </AnimatedList>
-                ) : (
-                    <div className="flex items-center justify-center rounded-rh-md bg-rh-bg-surface py-10">
-                        <p className="text-sm text-rh-text-tertiary">
-                            아직 최근 활동이 없습니다
-                        </p>
-                    </div>
-                )}
             </div>
 
             {/* 바텀시트 — dynamic import (framer-motion 분리) */}

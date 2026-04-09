@@ -20,24 +20,20 @@ const InviteCodesTab = dynamic(
     () => import("./tabs/InviteCodesTab"),
     { ssr: true }
 );
-const GradesTab = dynamic(
-    () => import("./tabs/GradesTab"),
-    { ssr: true }
-);
-
-type TabKey = "location" | "members" | "invites" | "grades";
+type TabKey = "location" | "members" | "invites";
 
 const TABS = [
     { key: "location", label: "장소" },
     { key: "members", label: "운영진" },
     { key: "invites", label: "초대코드" },
-    { key: "grades", label: "등급" },
 ];
 
 interface SettingsManagementProps {
     crewId: string;
     initialLocations: CrewLocation[];
     locationBasedAttendance: boolean;
+    initialAccuracyRange: number;
+    allowUnregisteredLocation: boolean;
     initialTab: string;
 }
 
@@ -45,6 +41,8 @@ const SettingsManagement = memo(function SettingsManagement({
     crewId,
     initialLocations,
     locationBasedAttendance,
+    initialAccuracyRange,
+    allowUnregisteredLocation,
     initialTab,
 }: SettingsManagementProps) {
     const [activeTab, setActiveTab] = useState<TabKey>(
@@ -76,6 +74,12 @@ const SettingsManagement = memo(function SettingsManagement({
                                 locationBasedAttendance={
                                     locationBasedAttendance
                                 }
+                                initialAccuracyRange={
+                                    initialAccuracyRange
+                                }
+                                allowUnregisteredLocation={
+                                    allowUnregisteredLocation
+                                }
                             />
                         )}
                         {activeTab === "members" && (
@@ -83,9 +87,6 @@ const SettingsManagement = memo(function SettingsManagement({
                         )}
                         {activeTab === "invites" && (
                             <InviteCodesTab crewId={crewId} />
-                        )}
-                        {activeTab === "grades" && (
-                            <GradesTab crewId={crewId} />
                         )}
                     </FadeIn>
                 </div>

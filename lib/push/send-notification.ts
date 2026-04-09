@@ -17,13 +17,14 @@ function getSupabaseAdmin() {
 /**
  * 범용 알림 발송 함수
  * @param crewId - 대상 크루
- * @param targetRole - 대상 역할 (null이면 전체 회원)
+ * @param targetRole - 대상 역할 (string, string[], null)
+ *                     null이면 전체 회원
  * @param excludeUserId - 제외할 사용자 (예: 출석자 본인)
  * @param payload - 알림 내용
  */
 export async function sendNotification(
     crewId: string,
-    targetRole: string | null,
+    targetRole: string | string[] | null,
     excludeUserId: string | null,
     payload: NotificationPayload
 ): Promise<void> {
@@ -37,14 +38,18 @@ export async function sendNotification(
             .eq("crew_id", crewId)
             .eq("is_active", true);
 
-        // 역할 필터링이 필요한 경우 user_crews 조인
+        // 역할 필터링이 필요한 경우 user_crews 조회
         if (targetRole) {
+            const roles = Array.isArray(targetRole)
+                ? targetRole
+                : [targetRole];
+
             const { data: roleUsers } = await supabaseAdmin
                 .schema("attendance")
                 .from("user_crews")
                 .select("user_id")
                 .eq("crew_id", crewId)
-                .eq("crew_role", targetRole);
+                .in("crew_role", roles);
 
             if (!roleUsers || roleUsers.length === 0) return;
 

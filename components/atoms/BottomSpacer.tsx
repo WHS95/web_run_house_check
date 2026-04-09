@@ -1,10 +1,13 @@
 /**
- * 마지막 콘텐츠가 sticky 헤더까지
+ * 마지막 콘텐츠가 sticky 헤더 바로 아래까지만
  * 스크롤될 수 있도록 하단 여백 확보.
  *
- * height = 100dvh - stickyAreaPx - lastCardPx
+ * height = 100dvh
+ *          - var(--rh-bottom-inset)  (바텀 내비)
+ *          - stickyArea              (헤더+셀렉터)
+ *          - lastCard                (마지막 카드)
  *
- * @param stickyArea  헤더+셀렉터 등 sticky 영역 높이 (px)
+ * @param stickyArea  sticky 영역 총 높이 (px)
  * @param lastCard    마지막 카드 예상 높이 (px)
  */
 export default function BottomSpacer({
@@ -14,12 +17,15 @@ export default function BottomSpacer({
     stickyArea?: number;
     lastCard?: number;
 }) {
-    const total = stickyArea + lastCard;
+    const fixed = stickyArea + lastCard;
     return (
         <div
-            className={
-                `h-[calc(100dvh-${total}px)]`
-            }
+            style={{
+                height:
+                    `calc(100dvh`
+                    + ` - var(--rh-bottom-inset, 0px)`
+                    + ` - ${fixed}px)`,
+            }}
             aria-hidden
         />
     );

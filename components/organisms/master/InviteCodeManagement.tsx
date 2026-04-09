@@ -266,9 +266,9 @@ export default function InviteCodeManagement({
                       <div className="flex items-center space-x-2">
                         <Badge 
                           variant={code.is_active ? "outline" : "destructive"} 
-                          className={code.is_active 
-                            ? "bg-green-600 text-white border-green-600" 
-                            : "bg-red-600 text-white border-red-600"
+                          className={code.is_active
+                            ? "bg-rh-status-success text-white border-rh-status-success"
+                            : "bg-rh-status-error text-white border-rh-status-error"
                           }
                         >
                           {code.is_active ? "활성" : "비활성"}
@@ -316,8 +316,8 @@ export default function InviteCodeManagement({
                             onClick={() => setEditForm(prev => ({ ...prev, is_active: !prev.is_active }))}
                             className="flex items-center space-x-2 text-sm text-rh-text-secondary hover:text-white"
                           >
-                            {editForm.is_active ? 
-                              <ToggleRight className="w-5 h-5 text-green-500" /> : 
+                            {editForm.is_active ?
+                              <ToggleRight className="w-5 h-5 text-rh-status-success" /> :
                               <ToggleLeft className="w-5 h-5 text-rh-text-tertiary" />
                             }
                             <span>{editForm.is_active ? "활성" : "비활성"}</span>

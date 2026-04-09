@@ -172,7 +172,7 @@ export default function AddressSearch({
 
             {error && (
               <div className='p-4 text-center'>
-                <p className='text-sm text-red-400'>
+                <p className='text-sm text-rh-status-error'>
                   검색 중 오류가 발생했습니다
                 </p>
                 <p className='mt-1 text-xs text-rh-text-tertiary'>{error}</p>

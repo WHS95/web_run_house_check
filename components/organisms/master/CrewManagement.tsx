@@ -423,7 +423,7 @@ export default function CrewManagement({
                             {managerCount > 0 && (
                               <Badge
                                 variant='outline'
-                                className='text-xs text-white bg-green-600 border-green-600'
+                                className='text-xs text-white bg-rh-status-success border-rh-status-success'
                               >
                                 운영진 {managerCount}명
                               </Badge>
@@ -513,7 +513,7 @@ export default function CrewManagement({
                                     <div className='flex items-center space-x-3'>
                                       <div className='flex justify-center items-center w-8 h-8 rounded-full bg-rh-bg-muted'>
                                         {isManager ? (
-                                          <Crown className='w-4 h-4 text-yellow-500' />
+                                          <Crown className='w-4 h-4 text-rh-status-warning' />
                                         ) : (
                                           <Users className='w-4 h-4 text-rh-text-secondary' />
                                         )}
@@ -533,7 +533,7 @@ export default function CrewManagement({
                                         variant='outline'
                                         className={
                                           isManager
-                                            ? "text-white bg-yellow-600 border-yellow-600"
+                                            ? "text-white bg-rh-status-warning border-rh-status-warning"
                                             : "text-white bg-rh-bg-surface border-rh-border"
                                         }
                                       >
@@ -553,8 +553,8 @@ export default function CrewManagement({
                                         disabled={isUpdating}
                                         className={`text-xs ${
                                           isManager
-                                            ? "text-red-400 hover:text-red-300"
-                                            : "text-green-400 hover:text-green-300"
+                                            ? "text-rh-status-error hover:text-rh-status-error/70"
+                                            : "text-rh-status-success hover:text-rh-status-success/70"
                                         }`}
                                       >
                                         {isUpdating ? (

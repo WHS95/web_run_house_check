@@ -29,7 +29,7 @@ export default function UnverifiedUserModal({
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-rh-bg-primary bg-opacity-50'>
       <div className='bg-white rounded-lg p-6 max-w-md w-full mx-4'>
         <div className='text-center mb-6'>
-          <div className='inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-100 text-yellow-500 mb-4'>
+          <div className='inline-flex items-center justify-center w-16 h-16 rounded-full bg-rh-status-warning/20 text-rh-status-warning mb-4'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
               className='h-8 w-8'

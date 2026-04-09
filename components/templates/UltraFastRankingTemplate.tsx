@@ -148,6 +148,21 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
     [currentRankingData]
   );
 
+  // 현재 유저의 출석/개설 정보를 항상 가져옴
+  const currentUserAttendance = useMemo(() =>
+    currentData.attendanceRanking.find(
+        (item) => item.is_current_user
+    ),
+    [currentData.attendanceRanking]
+  );
+
+  const currentUserHosting = useMemo(() =>
+    currentData.hostingRanking.find(
+        (item) => item.is_current_user
+    ),
+    [currentData.hostingRanking]
+  );
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -163,7 +178,7 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-rh-bg-primary text-white">
+    <div className="relative flex flex-col h-screen bg-rh-bg-primary text-white">
       <div className="shrink-0 bg-rh-bg-primary pt-safe">
         <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-primary" />
       </div>
@@ -215,7 +230,7 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
                   </span>
                 </div>
                 <p className="text-xs text-rh-text-tertiary">
-                  출석 {currentUserRank.value}회 · 총 {currentRankingData.length}명 중
+                  출석 {currentUserAttendance?.value ?? 0}회 · 개설 {currentUserHosting?.value ?? 0}회 · 총 {currentRankingData.length}명 중
                 </p>
               </div>
               <Trophy className="w-[18px] h-[18px] text-rh-accent" />
@@ -231,6 +246,7 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
                   name={item.name || '알 수 없음'}
                   score={item.value}
                   isCurrentUser={item.is_current_user}
+                  scoreLabel={activeTab === 'hosting' ? '개설' : '출석'}
                 />
               ))}
             </div>
@@ -259,7 +275,7 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.2 }}
             onClick={scrollToTop}
-            className="fixed right-4 bottom-24 z-20 w-10 h-10 rounded-full bg-rh-bg-surface/90 backdrop-blur-sm border border-rh-border shadow-lg flex items-center justify-center active:scale-90 transition-transform"
+            className="absolute right-4 bottom-4 z-20 w-10 h-10 rounded-full bg-rh-bg-surface/90 backdrop-blur-sm border border-rh-border shadow-lg flex items-center justify-center active:scale-90 transition-transform"
             aria-label="맨 위로"
           >
             <ChevronUp className="w-5 h-5 text-rh-text-secondary" />

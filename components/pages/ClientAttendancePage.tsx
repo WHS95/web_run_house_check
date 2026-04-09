@@ -413,6 +413,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 value={formData.date}
                 onChange={(e) => handleFormChange("date", e.target.value)}
                 className='text-white ios-date-input bg-rh-bg-surface border border-rh-border'
+                suppressHydrationWarning
               />
               <div className='absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none'>
                 <Calendar className='w-[18px] h-[18px] text-rh-text-muted' />
@@ -431,6 +432,9 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                 onChange={(e) => handleFormChange("time", e.target.value)}
                 className='text-white ios-select bg-rh-bg-surface border border-rh-border'
               >
+                {!mounted && (
+                  <option value="">시간 선택</option>
+                )}
                 {availableTimeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}

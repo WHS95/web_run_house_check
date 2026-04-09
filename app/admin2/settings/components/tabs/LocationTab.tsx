@@ -40,12 +40,16 @@ const CLS_SUB_TEXT =
 interface LocationTabProps {
     crewId: string;
     locationBasedAttendance: boolean;
+    initialAccuracyRange: number;
+    allowUnregisteredLocation: boolean;
 }
 
 /* ── 컴포넌트 ── */
 const LocationTab = memo(function LocationTab({
     crewId,
     locationBasedAttendance,
+    initialAccuracyRange,
+    allowUnregisteredLocation,
 }: LocationTabProps) {
     const { state, actions } =
         useCrewLocationContext();
@@ -54,6 +58,12 @@ const LocationTab = memo(function LocationTab({
     const [isEnabled, setIsEnabled] = useState(
         locationBasedAttendance
     );
+    const [allowUnregistered, setAllowUnregistered] =
+        useState(allowUnregisteredLocation);
+    const [accuracyRange, setAccuracyRange] =
+        useState(initialAccuracyRange);
+    const [savingRange, setSavingRange] =
+        useState(false);
     const [viewMode, setViewMode] = useState<
         "list" | "form"
     >("list");
@@ -110,6 +120,74 @@ const LocationTab = memo(function LocationTab({
         },
         [crewId]
     );
+
+    /* 미등록 장소 출석 허용 토글 */
+    const handleUnregisteredToggle = useCallback(
+        async (enabled: boolean) => {
+            haptic.medium();
+            try {
+                const url =
+                    "/api/admin/crew-settings"
+                    + "/location-attendance";
+                const res = await fetch(url, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+                    body: JSON.stringify({
+                        crew_id: crewId,
+                        allow_unregistered_location:
+                            enabled,
+                    }),
+                });
+                if (res.ok) {
+                    setAllowUnregistered(enabled);
+                    haptic.success();
+                }
+            } catch {
+                haptic.error();
+            }
+        },
+        [crewId]
+    );
+
+    /* 오차 범위 슬라이더 변경 */
+    const handleRangeChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setAccuracyRange(Number(e.target.value));
+        },
+        []
+    );
+
+    /* 오차 범위 저장 (슬라이더 놓을 때) */
+    const handleRangeSave = useCallback(async () => {
+        haptic.light();
+        setSavingRange(true);
+        try {
+            const url =
+                "/api/admin/crew-settings"
+                + "/location-attendance";
+            const res = await fetch(url, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type":
+                        "application/json",
+                },
+                body: JSON.stringify({
+                    crew_id: crewId,
+                    accuracy_range: accuracyRange,
+                }),
+            });
+            if (res.ok) {
+                haptic.success();
+            }
+        } catch {
+            haptic.error();
+        } finally {
+            setSavingRange(false);
+        }
+    }, [crewId, accuracyRange]);
 
     /* 폼 초기화 + 리스트로 복귀 */
     const resetForm = useCallback(() => {
@@ -302,6 +380,76 @@ const LocationTab = memo(function LocationTab({
         return { lat, lng };
     }, [formData.latitude, formData.longitude]);
 
+    /* ── 오차 범위 슬라이더 (공통) ── */
+    const rangeSlider = isEnabled ? (
+        <div className={CLS_CARD + " space-y-3"}>
+            <div
+                className={
+                    "flex items-center"
+                    + " justify-between"
+                }
+            >
+                <span className="text-sm text-white">
+                    허용 범위
+                </span>
+                <span
+                    className={
+                        "text-sm font-semibold"
+                        + " text-rh-accent"
+                    }
+                >
+                    {accuracyRange}m
+                    {savingRange && (
+                        <span
+                            className={
+                                "ml-1 text-xs"
+                                + " text-rh-text"
+                                + "-secondary"
+                            }
+                        >
+                            저장 중...
+                        </span>
+                    )}
+                </span>
+            </div>
+            <input
+                type="range"
+                min={50}
+                max={500}
+                step={50}
+                value={accuracyRange}
+                onChange={handleRangeChange}
+                onMouseUp={handleRangeSave}
+                onTouchEnd={handleRangeSave}
+                className={
+                    "w-full h-1.5 rounded-full"
+                    + " appearance-none"
+                    + " cursor-pointer"
+                    + " bg-rh-bg-muted"
+                    + " accent-rh-accent"
+                    + " [&::-webkit-slider-thumb]"
+                    + ":appearance-none"
+                    + " [&::-webkit-slider-thumb]"
+                    + ":w-5"
+                    + " [&::-webkit-slider-thumb]"
+                    + ":h-5"
+                    + " [&::-webkit-slider-thumb]"
+                    + ":rounded-full"
+                    + " [&::-webkit-slider-thumb]"
+                    + ":bg-rh-accent"
+                }
+            />
+            <div className="flex justify-between">
+                <span className={CLS_SUB_TEXT}>
+                    50m
+                </span>
+                <span className={CLS_SUB_TEXT}>
+                    500m
+                </span>
+            </div>
+        </div>
+    ) : null;
+
     /* ────── 폼 뷰 ────── */
     if (viewMode === "form") {
         return (
@@ -311,6 +459,23 @@ const LocationTab = memo(function LocationTab({
                     checked={isEnabled}
                     onCheckedChange={handleToggle}
                 />
+
+                {isEnabled && (
+                    <AdminSwitchRow
+                        label="미등록 장소 출석 허용"
+                        description={
+                            "등록되지 않은 장소에서도"
+                            + " 출석을 진행할 수"
+                            + " 있습니다"
+                        }
+                        checked={allowUnregistered}
+                        onCheckedChange={
+                            handleUnregisteredToggle
+                        }
+                    />
+                )}
+
+                {rangeSlider}
 
                 {/* 폼 카드 */}
                 <div className="rounded-xl bg-rh-bg-surface p-3 space-y-3">
@@ -456,6 +621,23 @@ const LocationTab = memo(function LocationTab({
                 checked={isEnabled}
                 onCheckedChange={handleToggle}
             />
+
+            {isEnabled && (
+                <AdminSwitchRow
+                    label="미등록 장소 출석 허용"
+                    description={
+                        "등록되지 않은 장소에서도"
+                        + " 출석을 진행할 수"
+                        + " 있습니다"
+                    }
+                    checked={allowUnregistered}
+                    onCheckedChange={
+                        handleUnregisteredToggle
+                    }
+                />
+            )}
+
+            {rangeSlider}
 
             <AdminSearchBar
                 value={search}

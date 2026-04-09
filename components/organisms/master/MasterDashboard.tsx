@@ -113,7 +113,7 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
                 </p>
                 <p className="text-2xl font-bold text-white">{activeInviteCodes}</p>
               </div>
-              <Activity className="w-8 h-8 text-green-500" />
+              <Activity className="w-8 h-8 text-rh-status-success" />
             </div>
           </CardContent>
         </Card>
@@ -127,7 +127,7 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
                 </p>
                 <p className="text-2xl font-bold text-white">{recentCrews}</p>
               </div>
-              <TrendingUp className="w-8 h-8 text-green-500" />
+              <TrendingUp className="w-8 h-8 text-rh-status-success" />
             </div>
           </CardContent>
         </Card>
@@ -166,9 +166,9 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
                     <Badge 
                       variant="outline" 
                       className={
-                        activity.type === 'crew_created' 
-                          ? "bg-blue-600 text-white border-blue-600" 
-                          : "bg-green-600 text-white border-green-600"
+                        activity.type === 'crew_created'
+                          ? "bg-rh-accent text-white border-rh-accent"
+                          : "bg-rh-status-success text-white border-rh-status-success"
                       }
                     >
                       {activity.type === 'crew_created' ? 'CREW' : 'CODE'}
@@ -210,7 +210,7 @@ export default function MasterDashboard({ crews, inviteCodes }: MasterDashboardP
                       <Badge variant="outline" className="bg-rh-accent text-white border-rh-accent">
                         총 {crewCodes.length}개
                       </Badge>
-                      <Badge variant="outline" className="bg-green-600 text-white border-green-600">
+                      <Badge variant="outline" className="bg-rh-status-success text-white border-rh-status-success">
                         활성 {activeCodes.length}개
                       </Badge>
                     </div>

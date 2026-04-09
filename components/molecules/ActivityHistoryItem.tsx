@@ -44,20 +44,20 @@ const ActivityHistoryItem: React.FC<ActivityHistoryItemProps> = ({
     if (type === "create_meeting") {
       return {
         icon: <Users className='w-[0.75rem] h-[0.75rem]' />,
-        color: "bg-purple-500",
-        borderColor: "border-purple-200",
-        textColor: "text-purple-700",
-        bgColor: "bg-purple-50",
+        color: "bg-rh-bg-muted",
+        borderColor: "border-rh-border",
+        textColor: "text-rh-text-secondary",
+        bgColor: "bg-rh-bg-surface",
         message: `${location}에서 ${exerciseType} 모임을 개설했습니다`,
         label: "모임 개설",
       };
     } else {
       return {
         icon: <CheckCircle className='w-[0.75rem] h-[0.75rem]' />,
-        color: "bg-green-500",
-        borderColor: "border-green-200",
-        textColor: "text-green-700",
-        bgColor: "bg-green-50",
+        color: "bg-rh-status-success",
+        borderColor: "border-rh-status-success",
+        textColor: "text-rh-status-success",
+        bgColor: "bg-rh-status-success/10",
         message: `${location}에서 ${exerciseType} 활동에 참여했습니다`,
         label: "출석",
       };

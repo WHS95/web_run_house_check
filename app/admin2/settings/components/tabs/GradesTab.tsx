@@ -792,11 +792,11 @@ const GradeRecommendations = memo(
 
 // ─── 수동 지정 서브탭 ───
 const AVATAR_COLORS = [
-    "bg-blue-500",
-    "bg-emerald-500",
-    "bg-amber-500",
-    "bg-purple-500",
-    "bg-rose-500",
+    "bg-rh-accent",
+    "bg-rh-status-success",
+    "bg-rh-status-warning",
+    "bg-rh-bg-muted",
+    "bg-rh-status-error",
 ];
 
 function getColor(name: string) {

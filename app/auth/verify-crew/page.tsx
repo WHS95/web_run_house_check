@@ -1,7 +1,7 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import CrewVerificationForm from "@/components/auth/CrewVerificationForm";
-import { createClient } from "@/lib/supabase-admin";
+import { createClient } from "@/lib/supabase/server";
 import PageHeader from "@/components/organisms/common/PageHeader";
 
 export default async function VerifyCrewPage() {

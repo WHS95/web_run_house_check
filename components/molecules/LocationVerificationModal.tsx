@@ -105,13 +105,13 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
   const getStatusIcon = () => {
     switch (verificationStatus) {
       case 'checking':
-        return <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />;
+        return <Loader2 className="w-8 h-8 text-rh-accent animate-spin" />;
       case 'success':
-        return <CheckCircle className="w-8 h-8 text-green-500" />;
+        return <CheckCircle className="w-8 h-8 text-rh-status-success" />;
       case 'failed':
-        return <AlertCircle className="w-8 h-8 text-red-500" />;
+        return <AlertCircle className="w-8 h-8 text-rh-status-error" />;
       case 'error':
-        return <AlertCircle className="w-8 h-8 text-red-500" />;
+        return <AlertCircle className="w-8 h-8 text-rh-status-error" />;
       default:
         return <MapPin className="w-8 h-8 text-rh-text-tertiary" />;
     }
@@ -120,12 +120,12 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
   const getStatusColor = () => {
     switch (verificationStatus) {
       case 'checking':
-        return 'border-blue-500/30';
+        return 'border-rh-accent/30';
       case 'success':
-        return 'border-green-500/30';
+        return 'border-rh-status-success/30';
       case 'failed':
       case 'error':
-        return 'border-red-500/30';
+        return 'border-rh-status-error/30';
       default:
         return 'border-rh-border';
     }

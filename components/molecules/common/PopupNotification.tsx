@@ -53,16 +53,16 @@ const PopupNotification = memo<PopupNotificationProps>(
         const iconConfig = (() => {
             switch (type) {
                 case "success":
-                    return { color: "text-blue-500", Component: CircleCheck };
+                    return { color: "text-rh-accent", Component: CircleCheck };
                 case "error":
-                    return { color: "text-red-500", Component: CircleSlash };
+                    return { color: "text-rh-status-error", Component: CircleSlash };
                 case "loading":
                     return {
-                        color: "text-yellow-500",
+                        color: "text-rh-status-warning",
                         Component: CircleEllipsis,
                     };
                 default:
-                    return { color: "text-red-500", Component: CircleSlash };
+                    return { color: "text-rh-status-error", Component: CircleSlash };
             }
         })();
 

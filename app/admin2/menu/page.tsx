@@ -23,11 +23,6 @@ const menuItems = [
         href: "/admin2/notice",
     },
     {
-        title: "푸시 알림 발송",
-        subtitle: "크루원에게 알림 보내기",
-        href: "/admin2/push",
-    },
-    {
         title: "크루 정보 편집",
         subtitle: "크루명 · 소개 · 로고",
         href: "/admin2/crew-edit",

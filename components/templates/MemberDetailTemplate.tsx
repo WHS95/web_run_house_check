@@ -110,10 +110,8 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
 
     const displayName = useMemo(() => {
         if (!userProfile?.firstName) return '사용자';
-        return userProfile.birthYear
-            ? `${userProfile.firstName} (${String(userProfile.birthYear)})`
-            : userProfile.firstName;
-    }, [userProfile?.firstName, userProfile?.birthYear]);
+        return userProfile.firstName;
+    }, [userProfile?.firstName]);
 
     const adminButton = useMemo(() => {
         return userProfile?.isAdmin ? <AdminButton /> : null;
@@ -194,7 +192,7 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                     {showNotificationToggle && (
                         <div className="flex items-center justify-between rounded-rh-lg bg-rh-bg-surface h-[52px] px-4">
                             <span className="text-sm font-medium text-white">
-                                푸시 알림
+                                푸시 알림 수신
                             </span>
                             <Switch
                                 checked={isNotificationEnabled}

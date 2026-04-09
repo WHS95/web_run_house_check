@@ -285,7 +285,7 @@ export default function AdminGradeAssignment({
 
                                         {/* 수동 오버라이드 뱃지 */}
                                         {member.grade_override && (
-                                            <span className="bg-amber-500/10 rounded-full px-1.5 py-0.5 text-[9px] text-amber-400 font-semibold flex items-center gap-1 whitespace-nowrap">
+                                            <span className="bg-rh-status-warning/10 rounded-full px-1.5 py-0.5 text-[9px] text-rh-status-warning font-semibold flex items-center gap-1 whitespace-nowrap">
                                                 <Lock className="w-2.5 h-2.5" />
                                                 수동
                                             </span>

@@ -158,7 +158,7 @@ const AttendanceForm: React.FC<AttendanceFormProps> = React.memo(
             disabled={true}
           />
           {errors.name && (
-            <p className='mt-1 text-xs text-red-500'>{errors.name.message}</p>
+            <p className='mt-1 text-xs text-rh-status-error'>{errors.name.message}</p>
           )}
         </div>
 
@@ -171,10 +171,10 @@ const AttendanceForm: React.FC<AttendanceFormProps> = React.memo(
             onTimeChange={handleTimeChange}
           />
           {errors.date && (
-            <p className='mt-1 text-xs text-red-500'>{errors.date.message}</p>
+            <p className='mt-1 text-xs text-rh-status-error'>{errors.date.message}</p>
           )}
           {errors.time && (
-            <p className='mt-1 text-xs text-red-500'>{errors.time.message}</p>
+            <p className='mt-1 text-xs text-rh-status-error'>{errors.time.message}</p>
           )}
         </div>
 
@@ -188,7 +188,7 @@ const AttendanceForm: React.FC<AttendanceFormProps> = React.memo(
             onChange={handleSearchableSelectChange}
           />
           {errors.location && (
-            <p className='mt-1 text-xs text-red-500'>
+            <p className='mt-1 text-xs text-rh-status-error'>
               {errors.location.message}
             </p>
           )}
@@ -204,7 +204,7 @@ const AttendanceForm: React.FC<AttendanceFormProps> = React.memo(
             onChange={handleSearchableSelectChange}
           />
           {errors.exerciseType && (
-            <p className='mt-1 text-xs text-red-500'>
+            <p className='mt-1 text-xs text-rh-status-error'>
               {errors.exerciseType.message}
             </p>
           )}
@@ -220,7 +220,7 @@ const AttendanceForm: React.FC<AttendanceFormProps> = React.memo(
               onChange={handleRadioChange}
             />
             {errors.isHost && (
-              <p className='mt-1 text-xs text-red-500'>
+              <p className='mt-1 text-xs text-rh-status-error'>
                 {errors.isHost.message}
               </p>
             )}

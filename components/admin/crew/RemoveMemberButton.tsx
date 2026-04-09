@@ -46,7 +46,7 @@ export default function RemoveMemberButton({
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className='p-2 text-red-600 rounded hover:text-red-900 bg-red-50'
+        className='p-2 text-rh-status-error rounded hover:text-rh-status-error/70 bg-rh-status-error/10'
         title='회원 제거'
       >
         <Trash2 size={16} />
@@ -72,7 +72,7 @@ export default function RemoveMemberButton({
               </p>
 
               {error && (
-                <div className='p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-md'>
+                <div className='p-3 mb-4 text-sm text-rh-status-error bg-rh-status-error/10 rounded-md'>
                   {error}
                 </div>
               )}
@@ -89,7 +89,7 @@ export default function RemoveMemberButton({
                 <button
                   type='button'
                   onClick={handleRemove}
-                  className='px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                  className='px-4 py-2 text-sm font-medium text-white bg-rh-status-error border border-transparent rounded-md shadow-sm hover:bg-rh-status-error/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rh-status-error'
                   disabled={isLoading}
                 >
                   {isLoading ? "제거 중..." : "제거"}

@@ -57,9 +57,9 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
   };
 
   const getRankBadgeColor = (rank: number) => {
-    if (rank === 1) return "bg-yellow-500 text-white";
+    if (rank === 1) return "bg-rh-status-warning text-white";
     if (rank <= 3) return "bg-rh-bg-muted text-white";
-    if (rank <= 10) return "bg-blue-500 text-white";
+    if (rank <= 10) return "bg-rh-accent text-white";
     return "bg-rh-bg-muted text-rh-text-muted";
   };
 
@@ -89,8 +89,8 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
   if (error) {
     return (
       <div className='flex flex-col items-center justify-center py-16 text-center'>
-        <div className='w-[4rem] h-[4rem] bg-red-500/20 rounded-full flex items-center justify-center mb-4'>
-          <TrendingUp className='w-[1.5rem] h-[1.5rem] text-red-400' />
+        <div className='w-[4rem] h-[4rem] bg-rh-status-error/20 rounded-full flex items-center justify-center mb-4'>
+          <TrendingUp className='w-[1.5rem] h-[1.5rem] text-rh-status-error' />
         </div>
         <p className='text-rh-text-secondary text-[0.875rem] mb-4'>{error}</p>
         <button
@@ -140,7 +140,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
               <div className='text-[0.75rem] text-rh-text-secondary'>참여 횟수</div>
             </div>
             <div className='text-center'>
-              <div className='text-[1.5rem] font-bold text-green-400'>
+              <div className='text-[1.5rem] font-bold text-rh-status-success'>
                 {stat.meetings_created_count}
               </div>
               <div className='text-[0.75rem] text-rh-text-secondary'>개설 횟수</div>
@@ -166,7 +166,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({
             </div>
             <div className='w-full bg-rh-bg-surface rounded-full h-0.5'>
               <div
-                className='bg-gradient-to-r from-blue-500 to-green-500 h-0.5 rounded-full transition-all duration-300'
+                className='bg-gradient-to-r from-rh-accent to-rh-status-success h-0.5 rounded-full transition-all duration-300'
                 style={{
                   width: `${Math.min(
                     ((stat.attendance_count + stat.meetings_created_count) /

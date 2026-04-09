@@ -55,7 +55,7 @@ export default function YearMonthSelector({
     /* ── 펼침 모드 (2줄) ── */
     const expandedUI = (
         <div className="space-y-2">
-            {/* 연도 네비게이터 */}
+            {/* 월 네비게이터 */}
             <div
                 className={
                     "flex items-center"
@@ -63,9 +63,7 @@ export default function YearMonthSelector({
                 }
             >
                 <button
-                    onClick={() =>
-                        navigate(year - 1, month)
-                    }
+                    onClick={goPrevMonth}
                     className={
                         "p-1"
                         + " text-rh-text-tertiary"
@@ -82,12 +80,10 @@ export default function YearMonthSelector({
                         + " text-white"
                     }
                 >
-                    {year}년
+                    {year}년 {month}월
                 </span>
                 <button
-                    onClick={() =>
-                        navigate(year + 1, month)
-                    }
+                    onClick={goNextMonth}
                     className={
                         "p-1"
                         + " text-rh-text-tertiary"

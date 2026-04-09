@@ -27,7 +27,7 @@ const NativeTabBar: React.FC<NativeTabBarProps> = ({ tabs }) => {
   return (
     <div
       className='
-            fixed bottom-0 left-0 right-0 z-40
+            shrink-0 z-40
             bg-white/95 backdrop-blur-md border-t border-rh-border
             safe-area-inset-bottom
         '
@@ -50,7 +50,7 @@ const NativeTabBar: React.FC<NativeTabBarProps> = ({ tabs }) => {
                                     active:scale-95 active:bg-rh-bg-surface
                                     ${
                                       isActive
-                                        ? "text-blue-500"
+                                        ? "text-rh-accent"
                                         : "text-rh-text-tertiary"
                                     }
                                 `}
@@ -85,7 +85,7 @@ const NativeTabBar: React.FC<NativeTabBarProps> = ({ tabs }) => {
                   <div
                     className='
                                         absolute -top-0.5 left-1/2 transform -translate-x-1/2
-                                        w-1 h-1 bg-blue-500 rounded-full
+                                        w-1 h-1 bg-rh-accent rounded-full
                                     '
                   />
                 )}
@@ -96,7 +96,7 @@ const NativeTabBar: React.FC<NativeTabBarProps> = ({ tabs }) => {
                     className='
                                         absolute -top-1 -right-1
                                         min-w-[18px] h-[18px] px-1
-                                        bg-red-500 text-white text-xs font-bold
+                                        bg-rh-status-error text-white text-xs font-bold
                                         flex items-center justify-center
                                         rounded-full border-2 border-white
                                     '

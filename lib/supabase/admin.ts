@@ -1602,7 +1602,8 @@ export async function getSpecificMonthStats(
  */
 export async function toggleLocationBasedAttendance(
   crewId: string,
-  locationBasedAttendance: boolean
+  locationBasedAttendance: boolean,
+  accuracyRange?: number
 ): Promise<{
   success: boolean;
   error: Error | null;
@@ -1610,26 +1611,148 @@ export async function toggleLocationBasedAttendance(
   try {
     const supabase = await createClient();
 
+    const updateData: Record<string, unknown> = {
+      location_based_attendance: locationBasedAttendance,
+      updated_at: new Date().toISOString(),
+    };
+
+    /* 오차 범위가 전달된 경우 함께 저장 */
+    if (
+      accuracyRange !== undefined
+      && accuracyRange >= 50
+      && accuracyRange <= 500
+    ) {
+      updateData.accuracy_range = accuracyRange;
+    }
+
+    const { error } = await supabase
+      .schema("attendance")
+      .from("crews")
+      .update(updateData)
+      .eq("id", crewId);
+
+    if (error) {
+      console.error(
+        "위치 기반 출석 설정 변경 오류:", error
+      );
+      return {
+        success: false,
+        error: new Error(error.message),
+      };
+    }
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error(
+      "위치 기반 출석 설정 변경 오류:", error
+    );
+    return {
+      success: false,
+      error: new Error(
+        error.message || "알 수 없는 오류 발생"
+      ),
+    };
+  }
+}
+
+/**
+ * 크루의 위치 기반 출석 오차 범위를 업데이트합니다.
+ */
+export async function updateAccuracyRange(
+  crewId: string,
+  accuracyRange: number
+): Promise<{
+  success: boolean;
+  error: Error | null;
+}> {
+  try {
+    if (accuracyRange < 50 || accuracyRange > 500) {
+      return {
+        success: false,
+        error: new Error(
+          "오차 범위는 50~500m 사이여야 합니다."
+        ),
+      };
+    }
+
+    const supabase = await createClient();
+
     const { error } = await supabase
       .schema("attendance")
       .from("crews")
       .update({
-        location_based_attendance: locationBasedAttendance,
+        accuracy_range: accuracyRange,
         updated_at: new Date().toISOString(),
       })
       .eq("id", crewId);
 
     if (error) {
-      console.error("위치 기반 출석 설정 변경 오류:", error);
-      return { success: false, error: new Error(error.message) };
+      console.error(
+        "오차 범위 변경 오류:", error
+      );
+      return {
+        success: false,
+        error: new Error(error.message),
+      };
     }
 
     return { success: true, error: null };
   } catch (error: any) {
-    console.error("위치 기반 출석 설정 변경 오류:", error);
+    console.error("오차 범위 변경 오류:", error);
     return {
       success: false,
-      error: new Error(error.message || "알 수 없는 오류 발생"),
+      error: new Error(
+        error.message || "알 수 없는 오류 발생"
+      ),
     };
   }
+}
+
+/**
+ * 크루의 미등록 장소 출석 허용 설정을 업데이트합니다.
+ */
+export async function updateAllowUnregisteredLocation(
+    crewId: string,
+    allow: boolean
+): Promise<{
+    success: boolean;
+    error: Error | null;
+}> {
+    try {
+        const supabase = await createClient();
+
+        const { error } = await supabase
+            .schema("attendance")
+            .from("crews")
+            .update({
+                allow_unregistered_location: allow,
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", crewId);
+
+        if (error) {
+            console.error(
+                "미등록 장소 출석 설정 변경 오류:",
+                error
+            );
+            return {
+                success: false,
+                error: new Error(error.message),
+            };
+        }
+
+        return { success: true, error: null };
+    } catch (error: any) {
+        console.error(
+            "미등록 장소 출석 설정 변경 오류:",
+            error
+        );
+        return {
+            success: false,
+            error: new Error(
+                error.message
+                || "알 수 없는 오류 발생"
+            ),
+        };
+    }
 }

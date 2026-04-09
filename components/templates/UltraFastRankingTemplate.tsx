@@ -8,7 +8,6 @@ import PageHeader from '@/components/organisms/common/PageHeader';
 import MonthNavigator from '@/components/molecules/MonthNavigator';
 import RankingTabs, { TabItem } from '@/components/organisms/ranking/RankingTabs';
 import RankingListItem from '@/components/organisms/ranking/RankingListItem';
-import { AnimatedList, AnimatedItem } from '../atoms/AnimatedList';
 import type { NotificationType } from '@/components/molecules/common/PopupNotification';
 
 import { haptic } from '@/lib/haptic';
@@ -32,21 +31,6 @@ export interface RankingData {
   hostingRanking: RankItem[];
   crewName?: string | null;
 }
-
-const RankingListSkeleton = React.memo(() => (
-  <div className="pb-safe space-y-2">
-    {Array.from({ length: 8 }).map((_, index) => (
-      <div key={index} className="flex items-center px-4 h-14 rounded-rh-lg bg-rh-bg-surface animate-pulse">
-        <div className="w-8 h-5 bg-rh-bg-muted rounded" />
-        <div className="flex-1 ml-3">
-          <div className="w-20 h-4 bg-rh-bg-muted rounded mb-1" />
-          <div className="w-14 h-3 bg-rh-bg-muted rounded" />
-        </div>
-      </div>
-    ))}
-  </div>
-));
-RankingListSkeleton.displayName = 'RankingListSkeleton';
 
 interface UltraFastRankingTemplateProps {
   initialData?: RankingData | null;
@@ -208,59 +192,62 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto px-4 pt-2 scroll-area-bottom space-y-2"
       >
-        {/* 내 순위 카드 */}
-        {currentUserRank && !isDataLoading && (
-          <div className="flex items-center gap-3 px-4 h-14 rounded-xl bg-rh-accent/[0.1] border border-rh-accent/30">
-            <div className="w-8 h-8 rounded-lg bg-rh-accent/20 flex items-center justify-center">
-              <span className="font-bold text-base text-rh-accent">
-                {currentUserRank.rank}
-              </span>
-            </div>
-            <div className="flex-1 flex flex-col gap-0.5">
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-semibold text-white">
-                  {currentUserRank.name || '알 수 없음'}
-                </span>
-                <span className="bg-rh-accent text-white text-[10px] rounded-full px-1.5 leading-4">
-                  나
+        {/* 월 변경 로딩 시 opacity로 표시, 스켈레톤 미사용 */}
+        <div className={isDataLoading
+          ? "opacity-50 pointer-events-none transition-opacity"
+          : "transition-opacity"
+        }>
+          {/* 내 순위 카드 */}
+          {currentUserRank && (
+            <div className="flex items-center gap-3 px-4 h-14 rounded-xl bg-rh-accent/[0.1] border border-rh-accent/30 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-rh-accent/20 flex items-center justify-center">
+                <span className="font-bold text-base text-rh-accent">
+                  {currentUserRank.rank}
                 </span>
               </div>
-              <p className="text-xs text-rh-text-tertiary">
-                출석 {currentUserRank.value}회 · 총 {currentRankingData.length}명 중
-              </p>
+              <div className="flex-1 flex flex-col gap-0.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-semibold text-white">
+                    {currentUserRank.name || '알 수 없음'}
+                  </span>
+                  <span className="bg-rh-accent text-white text-[10px] rounded-full px-1.5 leading-4">
+                    나
+                  </span>
+                </div>
+                <p className="text-xs text-rh-text-tertiary">
+                  출석 {currentUserRank.value}회 · 총 {currentRankingData.length}명 중
+                </p>
+              </div>
+              <Trophy className="w-[18px] h-[18px] text-rh-accent" />
             </div>
-            <Trophy className="w-[18px] h-[18px] text-rh-accent" />
-          </div>
-        )}
+          )}
 
-        {isDataLoading ? (
-          <RankingListSkeleton />
-        ) : currentRankingData.length > 0 ? (
-          <AnimatedList className="space-y-2">
-            {currentRankingData.map((item) => (
-              <AnimatedItem key={item.user_id}>
+          {currentRankingData.length > 0 ? (
+            <div className="space-y-2">
+              {currentRankingData.map((item) => (
                 <RankingListItem
+                  key={item.user_id}
                   rank={item.rank}
                   name={item.name || '알 수 없음'}
                   score={item.value}
                   isCurrentUser={item.is_current_user}
                 />
-              </AnimatedItem>
-            ))}
-          </AnimatedList>
-        ) : (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <div className="mb-4 text-rh-text-secondary">
-                <svg className="w-[4rem] h-[4rem] mx-auto opacity-50" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <p className="text-rh-text-tertiary text-[1.125rem] font-medium">해당 월의 출석 데이터가 없습니다</p>
-              <p className="text-rh-text-secondary text-[0.875rem] mt-2">다른 월을 확인해보세요</p>
+              ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="mb-4 text-rh-text-secondary">
+                  <svg className="w-[4rem] h-[4rem] mx-auto opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <p className="text-rh-text-tertiary text-[1.125rem] font-medium">해당 월의 출석 데이터가 없습니다</p>
+                <p className="text-rh-text-secondary text-[0.875rem] mt-2">다른 월을 확인해보세요</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Scroll to Top FAB */}

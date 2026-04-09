@@ -73,40 +73,61 @@ export async function POST(request: Request) {
       );
     }
 
-    // 병렬로 locationId 검증과 출석 기록 삽입 준비
-    const [locationValidation] = await Promise.allSettled([
-      supabase
+    // 미등록 장소 처리
+    const isUnregistered =
+        locationId === "unregistered";
+    let locationName = "미등록 장소";
+
+    if (isUnregistered) {
+      // 미등록 장소 허용 여부 확인
+      const { data: crewSettings } = await supabase
         .schema("attendance")
-        .from("crew_locations")
-        .select("name")
-        .eq("id", locationId)
-        .eq("crew_id", crewId)
-        .eq("is_active", true)
-        .single(),
-    ]);
+        .from("crews")
+        .select("allow_unregistered_location")
+        .eq("id", crewId)
+        .single();
 
-    if (
-      locationValidation.status === "rejected" ||
-      locationValidation.value.error ||
-      !locationValidation.value.data
-    ) {
-      //console.error(
-      //   "Error fetching location name:",
-      //   locationValidation.status === "fulfilled"
-      //     ? locationValidation.value.error
-      //     : locationValidation.reason
-      // );
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "선택한 장소를 찾을 수 없거나 현재 크루에서 사용할 수 없는 장소입니다.",
-        },
-        { status: 404 }
-      );
+      if (
+        !crewSettings
+          ?.allow_unregistered_location
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "미등록 장소 출석이 허용되지 "
+              + "않은 크루입니다.",
+          },
+          { status: 403 }
+        );
+      }
+    } else {
+      // 등록된 장소 검증
+      const { data: locData, error: locError } =
+        await supabase
+          .schema("attendance")
+          .from("crew_locations")
+          .select("name")
+          .eq("id", locationId)
+          .eq("crew_id", crewId)
+          .eq("is_active", true)
+          .single();
+
+      if (locError || !locData) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "선택한 장소를 찾을 수 없거나 "
+              + "현재 크루에서 사용할 수 없는 "
+              + "장소입니다.",
+          },
+          { status: 404 }
+        );
+      }
+
+      locationName = locData.name;
     }
-
-    const locationName = locationValidation.value.data.name;
 
     // 출석 기록 삽입
     const { data: attendanceRecord, error: insertError } = await supabase
@@ -138,17 +159,40 @@ export async function POST(request: Request) {
     }
 
     // 출석 알림 발송 (fire-and-forget)
-    sendNotification(
-        crewId,
-        "CREW_MANAGER",
-        userId,
-        {
-            type: "attendance",
-            title: "새 출석 알림",
-            body: `회원이 ${locationName}에서 출석했습니다.`,
-            data: { crewId, locationName },
+    // 사용자 이름·년생 조회 후 운영진에게 푸시
+    (async () => {
+        try {
+            const { data: userInfo } = await supabase
+                .schema("attendance")
+                .from("users")
+                .select("first_name, birth_year")
+                .eq("id", userId)
+                .single();
+
+            const userName = userInfo?.first_name || "회원";
+            // 년생 뒤 2자리 (예: 1995 → 95)
+            const birthSuffix = userInfo?.birth_year
+                ? String(userInfo.birth_year).slice(-2)
+                : null;
+            const displayName = birthSuffix
+                ? `${userName}(${birthSuffix})`
+                : userName;
+
+            await sendNotification(
+                crewId,
+                ["OWNER", "CREW_MANAGER"],
+                userId,
+                {
+                    type: "attendance",
+                    title: "출석 알림",
+                    body: `${displayName}님이 ${locationName}에 출석을 하였습니다.`,
+                    data: { crewId, locationName },
+                }
+            );
+        } catch {
+            // 알림 실패가 출석 완료를 막지 않음
         }
-    ).catch(() => {});
+    })();
 
     return NextResponse.json(
       {

@@ -75,7 +75,7 @@ const AdminModal = memo(function AdminModal({
                         transition={{ duration: 0.2 }}
                     >
                         {title && (
-                            <div className="flex items-center justify-between">
+                            <div className="flex justify-between items-center">
                                 <h3 className="text-base font-semibold text-white">
                                     {title}
                                 </h3>

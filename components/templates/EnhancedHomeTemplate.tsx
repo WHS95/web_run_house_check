@@ -144,7 +144,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
                 </div>
                 <button
                     onClick={() => router.push('/notifications')}
-                    className="relative flex h-10 w-10 items-center justify-center rounded-rh-md bg-rh-bg-surface"
+                    className="relative flex h-10 w-10 items-center justify-center rounded-rh-md"
                 >
                     <Bell className="h-5 w-5 text-rh-text-secondary" />
                 </button>
@@ -265,8 +265,8 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
                     <ChevronRight className="h-4.5 w-4.5 shrink-0 text-rh-text-muted" />
                 </button>
 
-                {/* 나의 최근 활동 — 주간 히트맵 */}
-                <SectionLabel>나의 최근 활동</SectionLabel>
+                {/* 최근 참여일 — 주간 히트맵 */}
+                <SectionLabel>최근 참여일</SectionLabel>
                 <WeeklyAttendanceHeatmap
                     attendanceDays={myAttendanceDays}
                 />

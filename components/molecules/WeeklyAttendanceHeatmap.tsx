@@ -78,10 +78,19 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
         const weeks: Array<
             Array<{
                 date: string;
+                day: number;
                 isToday: boolean;
+                isFuture: boolean;
+                isMonthStart: boolean;
+                monthShort: string;
                 count: number;
             }>
         > = [];
+
+        const MONTH_SHORT = [
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        ];
 
         for (let w = 0; w < 4; w++) {
             const weekStart = new Date(startMonday);
@@ -90,7 +99,11 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
             );
             const week: Array<{
                 date: string;
+                day: number;
                 isToday: boolean;
+                isFuture: boolean;
+                isMonthStart: boolean;
+                monthShort: string;
                 count: number;
             }> = [];
             for (let i = 0; i < 7; i++) {
@@ -111,7 +124,11 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                 const isFuture = d > today;
                 week.push({
                     date: dateStr,
+                    day: d.getDate(),
                     isToday: dateStr === todayStr,
+                    isFuture,
+                    isMonthStart: d.getDate() === 1,
+                    monthShort: MONTH_SHORT[d.getMonth()],
                     count: isFuture
                         ? 0
                         : attendanceSet.get(
@@ -191,57 +208,104 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
             </div>
 
             {/* 4주 히트맵 */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2 pt-2">
                 {weeks.map((week, wi) => (
                     <div
                         key={wi}
                         className="flex justify-around"
                     >
-                        {week.map((day, di) => (
-                            <motion.div
-                                key={day.date}
-                                initial={{
-                                    scale: 0,
-                                    opacity: 0,
-                                }}
-                                animate={{
-                                    scale: 1,
-                                    opacity: 1,
-                                }}
-                                transition={{
-                                    delay:
-                                        wi * 0.05 +
-                                        di * 0.03,
-                                    type: 'spring',
-                                    stiffness: 400,
-                                    damping: 20,
-                                }}
-                                className={`flex h-10 w-10 items-center
-                                    justify-center rounded-rh-md
-                                    text-xs font-medium
-                                    transition-colors
-                                    ${
-                                        day.isToday
-                                            ? 'bg-rh-accent text-white'
-                                            : day.count > 0
-                                              ? 'text-rh-text-secondary'
-                                              : 'text-rh-text-muted'
-                                    }`}
-                                style={
-                                    !day.isToday &&
-                                    day.count > 0
-                                        ? {
-                                              backgroundColor:
-                                                  '#2F3E50',
-                                          }
-                                        : undefined
-                                }
-                            >
-                                {new Date(
-                                    day.date + 'T00:00:00'
-                                ).getDate()}
-                            </motion.div>
-                        ))}
+                        {week.map((day, di) => {
+                            const attended =
+                                !day.isToday && day.count > 0;
+                            const isDim =
+                                !day.isToday &&
+                                day.count === 0;
+
+                            return (
+                                <motion.div
+                                    key={day.date}
+                                    initial={{
+                                        scale: 0,
+                                        opacity: 0,
+                                    }}
+                                    animate={{
+                                        scale: 1,
+                                        opacity: 1,
+                                    }}
+                                    transition={{
+                                        delay:
+                                            wi * 0.05 +
+                                            di * 0.03,
+                                        type: 'spring',
+                                        stiffness: 400,
+                                        damping: 20,
+                                    }}
+                                    className="relative flex h-10 w-10
+                                        items-center justify-center"
+                                >
+                                    {/* 월 시작 칩 */}
+                                    {day.isMonthStart && (
+                                        <span
+                                            className="absolute -top-3
+                                                left-1/2 -translate-x-1/2
+                                                rounded-full
+                                                bg-rh-bg-muted
+                                                px-1.5 py-0.5
+                                                text-[9px]
+                                                font-semibold
+                                                text-white
+                                                leading-none"
+                                        >
+                                            {day.monthShort}
+                                        </span>
+                                    )}
+
+                                    {/* 참여한 날: 손으로 그린 체크 마크 */}
+                                    {attended && (
+                                        <svg
+                                            viewBox="0 0 40 40"
+                                            className="absolute
+                                                inset-0 h-full w-full
+                                                text-rh-accent"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            <path d="M8 22 Q13 27, 17 30 Q22 22, 33 10" />
+                                        </svg>
+                                    )}
+
+                                    {/* 오늘: 솔리드 원 */}
+                                    {day.isToday && (
+                                        <span
+                                            className="absolute inset-1
+                                                rounded-full
+                                                bg-rh-accent"
+                                        />
+                                    )}
+
+                                    {/* 날짜 숫자 */}
+                                    <span
+                                        className={`relative text-xs
+                                            font-semibold
+                                            ${
+                                                day.isToday
+                                                    ? 'text-white'
+                                                    : attended
+                                                      ? 'text-white'
+                                                      : isDim &&
+                                                          day.isFuture
+                                                        ? 'text-rh-text-muted'
+                                                        : 'text-rh-text-tertiary'
+                                            }`}
+                                    >
+                                        {day.day}
+                                    </span>
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 ))}
             </div>

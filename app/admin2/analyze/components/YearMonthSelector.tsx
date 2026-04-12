@@ -4,13 +4,15 @@ import {
     useRouter,
     usePathname,
 } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
     ChevronLeft,
     ChevronRight,
 } from "lucide-react";
 import StickyCollapseHeader
     from "@/components/atoms/StickyCollapseHeader";
+import AdminModal
+    from "@/app/admin2/components/ui/AdminModal";
 
 const monthOptions = Array.from(
     { length: 12 },
@@ -20,20 +22,52 @@ const monthOptions = Array.from(
 export default function YearMonthSelector({
     year,
     month,
+    onChange,
+    disabled = false,
 }: {
     year: number;
     month: number;
+    /** 선택 시 커스텀 핸들러. 지정되면 URL 라우팅 대신 호출됨 */
+    onChange?: (year: number, month: number) => void;
+    disabled?: boolean;
 }) {
     const router = useRouter();
     const pathname = usePathname();
+    const [pickerOpen, setPickerOpen] =
+        useState(false);
+
+    /* 현재 KST 년도 기준 ±2년 */
+    const years = useMemo(() => {
+        const kstNow = new Date(
+            Date.now() + 9 * 60 * 60 * 1000,
+        );
+        const currentYear =
+            kstNow.getUTCFullYear();
+        return Array.from(
+            { length: 5 },
+            (_, i) => currentYear - 2 + i,
+        );
+    }, []);
+
+    const openPicker = useCallback(() => {
+        setPickerOpen(true);
+    }, []);
+    const closePicker = useCallback(() => {
+        setPickerOpen(false);
+    }, []);
 
     const navigate = useCallback(
         (y: number, m: number) => {
+            if (disabled) return;
+            if (onChange) {
+                onChange(y, m);
+                return;
+            }
             router.push(
                 `${pathname}?year=${y}&month=${m}`,
             );
         },
-        [router, pathname],
+        [router, pathname, onChange, disabled],
     );
 
     const goPrevMonth = useCallback(() => {
@@ -73,15 +107,17 @@ export default function YearMonthSelector({
                         className="w-6 h-6"
                     />
                 </button>
-                <span
+                <button
+                    onClick={openPicker}
                     className={
                         "text-[17px]"
                         + " font-bold"
                         + " text-white"
+                        + " focus:outline-none"
                     }
                 >
                     {year}년 {month}월
-                </span>
+                </button>
                 <button
                     onClick={goNextMonth}
                     className={
@@ -151,14 +187,16 @@ export default function YearMonthSelector({
                     className="w-5 h-5"
                 />
             </button>
-            <span
+            <button
+                onClick={openPicker}
                 className={
                     "text-[15px]"
                     + " font-bold text-white"
+                    + " focus:outline-none"
                 }
             >
                 {year}년 {month}월
-            </span>
+            </button>
             <button
                 onClick={goNextMonth}
                 className={
@@ -174,9 +212,112 @@ export default function YearMonthSelector({
     );
 
     return (
-        <StickyCollapseHeader
-            expanded={expandedUI}
-            collapsed={collapsedUI}
-        />
+        <>
+            <StickyCollapseHeader
+                expanded={expandedUI}
+                collapsed={collapsedUI}
+            />
+            <AdminModal
+                open={pickerOpen}
+                onClose={closePicker}
+                // title="년월 선택"
+            >
+                <div className="flex flex-col gap-5">
+                    {/* 년도 선택 */}
+                    <div>
+                        <h4
+                            className={
+                                "text-[13px]"
+                                + " font-medium"
+                                + " text-rh-text-secondary"
+                                + " mb-3"
+                            }
+                        >
+                            년도
+                        </h4>
+                        <div
+                            className={
+                                "grid grid-cols-5"
+                                + " gap-2"
+                            }
+                        >
+                            {years.map((y) => (
+                                <button
+                                    key={y}
+                                    onClick={() => {
+                                        navigate(
+                                            y,
+                                            month,
+                                        );
+                                        closePicker();
+                                    }}
+                                    className={
+                                        "h-9"
+                                        + " rounded-lg"
+                                        + " text-[13px]"
+                                        + " font-medium"
+                                        + " transition-colors"
+                                        + (y === year
+                                            ? " bg-rh-accent"
+                                              + " text-white"
+                                            : " bg-rh-bg-muted/40"
+                                              + " text-rh-text-secondary")
+                                    }
+                                >
+                                    {y}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 월 선택 */}
+                    <div>
+                        <h4
+                            className={
+                                "text-[13px]"
+                                + " font-medium"
+                                + " text-rh-text-secondary"
+                                + " mb-3"
+                            }
+                        >
+                            월
+                        </h4>
+                        <div
+                            className={
+                                "grid grid-cols-4"
+                                + " gap-2"
+                            }
+                        >
+                            {monthOptions.map((m) => (
+                                <button
+                                    key={m}
+                                    onClick={() => {
+                                        navigate(
+                                            year,
+                                            m,
+                                        );
+                                        closePicker();
+                                    }}
+                                    className={
+                                        "h-10"
+                                        + " rounded-lg"
+                                        + " text-[14px]"
+                                        + " font-medium"
+                                        + " transition-colors"
+                                        + (m === month
+                                            ? " bg-rh-accent"
+                                              + " text-white"
+                                            : " bg-rh-bg-muted/40"
+                                              + " text-rh-text-secondary")
+                                    }
+                                >
+                                    {m}월
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </AdminModal>
+        </>
     );
 }

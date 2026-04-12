@@ -7,10 +7,9 @@ import {
     useCallback,
     useMemo,
 } from "react";
+import { ChevronDown, Plus } from "lucide-react";
 import {
     AdminSearchBar,
-    AdminBadge,
-    AdminSmallButton,
     AdminDivider,
     AdminAlertDialog,
 } from "@/app/admin2/components/ui";
@@ -76,36 +75,6 @@ function getInitial(m: CrewMember): string {
     return name.charAt(0);
 }
 
-// 역할 라벨
-function getRoleLabel(
-    role: CrewMember["crew_role"]
-): string {
-    switch (role) {
-        case "OWNER":
-            return "크루장";
-        case "CREW_MANAGER":
-            return "운영진";
-        case "MEMBER":
-            return "멤버";
-        default:
-            return "멤버";
-    }
-}
-
-// 역할 설명
-function getRoleDescription(
-    role: CrewMember["crew_role"]
-): string {
-    switch (role) {
-        case "OWNER":
-            return "크루장 · 전체 권한";
-        case "CREW_MANAGER":
-            return "운영진 · 출석/회원 관리";
-        default:
-            return "";
-    }
-}
-
 const MembersTab = memo(function MembersTab({
     crewId,
 }: MembersTabProps) {
@@ -119,6 +88,10 @@ const MembersTab = memo(function MembersTab({
     const [actionType, setActionType] = useState<
         "promote" | "demote" | null
     >(null);
+    const [adminsOpen, setAdminsOpen] =
+        useState(true);
+    const [membersOpen, setMembersOpen] =
+        useState(true);
 
     // 멤버 목록 조회
     const fetchMembers = useCallback(async () => {
@@ -243,30 +216,52 @@ const MembersTab = memo(function MembersTab({
         <div className="space-y-4">
             {/* 운영진 섹션 */}
             <div className="space-y-3">
-                <div
+                <button
+                    type="button"
+                    onClick={() => {
+                        haptic.light();
+                        setAdminsOpen((v) => !v);
+                    }}
                     className={
                         "flex items-center"
-                        + " justify-between"
+                        + " justify-between w-full"
                     }
                 >
-                    <h3
+                    <div
                         className={
-                            "text-sm font-semibold"
-                            + " text-white"
+                            "flex items-baseline gap-2"
                         }
                     >
-                        운영진
-                    </h3>
-                    <span
+                        <h3
+                            className={
+                                "text-sm font-semibold"
+                                + " text-white"
+                            }
+                        >
+                            운영진
+                        </h3>
+                        <span
+                            className={
+                                "text-xs"
+                                + " text-rh-text-secondary"
+                            }
+                        >
+                            {admins.length}명
+                        </span>
+                    </div>
+                    <ChevronDown
                         className={
-                            "text-xs"
+                            "w-4 h-4"
                             + " text-rh-text-secondary"
+                            + " transition-transform"
+                            + (adminsOpen
+                                ? ""
+                                : " -rotate-90")
                         }
-                    >
-                        {admins.length}명
-                    </span>
-                </div>
+                    />
+                </button>
 
+                {adminsOpen && (
                 <AnimatedList
                     className="space-y-2"
                 >
@@ -329,89 +324,76 @@ const MembersTab = memo(function MembersTab({
                                             m
                                         )}
                                     </div>
-                                    <div>
-                                        <div
-                                            className={
-                                                "flex"
-                                                + " items-center"
-                                                + " gap-2"
-                                            }
-                                        >
-                                            <span
-                                                className={
-                                                    "text-sm"
-                                                    + " font-semibold"
-                                                    + " text-white"
-                                                }
-                                            >
-                                                {getDisplayName(
-                                                    m
-                                                )}
-                                            </span>
-                                            {m.crew_role ===
-                                            "OWNER" ? (
-                                                <AdminBadge
-                                                    variant="accent"
-                                                >
-                                                    {getRoleLabel(
-                                                        m.crew_role
-                                                    )}
-                                                </AdminBadge>
-                                            ) : (
-                                                <AdminBadge
-                                                    variant="outline"
-                                                >
-                                                    {getRoleLabel(
-                                                        m.crew_role
-                                                    )}
-                                                </AdminBadge>
-                                            )}
-                                        </div>
-                                        <span
-                                            className={
-                                                "text-xs"
-                                                + " text-rh-text-secondary"
-                                            }
-                                        >
-                                            {getRoleDescription(
-                                                m.crew_role
-                                            )}
-                                        </span>
-                                    </div>
+                                    <span
+                                        className={
+                                            "text-sm"
+                                            + " font-semibold"
+                                            + " text-white"
+                                        }
+                                    >
+                                        {getDisplayName(
+                                            m
+                                        )}
+                                    </span>
                                 </div>
                             </div>
                         </AnimatedItem>
                     ))}
                 </AnimatedList>
+                )}
             </div>
 
             <AdminDivider />
 
             {/* 멤버 섹션 */}
             <div className="space-y-3">
-                <div
+                <button
+                    type="button"
+                    onClick={() => {
+                        haptic.light();
+                        setMembersOpen((v) => !v);
+                    }}
                     className={
                         "flex items-center"
-                        + " justify-between"
+                        + " justify-between w-full"
                     }
                 >
-                    <h3
+                    <div
                         className={
-                            "text-sm font-semibold"
-                            + " text-white"
+                            "flex items-baseline gap-2"
                         }
                     >
-                        멤버
-                    </h3>
-                    <span
+                        <h3
+                            className={
+                                "text-sm font-semibold"
+                                + " text-white"
+                            }
+                        >
+                            멤버
+                        </h3>
+                        <span
+                            className={
+                                "text-xs"
+                                + " text-rh-text-secondary"
+                            }
+                        >
+                            {regularMembers.length}명
+                        </span>
+                    </div>
+                    <ChevronDown
                         className={
-                            "text-xs"
+                            "w-4 h-4"
                             + " text-rh-text-secondary"
+                            + " transition-transform"
+                            + (membersOpen
+                                ? ""
+                                : " -rotate-90")
                         }
-                    >
-                        {regularMembers.length}명
-                    </span>
-                </div>
+                    />
+                </button>
+
+                {membersOpen && (
+                <>
                 <p
                     className={
                         "text-xs"
@@ -474,32 +456,20 @@ const MembersTab = memo(function MembersTab({
                                             m
                                         )}
                                     </div>
-                                    <div
+                                    <span
                                         className={
-                                            "flex"
-                                            + " items-center"
-                                            + " gap-2"
+                                            "text-sm"
+                                            + " font-semibold"
+                                            + " text-white"
                                         }
                                     >
-                                        <span
-                                            className={
-                                                "text-sm"
-                                                + " font-semibold"
-                                                + " text-white"
-                                            }
-                                        >
-                                            {getDisplayName(
-                                                m
-                                            )}
-                                        </span>
-                                        <AdminBadge
-                                            variant="muted"
-                                        >
-                                            멤버
-                                        </AdminBadge>
-                                    </div>
+                                        {getDisplayName(
+                                            m
+                                        )}
+                                    </span>
                                 </div>
-                                <AdminSmallButton
+                                <button
+                                    type="button"
                                     onClick={() => {
                                         haptic.light();
                                         setActionTarget(
@@ -509,9 +479,23 @@ const MembersTab = memo(function MembersTab({
                                             "promote"
                                         );
                                     }}
+                                    aria-label="운영진으로 등록"
+                                    className={
+                                        "w-8 h-8"
+                                        + " rounded-full"
+                                        + " flex"
+                                        + " items-center"
+                                        + " justify-center"
+                                        + " bg-rh-accent"
+                                        + " text-white"
+                                        + " active:opacity-80"
+                                        + " transition-opacity"
+                                    }
                                 >
-                                    권한 부여
-                                </AdminSmallButton>
+                                    <Plus
+                                        className="w-4 h-4"
+                                    />
+                                </button>
                             </div>
                         </AnimatedItem>
                     ))}
@@ -530,6 +514,8 @@ const MembersTab = memo(function MembersTab({
                         </p>
                     )}
                 </AnimatedList>
+                </>
+                )}
             </div>
 
             {/* 권한 변경 확인 다이얼로그 */}

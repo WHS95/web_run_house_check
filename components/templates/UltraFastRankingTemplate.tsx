@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trophy, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHeader from '@/components/organisms/common/PageHeader';
-import MonthNavigator from '@/components/molecules/MonthNavigator';
+import YearMonthSelector from '@/app/admin2/analyze/components/YearMonthSelector';
 import RankingTabs, { TabItem } from '@/components/organisms/ranking/RankingTabs';
 import RankingListItem from '@/components/organisms/ranking/RankingListItem';
 import type { NotificationType } from '@/components/molecules/common/PopupNotification';
@@ -91,35 +91,11 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
     });
   }, [router]);
 
-  const handlePrevMonth = useCallback(async () => {
+  const handleMonthChange = useCallback(async (newYear: number, newMonth: number) => {
     if (isDataLoading) return;
+    if (newYear === currentData.selectedYear && newMonth === currentData.selectedMonth) return;
     haptic.light();
     setIsDataLoading(true);
-
-    let newYear = currentData.selectedYear;
-    let newMonth = currentData.selectedMonth - 1;
-    if (newMonth < 1) { newMonth = 12; newYear -= 1; }
-
-    try {
-      await loadMonthData(newYear, newMonth);
-    } catch {
-      haptic.error();
-      setNotificationType("error");
-      setNotificationMessage("데이터를 불러오지 못했습니다");
-      setShowNotification(true);
-    } finally {
-      setIsDataLoading(false);
-    }
-  }, [isDataLoading, currentData.selectedYear, currentData.selectedMonth, loadMonthData]);
-
-  const handleNextMonth = useCallback(async () => {
-    if (isDataLoading) return;
-    haptic.light();
-    setIsDataLoading(true);
-
-    let newYear = currentData.selectedYear;
-    let newMonth = currentData.selectedMonth + 1;
-    if (newMonth > 12) { newMonth = 1; newYear += 1; }
 
     try {
       await loadMonthData(newYear, newMonth);
@@ -143,71 +119,75 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
     [activeTab, currentData.attendanceRanking, currentData.hostingRanking]
   );
 
-  const currentUserRank = useMemo(() =>
-    currentRankingData.find((item) => item.is_current_user),
+  // 실제 데이터 존재 여부: 값이 0보다 큰 항목이 하나라도 있어야 데이터가 있다고 판단
+  const hasRealData = useMemo(() =>
+    currentRankingData.some((item) => item.value > 0),
     [currentRankingData]
   );
 
-  // 현재 유저의 출석/개설 정보를 항상 가져옴
-  const currentUserAttendance = useMemo(() =>
-    currentData.attendanceRanking.find(
-        (item) => item.is_current_user
-    ),
-    [currentData.attendanceRanking]
+  const visibleRankingData = useMemo(() =>
+    hasRealData ? currentRankingData.filter((item) => item.value > 0) : [],
+    [hasRealData, currentRankingData]
   );
 
-  const currentUserHosting = useMemo(() =>
-    currentData.hostingRanking.find(
-        (item) => item.is_current_user
-    ),
-    [currentData.hostingRanking]
+  const currentUserRank = useMemo(() =>
+    hasRealData ? visibleRankingData.find((item) => item.is_current_user) : undefined,
+    [hasRealData, visibleRankingData]
   );
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  // 현재 유저의 출석/개설 정보 (값이 0인 경우 undefined 처리)
+  const currentUserAttendance = useMemo(() => {
+    const item = currentData.attendanceRanking.find((i) => i.is_current_user);
+    return item && item.value > 0 ? item : undefined;
+  }, [currentData.attendanceRanking]);
+
+  const currentUserHosting = useMemo(() => {
+    const item = currentData.hostingRanking.find((i) => i.is_current_user);
+    return item && item.value > 0 ? item : undefined;
+  }, [currentData.hostingRanking]);
+
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  const handleScroll = useCallback(() => {
-    if (scrollRef.current) {
-      setShowScrollTop(scrollRef.current.scrollTop > 200);
-    }
+  // .main-content(루트 레이아웃 스크롤 영역) 스크롤 감지
+  React.useEffect(() => {
+    const el = document.querySelector('.main-content');
+    if (!el) return;
+    const onScroll = () => {
+      setShowScrollTop((el as HTMLElement).scrollTop > 200);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
   }, []);
 
   const scrollToTop = useCallback(() => {
     haptic.light();
-    scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    const el = document.querySelector('.main-content') as HTMLElement | null;
+    el?.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   return (
-    <div className="relative flex flex-col h-screen bg-rh-bg-primary text-white">
-      <div className="shrink-0 bg-rh-bg-primary pt-safe">
-        <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-primary" />
-      </div>
+    <div className="relative flex flex-col min-h-screen bg-rh-bg-primary text-white">
+      <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-surface" />
 
-      {/* Sticky 영역: 스크롤 밖 */}
-      <div className="shrink-0 sticky top-0 z-10 bg-rh-bg-primary/80 backdrop-blur-xl px-4 pt-4 pb-3 space-y-3 relative">
-        <MonthNavigator
-          year={currentData.selectedYear}
-          month={currentData.selectedMonth}
-          onPrev={handlePrevMonth}
-          onNext={handleNextMonth}
-          disabled={isDataLoading}
-        />
+      {/* 년월 선택 (admin2/analyze와 동일 컴포넌트 — 스크롤 시 자동 축소) */}
+      <YearMonthSelector
+        year={currentData.selectedYear}
+        month={currentData.selectedMonth}
+        onChange={handleMonthChange}
+        disabled={isDataLoading}
+      />
+
+      {/* 랭킹 탭 */}
+      <div className="px-4 pb-3">
         <RankingTabs
           tabs={tabs}
           activeTabId={activeTab}
           onTabChange={handleTabChange}
         />
-        {/* 하단 그라데이션 섀도우 */}
-        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-b from-rh-bg-primary/40 to-transparent pointer-events-none translate-y-full" />
       </div>
 
-      {/* 스크롤 영역: 리스트만 */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-4 pt-2 scroll-area-bottom space-y-2"
-      >
-        {/* 월 변경 로딩 시 opacity로 표시, 스켈레톤 미사용 */}
+      {/* 리스트 */}
+      <div className="flex-1 px-4 space-y-2">
         <div className={isDataLoading
           ? "opacity-50 pointer-events-none transition-opacity"
           : "transition-opacity"
@@ -230,16 +210,16 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
                   </span>
                 </div>
                 <p className="text-xs text-rh-text-tertiary">
-                  출석 {currentUserAttendance?.value ?? 0}회 · 개설 {currentUserHosting?.value ?? 0}회 · 총 {currentRankingData.length}명 중
+                  출석 {currentUserAttendance?.value ?? 0}회 · 개설 {currentUserHosting?.value ?? 0}회 · 총 {visibleRankingData.length}명 중
                 </p>
               </div>
               <Trophy className="w-[18px] h-[18px] text-rh-accent" />
             </div>
           )}
 
-          {currentRankingData.length > 0 ? (
+          {visibleRankingData.length > 0 ? (
             <div className="space-y-2">
-              {currentRankingData.map((item) => (
+              {visibleRankingData.map((item) => (
                 <RankingListItem
                   key={item.user_id}
                   rank={item.rank}
@@ -266,22 +246,24 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
         </div>
       </div>
 
-      {/* Scroll to Top FAB */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.2 }}
-            onClick={scrollToTop}
-            className="absolute right-4 bottom-4 z-20 w-10 h-10 rounded-full bg-rh-bg-surface/90 backdrop-blur-sm border border-rh-border shadow-lg flex items-center justify-center active:scale-90 transition-transform"
-            aria-label="맨 위로"
-          >
-            <ChevronUp className="w-5 h-5 text-rh-text-secondary" />
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {/* Scroll to Top FAB — sticky 패턴 (fixed 금지) */}
+      <div className="sticky bottom-4 z-20 flex justify-end px-4 pointer-events-none h-0">
+        <AnimatePresence>
+          {showScrollTop && (
+            <motion.button
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.2 }}
+              onClick={scrollToTop}
+              className="pointer-events-auto -translate-y-full w-10 h-10 rounded-full bg-rh-bg-surface/90 backdrop-blur-sm border border-rh-border shadow-lg flex items-center justify-center active:scale-90 transition-transform"
+              aria-label="맨 위로"
+            >
+              <ChevronUp className="w-5 h-5 text-rh-text-secondary" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
 
       {notificationType && (
         <React.Suspense fallback={null}>

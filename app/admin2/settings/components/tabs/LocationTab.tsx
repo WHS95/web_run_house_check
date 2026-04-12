@@ -19,7 +19,7 @@ import {
 import {
     CrewLocation,
 } from "@/lib/validators/crewLocationSchema";
-import { MapPin, ChevronRight } from "lucide-react";
+import { MapPin, ChevronRight, X } from "lucide-react";
 import { haptic } from "@/lib/haptic";
 import {
     AnimatedList,
@@ -479,9 +479,22 @@ const LocationTab = memo(function LocationTab({
 
                 {/* 폼 카드 */}
                 <div className="rounded-xl bg-rh-bg-surface p-3 space-y-3">
-                    <h3 className="text-[15px] font-semibold text-white">
-                        활동 장소 정보 입력
-                    </h3>
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-[15px] font-semibold text-white">
+                            활동 장소 정보 입력
+                        </h3>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                haptic.light();
+                                resetForm();
+                            }}
+                            aria-label="닫기"
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-rh-bg-primary text-rh-text-secondary hover:text-white"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
 
                     {/* 내부 카드 */}
                     <div className="rounded-xl bg-rh-bg-primary p-3 space-y-2.5">

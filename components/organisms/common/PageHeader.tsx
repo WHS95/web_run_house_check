@@ -26,22 +26,29 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       }`}
     >
       {/* 타이틀 (좌측) */}
-      <div className='flex-1 pl-4 pr-2'>
+      <div className='flex-1 pr-2 pl-4'>
         <h1 className='text-[18px] font-semibold text-white truncate'>{title}</h1>
       </div>
 
       {/* 우측 액션 */}
-      {rightAction && <div className='px-3'>{rightAction}</div>}
+      {rightAction && (
+        <div className='rounded-md border border-white'>
+          {rightAction}
+        </div>
+      )}
+ 
+ 
+ 
 
-      {/* 뒤로가기 버튼 (우측 끝) */}
+      {/* 뒤로가기 버튼 (우측 끝)
       {backLink && (
         <Link
           href={backLink}
-          className='flex items-center pl-1 pr-2 h-full text-rh-accent active:opacity-70 transition-opacity'
+          className='flex items-center pr-2 pl-1 h-full transition-opacity text-rh-accent active:opacity-70'
         >
           <ChevronLeft size={24} />
         </Link>
-      )}
+      )} */}
     </header>
   );
 };

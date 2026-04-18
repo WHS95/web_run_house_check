@@ -203,7 +203,7 @@ const NavItem = React.memo<NavItemProps>(
         return (
             <button
                 onClick={handleClick}
-                className="flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 transition-transform duration-100 active:scale-90"
+                className="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] flex-1 py-2 px-3 transition-transform duration-100 active:scale-90"
             >
                 <div className="flex flex-col items-center gap-1">
                     <NavigationIcon

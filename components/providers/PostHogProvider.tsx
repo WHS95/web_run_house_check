@@ -34,7 +34,8 @@ export default function PostHogProvider({
             api_host:
                 process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "/ingest",
             ui_host: "https://us.posthog.com",
-            capture_pageview: false,
+            defaults: "2026-01-30",
+            capture_pageview: false, // App Router는 직접 캡처
             capture_pageleave: true,
             person_profiles: "identified_only",
             loaded: (ph) => {

@@ -65,6 +65,25 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
 
+  // PostHog 역프록시: 광고 차단 회피용 (/ingest → us.i.posthog.com)
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://us-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://us.i.posthog.com/:path*",
+      },
+      {
+        source: "/ingest/decide",
+        destination: "https://us.i.posthog.com/decide",
+      },
+    ];
+  },
+
   images: {
     domains: [],
     // 이미지 최적화 설정

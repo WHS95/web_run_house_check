@@ -193,8 +193,8 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
           ? "opacity-50 pointer-events-none transition-opacity"
           : "transition-opacity"
         }>
-          {/* 내 순위 카드 */}
-          {currentUserRank && (
+          {/* 내 순위 카드 — top 3 이내면 리스트 상단에 이미 하이라이트되므로 중복 숨김 */}
+          {currentUserRank && currentUserRank.rank > 3 && (
             <div className="flex items-center gap-3 px-4 h-14 rounded-xl bg-rh-accent/[0.1] border border-rh-accent/30 mb-2">
               <div className="w-8 h-8 rounded-lg bg-rh-accent/20 flex items-center justify-center">
                 <span className="font-bold text-base text-rh-accent">

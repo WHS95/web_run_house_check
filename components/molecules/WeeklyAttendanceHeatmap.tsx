@@ -14,7 +14,7 @@ interface WeeklyAttendanceHeatmapProps {
     className?: string;
 }
 
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 
 /**
  * 최근 4주간 출석 히트맵 (Mon-Sun × 4 rows)
@@ -88,8 +88,8 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
         > = [];
 
         const MONTH_SHORT = [
-            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+            '1월', '2월', '3월', '4월', '5월', '6월',
+            '7월', '8월', '9월', '10월', '11월', '12월',
         ];
 
         for (let w = 0; w < 4; w++) {
@@ -152,7 +152,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                     {DAY_LABELS.map((day) => (
                         <span
                             key={day}
-                            className="w-10 text-center text-[11px]
+                            className="w-10 text-center text-xs
                                 font-medium text-rh-text-tertiary"
                         >
                             {day}
@@ -189,7 +189,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                 <span className="text-[13px] font-semibold text-white">
                     {monthLabel}
                 </span>
-                <span className="text-[11px] text-rh-text-tertiary">
+                <span className="text-xs text-rh-text-tertiary">
                     최근 4주
                 </span>
             </div>
@@ -251,7 +251,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                                                 rounded-full
                                                 bg-rh-bg-muted
                                                 px-1.5 py-0.5
-                                                text-[9px]
+                                                text-[10px]
                                                 font-semibold
                                                 text-white
                                                 leading-none"

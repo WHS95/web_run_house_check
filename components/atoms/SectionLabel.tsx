@@ -10,7 +10,7 @@ const SectionLabel: React.FC<SectionLabelProps> = ({
     className = "",
 }) => (
     <h3
-        className={`text-rh-label font-semibold text-rh-text-tertiary tracking-widest uppercase ${className}`}
+        className={`text-rh-caption font-semibold text-rh-text-tertiary tracking-widest uppercase ${className}`}
     >
         {children}
     </h3>

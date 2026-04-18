@@ -7,7 +7,7 @@ let client: PostHog | null = null;
 /**
  * 서버(라우트 핸들러·서버 액션·서버 컴포넌트)에서 PostHog 이벤트를
  * 기록할 때 사용. 환경변수가 비어있으면 null을 돌려주어 안전하게 no-op.
- * 요청 종료 직전 `await flush()`를 호출해 이벤트를 전송할 것.
+ * 요청 종료 직전 `await flushPostHog()`를 호출해 이벤트를 전송할 것.
  */
 export function getPostHogServer(): PostHog | null {
     const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
+import { getPostHogServer, flushPostHog } from "@/lib/posthog/server";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +65,20 @@ export async function PATCH(request: NextRequest) {
                 { error: "등급 변경 로그 기록에 실패했습니다." },
                 { status: 500 }
             );
+        }
+
+        const posthog = getPostHogServer();
+        if (posthog) {
+            posthog.capture({
+                distinctId: guard.userId,
+                event: "server_grade_assigned",
+                properties: {
+                    crew_id: crewId,
+                    target_user_id: userId,
+                    grade_id: gradeId,
+                },
+            });
+            await flushPostHog();
         }
 
         return NextResponse.json({

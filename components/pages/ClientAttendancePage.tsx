@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import PopupNotification, {
   NotificationType,
@@ -218,6 +219,12 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           isHost: submissionData.isHost,
           attendanceTimestamp: submissionData.attendanceTimestamp,
         });
+        posthog.capture("attendance_queued_offline", {
+          crew_id: submissionData.crewId,
+          location_id: submissionData.locationId,
+          exercise_type_id: submissionData.exerciseTypeId,
+          is_host: submissionData.isHost,
+        });
         haptic.success();
         setNotificationType("success");
         setNotificationMessage("오프라인 출석이 저장되었습니다. 연결 시 자동 전송됩니다.");
@@ -228,17 +235,31 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
       const response = await fetch("/api/attendance", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-POSTHOG-DISTINCT-ID": posthog.get_distinct_id() ?? "",
+          "X-POSTHOG-SESSION-ID": posthog.get_session_id() ?? "",
+        },
         body: JSON.stringify(submissionData),
       });
 
       const result = await response.json();
 
       if (response.ok && result.success) {
+        posthog.capture("attendance_submitted", {
+          crew_id: submissionData.crewId,
+          location_id: submissionData.locationId,
+          exercise_type_id: submissionData.exerciseTypeId,
+          is_host: submissionData.isHost,
+        });
         haptic.success();
         setNotificationType("success");
         setNotificationMessage("출석이 완료되었습니다!");
       } else {
+        posthog.captureException(
+          new Error(result.message || "attendance_failed"),
+          { properties: { status: response.status } }
+        );
         haptic.error();
         setNotificationType("error");
         setNotificationMessage(
@@ -246,6 +267,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         );
       }
     } catch (error) {
+      posthog.captureException(error);
       haptic.error();
       setNotificationType("error");
       setNotificationMessage("네트워크 오류가 발생했습니다.");

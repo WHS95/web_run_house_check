@@ -173,12 +173,11 @@ const nextConfig = {
 const { withSentryConfig } = require("@sentry/nextjs");
 
 module.exports = withSentryConfig(nextConfig, {
-  // Sentry 프로젝트 식별자 (wizard 실행 시 자동 채워짐)
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
+  // Sentry 프로젝트 식별자 — env 기반 (SENTRY_ORG / SENTRY_PROJECT)
+  org: process.env.SENTRY_ORG ?? "runhouse",
+  project: process.env.SENTRY_PROJECT ?? "runhouse",
 
-  // 소스맵 업로드용 토큰 — CI / Vercel 환경변수에 설정할 것
-  // (미설정 시 빌드는 통과하되 소스맵 업로드만 스킵)
+  // 소스맵 업로드용 토큰 — CI / Vercel 환경변수에 설정
   authToken: process.env.SENTRY_AUTH_TOKEN,
 
   // CI 외 로그 억제
@@ -196,5 +195,15 @@ module.exports = withSentryConfig(nextConfig, {
       !process.env.SENTRY_AUTH_TOKEN ||
       !process.env.SENTRY_ORG ||
       !process.env.SENTRY_PROJECT,
+  },
+
+  webpack: {
+    // Vercel Cron 자동 계측
+    automaticVercelMonitors: true,
+
+    // Sentry 로거 tree-shaking으로 번들 크기 축소
+    treeshake: {
+      removeDebugLogging: true,
+    },
   },
 });

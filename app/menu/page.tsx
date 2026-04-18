@@ -16,35 +16,35 @@ const menuItems = [
         title: "페이스 계산기",
         description: "거리와 시간으로 페이스 계산",
         href: "/calculator/pace",
-        iconBg: "#669FF2",
+        iconBg: "bg-rh-accent",
     },
     {
         icon: Timer,
         title: "완주 시간 예측기",
         description: "기록 기반 완주 시간 예측",
         href: "/calculator/prediction",
-        iconBg: "#8BB5F5",
+        iconBg: "bg-rh-status-success",
     },
     {
         icon: Split,
         title: "스플릿 타임 계산기",
         description: "구간별 스플릿 타임 계산",
         href: "/calculator/split-time",
-        iconBg: "#5580C0",
+        iconBg: "bg-rh-status-warning",
     },
     {
         icon: HeartPulse,
         title: "심박수 존 계산기",
         description: "최대 심박수 기반 존 계산",
         href: "/calculator/heart-rate",
-        iconBg: "#3E6496",
+        iconBg: "bg-rh-status-error",
     },
     {
         icon: CircleDot,
         title: "트랙 페이스 계산기",
         description: "트랙 거리별 페이스 변환",
         href: "/calculator/track-pace",
-        iconBg: "#4C525E",
+        iconBg: "bg-rh-bg-muted",
     },
 ];
 
@@ -68,18 +68,10 @@ export default function MenuPage() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex items-center gap-4 w-full h-[72px] px-4 rounded-xl transition-colors active:opacity-80"
-                                style={{
-                                    backgroundColor:
-                                        "#2B3644",
-                                }}
+                                className="flex items-center gap-4 w-full h-[72px] px-4 rounded-xl bg-rh-bg-surface transition-colors active:opacity-80"
                             >
                                 <div
-                                    className="flex justify-center items-center w-11 h-11 rounded-lg shrink-0"
-                                    style={{
-                                        backgroundColor:
-                                            item.iconBg,
-                                    }}
+                                    className={`flex justify-center items-center w-11 h-11 rounded-lg shrink-0 ${item.iconBg}`}
                                 >
                                     <IconComponent
                                         size={22}
@@ -90,21 +82,13 @@ export default function MenuPage() {
                                     <div className="text-[15px] font-semibold text-white">
                                         {item.title}
                                     </div>
-                                    <div
-                                        className="text-xs mt-0.5"
-                                        style={{
-                                            color: "#64748B",
-                                        }}
-                                    >
+                                    <div className="text-xs mt-0.5 text-rh-text-tertiary">
                                         {item.description}
                                     </div>
                                 </div>
                                 <ChevronRight
                                     size={18}
-                                    className="shrink-0"
-                                    style={{
-                                        color: "#475569",
-                                    }}
+                                    className="shrink-0 text-rh-text-muted"
                                 />
                             </Link>
                         );

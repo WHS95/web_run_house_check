@@ -28,6 +28,8 @@ const nextConfig = {
     },
     // 런타임 최적화
     serverComponentsExternalPackages: ['@supabase/ssr'],
+    // Sentry instrumentation.ts 활성화 (Next 14 요구)
+    instrumentationHook: true,
   },
 
   // 번들 분석 및 최적화
@@ -168,4 +170,31 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+const { withSentryConfig } = require("@sentry/nextjs");
+
+module.exports = withSentryConfig(nextConfig, {
+  // Sentry 프로젝트 식별자 (wizard 실행 시 자동 채워짐)
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // 소스맵 업로드용 토큰 — CI / Vercel 환경변수에 설정할 것
+  // (미설정 시 빌드는 통과하되 소스맵 업로드만 스킵)
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // CI 외 로그 억제
+  silent: !process.env.CI,
+
+  // 서드파티 번들까지 포함해 스택 트레이스 가독성 향상
+  widenClientFileUpload: true,
+
+  // 광고 차단기 회피용 자체 도메인 터널
+  tunnelRoute: "/monitoring",
+
+  // 인증 정보 누락 시 소스맵 업로드 자체를 스킵해 빌드 실패 방지
+  sourcemaps: {
+    disable:
+      !process.env.SENTRY_AUTH_TOKEN ||
+      !process.env.SENTRY_ORG ||
+      !process.env.SENTRY_PROJECT,
+  },
+});

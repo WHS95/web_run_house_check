@@ -14,10 +14,14 @@ export async function middleware(req: NextRequest) {
 
     const { pathname } = req.nextUrl;
 
-    // 공개 라우트, API, 정적 파일 스킵
+    // 공개 라우트, API, 정적 파일, 옵저버빌리티 프록시 스킵
+    // /ingest      → PostHog 리버스 프록시
+    // /monitoring  → Sentry tunnelRoute
     if (
         pathname.startsWith("/api") ||
         pathname.startsWith("/_next") ||
+        pathname.startsWith("/ingest") ||
+        pathname.startsWith("/monitoring") ||
         pathname.includes(".") ||
         PUBLIC_ROUTES.some(
             (route) =>

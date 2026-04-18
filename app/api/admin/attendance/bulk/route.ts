@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidateTag } from "next/cache";
 import { assertAdmin, isGuardFailure } from "@/lib/admin2/api-guard";
+import { getPostHogServer, flushPostHog } from "@/lib/posthog/server";
 
 export async function POST(request: NextRequest) {
   const guard = await assertAdmin("attendance.create");
@@ -161,6 +162,22 @@ export async function POST(request: NextRequest) {
     const createdCount = insertResult?.length || 0;
 
     revalidateTag(`admin:attendance:${guard.crewId}`);
+
+    const posthog = getPostHogServer();
+    if (posthog) {
+        posthog.capture({
+            distinctId: guard.userId,
+            event: "server_admin_bulk_attendance",
+            properties: {
+                crew_id: crewId,
+                member_count: createdCount,
+                location: locationData.name,
+                exercise_type_id: parsedExerciseTypeId,
+                attendance_timestamp: attendanceTimestamp,
+            },
+        });
+        await flushPostHog();
+    }
 
     return NextResponse.json({
       success: true,

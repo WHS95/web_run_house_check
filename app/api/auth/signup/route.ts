@@ -3,6 +3,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies, headers } from "next/headers";
 import { signupSchema } from "@/lib/validators/signupSchema";
 import { rateLimit } from "@/lib/rate-limit";
+import { getPostHogServer, flushPostHog } from "@/lib/posthog/server";
 
 export async function POST(request: Request) {
   // Rate limit 체크
@@ -180,6 +181,27 @@ export async function POST(request: Request) {
         { success: false, message: "회원가입 중 오류가 발생했습니다." },
         { status: 500 }
       );
+    }
+
+    const posthog = getPostHogServer();
+    if (posthog) {
+        posthog.identify({
+            distinctId: user.id,
+            properties: {
+                name: firstName,
+                email: email,
+                crew_id: verifiedCrewId,
+            },
+        });
+        posthog.capture({
+            distinctId: user.id,
+            event: "server_signup_completed",
+            properties: {
+                crew_id: verifiedCrewId,
+                oauth_provider: user.app_metadata?.provider ?? null,
+            },
+        });
+        await flushPostHog();
     }
 
     return NextResponse.json(

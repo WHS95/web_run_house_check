@@ -5,6 +5,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import posthog from "posthog-js";
 import {
     signupSchema,
     type SignupFormData,
@@ -285,6 +286,9 @@ export default function SignupPage() {
                 setCrewCodeVerified(true);
                 setValue("verifiedCrewId", data.crewId, { shouldValidate: true });
                 clearFormErrors("verifiedCrewId");
+                posthog.capture("crew_code_verified", {
+                    crew_id: data.crewId,
+                });
             } else {
                 setFormError("crewCode", {
                     type: "manual",
@@ -329,15 +333,28 @@ export default function SignupPage() {
                 const result = await response.json();
 
                 if (response.ok && result.success) {
+                    posthog.identify(formData.verifiedCrewId, {
+                        crew_id: formData.verifiedCrewId,
+                        name: formData.firstName,
+                        email: formData.email,
+                    });
+                    posthog.capture("signup_completed", {
+                        crew_id: formData.verifiedCrewId,
+                    });
                     setNotificationMessage("회원가입에 성공했습니다.");
                     setNotificationType("success");
                     setIsNotificationVisible(true);
                 } else {
+                    posthog.captureException(
+                        new Error(result.message || "signup_failed"),
+                        { properties: { status: response.status } }
+                    );
                     setNotificationMessage(result.message || "회원가입에 실패했습니다.");
                     setNotificationType("error");
                     setIsNotificationVisible(true);
                 }
             } catch (error) {
+                posthog.captureException(error);
                 setNotificationMessage("회원가입 중 오류가 발생했습니다.");
                 setNotificationType("error");
                 setIsNotificationVisible(true);

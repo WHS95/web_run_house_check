@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { attendanceSubmissionSchema } from "@/lib/validators/attendanceSchema";
 import { sendNotification } from "@/lib/push/send-notification";
+import { getPostHogServer, flushPostHog } from "@/lib/posthog/server";
 
 // 동적 렌더링 강제
 export const dynamic = "force-dynamic";
@@ -193,6 +194,22 @@ export async function POST(request: Request) {
             // 알림 실패가 출석 완료를 막지 않음
         }
     })();
+
+    const posthog = getPostHogServer();
+    if (posthog) {
+        posthog.capture({
+            distinctId: userId,
+            event: "server_attendance_recorded",
+            properties: {
+                crew_id: crewId,
+                location: locationName,
+                exercise_type_id: exerciseTypeId,
+                is_host: isHost,
+                attendance_timestamp: attendanceTimestamp,
+            },
+        });
+        await flushPostHog();
+    }
 
     return NextResponse.json(
       {

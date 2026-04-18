@@ -28,6 +28,8 @@ const nextConfig = {
     },
     // 런타임 최적화
     serverComponentsExternalPackages: ['@supabase/ssr'],
+    // Sentry instrumentation.ts 활성화 (Next 14 요구)
+    instrumentationHook: true,
   },
 
   // 번들 분석 및 최적화
@@ -64,6 +66,25 @@ const nextConfig = {
   // 압축 및 캐싱 최적화
   compress: true,
   poweredByHeader: false,
+
+  // PostHog 역프록시: 광고 차단 회피용 (/ingest → us.i.posthog.com)
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://us-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://us.i.posthog.com/:path*",
+      },
+      {
+        source: "/ingest/decide",
+        destination: "https://us.i.posthog.com/decide",
+      },
+    ];
+  },
 
   images: {
     domains: [],
@@ -149,4 +170,40 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+const { withSentryConfig } = require("@sentry/nextjs");
+
+module.exports = withSentryConfig(nextConfig, {
+  // Sentry 프로젝트 식별자 — env 기반 (SENTRY_ORG / SENTRY_PROJECT)
+  org: process.env.SENTRY_ORG ?? "runhouse",
+  project: process.env.SENTRY_PROJECT ?? "runhouse",
+
+  // 소스맵 업로드용 토큰 — CI / Vercel 환경변수에 설정
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // CI 외 로그 억제
+  silent: !process.env.CI,
+
+  // 서드파티 번들까지 포함해 스택 트레이스 가독성 향상
+  widenClientFileUpload: true,
+
+  // 광고 차단기 회피용 자체 도메인 터널
+  tunnelRoute: "/monitoring",
+
+  // 인증 정보 누락 시 소스맵 업로드 자체를 스킵해 빌드 실패 방지
+  sourcemaps: {
+    disable:
+      !process.env.SENTRY_AUTH_TOKEN ||
+      !process.env.SENTRY_ORG ||
+      !process.env.SENTRY_PROJECT,
+  },
+
+  webpack: {
+    // Vercel Cron 자동 계측
+    automaticVercelMonitors: true,
+
+    // Sentry 로거 tree-shaking으로 번들 크기 축소
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+});

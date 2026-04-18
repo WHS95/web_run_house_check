@@ -38,19 +38,22 @@ export default function PushPermissionBanner({
                             <div className="mt-3 flex gap-2">
                                 <button
                                     onClick={onAllow}
-                                    className="rounded-rh-md bg-rh-accent px-4 py-2 text-rh-caption font-semibold text-white"
+                                    className="rounded-rh-md bg-rh-accent px-5 py-2.5 min-h-[44px] text-rh-caption font-semibold text-white"
                                 >
                                     허용
                                 </button>
                                 <button
                                     onClick={onDismiss}
-                                    className="rounded-rh-md px-4 py-2 text-rh-caption text-rh-text-secondary"
+                                    className="rounded-rh-md px-5 py-2.5 min-h-[44px] text-rh-caption text-rh-text-secondary"
                                 >
                                     나중에
                                 </button>
                             </div>
                         </div>
-                        <button onClick={onDismiss}>
+                        <button
+                            onClick={onDismiss}
+                            className="flex items-center justify-center h-10 w-10 -mr-2 -mt-2"
+                        >
                             <X className="h-4 w-4 text-rh-text-muted" />
                         </button>
                     </div>

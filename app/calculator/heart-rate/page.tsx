@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Info } from "lucide-react";
 import CalculatorLayout from "@/components/calculator/shared/CalculatorLayout";
 import {
@@ -25,7 +25,7 @@ export default function HeartRateCalculatorPage() {
     const [maxHR, setMaxHR] = useState<number | null>(null);
     const [zones, setZones] = useState<HeartRateZone[]>([]);
 
-    const handleCalculate = () => {
+    const handleCalculate = useCallback(() => {
         const ageNum = parseInt(age);
         if (!ageNum || ageNum <= 0 || ageNum > 120) {
             toast({
@@ -36,7 +36,7 @@ export default function HeartRateCalculatorPage() {
         }
         setMaxHR(calculateMaxHeartRate(ageNum));
         setZones(calculateHeartRateZones(ageNum));
-    };
+    }, [age, toast]);
 
     return (
         <CalculatorLayout title="심박수 존 계산기">

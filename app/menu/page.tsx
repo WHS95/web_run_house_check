@@ -1,7 +1,5 @@
-"use client";
-
-import React, { useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import Link from "next/link";
 import {
     Gauge,
     Timer,
@@ -50,19 +48,9 @@ const menuItems = [
     },
 ];
 
+// 서버 컴포넌트로 변환 — JS 번들 제거
+// Link 사용으로 자동 prefetch + 즉시 네비게이션
 export default function MenuPage() {
-    const router = useRouter();
-
-    const handleItemClick = useCallback(
-        (href: string) => {
-            if (typeof window !== "undefined" && window.navigator.vibrate) {
-                window.navigator.vibrate(50);
-            }
-            router.push(href);
-        },
-        [router]
-    );
-
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             <PageHeader
@@ -74,18 +62,24 @@ export default function MenuPage() {
 
             <div className="overflow-y-auto flex-1 px-4 pt-4 pb-4">
                 <div className="flex flex-col gap-4">
-                    {menuItems.map((item, index) => {
+                    {menuItems.map((item) => {
                         const IconComponent = item.icon;
                         return (
-                            <button
-                                key={index}
-                                onClick={() => handleItemClick(item.href)}
+                            <Link
+                                key={item.href}
+                                href={item.href}
                                 className="flex items-center gap-4 w-full h-[72px] px-4 rounded-xl transition-colors active:opacity-80"
-                                style={{ backgroundColor: "#2B3644" }}
+                                style={{
+                                    backgroundColor:
+                                        "#2B3644",
+                                }}
                             >
                                 <div
                                     className="flex justify-center items-center w-11 h-11 rounded-lg shrink-0"
-                                    style={{ backgroundColor: item.iconBg }}
+                                    style={{
+                                        backgroundColor:
+                                            item.iconBg,
+                                    }}
                                 >
                                     <IconComponent
                                         size={22}
@@ -98,7 +92,9 @@ export default function MenuPage() {
                                     </div>
                                     <div
                                         className="text-xs mt-0.5"
-                                        style={{ color: "#64748B" }}
+                                        style={{
+                                            color: "#64748B",
+                                        }}
                                     >
                                         {item.description}
                                     </div>
@@ -106,9 +102,11 @@ export default function MenuPage() {
                                 <ChevronRight
                                     size={18}
                                     className="shrink-0"
-                                    style={{ color: "#475569" }}
+                                    style={{
+                                        color: "#475569",
+                                    }}
                                 />
-                            </button>
+                            </Link>
                         );
                     })}
                 </div>

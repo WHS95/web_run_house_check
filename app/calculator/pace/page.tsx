@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import CalculatorLayout from "@/components/calculator/shared/CalculatorLayout";
 import TimeInput from "@/components/calculator/shared/TimeInput";
 import ChipSelector from "@/components/calculator/shared/ChipSelector";
@@ -35,12 +35,12 @@ export default function PaceCalculatorPage() {
         speed?: string;
     } | null>(null);
 
-    const handleModeChange = (val: string) => {
+    const handleModeChange = useCallback((val: string) => {
         setMode(val as CalculatorMode);
         setResults(null);
-    };
+    }, []);
 
-    const handleCalculate = () => {
+    const handleCalculate = useCallback(() => {
         const h = parseInt(hours || "0");
         const m = parseInt(minutes || "0");
         const s = parseInt(seconds || "0");
@@ -92,7 +92,7 @@ export default function PaceCalculatorPage() {
                 time: `${rh}:${rm.toString().padStart(2, "0")}:${rs.toString().padStart(2, "0")}`,
             });
         }
-    };
+    }, [mode, distance, hours, minutes, seconds, paceMin, paceSec, toast]);
 
     return (
         <CalculatorLayout title="페이스 계산기">
@@ -143,12 +143,12 @@ export default function PaceCalculatorPage() {
             {mode !== "pace" && (
                 <TimeInput
                     label="목표 페이스 (km당)"
-                    hours={paceMin}
-                    minutes={paceSec}
-                    seconds="0"
-                    onHoursChange={setPaceMin}
-                    onMinutesChange={setPaceSec}
-                    onSecondsChange={() => {}}
+                    hours="0"
+                    minutes={paceMin}
+                    seconds={paceSec}
+                    onHoursChange={() => {}}
+                    onMinutesChange={setPaceMin}
+                    onSecondsChange={setPaceSec}
                     hideHours
                 />
             )}

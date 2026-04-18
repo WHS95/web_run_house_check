@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import CalculatorLayout from "@/components/calculator/shared/CalculatorLayout";
 import TimeInput from "@/components/calculator/shared/TimeInput";
 import ResultTable from "@/components/calculator/shared/ResultTable";
@@ -21,7 +21,7 @@ export default function SplitTimeCalculatorPage() {
         { label: string; value: string; highlight?: boolean }[]
     >([]);
 
-    const handleCalculate = () => {
+    const handleCalculate = useCallback(() => {
         const dist = parseFloat(distance);
         const h = parseInt(hours || "0");
         const m = parseInt(minutes || "0");
@@ -57,7 +57,7 @@ export default function SplitTimeCalculatorPage() {
         });
 
         setRows(resultRows);
-    };
+    }, [distance, hours, minutes, seconds, toast]);
 
     return (
         <CalculatorLayout title="스플릿 타임 계산기">

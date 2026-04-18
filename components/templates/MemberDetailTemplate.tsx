@@ -3,7 +3,7 @@
 import React, { memo, useMemo, useCallback, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Settings, LogOut, ChevronRight } from 'lucide-react';
+import { LogOut, ChevronRight } from 'lucide-react';
 import { createBrowserClient } from '@supabase/ssr';
 import { Switch } from '@/components/ui/switch';
 import { getFCMToken } from '@/lib/firebase/client';
@@ -58,10 +58,10 @@ ErrorState.displayName = 'ErrorState';
 const AdminButton = memo(() => (
     <Link
         href="/admin2"
-        className="flex items-center justify-center w-10 h-10 rounded-rh-md bg-rh-bg-primary hover:bg-rh-bg-muted transition-colors"
-        title="크루관리"
+        className="flex items-center justify-center px-3 h-9 rounded-rh-md bg-rh-bg-primary hover:bg-rh-bg-muted transition-colors"
+        title="관리자 모드"
     >
-        <Settings size={20} className="text-rh-text-secondary" />
+        <span className="text-sm text-rh-text-secondary font-medium">관리자 모드</span>
     </Link>
 ));
 AdminButton.displayName = 'AdminButton';

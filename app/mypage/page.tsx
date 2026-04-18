@@ -1,212 +1,125 @@
-"use client";
-
-import React, { useState, useEffect, useMemo, Suspense } from "react";
-import { useRouter } from "next/navigation";
-import { createBrowserClient } from "@supabase/ssr";
+import React, { Suspense } from "react";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
 
 // 동적 로딩으로 번들 크기 최적화
 const MemberDetailTemplate = dynamic(
-  () => import("@/components/templates/MemberDetailTemplate"),
-  {
-    ssr: true,
-    loading: () => <MyPageSkeleton />,
-  }
+    () => import("@/components/templates/MemberDetailTemplate"),
+    { ssr: true }
 );
 
-// ⚡ 타입 정의
-interface UserProfileForMyPage {
-  firstName: string | null;
-  crewId: string | null;
-  birthYear: number | null;
-  joinDate: string | null;
-  rankName: string | null;
-  email: string | null;
-  phone: string | null;
-  profileImageUrl?: string | null;
-  isAdmin: boolean;
-}
-
-interface Activity {
-  type: "attendance" | "create_meeting";
-  date: string;
-  location: string;
-  exerciseType: string;
-}
-
-interface ActivityData {
-  attendanceCount: number;
-  meetingsCreatedCount: number;
-  activities: Activity[];
-}
-
-// ⚡ 로딩 스켈레톤 컴포넌트
-const MyPageSkeleton = React.memo(() => (
-  <div className='flex flex-col h-screen bg-rh-bg-primary'>
-    <div className='flex-shrink-0 h-20 bg-rh-bg-surface border-b border-rh-border'>
-      <div className='flex justify-center items-center h-full'>
-        <div className='w-20 h-[1.5rem] rounded bg-rh-bg-muted'></div>
-      </div>
-    </div>
-    <div className='flex-1 p-4 space-y-3'>
-      {/* 프로필 영역 */}
-      <div className='flex items-center space-x-2'>
-        <div className='w-[4rem] h-[4rem] rounded-full bg-rh-bg-surface'></div>
-        <div className='flex-1 space-y-1'>
-          <div className='w-[128px] h-[1.5rem] rounded bg-rh-bg-surface'></div>
-          <div className='w-24 h-[1rem] rounded bg-rh-bg-surface'></div>
+// 로딩 스켈레톤 컴포넌트 (animate-pulse 없는 정적 스켈레톤)
+const MyPageSkeleton = () => (
+    <div className='flex flex-col h-screen bg-rh-bg-primary'>
+        <div className='flex-shrink-0 h-20 bg-rh-bg-surface border-b border-rh-border'>
+            <div className='flex justify-center items-center h-full'>
+                <div className='w-20 h-[1.5rem] rounded bg-rh-bg-muted'></div>
+            </div>
         </div>
-      </div>
-
-      {/* 활동 그래프 영역 */}
-      <div className='h-[160px] rounded-lg bg-rh-bg-surface'></div>
-
-      {/* 활동 내역 영역 */}
-      <div className='space-y-1.5'>
-        {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className='h-16 bg-rh-bg-muted rounded-lg'></div>
-        ))}
-      </div>
+        <div className='flex-1 p-4 space-y-3'>
+            <div className='flex items-center space-x-2'>
+                <div className='w-[4rem] h-[4rem] rounded-full bg-rh-bg-surface'></div>
+                <div className='flex-1 space-y-1'>
+                    <div className='w-[128px] h-[1.5rem] rounded bg-rh-bg-surface'></div>
+                    <div className='w-24 h-[1rem] rounded bg-rh-bg-surface'></div>
+                </div>
+            </div>
+            <div className='h-[160px] rounded-lg bg-rh-bg-surface'></div>
+            <div className='space-y-1.5'>
+                {Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className='h-16 bg-rh-bg-muted rounded-lg'></div>
+                ))}
+            </div>
+        </div>
     </div>
-  </div>
-));
-MyPageSkeleton.displayName = "MyPageSkeleton";
+);
 
-// ⚡ 메인 마이페이지 컴포넌트
-export default function MyPage() {
-  const router = useRouter();
+// 서버에서 마이페이지 데이터 사전 로딩
+async function getMyPageData() {
+    try {
+        const supabase = await createClient();
 
-  // ⚡ 상태 관리
-  const [userProfile, setUserProfile] = useState<UserProfileForMyPage | null>(
-    null
-  );
-  const [activityData, setActivityData] = useState<ActivityData>({
-    attendanceCount: 0,
-    meetingsCreatedCount: 0,
-    activities: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  // ⚡ Supabase 클라이언트 (메모화)
-  const supabase = useMemo(
-    () =>
-      createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      ),
-    []
-  );
-
-  // ⚡ 데이터 로딩 - 통합 함수 사용으로 대폭 간소화
-  useEffect(() => {
-    const loadMyPageData = async () => {
-      try {
         // 1. 사용자 인증 확인
         const {
-          data: { user },
-          error: authError,
+            data: { user },
+            error: authError,
         } = await supabase.auth.getUser();
         if (authError || !user) {
-          router.push("/auth/login");
-          return;
+            return { needsAuth: true };
         }
 
-        // 사용자 ID 저장
-        setUserId(user.id);
-
-        // 2. 통합 마이페이지 데이터 조회 (4-5번 통신 → 1번 통신)
+        // 2. 통합 마이페이지 데이터 조회
         const { data: result, error } = await supabase
-          .schema("attendance")
-          .rpc("get_mypage_data_unified", {
-            p_user_id: user.id,
-          });
+            .schema("attendance")
+            .rpc("get_mypage_data_unified", {
+                p_user_id: user.id,
+            });
 
         if (error) {
-          //console.error("마이페이지 데이터 조회 오류:", error);
-          throw new Error(error.message);
+            throw new Error(error.message);
         }
 
         // 3. 결과 처리
         if (!result.success) {
-          if (result.error === "user_not_found") {
-            router.push("/auth/login");
-            return;
-          }
-          if (result.error === "crew_not_verified") {
-            router.push("/auth/verify-crew");
-            return;
-          }
-          throw new Error(result.message || "알 수 없는 오류가 발생했습니다.");
+            if (result.error === "user_not_found") {
+                return { needsAuth: true };
+            }
+            if (result.error === "crew_not_verified") {
+                return { needsCrewVerification: true };
+            }
+            throw new Error(result.message || "알 수 없는 오류가 발생했습니다.");
         }
 
-        // 4. 상태 업데이트
-        const { userProfile: profileData, activityData: activityInfo } =
-          result.data;
-
-        // 날짜 포맷 변환 (YYYY-MM-DD → 한국어 형식)
-        const formattedProfile = {
-          ...profileData,
-          joinDate: profileData.joinDate
-            ? new Date(profileData.joinDate).toLocaleDateString("ko-KR")
-            : null,
+        // 4. 날짜 포맷 변환 (YYYY-MM-DD → 한국어 형식)
+        const { userProfile: profileData, activityData } = result.data;
+        const userProfile = {
+            ...profileData,
+            joinDate: profileData.joinDate
+                ? new Date(profileData.joinDate).toLocaleDateString("ko-KR")
+                : null,
         };
 
-        setUserProfile(formattedProfile);
-        // console.log("1231231", activityInfo);
-        setActivityData(activityInfo);
-      } catch (error) {
-        //console.error("마이페이지 데이터 로딩 오류:", error);
-        setError(
-          error instanceof Error
-            ? error.message
-            : "데이터를 불러오지 못했습니다."
-        );
+        return {
+            userProfile,
+            activityData,
+            userId: user.id,
+        };
+    } catch (error) {
+        console.error("마이페이지 데이터 로딩 오류:", error);
+        return {
+            error:
+                error instanceof Error
+                    ? error.message
+                    : "데이터를 불러오지 못했습니다.",
+        };
+    }
+}
 
-        // 에러 발생 시 기본값 설정
-        setUserProfile({
-          firstName: "사용자",
-          crewId: null,
-          email: null,
-          birthYear: null,
-          joinDate: null,
-          phone: null,
-          rankName: "Beginer",
-          profileImageUrl: null,
-          isAdmin: false,
-        });
-        setActivityData({
-          attendanceCount: 0,
-          meetingsCreatedCount: 0,
-          activities: [],
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+export default async function MyPage() {
+    const data = await getMyPageData();
 
-    loadMyPageData();
-  }, [supabase, router]);
+    // 인증이 필요한 경우
+    if (data.needsAuth) {
+        redirect("/auth/login");
+    }
 
-  // ⚡ 로딩 중일 때 스켈레톤 표시
-  if (isLoading) {
-    return <MyPageSkeleton />;
-  }
+    // 크루 인증이 필요한 경우
+    if (data.needsCrewVerification) {
+        redirect("/auth/verify-crew");
+    }
 
-  // ⚡ 에러 상태 처리
-  if (error) {
-    console.warn("마이페이지 에러:", error);
-    // 에러가 있어도 기본 데이터로 렌더링 (사용자 경험 개선)
-  }
-
-  return (
-    <Suspense fallback={<MyPageSkeleton />}>
-      <MemberDetailTemplate
-        userProfile={userProfile}
-        activityData={activityData}
-        userId={userId || undefined}
-      />
-    </Suspense>
-  );
+    return (
+        <Suspense fallback={<MyPageSkeleton />}>
+            <MemberDetailTemplate
+                userProfile={data.userProfile ?? null}
+                activityData={data.activityData ?? {
+                    attendanceCount: 0,
+                    meetingsCreatedCount: 0,
+                    activities: [],
+                }}
+                userId={data.userId}
+            />
+        </Suspense>
+    );
 }

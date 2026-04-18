@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import CalculatorLayout from "@/components/calculator/shared/CalculatorLayout";
 import TimeInput from "@/components/calculator/shared/TimeInput";
 import ChipSelector from "@/components/calculator/shared/ChipSelector";
@@ -35,7 +35,7 @@ export default function TrackPaceCalculatorPage() {
     const [selectedLane, setSelectedLane] = useState("both");
     const [outputMode, setOutputMode] = useState("single");
 
-    const getPaceInSeconds = (): number => {
+    const getPaceInSeconds = useCallback((): number => {
         if (inputMode === "marathon") {
             const total =
                 parseInt(marathonH) * 3600 +
@@ -44,7 +44,7 @@ export default function TrackPaceCalculatorPage() {
             return total / 42.195;
         }
         return parseInt(paceM) * 60 + parseInt(paceS);
-    };
+    }, [inputMode, marathonH, marathonM, marathonS, paceM, paceS]);
 
     const calcLapTime = (pacePerKm: number, laneDist: number): string => {
         const lapSec = pacePerKm * (laneDist / 1000);
@@ -58,31 +58,37 @@ export default function TrackPaceCalculatorPage() {
         return `${m}:${s.toString().padStart(2, "0")}`;
     };
 
-    const paceInSeconds = getPaceInSeconds();
+    const paceInSeconds = useMemo(
+        () => getPaceInSeconds(),
+        [getPaceInSeconds]
+    );
 
     // 테이블 결과 생성 (±60초, 30초 단위)
-    const tableRows = [];
-    for (let offset = -60; offset <= 60; offset += 30) {
-        const currentPace = paceInSeconds + offset;
-        if (currentPace <= 0) continue;
-        const m = Math.floor(currentPace / 60);
-        const s = Math.floor(currentPace % 60);
-        const paceStr = `${m}:${s.toString().padStart(2, "0")}/km`;
-        const lane1 = calcLapTime(currentPace, LANE_DISTANCES.lane1);
-        const lane2 = calcLapTime(currentPace, LANE_DISTANCES.lane2);
-        const isBase = offset === 0;
+    const tableRows = useMemo(() => {
+        const rows = [];
+        for (let offset = -60; offset <= 60; offset += 30) {
+            const currentPace = paceInSeconds + offset;
+            if (currentPace <= 0) continue;
+            const m = Math.floor(currentPace / 60);
+            const s = Math.floor(currentPace % 60);
+            const paceStr = `${m}:${s.toString().padStart(2, "0")}/km`;
+            const lane1 = calcLapTime(currentPace, LANE_DISTANCES.lane1);
+            const lane2 = calcLapTime(currentPace, LANE_DISTANCES.lane2);
+            const isBase = offset === 0;
 
-        let value = "";
-        if (selectedLane === "lane1") value = lane1;
-        else if (selectedLane === "lane2") value = lane2;
-        else value = `${lane1} / ${lane2}`;
+            let value = "";
+            if (selectedLane === "lane1") value = lane1;
+            else if (selectedLane === "lane2") value = lane2;
+            else value = `${lane1} / ${lane2}`;
 
-        tableRows.push({
-            label: paceStr,
-            value,
-            highlight: isBase,
-        });
-    }
+            rows.push({
+                label: paceStr,
+                value,
+                highlight: isBase,
+            });
+        }
+        return rows;
+    }, [paceInSeconds, selectedLane]);
 
     return (
         <CalculatorLayout title="트랙 페이스 계산기">

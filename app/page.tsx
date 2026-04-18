@@ -56,12 +56,32 @@ async function getInitialHomeData() {
       return { needsAuth: true };
     }
 
-    // 서버에서 홈페이지 데이터 조회
-    const { data: functionResult, error: functionError } = await supabase
-      .schema("attendance")
-      .rpc("get_home_page_data", {
-        p_user_id: user.id,
-      });
+    // 홈페이지 RPC + 사용자 활성 상태를 병렬로 조회 (둘 다 user.id만 필요)
+    const [
+      { data: functionResult, error: functionError },
+      { data: statusData },
+    ] = await Promise.all([
+      supabase
+        .schema("attendance")
+        .rpc("get_home_page_data", {
+          p_user_id: user.id,
+        }),
+      supabase
+        .schema("attendance")
+        .from("users")
+        .select(
+          `
+          status,
+          suspension_reason,
+          user_crews!inner (
+            status,
+            suspension_reason
+          )
+        `
+        )
+        .eq("id", user.id)
+        .single(),
+    ]);
 
     if (functionError) {
       throw functionError;
@@ -83,7 +103,35 @@ async function getInitialHomeData() {
         myAttendanceDays: [],
         activeNotice: null,
         myRanking: null,
+        isDeactivated: false,
+        deactivationMessage: "",
       };
+    }
+
+    // 사용자 활성 상태 확인
+    let isDeactivated = false;
+    let deactivationMessage = "";
+
+    if (statusData) {
+      const uStatus = statusData.status?.toLowerCase();
+      const ucStatus = (
+        statusData.user_crews as Array<{
+          status: string | null;
+          suspension_reason: string | null;
+        }>
+      )?.[0]?.status?.toLowerCase();
+
+      if (
+        uStatus === "suspended" ||
+        uStatus === "inactive" ||
+        ucStatus === "suspended" ||
+        ucStatus === "inactive" ||
+        ucStatus === "withdrawn"
+      ) {
+        isDeactivated = true;
+        deactivationMessage =
+          "비활성화 된 상태입니다. 운영진에게 문의바랍니다.";
+      }
     }
 
     const crewId = functionResult.data?.crewId;
@@ -227,6 +275,8 @@ async function getInitialHomeData() {
       myAttendanceDays,
       activeNotice,
       myRanking,
+      isDeactivated,
+      deactivationMessage,
     };
   } catch (error) {
     // 오류 발생 시 기본 데이터 반환
@@ -240,6 +290,8 @@ async function getInitialHomeData() {
       myAttendanceDays: [],
       activeNotice: null,
       myRanking: null,
+      isDeactivated: false,
+      deactivationMessage: "",
     };
   }
 }
@@ -272,6 +324,12 @@ export default async function HomePage() {
         }
         myRanking={
             initialData.myRanking ?? null
+        }
+        isDeactivated={
+            initialData.isDeactivated ?? false
+        }
+        deactivationMessage={
+            initialData.deactivationMessage ?? ""
         }
       />
     </Suspense>

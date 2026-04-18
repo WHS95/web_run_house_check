@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Info } from "lucide-react";
 import CalculatorLayout from "@/components/calculator/shared/CalculatorLayout";
 import TimeInput from "@/components/calculator/shared/TimeInput";
@@ -31,7 +31,7 @@ export default function PredictionCalculatorPage() {
         { label: string; value: string; highlight?: boolean }[]
     >([]);
 
-    const handleCalculate = () => {
+    const handleCalculate = useCallback(() => {
         const dist = parseFloat(recordedDistance);
         const targetDist = parseFloat(targetDistance);
         const h = parseInt(hours || "0");
@@ -85,7 +85,7 @@ export default function PredictionCalculatorPage() {
         }
 
         setRows(resultRows);
-    };
+    }, [recordedDistance, hours, minutes, seconds, targetDistance, toast]);
 
     return (
         <CalculatorLayout title="완주 시간 예측기">

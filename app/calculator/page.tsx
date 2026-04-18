@@ -1,14 +1,14 @@
-"use client";
-
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import { Gauge, Timer, Split, HeartPulse, CircleDot, ChevronRight } from "lucide-react";
-
-const PageHeader = dynamic(
-    () => import("@/components/organisms/common/PageHeader"),
-    { ssr: true }
-);
+import React from "react";
+import Link from "next/link";
+import {
+    Gauge,
+    Timer,
+    Split,
+    HeartPulse,
+    CircleDot,
+    ChevronRight,
+} from "lucide-react";
+import PageHeader from "@/components/organisms/common/PageHeader";
 
 const calculatorItems = [
     {
@@ -48,58 +48,43 @@ const calculatorItems = [
     },
 ];
 
+// 서버 컴포넌트로 변환 — "use client" 제거, 번들 크기 감소
+// Link 사용으로 자동 prefetch + 즉시 네비게이션
 export default function CalculatorPage() {
-    const router = useRouter();
-
-    useEffect(() => {
-        const calculatorRoutes = [
-            "/calculator/pace",
-            "/calculator/prediction",
-            "/calculator/split-time",
-            "/calculator/heart-rate",
-            "/calculator/track-pace",
-        ];
-        calculatorRoutes.forEach((route, index) => {
-            setTimeout(() => {
-                router.prefetch(route);
-            }, index * 100);
-        });
-    }, [router]);
-
     return (
-        <div className='flex flex-col h-screen bg-rh-bg-primary main-content'>
-            <div className='sticky top-0 z-10 bg-rh-bg-surface'>
+        <div className="flex flex-col h-screen bg-rh-bg-primary main-content">
+            <div className="sticky top-0 z-10 bg-rh-bg-surface">
                 <PageHeader
-                    title='러닝 계산기'
-                    iconColor='white'
-                    borderColor='border-rh-border'
+                    title="러닝 계산기"
+                    iconColor="white"
+                    borderColor="border-rh-border"
                 />
             </div>
 
-            <div className='flex-1 px-4 pt-4 space-y-3'>
-                {calculatorItems.map((item, index) => {
+            <div className="flex-1 px-4 pt-4 space-y-3">
+                {calculatorItems.map((item) => {
                     const IconComponent = item.icon;
                     return (
-                        <button
-                            key={index}
-                            onClick={() => router.push(item.href)}
-                            onMouseEnter={() => router.prefetch(item.href)}
-                            onFocus={() => router.prefetch(item.href)}
-                            className='flex items-center w-full bg-rh-bg-surface rounded-rh-lg px-4 h-[72px] gap-4 transition-colors active:bg-rh-bg-muted'
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className="flex items-center w-full bg-rh-bg-surface rounded-rh-lg px-4 h-[72px] gap-4 transition-colors active:bg-rh-bg-muted"
                         >
-                            <div className={`flex-shrink-0 w-11 h-11 ${item.iconBg} rounded-rh-md flex items-center justify-center`}>
-                                <IconComponent className='w-[22px] h-[22px] text-white' />
+                            <div
+                                className={`flex-shrink-0 w-11 h-11 ${item.iconBg} rounded-rh-md flex items-center justify-center`}
+                            >
+                                <IconComponent className="w-[22px] h-[22px] text-white" />
                             </div>
-                            <div className='flex-1 text-left'>
-                                <div className='text-[15px] font-semibold text-white'>
+                            <div className="flex-1 text-left">
+                                <div className="text-[15px] font-semibold text-white">
                                     {item.title}
                                 </div>
-                                <div className='text-xs text-rh-text-tertiary mt-0.5'>
+                                <div className="text-xs text-rh-text-tertiary mt-0.5">
                                     {item.description}
                                 </div>
                             </div>
-                            <ChevronRight className='w-[18px] h-[18px] text-rh-text-muted flex-shrink-0' />
-                        </button>
+                            <ChevronRight className="w-[18px] h-[18px] text-rh-text-muted flex-shrink-0" />
+                        </Link>
                     );
                 })}
             </div>

@@ -404,11 +404,13 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         <div className='space-y-5'>
           {/* 날짜 */}
           <div>
-            <label className='block mb-1.5 text-xs font-medium text-rh-text-secondary'>
+            <label htmlFor='attendance-date' className='block mb-1.5 text-xs font-medium text-rh-text-secondary'>
               날짜
             </label>
             <div className='relative'>
               <input
+                id='attendance-date'
+                name='attendance-date'
                 type='date'
                 value={formData.date}
                 onChange={(e) => handleFormChange("date", e.target.value)}
@@ -423,18 +425,18 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
           {/* 시간 */}
           <div>
-            <label className='block mb-1.5 text-xs font-medium text-rh-text-secondary'>
+            <label htmlFor='attendance-time' className='block mb-1.5 text-xs font-medium text-rh-text-secondary'>
               시간
             </label>
             <div className='relative'>
               <select
+                id='attendance-time'
+                name='attendance-time'
                 value={formData.time}
                 onChange={(e) => handleFormChange("time", e.target.value)}
                 className='text-white ios-select bg-rh-bg-surface border border-rh-border'
               >
-                {!mounted && (
-                  <option value="">시간 선택</option>
-                )}
+                <option value="" disabled>시간 선택</option>
                 {availableTimeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -449,11 +451,13 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
           {/* 장소 */}
           <div>
-            <label className='block mb-1.5 text-xs font-medium text-rh-text-secondary'>
+            <label htmlFor='attendance-location' className='block mb-1.5 text-xs font-medium text-rh-text-secondary'>
               장소
             </label>
             <div className='relative'>
               <select
+                id='attendance-location'
+                name='attendance-location'
                 value={formData.location}
                 onChange={(e) => handleFormChange("location", e.target.value)}
                 className='text-white ios-select bg-rh-bg-surface border border-rh-border'

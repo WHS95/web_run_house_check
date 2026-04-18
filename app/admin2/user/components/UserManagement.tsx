@@ -356,10 +356,15 @@ function UserManagementInner({
 
                 <div className="flex items-center justify-between">
                     <span className="text-[13px] text-rh-text-secondary">
-                        전체{" "}
+                        활성 회원{" "}
                         <span className="text-white font-medium">
-                            {displayCount}명
+                            {statusCounts.활성}명
                         </span>
+                        {statusFilter !== "전체" && (
+                            <span className="ml-2 text-rh-text-tertiary">
+                                (표시 {displayCount}명)
+                            </span>
+                        )}
                     </span>
 
                     <AdminSmallButton

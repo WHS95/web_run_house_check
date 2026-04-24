@@ -15,6 +15,8 @@ Sentry.init({
     // Sentry 로그 전송
     enableLogs: true,
 
-    // DSN 없을 때 조용히 비활성화
-    enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
+    // DSN 없을 때 또는 dev 모드에서 조용히 비활성화
+    enabled:
+        !!process.env.NEXT_PUBLIC_SENTRY_DSN &&
+        process.env.NODE_ENV !== "development",
 });

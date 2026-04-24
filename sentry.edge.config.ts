@@ -12,5 +12,7 @@ Sentry.init({
 
     enableLogs: true,
 
-    enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
+    enabled:
+        !!process.env.NEXT_PUBLIC_SENTRY_DSN &&
+        process.env.NODE_ENV !== "development",
 });

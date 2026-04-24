@@ -25,6 +25,8 @@ Sentry.init({
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
 
-    // DSN 없을 때 조용히 비활성화
-    enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
+    // DSN 없을 때 또는 dev 모드에서 조용히 비활성화
+    enabled:
+        !!process.env.NEXT_PUBLIC_SENTRY_DSN &&
+        process.env.NODE_ENV !== "development",
 });

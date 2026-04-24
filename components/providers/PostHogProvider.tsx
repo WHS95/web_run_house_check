@@ -10,6 +10,7 @@ function PostHogPageView() {
     const searchParams = useSearchParams();
 
     useEffect(() => {
+        if (process.env.NODE_ENV === "development") return;
         if (!pathname) return;
         let url = window.origin + pathname;
         const qs = searchParams?.toString();
@@ -26,6 +27,8 @@ export default function PostHogProvider({
     children: React.ReactNode;
 }) {
     useEffect(() => {
+        // dev 모드에서는 SDK 부팅/네트워크 비용 회피
+        if (process.env.NODE_ENV === "development") return;
         const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
         if (!key) return;
         if (posthog.__loaded) return;

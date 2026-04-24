@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  // dev에서는 이중 렌더 비활성화로 체감 속도 개선 (prod는 유지)
+  reactStrictMode: process.env.NODE_ENV !== "development",
 
   // API 라우트가 동적으로 작동하도록 설정
   output: "standalone",
@@ -172,38 +173,43 @@ const nextConfig = {
 
 const { withSentryConfig } = require("@sentry/nextjs");
 
-module.exports = withSentryConfig(nextConfig, {
-  // Sentry 프로젝트 식별자 — env 기반 (SENTRY_ORG / SENTRY_PROJECT)
-  org: process.env.SENTRY_ORG ?? "runhouse",
-  project: process.env.SENTRY_PROJECT ?? "runhouse",
+// dev 모드에서는 Sentry 래핑을 건너뛰어 컴파일 속도 향상
+// (instrumentation/소스맵 처리가 dev에 큰 지연 유발)
+module.exports =
+  process.env.NODE_ENV === "development"
+    ? nextConfig
+    : withSentryConfig(nextConfig, {
+        // Sentry 프로젝트 식별자 — env 기반 (SENTRY_ORG / SENTRY_PROJECT)
+        org: process.env.SENTRY_ORG ?? "runhouse",
+        project: process.env.SENTRY_PROJECT ?? "runhouse",
 
-  // 소스맵 업로드용 토큰 — CI / Vercel 환경변수에 설정
-  authToken: process.env.SENTRY_AUTH_TOKEN,
+        // 소스맵 업로드용 토큰 — CI / Vercel 환경변수에 설정
+        authToken: process.env.SENTRY_AUTH_TOKEN,
 
-  // CI 외 로그 억제
-  silent: !process.env.CI,
+        // CI 외 로그 억제
+        silent: !process.env.CI,
 
-  // 서드파티 번들까지 포함해 스택 트레이스 가독성 향상
-  widenClientFileUpload: true,
+        // 서드파티 번들까지 포함해 스택 트레이스 가독성 향상
+        widenClientFileUpload: true,
 
-  // 광고 차단기 회피용 자체 도메인 터널
-  tunnelRoute: "/monitoring",
+        // 광고 차단기 회피용 자체 도메인 터널
+        tunnelRoute: "/monitoring",
 
-  // 인증 정보 누락 시 소스맵 업로드 자체를 스킵해 빌드 실패 방지
-  sourcemaps: {
-    disable:
-      !process.env.SENTRY_AUTH_TOKEN ||
-      !process.env.SENTRY_ORG ||
-      !process.env.SENTRY_PROJECT,
-  },
+        // 인증 정보 누락 시 소스맵 업로드 자체를 스킵해 빌드 실패 방지
+        sourcemaps: {
+          disable:
+            !process.env.SENTRY_AUTH_TOKEN ||
+            !process.env.SENTRY_ORG ||
+            !process.env.SENTRY_PROJECT,
+        },
 
-  webpack: {
-    // Vercel Cron 자동 계측
-    automaticVercelMonitors: true,
+        webpack: {
+          // Vercel Cron 자동 계측
+          automaticVercelMonitors: true,
 
-    // Sentry 로거 tree-shaking으로 번들 크기 축소
-    treeshake: {
-      removeDebugLogging: true,
-    },
-  },
-});
+          // Sentry 로거 tree-shaking으로 번들 크기 축소
+          treeshake: {
+            removeDebugLogging: true,
+          },
+        },
+      });

@@ -1,8 +1,9 @@
 "use client";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useModalViewportPortal } from "@/hooks/useModalViewportPortal";
 
 interface AdminModalProps {
     open: boolean;
@@ -23,35 +24,9 @@ const AdminModal = memo(function AdminModal({
         onClose();
     }, [onClose]);
 
-    // 포털 마운트: SSR 시 document가 없으므로 클라이언트에서만 활성화
-    const [mounted, setMounted] = useState(false);
-    const [container, setContainer] =
-        useState<HTMLElement | null>(null);
+    const container = useModalViewportPortal(open);
 
-    useEffect(() => {
-        setMounted(true);
-        // mobile-viewport를 포털 타겟으로 사용 (없으면 body)
-        const target =
-            (document.querySelector(
-                ".mobile-viewport",
-            ) as HTMLElement | null) || document.body;
-        setContainer(target);
-    }, []);
-
-    // 모달 열림 시 배경 스크롤 방지
-    useEffect(() => {
-        if (!open) return;
-        const main = document.querySelector(
-            ".main-content",
-        ) as HTMLElement | null;
-        const prev = main?.style.overflow;
-        if (main) main.style.overflow = "hidden";
-        return () => {
-            if (main) main.style.overflow = prev || "";
-        };
-    }, [open]);
-
-    if (!mounted || !container) return null;
+    if (!container) return null;
 
     const modal = (
         <AnimatePresence>

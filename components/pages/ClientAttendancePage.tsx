@@ -91,24 +91,37 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, h) =>
 /* 미등록 장소 고정 ID */
 const UNREGISTERED_LOCATION_ID = "unregistered";
 
+interface CrewInfo {
+  id: string;
+  name: string;
+  location_based_attendance?: boolean;
+  accuracy_range?: number;
+  allow_unregistered_location?: boolean;
+}
+
+interface CrewLocation {
+  id: number;
+  name: string;
+  latitude: number | null;
+  longitude: number | null;
+  allowed_radius?: number;
+}
+
 interface ClientAttendancePageProps {
   initialFormData?: {
     userName: string;
-    crewInfo: any;
-    locationOptions: any[];
-    exerciseOptions: any[];
-    crewLocations?: Array<{
-      id: number;
-      name: string;
-      latitude: number | null;
-      longitude: number | null;
-    }>;
+    crewInfo: CrewInfo;
+    locationOptions: { value: string; label: string }[];
+    exerciseOptions: { value: string; label: string }[];
+    crewLocations?: CrewLocation[];
   };
   userStatus?: any;
   userId?: string;
   error?: string;
   canHost?: boolean;
 }
+
+const DEFAULT_ACCURACY_RANGE = 200;
 
 const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   initialFormData,
@@ -708,7 +721,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           isLocationBasedAttendance={initialFormData?.crewInfo?.location_based_attendance || false}
           crewLocations={initialFormData?.crewLocations || []}
           selectedLocationId={formData.location}
-          allowedRadius={50}
+          allowedRadius={initialFormData?.crewInfo?.accuracy_range ?? DEFAULT_ACCURACY_RANGE}
           onStatusChange={handleLocationStatusChange}
         />
 
@@ -752,7 +765,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         onClose={() => setShowLocationModal(false)}
         onVerified={handleLocationVerified}
         crewLocations={initialFormData?.crewLocations || []}
-        allowedRadius={50}
+        allowedRadius={initialFormData?.crewInfo?.accuracy_range ?? DEFAULT_ACCURACY_RANGE}
       />
 
       {/* 알림 팝업 */}

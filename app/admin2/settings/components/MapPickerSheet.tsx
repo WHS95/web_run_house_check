@@ -6,6 +6,7 @@ import {
     useCallback,
     useEffect,
 } from "react";
+import { createPortal } from "react-dom";
 import {
     X,
     MapPin,
@@ -19,6 +20,7 @@ import {
 import NaverMapContainer from "@/components/map/NaverMapContainer";
 import NaverMapLoader from "@/components/map/NaverMapLoader";
 import { useGeocoding } from "@/hooks/useGeocoding";
+import { useModalViewportPortal } from "@/hooks/useModalViewportPortal";
 import { NaverMapPosition } from "@/lib/types/naver-maps";
 import { CrewLocation } from "@/lib/types/crew-locations";
 import { haptic } from "@/lib/haptic";
@@ -66,6 +68,7 @@ const MapPickerSheet = memo(function MapPickerSheet({
     >(null);
 
     const { searchAddress } = useGeocoding();
+    const portalContainer = useModalViewportPortal(open);
 
     /* open될 때마다 초기 상태 재설정 */
     useEffect(() => {
@@ -168,7 +171,9 @@ const MapPickerSheet = memo(function MapPickerSheet({
           ]
         : [];
 
-    return (
+    if (!portalContainer) return null;
+
+    return createPortal(
         <AnimatePresence>
             {open && (
                 <motion.div
@@ -179,19 +184,21 @@ const MapPickerSheet = memo(function MapPickerSheet({
                     transition={{ duration: 0.2 }}
                 >
                     <NaverMapLoader>
-                        {/* 헤더 */}
-                        <div className="flex items-center justify-between px-4 h-14 bg-rh-bg-surface shrink-0">
-                            <button
-                                onClick={onClose}
-                                className="text-rh-text-secondary"
-                                aria-label="닫기"
-                            >
-                                <X size={22} />
-                            </button>
-                            <h3 className="text-[15px] font-semibold text-white">
-                                지도에서 위치 선택
-                            </h3>
-                            <div className="w-[22px]" />
+                        {/* 헤더 (status bar safe-area 흡수) */}
+                        <div className="shrink-0 bg-rh-bg-surface pt-safe">
+                            <div className="flex items-center justify-between px-4 h-14">
+                                <button
+                                    onClick={onClose}
+                                    className="text-rh-text-secondary"
+                                    aria-label="닫기"
+                                >
+                                    <X size={22} />
+                                </button>
+                                <h3 className="text-[15px] font-semibold text-white">
+                                    지도에서 위치 선택
+                                </h3>
+                                <div className="w-[22px]" />
+                            </div>
                         </div>
 
                         {/* 주소 검색 */}
@@ -214,8 +221,8 @@ const MapPickerSheet = memo(function MapPickerSheet({
                                             handleSearch();
                                         }
                                     }}
-                                    placeholder="시/구/동 단위로 검색 (예: 강남구 역삼동)"
-                                    className="flex-1 h-11 rounded-xl bg-rh-bg-surface px-4 text-sm text-white placeholder:text-[10px] placeholder:text-rh-text-tertiary border border-rh-border focus:border-rh-accent outline-none"
+                                    placeholder="예: 강남구 역삼동"
+                                    className="flex-1 h-11 rounded-xl bg-rh-bg-surface px-4 text-sm text-white placeholder:text-rh-text-tertiary border border-rh-border focus:border-rh-accent outline-none"
                                 />
                                 <button
                                     onClick={
@@ -278,7 +285,7 @@ const MapPickerSheet = memo(function MapPickerSheet({
                         </div>
 
                         {/* 하단 확인 영역 */}
-                        <div className="px-4 pt-3 pb-4 shrink-0 space-y-3 bg-rh-bg-primary">
+                        <div className="px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shrink-0 space-y-3 bg-rh-bg-primary">
                             <div className="rounded-xl bg-rh-bg-surface px-4 py-3 flex items-start gap-2">
                                 <MapPin
                                     size={18}
@@ -322,7 +329,8 @@ const MapPickerSheet = memo(function MapPickerSheet({
                     </NaverMapLoader>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        portalContainer
     );
 });
 

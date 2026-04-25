@@ -9,9 +9,18 @@ import React, {
 } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { Camera } from "lucide-react";
+import { Camera, X } from "lucide-react";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import FadeIn from "@/components/atoms/FadeIn";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ProfileForm {
     firstName: string;
@@ -52,6 +61,11 @@ export default function EditProfilePage() {
     const [isUploading, setIsUploading] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [dialog, setDialog] = useState<{
+        kind: "success" | "error" | "validation";
+        title: string;
+        description: string;
+    } | null>(null);
 
     const supabase = useMemo(
         () =>
@@ -200,7 +214,11 @@ export default function EditProfilePage() {
     const handleSave = useCallback(async () => {
         if (!userId) return;
         if (!form.firstName.trim()) {
-            alert("이름을 입력해주세요.");
+            setDialog({
+                kind: "validation",
+                title: "이름을 입력해주세요",
+                description: "이름은 필수 항목이에요.",
+            });
             return;
         }
 
@@ -218,7 +236,12 @@ export default function EditProfilePage() {
                     year < 1900 ||
                     year > new Date().getFullYear()
                 ) {
-                    alert("올바른 출생연도를 입력해주세요.");
+                    setDialog({
+                        kind: "validation",
+                        title: "출생연도를 확인해주세요",
+                        description:
+                            "1900년부터 올해 사이의 값을 입력해주세요.",
+                    });
                     setIsSaving(false);
                     return;
                 }
@@ -235,14 +258,33 @@ export default function EditProfilePage() {
 
             if (error) throw error;
 
-            alert("저장되었습니다.");
-            router.back();
+            setDialog({
+                kind: "success",
+                title: "저장되었습니다",
+                description: "변경 내용이 반영되었어요.",
+            });
         } catch {
-            alert("저장 중 오류가 발생했습니다.");
+            setDialog({
+                kind: "error",
+                title: "저장에 실패했어요",
+                description: "잠시 후 다시 시도해주세요.",
+            });
         } finally {
             setIsSaving(false);
         }
-    }, [userId, form, supabase, router]);
+    }, [userId, form, supabase]);
+
+    const handleDialogClose = useCallback(() => {
+        const wasSuccess = dialog?.kind === "success";
+        setDialog(null);
+        if (wasSuccess) {
+            router.back();
+        }
+    }, [dialog, router]);
+
+    const handleBack = useCallback(() => {
+        router.back();
+    }, [router]);
 
     if (isLoading) {
         return <EditProfileSkeleton />;
@@ -258,6 +300,16 @@ export default function EditProfilePage() {
                         iconColor="white"
                         borderColor="rh-border"
                         backgroundColor="bg-rh-bg-surface"
+                        rightAction={
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                aria-label="닫기"
+                                className="flex h-8 w-8 items-center justify-center rounded-full bg-rh-bg-muted/60 text-white hover:bg-rh-bg-muted active:opacity-70 transition-colors"
+                            >
+                                <X size={16} strokeWidth={2.5} />
+                            </button>
+                        }
                     />
                 </div>
 
@@ -381,6 +433,30 @@ export default function EditProfilePage() {
                     </button>
                 </div>
             </div>
+
+            <AlertDialog
+                open={dialog !== null}
+                onOpenChange={(open) => {
+                    if (!open) handleDialogClose();
+                }}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{dialog?.title}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {dialog?.description}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction
+                            onClick={handleDialogClose}
+                            className="w-full"
+                        >
+                            확인
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </FadeIn>
     );
 }

@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  animate,
+} from "framer-motion";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import PopupNotification, {
   NotificationType,
@@ -122,9 +128,156 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
   // 위치 기반 출석 관련 상태
   const [showLocationModal, setShowLocationModal] = useState(false);
-  const [locationVerified, setLocationVerified] = useState<boolean | null>(null);
+  const [, setLocationVerified] = useState<boolean | null>(null);
   const [locationMessage, setLocationMessage] = useState("");
   const [canAttendByLocation, setCanAttendByLocation] = useState(true); // 위치 기반 출석 가능 여부
+
+  // 스크롤 컨테이너 ref (iOS gesture 패턴 적용 대상)
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 배너(오프라인/대기열) collapse 진행도 (0=펼침, 1=접힘)
+  const bannerProgress = useMotionValue(0);
+  const bannerMaxHeight = useTransform(
+    bannerProgress,
+    [0, 1],
+    [60, 0],
+  );
+  const bannerOpacity = useTransform(
+    bannerProgress,
+    [0, 1],
+    [1, 0],
+  );
+
+  /* iOS gesture 패턴: 스크롤 컨테이너에 pointer/wheel 리스너 등록
+     - 손가락/휠을 따라 progress 연속 변화 → 배너 maxHeight/opacity 보간
+     - 모드 분기 (collapse / scroll / idle) + velocity 기반 spring snap
+     - 콘텐츠 길이/스크롤 가능 여부와 무관하게 동작 */
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let startY = 0;
+    let startProgress = 0;
+    let startTime = 0;
+    let mode: "idle" | "collapse" | "scroll" = "idle";
+    const SENSITIVITY = 100; // 배너가 작으니 더 민감하게
+    const VELOCITY_THRESHOLD = 400;
+
+    const onPointerDown = (e: PointerEvent) => {
+      startY = e.clientY;
+      startTime = e.timeStamp;
+      startProgress = bannerProgress.get();
+      mode = "idle";
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (e.pointerType === "mouse" && e.buttons === 0) return;
+      const dy = e.clientY - startY;
+
+      if (mode === "idle") {
+        if (Math.abs(dy) < 5) return;
+        const atTop = el.scrollTop <= 0;
+        const cur = bannerProgress.get();
+        const fingerDown = dy > 0;
+        const fingerUp = dy < 0;
+
+        if (cur > 0.5 && fingerDown) {
+          mode = "collapse";
+        } else if (cur < 0.5 && atTop && fingerUp) {
+          mode = "collapse";
+        } else {
+          mode = "scroll";
+        }
+      }
+
+      if (mode === "collapse") {
+        const newProg = Math.max(
+          0,
+          Math.min(1, startProgress + -dy / SENSITIVITY),
+        );
+        bannerProgress.set(newProg);
+      }
+    };
+
+    const onPointerEnd = (e: PointerEvent) => {
+      if (mode !== "collapse") {
+        mode = "idle";
+        return;
+      }
+      const elapsed = e.timeStamp - startTime;
+      const dy = e.clientY - startY;
+      const velocity = elapsed > 0 ? (-dy / elapsed) * 1000 : 0;
+      const cur = bannerProgress.get();
+
+      let target = cur > 0.5 ? 1 : 0;
+      if (velocity > VELOCITY_THRESHOLD) target = 1;
+      else if (velocity < -VELOCITY_THRESHOLD) target = 0;
+
+      animate(bannerProgress, target, {
+        type: "spring",
+        damping: 30,
+        stiffness: 350,
+      });
+      mode = "idle";
+    };
+
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointermove", onPointerMove);
+    el.addEventListener("pointerup", onPointerEnd);
+    el.addEventListener("pointercancel", onPointerEnd);
+
+    return () => {
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointermove", onPointerMove);
+      el.removeEventListener("pointerup", onPointerEnd);
+      el.removeEventListener("pointercancel", onPointerEnd);
+    };
+  }, [bannerProgress]);
+
+  /* desktop wheel 제스처: 최상단(scrollTop ≤ 0)에서 progress 구동
+     150ms 정적이면 spring snap */
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let endTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const snap = () => {
+      const cur = bannerProgress.get();
+      const target = cur > 0.5 ? 1 : 0;
+      if (cur !== target) {
+        animate(bannerProgress, target, {
+          type: "spring",
+          damping: 30,
+          stiffness: 350,
+        });
+      }
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      const cur = bannerProgress.get();
+      const atTop = el.scrollTop <= 0;
+      if (!atTop) return;
+
+      const dy = e.deltaY;
+      if (dy > 0 && cur < 1) {
+        bannerProgress.set(Math.min(1, cur + dy / 60));
+        e.preventDefault();
+      } else if (dy < 0 && cur > 0) {
+        bannerProgress.set(Math.max(0, cur + dy / 60));
+        e.preventDefault();
+      } else {
+        return;
+      }
+
+      if (endTimer) clearTimeout(endTimer);
+      endTimer = setTimeout(snap, 150);
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      if (endTimer) clearTimeout(endTimer);
+    };
+  }, [bannerProgress]);
 
   // 초기 폼 데이터 (SSR/CSR 일치 위해 날짜/시간은 빈 값으로 시작 후 mount에서 설정)
   const [mounted, setMounted] = useState(false);
@@ -401,27 +554,35 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       </div>
 
       {/* 스크롤 가능한 폼 영역 */}
-      <div className='flex-1 min-h-0 overflow-y-auto native-scroll pt-4 px-4 pb-4'>
-        {/* 오프라인 상태 배너 */}
-        {!isOnline && (
-          <div className="mb-3 flex items-center gap-2 rounded-lg bg-rh-status-warning/20 border border-rh-status-warning/10 px-3 py-2">
-            <WifiOff className="h-4 w-4 shrink-0 text-rh-status-warning" />
-            <span className="text-xs text-rh-status-warning">
-              오프라인 상태 · 출석 시 자동 저장됩니다
-            </span>
-          </div>
-        )}
+      <div ref={scrollRef} className='flex-1 min-h-0 overflow-y-auto native-scroll pt-4 px-4 pb-4'>
+        {/* 오프라인/대기열 배너 — iOS gesture로 swipe up하면 접혀서 출석 버튼 가시영역 확보 */}
+        <motion.div
+          style={{
+            maxHeight: bannerMaxHeight,
+            opacity: bannerOpacity,
+          }}
+          className="overflow-hidden"
+        >
+          {!isOnline && (
+            <div className="mb-3 flex items-center gap-2 rounded-lg bg-rh-status-warning/20 border border-rh-status-warning/10 px-3 py-2">
+              <WifiOff className="h-4 w-4 shrink-0 text-rh-status-warning" />
+              <span className="text-xs text-rh-status-warning">
+                오프라인 상태 · 출석 시 자동 저장됩니다
+              </span>
+            </div>
+          )}
 
-        {queueCount > 0 && isOnline && (
-          <div className="mb-3 flex items-center gap-2 rounded-lg bg-rh-accent/20 border border-rh-accent/10 px-3 py-2">
-            <CloudUpload className="h-4 w-4 shrink-0 text-rh-accent" />
-            <span className="text-xs text-rh-accent">
-              {isFlushing
-                ? "대기 중인 출석을 전송하고 있습니다..."
-                : `대기 중인 출석 ${queueCount}건`}
-            </span>
-          </div>
-        )}
+          {queueCount > 0 && isOnline && (
+            <div className="mb-3 flex items-center gap-2 rounded-lg bg-rh-accent/20 border border-rh-accent/10 px-3 py-2">
+              <CloudUpload className="h-4 w-4 shrink-0 text-rh-accent" />
+              <span className="text-xs text-rh-accent">
+                {isFlushing
+                  ? "대기 중인 출석을 전송하고 있습니다..."
+                  : `대기 중인 출석 ${queueCount}건`}
+              </span>
+            </div>
+          )}
+        </motion.div>
 
         <div className='space-y-5'>
           {/* 날짜 */}

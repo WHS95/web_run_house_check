@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getFCMToken } from "@/lib/firebase/client";
 
 interface UsePushNotificationOptions {
@@ -40,7 +40,14 @@ export function usePushNotification({
         "Notification" in window &&
         "serviceWorker" in navigator;
 
-    // 초기 상태 확인
+    // isTokenRegistered를 ref로 추적 — effect가 토큰 상태 변화에
+    // 재실행되어 isNotificationEnabled를 덮어쓰는 레이스를 방지
+    const isTokenRegisteredRef = useRef(isTokenRegistered);
+    useEffect(() => {
+        isTokenRegisteredRef.current = isTokenRegistered;
+    }, [isTokenRegistered]);
+
+    // 초기 상태 확인 (mount + crewId 변경 시에만 실행)
     useEffect(() => {
         if (!isSupported) return;
 
@@ -58,7 +65,7 @@ export function usePushNotification({
             const enabled = savedEnabled !== "false";
             setIsNotificationEnabled(enabled);
             setShouldShowBanner(false);
-            if (enabled && !isTokenRegistered && crewId) {
+            if (enabled && !isTokenRegisteredRef.current && crewId) {
                 (async () => {
                     try {
                         await navigator.serviceWorker.register(
@@ -113,26 +120,40 @@ export function usePushNotification({
 
         // 권한 미허용 시 배너 표시
         setShouldShowBanner(true);
-    }, [isSupported, isTokenRegistered, crewId]);
+    }, [isSupported, crewId]);
 
     // 권한 요청 및 토큰 등록
     const requestPermission = useCallback(async (): Promise<boolean> => {
-        if (!isSupported || !crewId) return false;
+        if (!isSupported) {
+            console.warn("[push] 지원하지 않는 환경");
+            return false;
+        }
+        if (!crewId) {
+            console.warn("[push] crewId 없음 — 토큰 등록 불가");
+            return false;
+        }
 
         try {
-            // Service Worker 등록
+            // 사용자 제스처 직후 즉시 권한 요청 (iOS Safari 호환)
+            const result = await Notification.requestPermission();
+            setPermission(result);
+
+            if (result !== "granted") {
+                console.info("[push] 권한 거부:", result);
+                return false;
+            }
+
+            // Service Worker 등록 (권한 확인 후)
             await navigator.serviceWorker.register(
                 "/firebase-messaging-sw.js"
             );
 
-            const result = await Notification.requestPermission();
-            setPermission(result);
-
-            if (result !== "granted") return false;
-
             // FCM 토큰 발급
             const token = await getFCMToken();
-            if (!token) return false;
+            if (!token) {
+                console.warn("[push] FCM 토큰 발급 실패");
+                return false;
+            }
 
             // 서버에 토큰 등록
             const response = await fetch("/api/push/token", {
@@ -141,17 +162,19 @@ export function usePushNotification({
                 body: JSON.stringify({ token, crewId }),
             });
 
-            if (response.ok) {
-                setIsTokenRegistered(true);
-                setShouldShowBanner(false);
-                // dismiss 상태 초기화
-                localStorage.removeItem(DISMISSED_KEY);
-                localStorage.removeItem(DISMISSED_COUNT_KEY);
-                return true;
+            if (!response.ok) {
+                console.warn("[push] 토큰 서버 등록 실패:", response.status);
+                return false;
             }
 
-            return false;
-        } catch {
+            setIsTokenRegistered(true);
+            setShouldShowBanner(false);
+            // dismiss 상태 초기화
+            localStorage.removeItem(DISMISSED_KEY);
+            localStorage.removeItem(DISMISSED_COUNT_KEY);
+            return true;
+        } catch (err) {
+            console.error("[push] requestPermission 예외:", err);
             return false;
         }
     }, [isSupported, crewId]);
@@ -176,20 +199,22 @@ export function usePushNotification({
         }
     }, []);
 
-    // 토글 핸들러 (ON/OFF 전환)
+    // 토글 핸들러 (ON/OFF 전환) — 낙관적 UI, 실패 시 롤백
     const toggleNotification = useCallback(async () => {
         if (isNotificationEnabled) {
-            // 켜져 있으면 끄기
-            await unregisterToken();
+            // OFF: 즉시 UI 반영, 토큰 해제는 백그라운드로
+            setIsNotificationEnabled(false);
+            localStorage.setItem(NOTIFICATION_ENABLED_KEY, "false");
+            void unregisterToken();
         } else {
-            // 꺼져 있으면 켜기
+            // ON: 낙관적으로 켜고 권한/토큰 등록 시도
+            setIsNotificationEnabled(true);
+            localStorage.setItem(NOTIFICATION_ENABLED_KEY, "true");
             const success = await requestPermission();
-            if (success) {
-                setIsNotificationEnabled(true);
-                localStorage.setItem(
-                    NOTIFICATION_ENABLED_KEY,
-                    "true"
-                );
+            if (!success) {
+                // 실패 시 롤백
+                setIsNotificationEnabled(false);
+                localStorage.setItem(NOTIFICATION_ENABLED_KEY, "false");
             }
         }
     }, [isNotificationEnabled, unregisterToken, requestPermission]);

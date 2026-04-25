@@ -49,12 +49,21 @@ async function getMyPageData() {
             return { needsAuth: true };
         }
 
-        // 2. 통합 마이페이지 데이터 조회
-        const { data: result, error } = await supabase
-            .schema("attendance")
-            .rpc("get_mypage_data_unified", {
-                p_user_id: user.id,
-            });
+        // 2. 통합 마이페이지 데이터 + 인증 크루 ID 병렬 조회
+        //    (RPC는 crewId를 반환하지 않아 푸시 토큰 등록에 필요한 값을 별도로 조회)
+        const [rpcResponse, crewIdResponse] = await Promise.all([
+            supabase
+                .schema("attendance")
+                .rpc("get_mypage_data_unified", { p_user_id: user.id }),
+            supabase
+                .schema("attendance")
+                .from("users")
+                .select("verified_crew_id")
+                .eq("id", user.id)
+                .single(),
+        ]);
+
+        const { data: result, error } = rpcResponse;
 
         if (error) {
             throw new Error(error.message);
@@ -71,10 +80,11 @@ async function getMyPageData() {
             throw new Error(result.message || "알 수 없는 오류가 발생했습니다.");
         }
 
-        // 4. 날짜 포맷 변환 (YYYY-MM-DD → 한국어 형식)
+        // 4. 날짜 포맷 변환 + crewId 주입
         const { userProfile: profileData, activityData } = result.data;
         const userProfile = {
             ...profileData,
+            crewId: crewIdResponse.data?.verified_crew_id ?? null,
             joinDate: profileData.joinDate
                 ? new Date(profileData.joinDate).toLocaleDateString("ko-KR")
                 : null,

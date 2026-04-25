@@ -1,6 +1,4 @@
 import React from "react";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
 
 interface PageHeaderProps {
   title: string;
@@ -32,23 +30,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({
 
       {/* 우측 액션 */}
       {rightAction && (
-        <div className='rounded-md border border-white'>
+        <div className='flex items-center pr-3'>
           {rightAction}
         </div>
       )}
- 
- 
- 
-
-      {/* 뒤로가기 버튼 (우측 끝)
-      {backLink && (
-        <Link
-          href={backLink}
-          className='flex items-center pr-2 pl-1 h-full transition-opacity text-rh-accent active:opacity-70'
-        >
-          <ChevronLeft size={24} />
-        </Link>
-      )} */}
     </header>
   );
 };

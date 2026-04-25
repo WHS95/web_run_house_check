@@ -159,41 +159,51 @@ export async function POST(request: Request) {
       );
     }
 
-    // 출석 알림 발송 (fire-and-forget)
-    // 사용자 이름·년생 조회 후 운영진에게 푸시
-    (async () => {
-        try {
-            const { data: userInfo } = await supabase
-                .schema("attendance")
-                .from("users")
-                .select("first_name, birth_year")
-                .eq("id", userId)
-                .single();
+    // 출석 알림 발송 — 운영진에게 푸시
+    // 응답 전에 await 해야 Vercel/serverless에서 안정적으로 발송됨
+    // (fire-and-forget IIFE는 응답 후 함수 종료로 중단될 수 있음)
+    try {
+        const { data: userInfo } = await supabase
+            .schema("attendance")
+            .from("users")
+            .select("first_name, birth_year")
+            .eq("id", userId)
+            .single();
 
-            const userName = userInfo?.first_name || "회원";
-            // 년생 뒤 2자리 (예: 1995 → 95)
-            const birthSuffix = userInfo?.birth_year
-                ? String(userInfo.birth_year).slice(-2)
-                : null;
-            const displayName = birthSuffix
-                ? `${userName}(${birthSuffix})`
-                : userName;
+        const userName = userInfo?.first_name || "회원";
+        // 년생 뒤 2자리 (예: 1995 → 95)
+        const birthSuffix = userInfo?.birth_year
+            ? String(userInfo.birth_year).slice(-2)
+            : null;
+        const displayName = birthSuffix
+            ? `${userName}(${birthSuffix})`
+            : userName;
 
-            await sendNotification(
-                crewId,
-                ["OWNER", "CREW_MANAGER"],
-                userId,
-                {
-                    type: "attendance",
-                    title: "출석 알림",
-                    body: `${displayName}님이 ${locationName}에 출석을 하였습니다.`,
-                    data: { crewId, locationName },
-                }
-            );
-        } catch {
-            // 알림 실패가 출석 완료를 막지 않음
-        }
-    })();
+        // KST 시간(HH:MM) 추출
+        const timeKst = new Date(
+            attendanceTimestamp,
+        ).toLocaleTimeString("ko-KR", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+            timeZone: "Asia/Seoul",
+        });
+
+        await sendNotification(
+            crewId,
+            ["OWNER", "CREW_MANAGER"],
+            userId,
+            {
+                type: "attendance",
+                title: "출석 알림",
+                body: `${displayName}님이 ${timeKst}분 ${locationName}에 출석을 하였습니다.`,
+                data: { crewId, locationName },
+            },
+        );
+    } catch (e) {
+        // 알림 실패가 출석 완료를 막지 않음 (로그만 남김)
+        console.error("[attendance push] send failed:", e);
+    }
 
     const posthog = getPostHogServer();
     if (posthog) {

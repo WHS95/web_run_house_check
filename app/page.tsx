@@ -8,12 +8,14 @@ function HomePageSkeleton() {
   return (
     <div className="flex flex-col min-h-screen bg-rh-bg-primary">
       {/* 헤더 스켈레톤 */}
-      <header className="sticky top-0 z-50 flex items-center justify-between px-4 h-14 pt-safe bg-rh-bg-primary">
-        <div className="flex flex-col gap-1">
-          <div className="h-3 w-24 rounded bg-rh-bg-surface" />
-          <div className="h-5 w-36 rounded bg-rh-bg-surface" />
+      <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
+        <div className="flex items-center justify-between px-4 h-14">
+          <div className="flex flex-col gap-1">
+            <div className="h-3 w-24 rounded bg-rh-bg-surface" />
+            <div className="h-5 w-36 rounded bg-rh-bg-surface" />
+          </div>
+          <div className="h-10 w-10 rounded-rh-md bg-rh-bg-surface" />
         </div>
-        <div className="h-10 w-10 rounded-rh-md bg-rh-bg-surface" />
       </header>
 
       <div className="flex-1 px-4 pt-4 pb-6 space-y-5">

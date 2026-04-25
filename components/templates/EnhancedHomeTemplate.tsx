@@ -133,21 +133,23 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {/* ── Header: 인사말 + 알림 버튼 ── */}
-            <header className="sticky top-0 z-50 flex items-center justify-between px-4 h-14 pt-safe bg-rh-bg-primary">
-                <div className="flex flex-col gap-0.5">
-                    <span className="text-xs font-semibold text-rh-accent">
-                        {crewName ?? 'RunHouse Crew'}
-                    </span>
-                    <span className="text-lg font-semibold text-white">
-                        안녕하세요, {username ?? '사용자'}님
-                    </span>
+            <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
+                <div className="flex items-center justify-between px-4 h-14">
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-xs font-semibold text-rh-accent">
+                            {crewName ?? 'RunHouse Crew'}
+                        </span>
+                        <span className="text-lg font-semibold text-white">
+                            안녕하세요, {username ?? '사용자'}님
+                        </span>
+                    </div>
+                    <button
+                        onClick={() => router.push('/notifications')}
+                        className="relative flex h-10 w-10 items-center justify-center rounded-rh-md"
+                    >
+                        <Bell className="h-5 w-5 text-rh-text-secondary" />
+                    </button>
                 </div>
-                <button
-                    onClick={() => router.push('/notifications')}
-                    className="relative flex h-10 w-10 items-center justify-center rounded-rh-md"
-                >
-                    <Bell className="h-5 w-5 text-rh-text-secondary" />
-                </button>
             </header>
 
             {/* ── 알림 유도 배너 ── */}

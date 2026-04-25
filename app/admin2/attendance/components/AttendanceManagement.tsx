@@ -9,7 +9,13 @@ import React, {
 } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
-import AdminSmallButton from "@/app/admin2/components/ui/AdminSmallButton";
+import { Plus } from "lucide-react";
+import {
+    motion,
+    useMotionValue,
+    useTransform,
+    animate,
+} from "framer-motion";
 import AdminAlertDialog from "@/app/admin2/components/ui/AdminAlertDialog";
 import AdminMonthNav from "@/app/admin2/components/ui/AdminMonthNav";
 import AttendanceRow from "@/app/admin2/components/ui/AttendanceRow";
@@ -60,26 +66,26 @@ function formatDateStr(date: Date) {
 }
 
 function getKSTDateStr(timestamp: string): string {
-    const utcDate = new Date(timestamp);
-    const kstDate = new Date(
-        utcDate.getTime() + 9 * 60 * 60 * 1000,
-    );
-    return formatDateStr(kstDate);
+    /* en-CA 로케일은 YYYY-MM-DD 포맷을 기본 출력 */
+    return new Date(timestamp).toLocaleDateString("en-CA", {
+        timeZone: "Asia/Seoul",
+    });
 }
 
 function getKSTTime(timestamp: string): string {
-    const utcDate = new Date(timestamp);
-    const kstDate = new Date(
-        utcDate.getTime() + 9 * 60 * 60 * 1000,
-    );
-    return kstDate.toLocaleTimeString("ko-KR", {
+    return new Date(timestamp).toLocaleTimeString("ko-KR", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
+        timeZone: "Asia/Seoul",
     });
 }
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const MONTH_SHORT = [
+    "1", "2", "3", "4", "5", "6",
+    "7", "8", "9", "10", "11", "12",
+];
 
 /* ── 캘린더 셀 ── */
 const CalendarCell = memo(function CalendarCell({
@@ -88,8 +94,9 @@ const CalendarCell = memo(function CalendarCell({
     isSelected,
     isToday,
     isSaturday,
+    isMonthStart,
+    monthShort,
     count,
-    compact,
     onSelect,
 }: {
     date: Date;
@@ -97,40 +104,17 @@ const CalendarCell = memo(function CalendarCell({
     isSelected: boolean;
     isToday: boolean;
     isSaturday: boolean;
+    isMonthStart: boolean;
+    monthShort: string;
     count: number;
-    compact: boolean;
     onSelect: (day: number) => void;
 }) {
-    /* .pen 기준 색상:
-       - 이전/다음 달: text-rh-text-muted
-       - 현재 달 일반: text-white
-       - 현재 달 토요일: text-rh-accent
-       - 선택됨: bg-rh-accent text-white
-       - 오늘: bg-rh-accent/20 text-rh-accent */
-    /* 셀 높이: 월간/주간 동일 h-11(44px)
-       - 월간: 인원 마커(숫자) 별도 노출
-       - 주간: 마커 숨기고 참여 있는 날짜는 일자 색상만 변경 */
     const hasAttendance = count > 0 && isCurrentMonth;
     let cellClass =
         `relative flex flex-col items-center justify-center gap-0.5 h-11 rounded-lg text-[13px] leading-none transition-colors`;
 
     if (!isCurrentMonth) {
         cellClass += " text-rh-text-muted";
-    } else if (compact) {
-        /* 주간 뷰: 배경 원 없이 텍스트 색상만 변경
-           참여 있는 날짜 → 빨간색(rh-status-error, 블루톤 테마) */
-        if (isSelected) {
-            cellClass += " text-rh-status-error font-bold";
-        } else if (hasAttendance) {
-            cellClass +=
-                " text-rh-status-error font-semibold";
-        } else if (isToday) {
-            cellClass += " text-rh-accent";
-        } else if (isSaturday) {
-            cellClass += " text-rh-accent";
-        } else {
-            cellClass += " text-white";
-        }
     } else if (isSelected) {
         cellClass += " bg-rh-accent text-white";
     } else if (isToday) {
@@ -150,8 +134,21 @@ const CalendarCell = memo(function CalendarCell({
             className={cellClass}
             disabled={!isCurrentMonth}
         >
+            {isMonthStart && (
+                <span
+                    className={`absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold leading-none pointer-events-none ${
+                        isSelected
+                            ? "text-white"
+                            : isCurrentMonth
+                              ? "text-rh-accent"
+                              : "text-rh-text-muted"
+                    }`}
+                >
+                    {monthShort}월
+                </span>
+            )}
             <span>{date.getDate()}</span>
-            {!compact && hasAttendance && (
+            {hasAttendance && (
                 <span
                     className={`text-[9px] leading-none ${isSelected ? "text-white/80" : "text-rh-accent"}`}
                 >
@@ -219,9 +216,218 @@ export default function AttendanceManagement({
         [],
     );
 
-    /* 달력 모드: 아코디언이 하나라도 열리면 주간 뷰로 자동 축소
-       → 참여자 리스트를 위한 수직 공간 확보 */
-    const isCollapsed = expandedGroups.size > 0;
+    /* ── 제스처 기반 collapse/expand (iOS native 패턴) ──
+       progress: 0=완전 펼침, 1=완전 접힘 (motion value, 손가락 따라 연속 변화)
+       - calendar maxHeight/opacity가 progress를 따라 부드럽게 보간
+       - 손을 떼면 velocity + 위치 기반으로 0 또는 1로 spring snap
+       - scroll listener 없음 → 콘텐츠 길이와 무관하게 동작 */
+    const progress = useMotionValue(0);
+    const calendarMaxHeight = useTransform(
+        progress,
+        [0, 1],
+        [600, 0],
+    );
+    const calendarOpacity = useTransform(
+        progress,
+        [0, 1],
+        [1, 0],
+    );
+
+    /* progress motion value를 React state로 미러
+       → isCollapsed 파생 값(아코디언 결합 등)에 사용 */
+    const [isProgressCollapsed, setIsProgressCollapsed] =
+        useState(false);
+    useEffect(() => {
+        const unsub = progress.on("change", (v) => {
+            setIsProgressCollapsed(v > 0.5);
+        });
+        return unsub;
+    }, [progress]);
+
+    /* pointer 기반 pan 제스처: 스크롤 가능 여부와 무관하게 작동.
+       모드 결정 로직 (iOS gesture recognizer 패턴):
+       - 첫 5px 이동 시 방향 + 컨텍스트로 'collapse' 또는 'scroll' 모드 확정
+       - 'collapse' 모드: progress 변경 (계속 손가락 따라감)
+       - 'scroll' 모드: 아무것도 안 함 (브라우저 네이티브 스크롤이 처리) */
+    useEffect(() => {
+        const el = document.querySelector(
+            ".main-content",
+        ) as HTMLElement | null;
+        if (!el) return;
+        let startY = 0;
+        let startProgress = 0;
+        let startTime = 0;
+        let mode: "idle" | "collapse" | "scroll" = "idle";
+        const SENSITIVITY = 150;
+        const VELOCITY_THRESHOLD = 400; // px/sec
+
+        const onPointerDown = (e: PointerEvent) => {
+            startY = e.clientY;
+            startTime = e.timeStamp;
+            startProgress = progress.get();
+            mode = "idle";
+        };
+
+        const onPointerMove = (e: PointerEvent) => {
+            if (
+                e.pointerType === "mouse" &&
+                e.buttons === 0
+            )
+                return;
+            const dy = e.clientY - startY;
+
+            if (mode === "idle") {
+                if (Math.abs(dy) < 5) return;
+                const atTop = el.scrollTop <= 0;
+                const cur = progress.get();
+                const fingerDown = dy > 0;
+                const fingerUp = dy < 0;
+
+                if (cur > 0.5 && fingerDown) {
+                    /* 접힌 상태에서 아래로 swipe → expand */
+                    mode = "collapse";
+                } else if (
+                    cur < 0.5 &&
+                    atTop &&
+                    fingerUp
+                ) {
+                    /* 펼친 상태 + 최상단 + 위로 swipe → collapse */
+                    mode = "collapse";
+                } else {
+                    mode = "scroll";
+                }
+            }
+
+            if (mode === "collapse") {
+                const newProg = Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        startProgress + -dy / SENSITIVITY,
+                    ),
+                );
+                progress.set(newProg);
+            }
+        };
+
+        const onPointerEnd = (e: PointerEvent) => {
+            if (mode !== "collapse") {
+                mode = "idle";
+                return;
+            }
+            const elapsed = e.timeStamp - startTime;
+            const dy = e.clientY - startY;
+            /* finger up = -dy 양수 = collapse 방향 velocity */
+            const velocity =
+                elapsed > 0 ? (-dy / elapsed) * 1000 : 0;
+            const cur = progress.get();
+
+            let target = cur > 0.5 ? 1 : 0;
+            if (velocity > VELOCITY_THRESHOLD) target = 1;
+            else if (velocity < -VELOCITY_THRESHOLD)
+                target = 0;
+
+            animate(progress, target, {
+                type: "spring",
+                damping: 30,
+                stiffness: 350,
+            });
+            mode = "idle";
+        };
+
+        el.addEventListener("pointerdown", onPointerDown);
+        el.addEventListener("pointermove", onPointerMove);
+        el.addEventListener("pointerup", onPointerEnd);
+        el.addEventListener("pointercancel", onPointerEnd);
+
+        return () => {
+            el.removeEventListener(
+                "pointerdown",
+                onPointerDown,
+            );
+            el.removeEventListener(
+                "pointermove",
+                onPointerMove,
+            );
+            el.removeEventListener(
+                "pointerup",
+                onPointerEnd,
+            );
+            el.removeEventListener(
+                "pointercancel",
+                onPointerEnd,
+            );
+        };
+    }, [progress]);
+
+    /* desktop wheel 제스처: trackpad/마우스 휠로도 progress 구동
+       - 최상단(scrollTop ≤ 0)에서만 progress에 반영 → 리스트 일반 스크롤 방해 안 함
+       - wheel 멈춘 후 150ms 정적이면 spring snap (iOS-like commit) */
+    useEffect(() => {
+        const el = document.querySelector(
+            ".main-content",
+        ) as HTMLElement | null;
+        if (!el) return;
+        let endTimer: ReturnType<typeof setTimeout> | null =
+            null;
+
+        const snap = () => {
+            const cur = progress.get();
+            const target = cur > 0.5 ? 1 : 0;
+            if (cur !== target) {
+                animate(progress, target, {
+                    type: "spring",
+                    damping: 30,
+                    stiffness: 350,
+                });
+            }
+        };
+
+        const onWheel = (e: WheelEvent) => {
+            const cur = progress.get();
+            const atTop = el.scrollTop <= 0;
+            if (!atTop) return;
+
+            const dy = e.deltaY;
+            if (dy > 0 && cur < 1) {
+                /* down wheel + 최상단 + 펼친 영역 남음 → collapse */
+                progress.set(Math.min(1, cur + dy / 80));
+                e.preventDefault();
+            } else if (dy < 0 && cur > 0) {
+                /* up wheel + 최상단 + 접힌 영역 남음 → expand */
+                progress.set(Math.max(0, cur + dy / 80));
+                e.preventDefault();
+            } else {
+                return;
+            }
+
+            if (endTimer) clearTimeout(endTimer);
+            endTimer = setTimeout(snap, 150);
+        };
+
+        el.addEventListener("wheel", onWheel, {
+            passive: false,
+        });
+        return () => {
+            el.removeEventListener("wheel", onWheel);
+            if (endTimer) clearTimeout(endTimer);
+        };
+    }, [progress]);
+
+    /* 아코디언 펼치면 자동 collapse */
+    useEffect(() => {
+        if (expandedGroups.size > 0) {
+            animate(progress, 1, {
+                type: "spring",
+                damping: 30,
+                stiffness: 350,
+            });
+        }
+    }, [expandedGroups, progress]);
+
+    /* 달력 모드: 아코디언 펼침 OR progress > 0.5 */
+    const isCollapsed =
+        expandedGroups.size > 0 || isProgressCollapsed;
 
     /* hydration 안전: 오늘 날짜는 mount 후 계산 */
     const [mounted, setMounted] = useState(false);
@@ -362,29 +568,15 @@ export default function AttendanceManagement({
         return days;
     }, [year, month]);
 
-    /* 주간 뷰용: 선택 날짜가 포함된 주(7일)만 추출 */
-    const weekDays = useMemo(() => {
-        const idx = calendarDays.findIndex(
-            (c) =>
-                c.isCurrentMonth &&
-                c.date.getDate() === selectedDay,
-        );
-        if (idx < 0) return calendarDays.slice(0, 7);
-        const weekStart = Math.floor(idx / 7) * 7;
-        return calendarDays.slice(
-            weekStart,
-            weekStart + 7,
-        );
-    }, [calendarDays, selectedDay]);
-
-    /* 달 변경 시: 아코디언 모두 닫고 스크롤 리셋 */
+    /* 달 변경 시: 아코디언 모두 닫고 스크롤·달력 모두 리셋 */
     useEffect(() => {
         const el = document.querySelector(
             ".main-content",
         ) as HTMLElement | null;
         if (el) el.scrollTop = 0;
         setExpandedGroups(new Set());
-    }, [year, month]);
+        progress.set(0);
+    }, [year, month, progress]);
 
     /* 날짜 변경 시: 아코디언 닫기 (이전 날짜의 그룹 키가 달라질 수 있음) */
     useEffect(() => {
@@ -452,6 +644,11 @@ export default function AttendanceManagement({
                 month === todayDate.getMonth() + 1 &&
                 year === todayDate.getFullYear();
             const isSaturday = date.getDay() === 6;
+            /* mount 후에만 월 라벨 렌더 → hydration mismatch 방지 */
+            const isMonthStart =
+                mounted && date.getDate() === 1;
+            const monthShort =
+                MONTH_SHORT[date.getMonth()];
             return (
                 <CalendarCell
                     key={idx}
@@ -460,8 +657,9 @@ export default function AttendanceManagement({
                     isSelected={isSelected}
                     isToday={isToday}
                     isSaturday={isSaturday}
+                    isMonthStart={isMonthStart}
+                    monthShort={monthShort}
                     count={count}
-                    compact={isCollapsed}
                     onSelect={setSelectedDay}
                 />
             );
@@ -472,7 +670,6 @@ export default function AttendanceManagement({
             month,
             year,
             mounted,
-            isCollapsed,
         ],
     );
 
@@ -493,70 +690,85 @@ export default function AttendanceManagement({
                     contain: "layout style",
                 }}
             >
-                <AdminMonthNav
-                    year={year}
-                    month={month}
-                    onPrev={handlePrevMonth}
-                    onNext={handleNextMonth}
-                />
-                <div className="mt-4 bg-rh-bg-surface rounded-xl p-3 overflow-hidden">
-                    {/* 요일 헤더 */}
-                    <div className="grid grid-cols-7 mb-1">
-                        {WEEKDAYS.map((d, i) => (
-                            <div
-                                key={d}
-                                className={`text-center text-[11px] font-semibold py-1 ${
-                                    i === 6
-                                        ? "text-rh-accent"
-                                        : "text-rh-text-tertiary"
-                                }`}
-                            >
-                                {d}
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* 월간 / 주간 전환
-                        - 이벤트(아코디언 토글) 기반이므로 스크롤과 충돌 없음
-                        - 부드러운 height 전환으로 UX 개선 */}
-                    <div
-                        style={{
-                            height: isCollapsed ? 44 : 284,
-                            transition:
-                                "height 220ms cubic-bezier(0.32, 0.72, 0, 1)",
-                        }}
-                        className="overflow-hidden"
-                    >
+                {/* 월 네비 + 풀 캘린더
+                    motion value(progress)로 maxHeight/opacity가 손가락 따라 연속 변화 */}
+                <motion.div
+                    style={{
+                        maxHeight: calendarMaxHeight,
+                        opacity: calendarOpacity,
+                    }}
+                    className="overflow-hidden"
+                >
+                    <AdminMonthNav
+                        year={year}
+                        month={month}
+                        onPrev={handlePrevMonth}
+                        onNext={handleNextMonth}
+                    />
+                    <div className="mt-4 bg-rh-bg-surface rounded-xl p-3 overflow-hidden">
+                        {/* 요일 헤더 */}
+                        <div className="grid grid-cols-7 mb-1">
+                            {WEEKDAYS.map((d, i) => (
+                                <div
+                                    key={d}
+                                    className={`text-center text-[11px] font-semibold py-1 ${
+                                        i === 6
+                                            ? "text-rh-accent"
+                                            : "text-rh-text-tertiary"
+                                    }`}
+                                >
+                                    {d}
+                                </div>
+                            ))}
+                        </div>
                         <div className="grid grid-cols-7 gap-1">
-                            {(isCollapsed
-                                ? weekDays
-                                : calendarDays
-                            ).map((cd, i) =>
+                            {calendarDays.map((cd, i) =>
                                 renderCell(cd, i),
                             )}
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
-                {/* 날짜 라벨 + 일괄등록 (달력과 함께 sticky 유지)
-                    - 라벨 탭 → 모든 아코디언 닫기 (= 달력 월간으로 복귀)
-                    - 아코디언이 닫혀 있으면 버튼 비활성 */}
+                {/* 날짜 라벨 + 일괄등록 (항상 sticky 유지)
+                    - 접힌 상태에서 탭 시 → 아코디언 닫기 + 스크롤 최상단 복귀
+                    - 펼친 상태에서는 비활성 */}
                 <div className="flex items-center justify-between py-3">
                     <button
                         type="button"
                         onClick={() => {
-                            if (isCollapsed) {
-                                setExpandedGroups(
-                                    new Set(),
-                                );
-                            }
+                            if (!isCollapsed) return;
+                            setExpandedGroups(new Set());
+                            animate(progress, 0, {
+                                type: "spring",
+                                damping: 30,
+                                stiffness: 350,
+                            });
+                            const el =
+                                document.querySelector(
+                                    ".main-content",
+                                ) as HTMLElement | null;
+                            if (el)
+                                el.scrollTo({
+                                    top: 0,
+                                    behavior: "smooth",
+                                });
                         }}
                         disabled={!isCollapsed}
                         className="flex items-center gap-1.5 text-sm font-semibold text-white disabled:opacity-100"
                     >
                         <span>
-                            {month}월 {selectedDay}일 (
-                            {dayOfWeek}) 출석 현황
+                            {(year % 100)
+                                .toString()
+                                .padStart(2, "0")}
+                            .
+                            {month
+                                .toString()
+                                .padStart(2, "0")}
+                            .
+                            {selectedDay
+                                .toString()
+                                .padStart(2, "0")}{" "}
+                            ({dayOfWeek})
                         </span>
                         <svg
                             width="14"
@@ -576,11 +788,14 @@ export default function AttendanceManagement({
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </button>
-                    <AdminSmallButton
+                    <button
+                        type="button"
                         onClick={() => setShowBulk(true)}
+                        aria-label="일괄 등록"
+                        className="flex items-center justify-center w-8 h-8 rounded-full bg-rh-accent text-white active:opacity-80 transition-opacity"
                     >
-                        일괄 등록
-                    </AdminSmallButton>
+                        <Plus className="w-4 h-4" strokeWidth={2.5} />
+                    </button>
                 </div>
             </div>
 

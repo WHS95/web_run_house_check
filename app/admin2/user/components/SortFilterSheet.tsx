@@ -1,7 +1,9 @@
 "use client";
 import { memo, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AdminFilterPill from "@/app/admin2/components/ui/AdminFilterPill";
+import { useModalViewportPortal } from "@/hooks/useModalViewportPortal";
 
 export type SortKey = "name" | "lastAttendance" | "count";
 export type SortDir = "asc" | "desc";
@@ -63,6 +65,7 @@ const SortFilterSheet = memo(function SortFilterSheet({
     const [dir, setDir] = useState<SortDir>(initDir);
     const [status, setStatus] =
         useState<StatusFilter>(initStatus);
+    const portalContainer = useModalViewportPortal(open);
 
     useEffect(() => {
         if (open) {
@@ -72,7 +75,9 @@ const SortFilterSheet = memo(function SortFilterSheet({
         }
     }, [open, initKey, initDir, initStatus]);
 
-    return (
+    if (!portalContainer) return null;
+
+    return createPortal(
         <AnimatePresence>
             {open && (
                 <motion.div
@@ -190,7 +195,8 @@ const SortFilterSheet = memo(function SortFilterSheet({
                     </motion.div>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        portalContainer
     );
 });
 

@@ -1,6 +1,8 @@
 "use client";
 import { memo } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useModalViewportPortal } from "@/hooks/useModalViewportPortal";
 
 interface AdminAlertDialogProps {
     open: boolean;
@@ -25,7 +27,10 @@ const AdminAlertDialog = memo(function AdminAlertDialog({
     confirmLabel = "확인",
     confirmVariant = "primary",
 }: AdminAlertDialogProps) {
-    return (
+    const portalContainer = useModalViewportPortal(open);
+    if (!portalContainer) return null;
+
+    return createPortal(
         <AnimatePresence>
             {open && (
                 <motion.div
@@ -76,7 +81,8 @@ const AdminAlertDialog = memo(function AdminAlertDialog({
                     </motion.div>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        portalContainer
     );
 });
 

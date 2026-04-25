@@ -6,11 +6,13 @@ import {
     useMemo,
     useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AdminAvatar from "./AdminAvatar";
 import AdminSearchBar from "./AdminSearchBar";
 import AdminCheckbox from "./AdminCheckbox";
 import { haptic } from "@/lib/haptic";
+import { useModalViewportPortal } from "@/hooks/useModalViewportPortal";
 
 export interface PickerMember {
     id: string;
@@ -34,6 +36,7 @@ const AdminMemberPickerSheet = memo(function AdminMemberPickerSheet({
 }: AdminMemberPickerSheetProps) {
     const [query, setQuery] = useState("");
     const [draft, setDraft] = useState<Set<string>>(selectedIds);
+    const portalContainer = useModalViewportPortal(open);
 
     // 시트 열릴 때마다 draft 초기화
     useEffect(() => {
@@ -82,7 +85,9 @@ const AdminMemberPickerSheet = memo(function AdminMemberPickerSheet({
         onClose();
     }, [draft, onConfirm, onClose]);
 
-    return (
+    if (!portalContainer) return null;
+
+    return createPortal(
         <AnimatePresence>
             {open && (
                 <motion.div
@@ -172,7 +177,8 @@ const AdminMemberPickerSheet = memo(function AdminMemberPickerSheet({
                     </motion.div>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        portalContainer
     );
 });
 

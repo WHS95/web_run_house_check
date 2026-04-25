@@ -1,4 +1,4 @@
-const CACHE_VERSION = "3";
+const CACHE_VERSION = "4";
 const CACHE_NAME = `runhouse-v${CACHE_VERSION}`;
 
 // 프리캐시할 정적 자산
@@ -14,6 +14,7 @@ const PRECACHE_URLS = [
 const NO_CACHE_PATTERNS = [
     /\/auth\//,
     /\/api\/auth/,
+    /\/api\/ping/,
     /supabase/,
     /\/sw\.js$/,
     /firebase/,

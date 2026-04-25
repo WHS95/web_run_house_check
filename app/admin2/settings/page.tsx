@@ -15,14 +15,12 @@ export default async function Admin2SettingsPage({
 
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="설정"
-                    backLink="/admin2"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                />
-            </div>
+            <PageHeader
+                title="설정"
+                backLink="/admin2"
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+            />
             <Suspense fallback={<SettingsSkeleton />}>
                 <SettingsDataServer
                     crewId={crewId}

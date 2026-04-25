@@ -395,13 +395,11 @@ export default function MasterPage() {
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {/* 헤더 */}
-            <div className="sticky top-0 z-50 shrink-0 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="마스터 관리"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                />
-            </div>
+            <PageHeader
+                title="마스터 관리"
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+            />
 
             {/* 탭바 */}
             <div className="shrink-0 px-4 pt-4">

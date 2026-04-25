@@ -53,13 +53,11 @@ const calculatorItems = [
 export default function CalculatorPage() {
     return (
         <div className="flex flex-col h-screen bg-rh-bg-primary main-content">
-            <div className="sticky top-0 z-10 bg-rh-bg-surface">
-                <PageHeader
-                    title="러닝 계산기"
-                    iconColor="white"
-                    borderColor="border-rh-border"
-                />
-            </div>
+            <PageHeader
+                title="러닝 계산기"
+                iconColor="white"
+                borderColor="border-rh-border"
+            />
 
             <div className="flex-1 px-4 pt-4 space-y-3">
                 {calculatorItems.map((item) => {

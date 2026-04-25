@@ -173,13 +173,11 @@ export default function MasterAdminPage() {
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {/* 헤더 */}
-            <div className="sticky top-0 z-50 shrink-0 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="마스터 관리"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                />
-            </div>
+            <PageHeader
+                title="마스터 관리"
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+            />
 
             {/* 탭 바 */}
             <div className="px-4 pt-4">

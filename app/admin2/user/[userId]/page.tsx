@@ -19,19 +19,17 @@ export default async function AdminUserDetailPage({
 
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="회원 상세"
-                    backLink="/admin2/user"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                    rightAction={
-                        <UserDetailHeaderMenu
-                            user={detail.user}
-                        />
-                    }
-                />
-            </div>
+            <PageHeader
+                title="회원 상세"
+                backLink="/admin2/user"
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+                rightAction={
+                    <UserDetailHeaderMenu
+                        user={detail.user}
+                    />
+                }
+            />
             <UserDetail detail={detail} crewId={crewId} />
         </>
     );

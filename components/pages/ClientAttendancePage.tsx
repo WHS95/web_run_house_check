@@ -543,15 +543,13 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
   return (
     <FadeIn>
     <div className='flex overflow-hidden relative flex-col h-screen bg-rh-bg-primary'>
-      {/* 헤더 - sticky 고정 */}
-      <div className='sticky top-0 z-50'>
-        <PageHeader
-          title='출석 체크'
-          iconColor='white'
-          borderColor='rh-border'
-          backgroundColor='bg-rh-bg-primary'
-        />
-      </div>
+      {/* 헤더 - PageHeader 자체가 sticky+pt-safe 처리 */}
+      <PageHeader
+        title='출석 체크'
+        iconColor='white'
+        borderColor='rh-border'
+        backgroundColor='bg-rh-bg-primary'
+      />
 
       {/* 스크롤 가능한 폼 영역 */}
       <div ref={scrollRef} className='flex-1 min-h-0 overflow-y-auto native-scroll pt-4 px-4 pb-4'>

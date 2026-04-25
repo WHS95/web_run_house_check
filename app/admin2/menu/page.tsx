@@ -32,13 +32,11 @@ const menuItems = [
 export default function AdminMenuPage() {
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="메뉴"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                />
-            </div>
+            <PageHeader
+                title="메뉴"
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+            />
             <FadeIn>
                 <div className="flex-1 px-4 pt-4 pb-4 space-y-5">
                     <span className="text-[11px] font-semibold text-rh-text-tertiary uppercase tracking-widest">

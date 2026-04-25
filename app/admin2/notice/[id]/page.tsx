@@ -70,14 +70,12 @@ export default async function AdminNoticeDetailPage({
 
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="공지 상세"
-                    backLink="/admin2/notice"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                />
-            </div>
+            <PageHeader
+                title="공지 상세"
+                backLink="/admin2/notice"
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+            />
             <FadeIn>
                 <div className="flex-1 px-4 pt-4 pb-8 space-y-4">
                     <div className="rounded-xl bg-rh-bg-surface p-4 space-y-3">

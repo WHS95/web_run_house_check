@@ -10,14 +10,12 @@ export default async function Admin2UserPage() {
 
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="회원 관리"
-                    backLink="/admin2"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                />
-            </div>
+            <PageHeader
+                title="회원 관리"
+                backLink="/admin2"
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+            />
             <Suspense fallback={<UserListSkeleton />}>
                 <UserListServer crewId={crewId} />
             </Suspense>

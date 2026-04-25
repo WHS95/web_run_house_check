@@ -22,14 +22,12 @@ export default async function Admin2AttendancePage({
 
     return (
         <>
-            <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="출석 관리"
-                    backLink="/admin2"
-                    iconColor="white"
-                    backgroundColor="bg-rh-bg-surface"
-                />
-            </div>
+            <PageHeader
+                title="출석 관리"
+                backLink="/admin2"
+                iconColor="white"
+                backgroundColor="bg-rh-bg-surface"
+            />
             <Suspense fallback={<AttendanceSkeleton />}>
                 <AttendanceDataServer
                     crewId={crewId}

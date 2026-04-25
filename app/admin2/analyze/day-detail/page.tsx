@@ -244,21 +244,14 @@ export default async function DayDetailPage({
 
     return (
         <>
-            <div
-                className={
-                    "sticky top-0 z-50"
-                    + " bg-rh-bg-primary pt-safe"
+            <PageHeader
+                title="요일별 참여율 상세"
+                backLink={backLink}
+                iconColor="white"
+                backgroundColor={
+                    "bg-rh-bg-surface"
                 }
-            >
-                <PageHeader
-                    title="요일별 참여율 상세"
-                    backLink={backLink}
-                    iconColor="white"
-                    backgroundColor={
-                        "bg-rh-bg-surface"
-                    }
-                />
-            </div>
+            />
             <div
                 className={
                     "flex-1 px-4 pt-4"

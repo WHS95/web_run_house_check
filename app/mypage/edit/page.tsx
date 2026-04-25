@@ -32,8 +32,8 @@ interface ProfileForm {
 
 const EditProfileSkeleton = React.memo(() => (
     <div className="flex flex-col min-h-screen bg-rh-bg-primary">
-        <div className="sticky top-0 z-50 shrink-0 bg-rh-bg-surface">
-            <div className="h-14" />
+        <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
+            <div className="h-14 bg-rh-bg-surface" />
         </div>
         <div className="flex-1 px-4 pt-6 space-y-6">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -293,25 +293,23 @@ export default function EditProfilePage() {
     return (
         <FadeIn>
             <div className="flex flex-col min-h-screen bg-rh-bg-primary">
-                <div className="sticky top-0 z-50 shrink-0">
-                    <PageHeader
-                        title="내정보 변경"
-                        backLink="/mypage"
-                        iconColor="white"
-                        borderColor="rh-border"
-                        backgroundColor="bg-rh-bg-surface"
-                        rightAction={
-                            <button
-                                type="button"
-                                onClick={handleBack}
-                                aria-label="닫기"
-                                className="flex h-8 w-8 items-center justify-center rounded-full bg-rh-bg-muted/60 text-white hover:bg-rh-bg-muted active:opacity-70 transition-colors"
-                            >
-                                <X size={16} strokeWidth={2.5} />
-                            </button>
-                        }
-                    />
-                </div>
+                <PageHeader
+                    title="내정보 변경"
+                    backLink="/mypage"
+                    iconColor="white"
+                    borderColor="rh-border"
+                    backgroundColor="bg-rh-bg-surface"
+                    rightAction={
+                        <button
+                            type="button"
+                            onClick={handleBack}
+                            aria-label="닫기"
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-rh-bg-muted/60 text-white hover:bg-rh-bg-muted active:opacity-70 transition-colors"
+                        >
+                            <X size={16} strokeWidth={2.5} />
+                        </button>
+                    }
+                />
 
                 <div className="flex-1 px-4 pt-6 pb-4 flex flex-col gap-6">
                     {/* 프로필 사진 */}

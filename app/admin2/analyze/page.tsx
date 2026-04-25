@@ -134,21 +134,14 @@ export default async function Admin2AnalyzePage({
 
     return (
         <>
-            <div
-                className={
-                    "sticky top-0 z-50"
-                    + " bg-rh-bg-primary pt-safe"
+            <PageHeader
+                title="통계 분석"
+                backLink="/admin2"
+                iconColor="white"
+                backgroundColor={
+                    "bg-rh-bg-surface"
                 }
-            >
-                <PageHeader
-                    title="통계 분석"
-                    backLink="/admin2"
-                    iconColor="white"
-                    backgroundColor={
-                        "bg-rh-bg-surface"
-                    }
-                />
-            </div>
+            />
             {/* 년도/월 선택 — 스크롤 시 자동 축소 */}
             <YearMonthSelector
                 year={year}

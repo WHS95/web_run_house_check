@@ -115,25 +115,18 @@ export default async function OverallDetailPage({
 
     return (
         <>
-            <div
-                className={
-                    "sticky top-0 z-50"
-                    + " bg-rh-bg-primary pt-safe"
+            <PageHeader
+                title="전체 대비 출석 상세"
+                backLink={
+                    `/admin2/analyze`
+                    + `?year=${year}`
+                    + `&month=${month}`
                 }
-            >
-                <PageHeader
-                    title="전체 대비 출석 상세"
-                    backLink={
-                        `/admin2/analyze`
-                        + `?year=${year}`
-                        + `&month=${month}`
-                    }
-                    iconColor="white"
-                    backgroundColor={
-                        "bg-rh-bg-surface"
-                    }
-                />
-            </div>
+                iconColor="white"
+                backgroundColor={
+                    "bg-rh-bg-surface"
+                }
+            />
             <div
                 className={
                     "flex-1 px-4 pt-4"

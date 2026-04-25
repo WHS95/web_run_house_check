@@ -135,15 +135,13 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             {/* Header */}
-            <div className="sticky top-0 z-50 shrink-0 bg-rh-bg-primary pt-safe">
-                <PageHeader
-                    title="MY"
-                    iconColor="white"
-                    borderColor="rh-border"
-                    backgroundColor="bg-rh-bg-primary"
-                    rightAction={adminButton}
-                />
-            </div>
+            <PageHeader
+                title="MY"
+                iconColor="white"
+                borderColor="rh-border"
+                backgroundColor="bg-rh-bg-primary"
+                rightAction={adminButton}
+            />
 
             {/* Content */}
             <div className="flex-1 px-4 pt-4 pb-4 space-y-5">

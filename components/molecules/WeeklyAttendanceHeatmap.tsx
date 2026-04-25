@@ -88,8 +88,9 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
         > = [];
 
         const MONTH_SHORT = [
-            '1월', '2월', '3월', '4월', '5월', '6월',
-            '7월', '8월', '9월', '10월', '11월', '12월',
+            '1', '2', '3', '4', '5',
+             '6',
+            '7', '8', '9', '10', '11', '12',
         ];
 
         for (let w = 0; w < 4; w++) {
@@ -146,14 +147,13 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
     if (!mounted) {
         return (
             <div
-                className={`rounded-rh-xl bg-rh-bg-surface p-3 ${className}`}
+                className={`p-3 rounded-rh-xl bg-rh-bg-surface ${className}`}
             >
                 <div className="flex justify-around mb-1">
                     {DAY_LABELS.map((day) => (
                         <span
                             key={day}
-                            className="w-10 text-center text-xs
-                                font-medium text-rh-text-tertiary"
+                            className="w-10 text-xs font-medium text-center text-rh-text-tertiary"
                         >
                             {day}
                         </span>
@@ -169,7 +169,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                                 (_, di) => (
                                     <div
                                         key={di}
-                                        className="h-10 w-10 rounded-rh-md"
+                                        className="w-10 h-10 rounded-rh-md"
                                     />
                                 )
                             )}
@@ -182,7 +182,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
 
     return (
         <div
-            className={`rounded-rh-xl bg-rh-bg-surface p-3 ${className}`}
+            className={`p-3 rounded-rh-xl bg-rh-bg-surface ${className}`}
         >
             {/* 월 라벨 */}
             <div className="flex items-center justify-between mb-2 px-0.5">
@@ -215,8 +215,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                         className="flex justify-around"
                     >
                         {week.map((day, di) => {
-                            const attended =
-                                !day.isToday && day.count > 0;
+                            const attended = day.count > 0;
                             const isDim =
                                 !day.isToday &&
                                 day.count === 0;
@@ -240,8 +239,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                                         stiffness: 400,
                                         damping: 20,
                                     }}
-                                    className="relative flex h-10 w-10
-                                        items-center justify-center"
+                                    className="flex relative justify-center items-center w-10 h-10"
                                 >
                                     {/* 월 시작 칩 */}
                                     {day.isMonthStart && (
@@ -264,9 +262,7 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                                     {attended && (
                                         <svg
                                             viewBox="0 0 40 40"
-                                            className="absolute
-                                                inset-0 h-full w-full
-                                                text-rh-accent"
+                                            className="absolute inset-0 w-full h-full text-rh-accent"
                                             fill="none"
                                             stroke="currentColor"
                                             strokeWidth="4"
@@ -277,12 +273,10 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                                         </svg>
                                     )}
 
-                                    {/* 오늘: 솔리드 원 */}
+                                    {/* 오늘: 링(테두리)만 표시 → 체크와 겹치지 않음 */}
                                     {day.isToday && (
                                         <span
-                                            className="absolute inset-1
-                                                rounded-full
-                                                bg-rh-accent"
+                                            className="absolute inset-1 rounded-full border-2 border-rh-accent"
                                         />
                                     )}
 
@@ -291,10 +285,10 @@ const WeeklyAttendanceHeatmap = memo<WeeklyAttendanceHeatmapProps>(({
                                         className={`relative text-xs
                                             font-semibold
                                             ${
-                                                day.isToday
+                                                attended
                                                     ? 'text-white'
-                                                    : attended
-                                                      ? 'text-white'
+                                                    : day.isToday
+                                                      ? 'text-rh-accent'
                                                       : isDim &&
                                                           day.isFuture
                                                         ? 'text-rh-text-muted'

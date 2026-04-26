@@ -86,6 +86,8 @@ export async function POST(request: Request) {
     }
 
     // updateUserData에서 phone_number 추가
+    // username/password_hash는 NOT NULL 제약이 있으므로 OAuth 가입자에게도 채워줌
+    // (자체 비밀번호 인증을 사용하지 않는 사용자는 password_hash를 빈 문자열로 둠)
     const updateUserData: Record<string, any> = {
       first_name: firstName,
       email: email,
@@ -102,6 +104,8 @@ export async function POST(request: Request) {
       terms_of_service_agreed_at: new Date().toISOString(),
       profile_image_url:
         user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
+      username: user.id,
+      password_hash: "",
     };
 
     // 사용자 이메일 변경이 필요하다면 supabase.auth.updateUser 사용

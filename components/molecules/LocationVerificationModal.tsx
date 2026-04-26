@@ -88,9 +88,18 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
       }
     } catch (error: any) {
       setVerificationStatus('error');
-      setVerificationMessage(error.message || '위치 확인 중 오류가 발생했습니다.');
+      // code 1 = 권한 거부. 일반 메시지로는 사용자가 어떻게 복구해야
+      // 할지 알 수 없으므로 OS별 활성화 절차를 안내한다.
+      const denied = error?.code === 1;
+      const msg = denied
+        ? '위치 권한이 거부되어 있어 출석할 수 없습니다.\n\n'
+          + 'iOS: 설정 > 개인정보 보호 및 보안 > 위치 서비스 > Safari/런하우스 > "사용 중인 동안" 선택\n'
+          + 'Android: 브라우저 주소창 좌측 자물쇠 아이콘 > 권한 > 위치 허용\n\n'
+          + '권한 활성화 후 "다시 시도"를 눌러주세요.'
+        : (error?.message || '위치 확인 중 오류가 발생했습니다.');
+      setVerificationMessage(msg);
       haptic.error();
-      onVerified(false, error.message || '위치 확인 중 오류가 발생했습니다.');
+      onVerified(false, msg);
     }
   };
 

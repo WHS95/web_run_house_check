@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { getFCMToken } from '@/lib/firebase/client';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import SectionLabel from '@/components/atoms/SectionLabel';
+import ConfirmDialog from '@/components/molecules/ConfirmDialog';
 
 import { usePushNotification } from '@/hooks/usePushNotification';
 
@@ -81,6 +82,10 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
     useEffect(() => { setMounted(true); }, []);
     const showNotificationToggle = mounted && isSupported;
 
+    // 회원 탈퇴 모달 상태
+    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+    const [isWithdrawing, setIsWithdrawing] = useState(false);
+
     const handleLogout = useCallback(async () => {
         try {
             if (typeof window !== "undefined" && window.navigator.vibrate) {
@@ -108,6 +113,29 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
             alert("로그아웃 처리 중 문제가 발생했습니다.");
         }
     }, [router]);
+
+    const handleWithdraw = useCallback(async () => {
+        if (isWithdrawing) return;
+        setIsWithdrawing(true);
+        try {
+            const res = await fetch("/api/user/withdraw", { method: "DELETE" });
+            const result = await res.json();
+            if (!res.ok || !result.success) {
+                alert(result.message || "탈퇴 처리 중 오류가 발생했습니다.");
+                setIsWithdrawing(false);
+                return;
+            }
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+            await supabase.auth.signOut();
+            router.replace("/auth/login");
+        } catch {
+            alert("탈퇴 처리 중 문제가 발생했습니다.");
+            setIsWithdrawing(false);
+        }
+    }, [router, isWithdrawing]);
 
     const displayName = useMemo(() => {
         if (!userProfile?.firstName) return '사용자';
@@ -235,7 +263,33 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                         로그아웃
                     </span>
                 </button>
+
+                {/* 회원 탈퇴 텍스트 링크 */}
+                <div className="flex justify-center pt-1">
+                    <button
+                        onClick={() => setShowWithdrawModal(true)}
+                        className="text-rh-text-tertiary text-xs underline"
+                    >
+                        회원 탈퇴
+                    </button>
+                </div>
             </div>
+
+            {/* 탈퇴 확인 모달 */}
+            <ConfirmDialog
+                open={showWithdrawModal}
+                onClose={() => {
+                    if (isWithdrawing) return;
+                    setShowWithdrawModal(false);
+                }}
+                onConfirm={handleWithdraw}
+                title="정말 탈퇴하시겠습니까?"
+                description={"계정과 개인정보(이름·이메일·연락처)가 영구 삭제되며 복구할 수 없습니다.\n\n출석 기록은 통계 보존을 위해 익명으로 남습니다."}
+                cancelLabel="취소"
+                confirmLabel={isWithdrawing ? "처리 중..." : "탈퇴하기"}
+                confirmVariant="danger"
+                confirmDisabled={isWithdrawing}
+            />
         </div>
     );
 });

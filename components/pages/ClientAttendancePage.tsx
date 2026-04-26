@@ -139,11 +139,9 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
     useState<NotificationType | null>(null);
   const [notificationMessage, setNotificationMessage] = useState("");
 
-  // 위치 기반 출석 관련 상태
+  // 위치 기반 출석 관련 상태 — submit 게이팅은 모달이 주관하므로
+  // 상태는 모달 표시 여부만 보관한다.
   const [showLocationModal, setShowLocationModal] = useState(false);
-  const [, setLocationVerified] = useState<boolean | null>(null);
-  const [locationMessage, setLocationMessage] = useState("");
-  const [canAttendByLocation, setCanAttendByLocation] = useState(true); // 위치 기반 출석 가능 여부
 
   // 스크롤 컨테이너 ref (iOS gesture 패턴 적용 대상)
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -329,23 +327,15 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  // 위치 상태 변경 핸들러
-  const handleLocationStatusChange = useCallback((canAttend: boolean, message: string) => {
-    setCanAttendByLocation(canAttend);
-    setLocationMessage(message);
-  }, []);
-
   // 위치 검증 완료 핸들러
   const handleLocationVerified = useCallback((isVerified: boolean, message: string) => {
-    setLocationVerified(isVerified);
-    setLocationMessage(message);
     setShowLocationModal(false);
 
     if (isVerified) {
       // 위치 검증 성공 시 출석 제출
       proceedWithSubmission();
     } else {
-      // 위치 검증 실패
+      // 위치 검증 실패 (권한 거부/범위 밖/오류)
       haptic.error();
       setNotificationType("error");
       setNotificationMessage(message);
@@ -476,26 +466,16 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         ?.location_based_attendance
       && !isUnregistered
     ) {
-      // 위치 상태가 출석 불가능한 경우 출석 차단
-      if (!canAttendByLocation) {
-        haptic.error();
-        setNotificationType("error");
-        setNotificationMessage(
-          locationMessage
-          || "현재 위치에서는 출석할 수 없습니다."
-        );
-        setShowNotification(true);
-        return;
-      }
-
-      // 위치 검증 모달 표시
+      // 항상 모달을 열어 권한 요청 + 위치 검증을 user gesture 컨텍스트에서
+      // 수행. (mount 시 자동 검증 결과로 미리 차단하지 않음 — 권한이
+      // 거부되었더라도 모달에서 재시도/안내가 가능해야 함.)
       setShowLocationModal(true);
       return;
     }
 
     // 위치 기반 출석이 비활성화된 경우 바로 제출
     proceedWithSubmission();
-  }, [isSubmitting, userId, userStatus, formData, initialFormData, canAttendByLocation, locationMessage]);
+  }, [isSubmitting, userId, userStatus, formData, initialFormData]);
 
   // 24시간 전체 옵션 (제출 시 isFutureDateTime으로 검증)
   const availableTimeOptions = TIME_OPTIONS;
@@ -521,10 +501,6 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
     },
     [initialFormData]
   );
-
-  /* 미등록 장소 선택 여부 */
-  const isUnregisteredLocation =
-    formData.location === UNREGISTERED_LOCATION_ID;
 
   // 에러 상태 처리
   if (error) {
@@ -716,31 +692,29 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           </div>
         </div>
 
-        {/* 위치 상태 */}
+        {/* 위치 상태 — informational only. 출석 차단은 모달이 주관. */}
         <LocationStatusIndicator
           isLocationBasedAttendance={initialFormData?.crewInfo?.location_based_attendance || false}
           crewLocations={initialFormData?.crewLocations || []}
           selectedLocationId={formData.location}
           allowedRadius={initialFormData?.crewInfo?.accuracy_range ?? DEFAULT_ACCURACY_RANGE}
-          onStatusChange={handleLocationStatusChange}
         />
 
       </div>
 
       {/* 하단 고정 액션 영역 (바텀 네비 위) */}
       <div className='shrink-0 px-4 pb-2 pt-2 bg-rh-bg-primary'>
-        {/* 제출 버튼 */}
+        {/* 제출 버튼: 위치 기반 출석이 켜져 있어도 클릭 시 모달이 권한 요청을
+            주관하므로 canAttendByLocation으로 차단하지 않는다. */}
         <button
           onClick={handleSubmit}
           disabled={
             isSubmitting ||
-            (userStatus && !userStatus.isActive) ||
-            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation && !isUnregisteredLocation)
+            (userStatus && !userStatus.isActive)
           }
           className={`flex items-center justify-center rounded-[12px] h-[52px] w-full text-[16px] font-semibold text-white transition-all duration-200 active:scale-[0.97] hw-accelerated ${
             isSubmitting ||
-            (userStatus && !userStatus.isActive) ||
-            (initialFormData?.crewInfo?.location_based_attendance && !canAttendByLocation && !isUnregisteredLocation)
+            (userStatus && !userStatus.isActive)
               ? "bg-rh-bg-muted cursor-not-allowed"
               : "bg-rh-accent hover:bg-rh-accent-hover"
           }`}

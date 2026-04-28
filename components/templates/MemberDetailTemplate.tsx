@@ -12,6 +12,7 @@ import SectionLabel from '@/components/atoms/SectionLabel';
 import ConfirmDialog from '@/components/molecules/ConfirmDialog';
 
 import { usePushNotification } from '@/hooks/usePushNotification';
+import { withdrawUserAction } from '@/app/mypage/actions';
 
 interface Activity {
     type: 'attendance' | 'create_meeting';
@@ -118,9 +119,8 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
         if (isWithdrawing) return;
         setIsWithdrawing(true);
         try {
-            const res = await fetch("/api/user/withdraw", { method: "DELETE" });
-            const result = await res.json();
-            if (!res.ok || !result.success) {
+            const result = await withdrawUserAction();
+            if (!result.success) {
                 alert(result.message || "탈퇴 처리 중 오류가 발생했습니다.");
                 setIsWithdrawing(false);
                 return;

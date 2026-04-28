@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CrewLocation } from "@/lib/types/crew-locations";
 import NaverMapLoader from "@/components/map/NaverMapLoader";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { getCrewLocationsAction } from "@/app/map/actions";
 
 /**
  * 지도 화면의 하단 UI 상태
@@ -76,12 +77,9 @@ export default function MapTemplate() {
     useEffect(() => {
         const fetchLocations = async () => {
             try {
-                const res = await fetch(
-                    "/api/crew-locations"
-                );
-                const json = await res.json();
-                if (json.success && json.data) {
-                    setLocations(json.data);
+                const result = await getCrewLocationsAction();
+                if (result.success && result.data) {
+                    setLocations(result.data as unknown as CrewLocation[]);
                 }
             } catch (err) {
                 console.error("장소 조회 실패:", err);

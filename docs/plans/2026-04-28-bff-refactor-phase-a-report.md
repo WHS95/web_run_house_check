@@ -250,9 +250,131 @@ lib/
 - `lib/supabase/crew-auth.ts`의 `verifyCrewInviteCode`는 'use client' 모듈이라 서버에서 호출하면 안 됨 — Phase B에서 actions.ts에 동등 로직을 직접 작성하여 격리. 단 클라이언트(/admin2/...) 측에서 여전히 사용 중 (필요 시 후속 정리).
 - `getCrewVerificationStatusAction`은 현재 호출자 0건 (route GET dead code 였음). 미래 사용 가능성 있어 유지.
 
-## 11. Phase C 진입 시도 (해당 시 추가)
+## 11. Phase C (G2: user) 부분 완료
 
-(작성 시점 미진입. 시간 여유 시 별도 commit으로 추가.)
+### 11.1 진행 결과
+
+| Step | 상태 | 비고 |
+|------|------|------|
+| C-1. `lib/domain/user/` TDD | ✅ | 9 tests, `사용자_활성여부_판정` |
+| C-2. `app/mypage/actions.ts` 신설 | ✅ | `getUserStatusAction`, `withdrawUserAction` (service_role 그대로) |
+| C-3. `MemberDetailTemplate.tsx` 변환 | ✅ | fetch → action |
+| C-4. legacy 2개 route 삭제 | ✅ | `user/status`, `user/withdraw` |
+| **C-5. admin/users + admin/crew-members** | ⏸️ **보류** | 호출자 9곳, admin2 라인 결합. 데드라인 시간 부족. |
+
+### 11.2 머지된 커밋 (Phase C)
+
+```
+45b1ab07 refactor(user): MemberDetailTemplate fetch → withdrawUserAction + legacy 2 routes 삭제
+ab4408c2 feat(domain/user): user 도메인 + mypage Server Actions
+```
+
+### 11.3 변경 파일 트리 (Phase C)
+
+```
+app/
+├── mypage/
+│   └── actions.ts                      [신규] getUserStatusAction + withdrawUserAction
+└── api/
+    └── user/                           [폴더째 삭제]
+        ├── status/route.ts
+        └── withdraw/route.ts
+
+components/
+└── templates/
+    └── MemberDetailTemplate.tsx        [수정] fetch → withdrawUserAction
+
+lib/
+└── domain/
+    └── user/                           [신규]
+        ├── policies.ts                 사용자_활성여부_판정 (status 우선순위 5단)
+        ├── policies.test.ts            9 tests
+        └── types.ts                    UserStatusActionResult, UserWithdrawActionResult
+```
+
+### 11.4 빌드 검증 (Phase C 직후)
+
+```
+✓ 44 tests PASS (attendance 13 + auth 22 + user 9)
+✓ check-bff OK / check-domain-tests OK (7 files)
+✓ typecheck 0 error / ESLint 0 error
+✓ next build 성공 (route 목록에서 /api/user/* 모두 제거 확인)
+```
+
+### 11.5 사용자 검토 항목 (Phase C)
+
+회귀 시나리오 (수동 검증):
+- [ ] **본인 탈퇴**: /mypage → 마이페이지 → 탈퇴 버튼 → "탈퇴가 완료되었습니다." → /auth/login 리다이렉트
+- [ ] **탈퇴 실패 케이스**: 잘못된 권한 등 → 알럿 메시지 표기
+- [ ] **`getUserStatusAction`** (현재 호출자 0건): 사용자 dirty의 ClientAttendancePage `userStatus` prop 채움 위해 미래 호출 가능. 수동 호출 검증 권장.
+
+### 11.6 보류 사유 — `admin/users`, `admin/crew-members`
+
+| route | 줄 수 | 호출자 | 보류 이유 |
+|------|------|--------|----------|
+| `app/api/admin/users/route.ts` | 55 | 6+곳 (admin2 settings, push, organisms 등) | 호출자 분포 + admin2 dirty와 부분 겹침 |
+| `app/api/admin/crew-members/route.ts` | 238 | 5+곳 (BulkAttendance, MembersTab 등) | 가장 큰 admin route. 호출자 다수 |
+
+이 두 route는 다음 작업 단위로 진입 권장 (별도 PR + 충분한 시간 + 회귀 검증).
+
+## 12. 최종 진행 요약 (사용자 복귀 시점 기준)
+
+### 12.1 마이그레이션 커버리지
+
+| 그룹 | 진행 | 상세 |
+|------|------|------|
+| **Phase A** (attendance 본보기) | ✅ 완료 | route 1개 → actions, 13 tests |
+| **Phase B** (G1: auth) | ✅ 완료 | route 3개 → actions 4개, 22 tests |
+| **Phase C** (G2: user 부분) | 🟡 부분 | route 2/4 완료 (status, withdraw). admin/users·crew-members 보류 |
+| **Phase D~G** (G3~G9) | ⏸️ 보류 | attendance(admin), grade, notice/push, crew/location, invite, master, analyze (총 28+ routes) |
+
+### 12.2 누계 변경
+
+- **신규 도메인 파일**: 13개 (`lib/domain/{attendance,auth,user}`)
+- **Vitest 테스트**: 44 tests, 7 도메인 파일 모두 1:1 보유
+- **Server Actions**: 7개 (submitAttendance, verifyCrewCodeAction, signupAction, verifyCrewMembershipAction, getCrewVerificationStatusAction, getUserStatusAction, withdrawUserAction)
+- **삭제된 legacy route**: 6개 (attendance, auth/signup, auth/verify-crew-code, crew-verification, user/status, user/withdraw)
+- **남은 `app/api/`**: 32개 (admin/* 19, master/* 5, push/* 2, notifications 1, crew-locations 1, dev/login 1, ping 1)
+- **변환된 클라이언트**: 6 호출 사이트
+- **인프라**: ESLint 7개 룰 (1~4 error, 5~6 warn 단계), Vitest, check-bff, check-domain-tests
+
+### 12.3 Phase별 commit hash
+
+```
+[Phase A]
+2a8fb771 chore(attendance): legacy /api/attendance route 제거
+6cb8a2f2 refactor(attendance): fetch → submitAttendance Server Action 직접 호출
+73b8d431 feat(attendance): submitAttendance Server Action 추가
+1d4ca47b feat(domain/attendance): validators · messages · types
+73c32ff3 feat(domain/attendance): 출석 정책 함수 + 단위 테스트
+bfc714d8 chore(bff): BFF 4계층 룰 + Vitest TDD 인프라 도입
+c16cf12c docs(bff): Phase A 실행 계획 추가
+9205ef83 docs(bff): BFF 4계층 리팩토링 설계 문서 추가
+bf41dae7 docs(bff): Phase A 완료 보고서 추가
+
+[Phase B]
+09aad485 chore(auth): legacy auth route 3개 제거
+9296d1cd refactor(auth): fetch → Server Action 직접 호출 (3 호출자)
+a7f04dc9 feat(auth): Server Actions 4개 추가
+56bad83b feat(domain/auth): auth 도메인 신설 (TDD, 22 tests)
+109024c2 docs(bff): 보고서에 Phase B (auth) 결과 추가
+
+[Phase C]
+45b1ab07 refactor(user): MemberDetailTemplate fetch → withdrawUserAction + legacy 2 routes 삭제
+ab4408c2 feat(domain/user): user 도메인 + mypage Server Actions
+```
+
+### 12.4 사용자 복귀 시 핵심 액션
+
+1. **브랜치 확인**: `git checkout feat/bff-refactor-phase-a && git log --oneline main..HEAD`
+2. **빌드 재현**: `npm run build` (모든 검증 통과 확인)
+3. **회귀 검증** (수동, dev 서버):
+   - 출석 등록 흐름 (Phase A)
+   - 회원가입/크루 인증 흐름 (Phase B)
+   - 본인 탈퇴 흐름 (Phase C)
+4. **머지 결정**: 일괄 squash 또는 PR 생성 후 검토
+5. **다음 단계**: `admin/users`, `admin/crew-members` 처리 + 룰 5/6 격상 cleanup PR
+
 
 ---
 

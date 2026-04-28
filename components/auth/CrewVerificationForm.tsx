@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, CheckCircle2 } from "lucide-react";
+import { verifyCrewMembershipAction } from "@/app/auth/verify-crew/actions";
 
 interface CrewVerificationFormProps {
     onSuccess?: (crew: { id: string; name: string }) => void;
@@ -31,24 +32,20 @@ export default function CrewVerificationForm({
             setIsLoading(true);
             setError(null);
 
-            const response = await fetch("/api/crew-verification", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ inviteCode }),
-            });
+            const result = await verifyCrewMembershipAction({ inviteCode });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "크루 인증에 실패했습니다.");
+            if (!result.success) {
+                throw new Error(result.message || "크루 인증에 실패했습니다.");
             }
 
             setIsSuccess(true);
 
-            if (onSuccess && data.crew) {
-                onSuccess(data.crew);
+            const verifiedCrew = result.data?.crew;
+            if (onSuccess && verifiedCrew) {
+                onSuccess({
+                    id: verifiedCrew.id,
+                    name: verifiedCrew.name ?? "",
+                });
             } else {
                 // 3초 후 홈페이지로 리다이렉트
                 setTimeout(() => {

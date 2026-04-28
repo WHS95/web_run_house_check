@@ -326,17 +326,39 @@ lib/
 | **Phase A** (attendance 본보기) | ✅ 완료 | route 1개 → actions, 13 tests |
 | **Phase B** (G1: auth) | ✅ 완료 | route 3개 → actions 4개, 22 tests |
 | **Phase C** (G2: user 부분) | 🟡 부분 | route 2/4 완료 (status, withdraw). admin/users·crew-members 보류 |
-| **Phase D~G** (G3~G9) | ⏸️ 보류 | attendance(admin), grade, notice/push, crew/location, invite, master, analyze (총 28+ routes) |
+| **추가 (push token)** | ✅ 완료 | route 1개 (`push/token`) → actions 2개, 5 tests |
+| **추가 (crew-locations)** | ✅ 완료 | route 1개 → action 1개 (도메인 types만) |
+| **Dead route 정리** | ✅ 완료 | 3개 삭제 (notifications, admin/analyze, master/admin/invite-codes) |
+| **Phase D~G 잔여** | ⏸️ 보류 | admin attendance, grade, notice/push, crew/location, invite, master 등 (총 ~24 routes) |
 
 ### 12.2 누계 변경
 
-- **신규 도메인 파일**: 13개 (`lib/domain/{attendance,auth,user}`)
-- **Vitest 테스트**: 44 tests, 7 도메인 파일 모두 1:1 보유
-- **Server Actions**: 7개 (submitAttendance, verifyCrewCodeAction, signupAction, verifyCrewMembershipAction, getCrewVerificationStatusAction, getUserStatusAction, withdrawUserAction)
-- **삭제된 legacy route**: 6개 (attendance, auth/signup, auth/verify-crew-code, crew-verification, user/status, user/withdraw)
-- **남은 `app/api/`**: 32개 (admin/* 19, master/* 5, push/* 2, notifications 1, crew-locations 1, dev/login 1, ping 1)
-- **변환된 클라이언트**: 6 호출 사이트
-- **인프라**: ESLint 7개 룰 (1~4 error, 5~6 warn 단계), Vitest, check-bff, check-domain-tests
+- **신규 도메인 폴더**: 5개 (`lib/domain/{attendance, auth, user, push, location}`)
+- **신규 도메인 파일**: 17개 (정책 + 검증 + 워크플로우 + 메시지 + 타입)
+- **Vitest 테스트**: 49 tests / 8 test files. 모든 도메인 파일이 *.test.ts 1:1 보유 (types.ts SKIP)
+- **Server Actions**: 11개
+    - `submitAttendance` (Phase A)
+    - `verifyCrewCodeAction`, `signupAction` (Phase B / signup)
+    - `verifyCrewMembershipAction`, `getCrewVerificationStatusAction` (Phase B / verify-crew)
+    - `getUserStatusAction`, `withdrawUserAction` (Phase C / mypage)
+    - `registerPushTokenAction`, `deactivatePushTokenAction` (push token)
+    - `getCrewLocationsAction` (crew-locations)
+    - (총 11개 중 1개 미사용 = `getCrewVerificationStatusAction`)
+- **삭제된 legacy route**: 11개
+    - `app/api/attendance` (Phase A)
+    - `app/api/auth/signup`, `app/api/auth/verify-crew-code`, `app/api/crew-verification` (Phase B)
+    - `app/api/user/status`, `app/api/user/withdraw` (Phase C)
+    - `app/api/push/token` (push)
+    - `app/api/crew-locations` (location)
+    - `app/api/notifications`, `app/api/admin/analyze`, `app/api/master/admin/invite-codes` (dead route 정리)
+- **남은 `app/api/`**: ~27개
+    - admin/* 17개 (attendance, settings, grade-recommendations × 3, grades × 2, crew-settings, crew-members, notices × 3, push-history, users, crew-locations × 2, invite-codes)
+    - master/* 4개 (crews, crew-members, invite-codes × 2)
+    - push/test 1개
+    - ping 1개 (헬스체크, 변환 의미 없음)
+    - dev/login 1개 (개발 도구, 화이트리스트)
+- **변환된 클라이언트 호출 사이트**: 11곳 (attendance 2 + auth 3 + mypage 1 + push 4 + map 1)
+- **인프라**: ESLint 7개 룰 (1~4 error, 5~6 warn 단계), Vitest, check-bff, check-domain-tests, build 통합 (`npm run build`)
 
 ### 12.3 Phase별 commit hash
 
@@ -362,6 +384,17 @@ a7f04dc9 feat(auth): Server Actions 4개 추가
 [Phase C]
 45b1ab07 refactor(user): MemberDetailTemplate fetch → withdrawUserAction + legacy 2 routes 삭제
 ab4408c2 feat(domain/user): user 도메인 + mypage Server Actions
+
+[추가 마이그레이션]
+913c3260 feat(location): crew-locations 마이그레이션 — getCrewLocationsAction
+6980cd95 feat(push): push token 마이그레이션 — registerPushTokenAction + deactivatePushTokenAction
+
+[Dead route 정리]
+bd3ee33b chore(admin,master): dead route 2개 제거
+bd678a17 chore(notifications): dead /api/notifications route 제거
+
+[보고서]
+22594674 docs(bff): 보고서 Phase C 결과 + 최종 진행 요약 추가
 ```
 
 ### 12.4 사용자 복귀 시 핵심 액션

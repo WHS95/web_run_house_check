@@ -171,9 +171,88 @@ exit: 1
 | 4 | `check-bff.ts` base ref 미발견 시 fail-open 거동 | Low | README에 명시됨 |
 | 5 | `lib/admin-stats.ts` (830줄) DB 호출 + 비즈니스 룰 혼재 | High | Phase G(stats) 작업 시 분해 |
 
-## 10. Phase B 진입 결과 (해당 시 추가)
+## 10. Phase B (G1: auth) 진입 결과 ✅ 완료
 
-(작성 시점 미진입. 별도 commit으로 추가될 수 있음.)
+### 10.1 진행 결과 요약
+
+| Step | 상태 | 비고 |
+|------|------|------|
+| B-0. (인프라 재사용) | ✅ | Phase A 인프라 그대로 사용 |
+| B-1. `lib/domain/auth/` TDD | ✅ | 22 tests PASS (policies 9, validators 5, workflows 8) |
+| B-2. `app/auth/{signup,verify-crew}/actions.ts` 신설 | ✅ | 4 Server Actions, 누계 35 tests |
+| B-3. 클라이언트 3곳 변환 | ✅ | page.tsx 2곳, CrewVerificationForm 1곳 |
+| B-4. legacy 3개 route 삭제 + build | ✅ | 534줄 제거, build 통과 |
+
+### 10.2 머지된 커밋 (Phase B)
+
+```
+09aad485 chore(auth): legacy auth route 3개 제거 (BFF 마이그레이션 완료)
+9296d1cd refactor(auth): fetch → Server Action 직접 호출 (3 호출자)
+a7f04dc9 feat(auth): Server Actions 4개 추가 (route 3개와 병행 운영)
+56bad83b feat(domain/auth): auth 도메인 신설 (TDD, 22 tests)
+```
+
+### 10.3 변경 파일 트리 (Phase B)
+
+```
+app/
+├── auth/
+│   ├── signup/
+│   │   ├── actions.ts                  [신규] verifyCrewCodeAction + signupAction
+│   │   └── page.tsx                    [수정] fetch → action 직접 호출 (2곳)
+│   └── verify-crew/
+│       └── actions.ts                  [신규] verifyCrewMembershipAction + getCrewVerificationStatusAction
+└── api/                                [3개 route 삭제]
+    ├── auth/                           [폴더째 삭제]
+    └── crew-verification/              [삭제]
+
+components/
+└── auth/
+    └── CrewVerificationForm.tsx        [수정] fetch → action
+
+lib/
+└── domain/
+    └── auth/                           [신규]
+        ├── policies.ts                 초대코드_유효한가, 인증된_사용자인가, 크루정보_완전한가
+        ├── policies.test.ts            9 tests
+        ├── validators.ts               signupSchema(re-export), verifyCrewCodeSchema, crewVerificationSchema
+        ├── validators.test.ts          5 tests
+        ├── workflows.ts                가입_upsert_payload_조립 (OAuth + Kakao 특수 + NOT NULL 보존)
+        ├── workflows.test.ts           8 tests
+        └── types.ts                    AuthActionResult, VerifyCrewCodeOk, CrewMembershipVerificationOk, CrewVerificationStatus
+```
+
+### 10.4 빌드 검증 (Phase B 직후)
+
+```
+✓ check-bff OK (app/api/ 신규 추가 없음)
+✓ check-domain-tests OK (6개 도메인 파일)
+✓ 35 tests PASS (attendance 13 + auth 22)
+✓ ESLint 0 error
+✓ tsc --noEmit 0 error
+✓ next build 성공 (route 목록에서 /api/auth/*, /api/crew-verification 제거 확인)
+```
+
+### 10.5 사용자 검토 항목 (Phase B 한정)
+
+회귀 시나리오 (수동 검증):
+- [ ] **회원가입 흐름**: 로그인(Google/Kakao) → 가입 폼 → 크루 코드 입력 + 검증(verifyCrewCodeAction) → 폼 제출(signupAction) → 성공 토스트 + PostHog `server_signup_completed`
+- [ ] **회원가입 거부 케이스**:
+    - 비활성 크루 코드 → "비활성화된 크루 코드입니다."
+    - 존재하지 않는 코드 → "존재하지 않는 크루 코드입니다."
+    - 중복 IP rate limit (10회/분 verify, 5회/분 signup)
+- [ ] **크루 인증 흐름** (이미 가입된 사용자가 크루 인증만): /auth/verify-crew → 초대 코드 입력 → "크루 인증이 완료되었습니다!"
+- [ ] **이미 인증된 사용자 거부**: "이미 크루에 인증된 사용자입니다."
+- [ ] **사용자의 dirty 의도 (signup eff98798) 보존 확인**: NOT NULL 제약 username/password_hash 자동 채움이 가입_upsert_payload_조립에 들어 있는지 (코드 검토만 OK)
+
+### 10.6 알려진 이슈 (Phase B 한정)
+
+- `lib/supabase/crew-auth.ts`의 `verifyCrewInviteCode`는 'use client' 모듈이라 서버에서 호출하면 안 됨 — Phase B에서 actions.ts에 동등 로직을 직접 작성하여 격리. 단 클라이언트(/admin2/...) 측에서 여전히 사용 중 (필요 시 후속 정리).
+- `getCrewVerificationStatusAction`은 현재 호출자 0건 (route GET dead code 였음). 미래 사용 가능성 있어 유지.
+
+## 11. Phase C 진입 시도 (해당 시 추가)
+
+(작성 시점 미진입. 시간 여유 시 별도 commit으로 추가.)
 
 ---
 

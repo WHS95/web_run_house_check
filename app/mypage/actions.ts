@@ -3,11 +3,17 @@
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { rateLimit } from '@/lib/rate-limit';
 import * as 사용자정책 from '@/lib/domain/user/policies';
 import type {
     UserStatusActionResult,
     UserWithdrawActionResult,
 } from '@/lib/domain/user/types';
+import {
+    pushTokenRegisterSchema,
+    pushTokenDeactivateSchema,
+} from '@/lib/domain/push/validators';
+import type { PushTokenActionResult } from '@/lib/domain/push/types';
 
 /**
  * 본인 사용자 상태 조회 (마이페이지/출석 페이지에서 가드용).
@@ -137,4 +143,87 @@ export async function withdrawUserAction(): Promise<UserWithdrawActionResult> {
         success: true,
         message: '탈퇴가 완료되었습니다.',
     };
+}
+
+/**
+ * 푸시 토큰 등록/갱신. 기존 /api/push/token POST 대체.
+ */
+export async function registerPushTokenAction(
+    input: unknown
+): Promise<PushTokenActionResult> {
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+        return { success: false, message: '인증이 필요합니다.' };
+    }
+
+    const rl = rateLimit({
+        key: `push-token:${user.id}`,
+        limit: 20,
+        windowMs: 60_000,
+    });
+    if (!rl.success) {
+        return { success: false, message: '요청이 너무 많습니다.' };
+    }
+
+    const parsed = pushTokenRegisterSchema.safeParse(input);
+    if (!parsed.success) {
+        return { success: false, message: '토큰과 크루 ID가 필요합니다.' };
+    }
+
+    const { error } = await supabase
+        .schema('attendance')
+        .from('user_push_tokens')
+        .upsert(
+            {
+                user_id: user.id,
+                crew_id: parsed.data.crewId,
+                token: parsed.data.token,
+                platform: 'web',
+                is_active: true,
+                updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'token' }
+        );
+
+    if (error) {
+        return { success: false, message: '토큰 등록에 실패했습니다.' };
+    }
+
+    return { success: true };
+}
+
+/**
+ * 푸시 토큰 비활성화 (로그아웃 시).
+ * 기존 /api/push/token DELETE 대체.
+ */
+export async function deactivatePushTokenAction(
+    input: unknown
+): Promise<PushTokenActionResult> {
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+        return { success: false, message: '인증이 필요합니다.' };
+    }
+
+    const parsed = pushTokenDeactivateSchema.safeParse(input);
+    if (!parsed.success) {
+        return { success: false, message: '토큰이 필요합니다.' };
+    }
+
+    await supabase
+        .schema('attendance')
+        .from('user_push_tokens')
+        .update({
+            is_active: false,
+            updated_at: new Date().toISOString(),
+        })
+        .eq('token', parsed.data.token)
+        .eq('user_id', user.id);
+
+    return { success: true };
 }

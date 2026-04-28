@@ -12,7 +12,7 @@ import SectionLabel from '@/components/atoms/SectionLabel';
 import ConfirmDialog from '@/components/molecules/ConfirmDialog';
 
 import { usePushNotification } from '@/hooks/usePushNotification';
-import { withdrawUserAction } from '@/app/mypage/actions';
+import { withdrawUserAction, deactivatePushTokenAction } from '@/app/mypage/actions';
 
 interface Activity {
     type: 'attendance' | 'create_meeting';
@@ -94,11 +94,7 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
             }
             const fcmToken = await getFCMToken();
             if (fcmToken) {
-                await fetch("/api/push/token", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: fcmToken }),
-                }).catch(() => {});
+                await deactivatePushTokenAction({ token: fcmToken }).catch(() => {});
             }
             const supabase = createBrowserClient(
                 process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -21,6 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import LoadingSpinner from "../atoms/LoadingSpinner";
 import FadeIn from "../atoms/FadeIn";
 import { useOfflineAttendance } from "@/hooks/useOfflineAttendance";
+import { submitAttendance } from "@/app/attendance/actions";
 
 // 한국 시간 유틸: UTC+9 기준으로 안정적 계산
 const getKoreaDate = () => {
@@ -389,19 +390,9 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         return;
       }
 
-      const response = await fetch("/api/attendance", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-POSTHOG-DISTINCT-ID": posthog.get_distinct_id() ?? "",
-          "X-POSTHOG-SESSION-ID": posthog.get_session_id() ?? "",
-        },
-        body: JSON.stringify(submissionData),
-      });
+      const result = await submitAttendance(submissionData);
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         posthog.capture("attendance_submitted", {
           crew_id: submissionData.crewId,
           location_id: submissionData.locationId,
@@ -413,8 +404,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         setNotificationMessage("출석이 완료되었습니다!");
       } else {
         posthog.captureException(
-          new Error(result.message || "attendance_failed"),
-          { properties: { status: response.status } }
+          new Error(result.message || "attendance_failed")
         );
         haptic.error();
         setNotificationType("error");

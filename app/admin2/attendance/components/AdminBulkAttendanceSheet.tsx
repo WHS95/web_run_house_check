@@ -28,6 +28,7 @@ import AdminCheckbox from
 import { Switch } from "@/components/ui/switch";
 import { haptic } from "@/lib/haptic";
 import { getAdminCrewUsersAction } from "@/app/admin2/actions";
+import { createBulkAttendanceAction } from "@/app/admin2/attendance/actions";
 
 /* ── 타입 ── */
 interface UserRow {
@@ -468,25 +469,15 @@ function AdminBulkAttendanceSheet({
                     10,
                 ),
             };
-            const res = await fetch(
-                "/api/admin/attendance/bulk",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                },
-            );
-            const json = await res.json();
-            if (res.ok && json.success) {
+            const result =
+                await createBulkAttendanceAction(payload);
+            if (result.success) {
                 haptic.success();
                 onSuccess();
             } else {
                 haptic.error();
                 setGuideMessage(
-                    json.message ||
+                    result.message ||
                         "출석 처리 중 오류가 발생했습니다.",
                 );
             }

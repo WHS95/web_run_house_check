@@ -3,6 +3,11 @@ import { useCallback } from "react";
 import useSWR from "swr";
 import { useAdmin } from "@/lib/admin2/context";
 import { adminKey } from "@/lib/admin2/swr-keys";
+import {
+    createBulkAttendanceAction,
+    deleteAttendanceAction,
+    updateAttendanceAction,
+} from "@/app/admin2/attendance/actions";
 
 export interface BulkAttendanceInput {
     users: Array<{ userId: string; isHost: boolean }>;
@@ -21,30 +26,26 @@ export function useAdminAttendance(year: number, month: number) {
 
     const createBulk = useCallback(
         async (input: BulkAttendanceInput): Promise<number> => {
-            const res = await fetch("/api/admin/attendance/bulk", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ crewId, ...input }),
+            const result = await createBulkAttendanceAction({
+                crewId,
+                ...input,
             });
-            const json = await res.json();
-            if (!json?.success) {
-                throw new Error(json?.message || "일괄 등록 실패");
+            if (!result?.success) {
+                throw new Error(result?.message || "일괄 등록 실패");
             }
             await invalidate("attendance");
-            return json.data?.createdCount ?? 0;
+            return result.data?.createdCount ?? 0;
         },
         [crewId, invalidate]
     );
 
     const deleteRecord = useCallback(
         async (recordId: string): Promise<void> => {
-            const res = await fetch(
-                `/api/admin/attendance/delete?recordId=${recordId}`,
-                { method: "DELETE" }
-            );
-            const json = await res.json();
-            if (!json?.success) {
-                throw new Error(json?.message || json?.error || "삭제 실패");
+            const result = await deleteAttendanceAction({ recordId });
+            if (!result?.success) {
+                throw new Error(
+                    result?.message || result?.error || "삭제 실패"
+                );
             }
             await invalidate("attendance");
         },
@@ -56,14 +57,14 @@ export function useAdminAttendance(year: number, month: number) {
             recordId: string,
             updates: Record<string, unknown>
         ): Promise<void> => {
-            const res = await fetch("/api/admin/attendance/update", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ recordId, updates }),
+            const result = await updateAttendanceAction({
+                recordId,
+                updates,
             });
-            const json = await res.json();
-            if (!json?.success) {
-                throw new Error(json?.message || json?.error || "수정 실패");
+            if (!result?.success) {
+                throw new Error(
+                    result?.message || result?.error || "수정 실패"
+                );
             }
             await invalidate("attendance");
         },

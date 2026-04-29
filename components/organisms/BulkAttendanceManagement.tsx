@@ -27,6 +27,7 @@ import PopupNotification, {
 } from "@/components/molecules/common/PopupNotification";
 import { haptic } from "@/lib/haptic";
 import { getAdminCrewUsersAction } from "@/app/admin2/actions";
+import { createBulkAttendanceAction } from "@/app/admin2/attendance/actions";
 
 // 나이 계산 함수
 const calculateAge = (birthYear: number | null): string => {
@@ -211,23 +212,17 @@ export default function BulkAttendanceManagement({
       // console.log("선택된 시간:", attendanceData.time);
       // console.log("생성된 타임스탬프:", attendanceTimestamp);
 
-      const response = await fetch("/api/admin/attendance/bulk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          crewId,
-          users: Array.from(selectedUsers).map((userId) => ({
-            userId,
-            isHost: false,
-          })),
-          attendanceTimestamp: attendanceTimestamp,
-          locationId: parseInt(attendanceData.location),
-        }),
-      });
+      const result = await createBulkAttendanceAction({
+        crewId,
+        users: Array.from(selectedUsers).map((userId) => ({
+          userId,
+          isHost: false,
+        })),
+        attendanceTimestamp: attendanceTimestamp,
+        locationId: parseInt(attendanceData.location),
+      } as Parameters<typeof createBulkAttendanceAction>[0]);
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         haptic.success();
         showNotification(
           `${selectedUsers.size}명의 출석이 성공적으로 처리되었습니다.`,

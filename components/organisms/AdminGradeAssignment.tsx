@@ -7,6 +7,7 @@ import {
     assignUserGradeAction,
     resetUserGradeOverrideAction,
 } from "@/app/admin2/settings/grade/actions";
+import { getCrewMembersAction } from "@/app/admin2/settings/members/actions";
 
 interface Member {
     id: string;
@@ -92,19 +93,14 @@ export default function AdminGradeAssignment({
 
     const fetchData = useCallback(async () => {
         try {
-            const [membersRes, gradesResult] = await Promise.all([
-                fetch(
-                    `/api/admin/crew-members?crewId=${crewId}`
-                ),
+            const [membersResult, gradesResult] = await Promise.all([
+                getCrewMembersAction({ crewId }),
                 getCrewGradesAction({ crewId }),
             ]);
 
-            if (membersRes.ok) {
-                const membersData = await membersRes.json();
+            if (membersResult.success) {
                 setMembers(
-                    Array.isArray(membersData)
-                        ? membersData
-                        : membersData.data ?? []
+                    (membersResult.data as unknown as Member[]) ?? []
                 );
             }
 

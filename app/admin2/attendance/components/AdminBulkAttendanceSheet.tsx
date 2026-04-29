@@ -29,6 +29,7 @@ import { Switch } from "@/components/ui/switch";
 import { haptic } from "@/lib/haptic";
 import { getAdminCrewUsersAction } from "@/app/admin2/actions";
 import { createBulkAttendanceAction } from "@/app/admin2/attendance/actions";
+import { getCrewSettingsBundleAction } from "@/app/admin2/settings/actions";
 
 /* ── 타입 ── */
 interface UserRow {
@@ -294,13 +295,10 @@ function AdminBulkAttendanceSheet({
         const load = async () => {
             setIsLoading(true);
             try {
-                const [uResult, sRes] = await Promise.all([
+                const [uResult, sResult] = await Promise.all([
                     getAdminCrewUsersAction({ crewId }),
-                    fetch(
-                        `/api/admin/settings?crewId=${crewId}`,
-                    ),
+                    getCrewSettingsBundleAction({ crewId }),
                 ]);
-                const sJson = await sRes.json();
                 if (cancelled) return;
                 if (
                     uResult.success &&
@@ -308,9 +306,9 @@ function AdminBulkAttendanceSheet({
                 ) {
                     setUsers(uResult.data as any);
                 }
-                if (sJson?.success && sJson.data) {
+                if (sResult.success && sResult.data) {
                     const locs: LocationRow[] =
-                        sJson.data.locations || [];
+                        (sResult.data.locations as LocationRow[]) || [];
                     setLocations(locs);
                     if (locs.length > 0) {
                         setLocationId(
@@ -318,7 +316,7 @@ function AdminBulkAttendanceSheet({
                         );
                     }
                     const exTypes: ExerciseTypeRow[] =
-                        sJson.data.exerciseTypes || [];
+                        (sResult.data.exerciseTypes as ExerciseTypeRow[]) || [];
                     setExerciseTypes(exTypes);
                     if (exTypes.length > 0) {
                         setExerciseTypeId(

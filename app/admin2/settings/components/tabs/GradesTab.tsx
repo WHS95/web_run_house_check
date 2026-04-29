@@ -31,6 +31,7 @@ import {
     assignUserGradeAction,
     resetUserGradeOverrideAction,
 } from "@/app/admin2/settings/grade/actions";
+import { getCrewMembersAction } from "@/app/admin2/settings/members/actions";
 
 // ─── 타입 정의 ───
 interface CrewGrade {
@@ -807,15 +808,14 @@ const GradeAssignment = memo(function GradeAssignment({
         async function load() {
             try {
                 setLoading(true);
-                const [membersRes, gResult] = await Promise.all([
-                    fetch(
-                        `/api/admin/crew-members?crewId=${crewId}`
-                    ),
+                const [mResult, gResult] = await Promise.all([
+                    getCrewMembersAction({ crewId }),
                     getCrewGradesAction({ crewId }),
                 ]);
-                const mResult = await membersRes.json();
                 if (mResult.success) {
-                    setMembers(mResult.data || []);
+                    setMembers(
+                        (mResult.data as unknown as Member[]) || []
+                    );
                 }
                 if (gResult.success) {
                     setGrades(

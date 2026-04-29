@@ -4,6 +4,10 @@ import useSWR from "swr";
 import { useAdmin } from "@/lib/admin2/context";
 import { adminKey } from "@/lib/admin2/swr-keys";
 import type { UserForAdmin } from "@/lib/supabase/admin";
+import {
+    changeCrewMemberRoleAction,
+    removeCrewMemberAction,
+} from "@/app/admin2/settings/members/actions";
 
 export function useAdminUsers() {
     const { crewId, invalidate } = useAdmin();
@@ -12,14 +16,13 @@ export function useAdminUsers() {
 
     const changeRole = useCallback(
         async (userId: string, isAdmin: boolean): Promise<void> => {
-            const res = await fetch("/api/admin/crew-members", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId, isAdmin, crewId }),
+            const result = await changeCrewMemberRoleAction({
+                userId,
+                isAdmin,
+                crewId,
             });
-            const json = await res.json();
-            if (!json?.success) {
-                throw new Error(json?.message || "권한 변경 실패");
+            if (!result.success) {
+                throw new Error(result.message || "권한 변경 실패");
             }
             await invalidate("users");
         },
@@ -33,11 +36,12 @@ export function useAdminUsers() {
                 { revalidate: false }
             );
             try {
-                const url = `/api/admin/crew-members?userId=${userId}&crewId=${crewId}`;
-                const res = await fetch(url, { method: "DELETE" });
-                const json = await res.json();
-                if (!json?.success) {
-                    throw new Error(json?.message || "멤버 추방 실패");
+                const result = await removeCrewMemberAction({
+                    userId,
+                    crewId,
+                });
+                if (!result.success) {
+                    throw new Error(result.message || "멤버 추방 실패");
                 }
                 await invalidate("users");
             } catch (e) {

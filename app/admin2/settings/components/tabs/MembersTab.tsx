@@ -18,6 +18,10 @@ import {
     AnimatedList,
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
+import {
+    getCrewMembersAction,
+    changeCrewMemberRoleAction,
+} from "@/app/admin2/settings/members/actions";
 
 // API에서 반환하는 크루 멤버 타입
 interface CrewMember {
@@ -97,13 +101,11 @@ const MembersTab = memo(function MembersTab({
     const fetchMembers = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(
-                `/api/admin/crew-members`
-                + `?crewId=${crewId}`
-            );
-            const result = await res.json();
-            if (res.ok && result.success) {
-                setMembers(result.data || []);
+            const result = await getCrewMembersAction({ crewId });
+            if (result.success) {
+                setMembers(
+                    (result.data as unknown as CrewMember[]) || []
+                );
             }
         } catch {
             // 에러 무시
@@ -125,22 +127,13 @@ const MembersTab = memo(function MembersTab({
             try {
                 const isAdmin =
                     actionType === "promote";
-                const res = await fetch(
-                    "/api/admin/crew-members",
-                    {
-                        method: "PATCH",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-                        body: JSON.stringify({
-                            crewId,
-                            userId: actionTarget.id,
-                            isAdmin,
-                        }),
-                    }
-                );
-                if (res.ok) {
+                const result =
+                    await changeCrewMemberRoleAction({
+                        crewId,
+                        userId: actionTarget.id,
+                        isAdmin,
+                    });
+                if (result.success) {
                     haptic.success();
                     // 로컬 상태 업데이트
                     setMembers((prev) =>

@@ -31,6 +31,11 @@ import {
     updateAdminCrewLocationAction,
     deleteAdminCrewLocationAction,
 } from "@/app/admin2/settings/locations/actions";
+import {
+    toggleLocationBasedAttendanceAction,
+    updateAccuracyRangeAction,
+    updateAllowUnregisteredLocationAction,
+} from "@/app/admin2/settings/actions";
 
 /* ── 상수 ── */
 const CLS_CARD =
@@ -100,22 +105,12 @@ const LocationTab = memo(function LocationTab({
         async (enabled: boolean) => {
             haptic.medium();
             try {
-                const url =
-                    "/api/admin/crew-settings"
-                    + "/location-attendance";
-                const res = await fetch(url, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify({
-                        crew_id: crewId,
-                        location_based_attendance:
-                            enabled,
-                    }),
-                });
-                if (res.ok) {
+                const result =
+                    await toggleLocationBasedAttendanceAction({
+                        crewId,
+                        enabled,
+                    });
+                if (result.success) {
                     setIsEnabled(enabled);
                     haptic.success();
                 }
@@ -131,22 +126,12 @@ const LocationTab = memo(function LocationTab({
         async (enabled: boolean) => {
             haptic.medium();
             try {
-                const url =
-                    "/api/admin/crew-settings"
-                    + "/location-attendance";
-                const res = await fetch(url, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                    body: JSON.stringify({
-                        crew_id: crewId,
-                        allow_unregistered_location:
-                            enabled,
-                    }),
-                });
-                if (res.ok) {
+                const result =
+                    await updateAllowUnregisteredLocationAction({
+                        crewId,
+                        allow: enabled,
+                    });
+                if (result.success) {
                     setAllowUnregistered(enabled);
                     haptic.success();
                 }
@@ -170,21 +155,11 @@ const LocationTab = memo(function LocationTab({
         haptic.light();
         setSavingRange(true);
         try {
-            const url =
-                "/api/admin/crew-settings"
-                + "/location-attendance";
-            const res = await fetch(url, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify({
-                    crew_id: crewId,
-                    accuracy_range: accuracyRange,
-                }),
+            const result = await updateAccuracyRangeAction({
+                crewId,
+                accuracyRange,
             });
-            if (res.ok) {
+            if (result.success) {
                 haptic.success();
             }
         } catch {

@@ -28,6 +28,7 @@ import PopupNotification, {
 import { haptic } from "@/lib/haptic";
 import { getAdminCrewUsersAction } from "@/app/admin2/actions";
 import { createBulkAttendanceAction } from "@/app/admin2/attendance/actions";
+import { getCrewSettingsBundleAction } from "@/app/admin2/settings/actions";
 
 // 나이 계산 함수
 const calculateAge = (birthYear: number | null): string => {
@@ -101,30 +102,24 @@ export default function BulkAttendanceManagement({
         setIsLoading(true);
 
         // 사용자 목록과 위치 목록을 병렬로 조회
-        const [usersResult, locationsResponse] = await Promise.all([
+        const [usersResult, settingsResult] = await Promise.all([
           getAdminCrewUsersAction({ crewId }),
-          fetch(`/api/admin/settings?crewId=${crewId}`),
+          getCrewSettingsBundleAction({ crewId }),
         ]);
 
         if (usersResult.success && usersResult.data) {
           setUsers((usersResult.data as any[]) || []);
         }
 
-        if (locationsResponse.ok) {
-          const locationsResult = await locationsResponse.json();
-          if (
-            locationsResult.success &&
-            locationsResult.data &&
-            locationsResult.data.locations
-          ) {
-            setLocations(locationsResult.data.locations);
-            // 첫 번째 위치를 기본값으로 설정
-            if (locationsResult.data.locations.length > 0) {
-              setAttendanceData((prev) => ({
-                ...prev,
-                location: locationsResult.data.locations[0].id.toString(),
-              }));
-            }
+        if (settingsResult.success && settingsResult.data) {
+          const locs = (settingsResult.data.locations as Location[]) || [];
+          setLocations(locs);
+          // 첫 번째 위치를 기본값으로 설정
+          if (locs.length > 0) {
+            setAttendanceData((prev) => ({
+              ...prev,
+              location: locs[0].id.toString(),
+            }));
           }
         }
       } catch (error) {

@@ -19,6 +19,7 @@ import {
   deleteAdminCrewLocationAction,
   toggleAdminCrewLocationActiveAction,
 } from "@/app/admin2/settings/locations/actions";
+import { toggleLocationBasedAttendanceAction } from "@/app/admin2/settings/actions";
 
 interface CrewLocationManagementProps {
   crewId: string;
@@ -84,26 +85,19 @@ function CrewLocationManagement({
     haptic.medium();
 
     try {
-      const response = await fetch(
-        "/api/admin/crew-settings/location-attendance",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            crew_id: crewId,
-            location_based_attendance: enabled,
-          }),
-        },
-      );
+      const result = await toggleLocationBasedAttendanceAction({
+        crewId,
+        enabled,
+      });
 
-      if (response.ok) {
+      if (result.success) {
         setIsLocationBasedEnabled(enabled);
         haptic.success();
         // onLocationUpdate 제거 - 팝업 없이 내부 상태만 업데이트
       } else {
-        throw new Error("위치 기반 출석 설정 변경에 실패했습니다.");
+        throw new Error(
+          result.message || "위치 기반 출석 설정 변경에 실패했습니다.",
+        );
       }
     } catch (error) {
       console.error("위치 기반 출석 설정 오류:", error);

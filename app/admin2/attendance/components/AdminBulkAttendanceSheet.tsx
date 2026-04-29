@@ -27,6 +27,7 @@ import AdminCheckbox from
     "@/app/admin2/components/ui/AdminCheckbox";
 import { Switch } from "@/components/ui/switch";
 import { haptic } from "@/lib/haptic";
+import { getAdminCrewUsersAction } from "@/app/admin2/actions";
 
 /* ── 타입 ── */
 interface UserRow {
@@ -292,22 +293,19 @@ function AdminBulkAttendanceSheet({
         const load = async () => {
             setIsLoading(true);
             try {
-                const [uRes, sRes] = await Promise.all([
-                    fetch(
-                        `/api/admin/users?crewId=${crewId}`,
-                    ),
+                const [uResult, sRes] = await Promise.all([
+                    getAdminCrewUsersAction({ crewId }),
                     fetch(
                         `/api/admin/settings?crewId=${crewId}`,
                     ),
                 ]);
-                const uJson = await uRes.json();
                 const sJson = await sRes.json();
                 if (cancelled) return;
                 if (
-                    uJson?.success &&
-                    Array.isArray(uJson.data)
+                    uResult.success &&
+                    Array.isArray(uResult.data)
                 ) {
-                    setUsers(uJson.data);
+                    setUsers(uResult.data as any);
                 }
                 if (sJson?.success && sJson.data) {
                     const locs: LocationRow[] =

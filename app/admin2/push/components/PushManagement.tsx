@@ -12,6 +12,7 @@ import {
     AnimatedList,
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
+import { getAdminCrewUsersAction } from "@/app/admin2/actions";
 
 interface Member {
     id: string;
@@ -59,13 +60,12 @@ const PushManagement = memo(function PushManagement({
     // 크루원 로드
     useEffect(() => {
         let cancelled = false;
-        fetch(`/api/admin/users?crewId=${crewId}`)
-            .then((res) => res.json())
-            .then((json) => {
+        getAdminCrewUsersAction({ crewId })
+            .then((result) => {
                 if (cancelled) return;
-                if (json?.success && Array.isArray(json.data)) {
-                    const list: Member[] = json.data.map(
-                        (u: { id: string; first_name: string }) => ({
+                if (result.success && Array.isArray(result.data)) {
+                    const list: Member[] = result.data.map(
+                        (u: any) => ({
                             id: u.id,
                             name: u.first_name,
                         }),

@@ -26,6 +26,7 @@ import PopupNotification, {
   NotificationType,
 } from "@/components/molecules/common/PopupNotification";
 import { haptic } from "@/lib/haptic";
+import { getAdminCrewUsersAction } from "@/app/admin2/actions";
 
 // 나이 계산 함수
 const calculateAge = (birthYear: number | null): string => {
@@ -99,16 +100,13 @@ export default function BulkAttendanceManagement({
         setIsLoading(true);
 
         // 사용자 목록과 위치 목록을 병렬로 조회
-        const [usersResponse, locationsResponse] = await Promise.all([
-          fetch(`/api/admin/users?crewId=${crewId}`),
+        const [usersResult, locationsResponse] = await Promise.all([
+          getAdminCrewUsersAction({ crewId }),
           fetch(`/api/admin/settings?crewId=${crewId}`),
         ]);
 
-        if (usersResponse.ok) {
-          const usersResult = await usersResponse.json();
-          if (usersResult.success && usersResult.data) {
-            setUsers(usersResult.data || []);
-          }
+        if (usersResult.success && usersResult.data) {
+          setUsers((usersResult.data as any[]) || []);
         }
 
         if (locationsResponse.ok) {

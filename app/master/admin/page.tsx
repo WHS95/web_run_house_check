@@ -10,6 +10,10 @@ import { haptic } from "@/lib/haptic";
 import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 import CrewManagement from "@/components/organisms/master/CrewManagement";
 import InviteCodeManagement from "@/components/organisms/master/InviteCodeManagement";
+import {
+    getCrewsAction,
+    getCrewMembersAction,
+} from "@/app/master/actions";
 
 interface Crew {
     id: string;
@@ -76,19 +80,16 @@ export default function MasterAdminPage() {
     const loadData = async () => {
         try {
             setIsLoading(true);
-            const [crewsResponse, codesResponse] = await Promise.all([
-                fetch("/api/master/crews"),
+            const [crewsResult, codesResponse] = await Promise.all([
+                getCrewsAction(),
                 fetch("/api/master/invite-codes"),
             ]);
 
             let loadedCrews: Crew[] = [];
 
-            if (crewsResponse.ok) {
-                const crewsResult = await crewsResponse.json();
-                if (crewsResult.success) {
-                    loadedCrews = crewsResult.data || [];
-                    setCrews(loadedCrews);
-                }
+            if (crewsResult.success && crewsResult.data) {
+                loadedCrews = crewsResult.data as Crew[];
+                setCrews(loadedCrews);
             }
 
             if (codesResponse.ok) {
@@ -101,10 +102,7 @@ export default function MasterAdminPage() {
             // 모든 크루의 멤버 조회
             if (loadedCrews.length > 0) {
                 const memberPromises = loadedCrews.map((crew) =>
-                    fetch(
-                        `/api/master/crew-members?crewId=${crew.id}`
-                    )
-                        .then((r) => r.json())
+                    getCrewMembersAction({ crewId: crew.id })
                         .then((result) => {
                             if (result.success && result.data) {
                                 return result.data.map(
@@ -112,12 +110,12 @@ export default function MasterAdminPage() {
                                         id: string;
                                         first_name: string | null;
                                         email: string | null;
-                                        crew_role: string;
+                                        crew_role: string | null;
                                     }) => ({
                                         id: m.id,
                                         first_name: m.first_name,
                                         email: m.email,
-                                        crew_role: m.crew_role,
+                                        crew_role: m.crew_role ?? "",
                                         crew_name: crew.name,
                                         crew_id: crew.id,
                                     })

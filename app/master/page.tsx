@@ -23,6 +23,12 @@ import { haptic } from "@/lib/haptic";
 import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+    getCrewsAction,
+    createCrewAction,
+    getCrewMembersAction,
+    updateCrewMemberRoleAction,
+} from "@/app/master/actions";
 
 // ─── [bundle-dynamic-imports] 비활성 탭 lazy load ───
 
@@ -148,18 +154,15 @@ export default function MasterPage() {
             setIsLoading(true);
 
             // [async-parallel] 독립 요청 병렬 실행
-            const [crewsRes, codesRes] = await Promise.all([
-                fetch("/api/master/crews"),
+            const [crewsResult, codesRes] = await Promise.all([
+                getCrewsAction(),
                 fetch("/api/master/invite-codes"),
             ]);
 
             let loadedCrews: Crew[] = [];
 
-            if (crewsRes.ok) {
-                const result = await crewsRes.json();
-                if (result.success) {
-                    loadedCrews = result.data || [];
-                }
+            if (crewsResult.success && crewsResult.data) {
+                loadedCrews = crewsResult.data as Crew[];
             }
 
             if (codesRes.ok) {
@@ -173,10 +176,9 @@ export default function MasterPage() {
             if (loadedCrews.length > 0) {
                 const memberPromises = loadedCrews.map(
                     (crew) =>
-                        fetch(
-                            `/api/master/crew-members?crewId=${crew.id}`
-                        )
-                            .then((r) => r.json())
+                        getCrewMembersAction({
+                            crewId: crew.id,
+                        })
                             .then((result) => {
                                 if (
                                     result.success &&
@@ -191,14 +193,17 @@ export default function MasterPage() {
                                             email:
                                                 | string
                                                 | null;
-                                            crew_role: string;
+                                            crew_role:
+                                                | string
+                                                | null;
                                         }) => ({
                                             id: m.id,
                                             first_name:
                                                 m.first_name,
                                             email: m.email,
                                             crew_role:
-                                                m.crew_role,
+                                                m.crew_role ??
+                                                "",
                                             crew_name:
                                                 crew.name,
                                             crew_id: crew.id,
@@ -260,18 +265,11 @@ export default function MasterPage() {
         setIsCreating(true);
         haptic.medium();
         try {
-            const res = await fetch("/api/master/crews", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    name: newCrewName.trim(),
-                    description: newCrewDesc.trim() || null,
-                }),
+            const result = await createCrewAction({
+                name: newCrewName.trim(),
+                description: newCrewDesc.trim() || null,
             });
-            const result = await res.json();
-            if (!res.ok || !result.success) {
+            if (!result.success) {
                 showNotification(
                     result.message ||
                         "크루 생성에 실패했습니다.",
@@ -332,23 +330,12 @@ export default function MasterPage() {
                     : "CREW_MANAGER";
             haptic.medium();
             try {
-                const res = await fetch(
-                    "/api/master/crew-members",
-                    {
-                        method: "PATCH",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-                        body: JSON.stringify({
-                            crewId,
-                            userId,
-                            newRole,
-                        }),
-                    }
-                );
-                const result = await res.json();
-                if (res.ok && result.success) {
+                const result = await updateCrewMemberRoleAction({
+                    crewId,
+                    userId,
+                    newRole,
+                });
+                if (result.success) {
                     // [rerender-functional-setstate]
                     setMembers((prev) =>
                         prev.map((m) =>

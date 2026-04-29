@@ -19,6 +19,11 @@ import {
 } from "lucide-react";
 import LoadingSpinner from "../../atoms/LoadingSpinner";
 import { haptic } from "@/lib/haptic";
+import {
+  createCrewAction,
+  getCrewMembersAction,
+  updateCrewMemberRoleAction,
+} from "@/app/master/actions";
 
 // 간단한 Textarea 컴포넌트
 const Textarea = ({
@@ -89,11 +94,13 @@ export default function CrewManagement({
     setLoadingMembers((prev) => new Set([...Array.from(prev), crewId]));
 
     try {
-      const response = await fetch(`/api/master/crew-members?crewId=${crewId}`);
-      const result = await response.json();
+      const result = await getCrewMembersAction({ crewId });
 
-      if (response.ok && result.success) {
-        setCrewMembers((prev) => ({ ...prev, [crewId]: result.data || [] }));
+      if (result.success) {
+        setCrewMembers((prev) => ({
+          ...prev,
+          [crewId]: (result.data || []) as CrewMember[],
+        }));
       } else {
         showNotification("크루 멤버 조회에 실패했습니다.", "error");
       }
@@ -141,19 +148,13 @@ export default function CrewManagement({
     haptic.medium();
 
     try {
-      const response = await fetch("/api/master/crew-members", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          crewId,
-          userId,
-          newRole,
-        }),
+      const result = await updateCrewMemberRoleAction({
+        crewId,
+        userId,
+        newRole,
       });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         // 로컬 상태 업데이트
         setCrewMembers((prev) => ({
           ...prev,
@@ -195,18 +196,12 @@ export default function CrewManagement({
 
     try {
       // 1. 크루 생성
-      const crewResponse = await fetch("/api/master/crews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: newCrew.name.trim(),
-          description: newCrew.description.trim() || null,
-        }),
+      const crewResult = await createCrewAction({
+        name: newCrew.name.trim(),
+        description: newCrew.description.trim() || null,
       });
 
-      const crewResult = await crewResponse.json();
-
-      if (!crewResponse.ok || !crewResult.success) {
+      if (!crewResult.success) {
         showNotification(
           crewResult.message || "크루 생성에 실패했습니다.",
           "error"
@@ -215,6 +210,10 @@ export default function CrewManagement({
       }
 
       const createdCrew = crewResult.data;
+      if (!createdCrew) {
+        showNotification("크루 생성 응답이 올바르지 않습니다.", "error");
+        return;
+      }
 
       // 2. 초대 코드 자동 생성 (옵션이 켜져 있을 경우)
       if (newCrew.createInviteCode) {

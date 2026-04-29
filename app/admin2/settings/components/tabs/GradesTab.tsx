@@ -20,6 +20,17 @@ import {
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
 import FadeIn from "@/components/atoms/FadeIn";
+import {
+    getCrewGradesAction,
+    createCrewGradeAction,
+    updateCrewGradeAction,
+    deactivateCrewGradeAction,
+    getGradeRecommendationsAction,
+    approveGradeRecommendationAction,
+    approveAllGradeRecommendationsAction,
+    assignUserGradeAction,
+    resetUserGradeOverrideAction,
+} from "@/app/admin2/settings/grade/actions";
 
 // ─── 타입 정의 ───
 interface CrewGrade {
@@ -125,12 +136,10 @@ const GradeSettings = memo(function GradeSettings({
     const fetchGrades = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(
-                `/api/admin/grades?crewId=${crewId}`
-            );
-            const result = await res.json();
-            if (res.ok && result.success) {
-                const data = result.data || [];
+            const result = await getCrewGradesAction({ crewId });
+            if (result.success) {
+                const data = (result.data ||
+                    []) as unknown as CrewGrade[];
                 setGrades(data);
                 if (data.length > 0) {
                     setPeriodType(
@@ -157,26 +166,19 @@ const GradeSettings = memo(function GradeSettings({
         haptic.medium();
 
         try {
-            const res = await fetch("/api/admin/grades", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    crewId,
-                    name_override: form.name.trim(),
-                    min_attendance_count: parseInt(
-                        form.minAttendance
-                    ) || 0,
-                    min_hosting_count: parseInt(
-                        form.minHosting
-                    ) || 0,
-                    can_host: form.canHost,
-                    promotion_period_type: periodType,
-                    sort_order: grades.length + 1,
-                }),
+            const result = await createCrewGradeAction({
+                crewId,
+                gradeId: 1,
+                nameOverride: form.name.trim(),
+                minAttendanceCount:
+                    parseInt(form.minAttendance) || 0,
+                minHostingCount:
+                    parseInt(form.minHosting) || 0,
+                canHost: form.canHost,
+                promotionPeriodType: periodType,
+                sortOrder: grades.length + 1,
             });
-            if (res.ok) {
+            if (result.success) {
                 haptic.success();
                 setShowForm(false);
                 setForm({
@@ -201,26 +203,18 @@ const GradeSettings = memo(function GradeSettings({
         haptic.medium();
 
         try {
-            const res = await fetch("/api/admin/grades", {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    crewId,
-                    gradeId: editGrade.id,
-                    name_override: form.name.trim(),
-                    min_attendance_count: parseInt(
-                        form.minAttendance
-                    ) || 0,
-                    min_hosting_count: parseInt(
-                        form.minHosting
-                    ) || 0,
-                    can_host: form.canHost,
-                    promotion_period_type: periodType,
-                }),
+            const result = await updateCrewGradeAction({
+                crewId,
+                gradeId: editGrade.id,
+                nameOverride: form.name.trim(),
+                minAttendanceCount:
+                    parseInt(form.minAttendance) || 0,
+                minHostingCount:
+                    parseInt(form.minHosting) || 0,
+                canHost: form.canHost,
+                promotionPeriodType: periodType,
             });
-            if (res.ok) {
+            if (result.success) {
                 haptic.success();
                 setEditGrade(null);
                 setShowForm(false);
@@ -245,11 +239,11 @@ const GradeSettings = memo(function GradeSettings({
         haptic.medium();
 
         try {
-            const res = await fetch(
-                `/api/admin/grades?crewId=${crewId}&gradeId=${deleteTarget.id}`,
-                { method: "DELETE" }
-            );
-            if (res.ok) {
+            const result = await deactivateCrewGradeAction({
+                crewId,
+                gradeId: deleteTarget.id,
+            });
+            if (result.success) {
                 haptic.success();
                 await fetchGrades();
             }
@@ -543,12 +537,15 @@ const GradeRecommendations = memo(
         const fetchRecs = useCallback(async () => {
             try {
                 setLoading(true);
-                const res = await fetch(
-                    `/api/admin/grade-recommendations?crewId=${crewId}`
-                );
-                const result = await res.json();
-                if (res.ok && result.success) {
-                    setRecs(result.data || []);
+                const result =
+                    await getGradeRecommendationsAction({
+                        crewId,
+                    });
+                if (result.success) {
+                    setRecs(
+                        (result.data ||
+                            []) as unknown as Recommendation[]
+                    );
                 }
             } catch {
                 // 무시
@@ -566,23 +563,16 @@ const GradeRecommendations = memo(
             async (rec: Recommendation) => {
                 haptic.medium();
                 try {
-                    const res = await fetch(
-                        "/api/admin/grade-recommendations/approve",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type":
-                                    "application/json",
-                            },
-                            body: JSON.stringify({
+                    const result =
+                        await approveGradeRecommendationAction(
+                            {
                                 crewId,
                                 userId: rec.user_id,
-                                gradeId:
+                                newGradeId:
                                     rec.recommended_grade_id,
-                            }),
-                        }
-                    );
-                    if (res.ok) {
+                            }
+                        );
+                    if (result.success) {
                         haptic.success();
                         setRecs((prev) =>
                             prev.filter(
@@ -639,18 +629,11 @@ const GradeRecommendations = memo(
         const handleApproveAll = useCallback(async () => {
             haptic.medium();
             try {
-                const res = await fetch(
-                    "/api/admin/grade-recommendations/approve-all",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-                        body: JSON.stringify({ crewId }),
-                    }
-                );
-                if (res.ok) {
+                const result =
+                    await approveAllGradeRecommendationsAction(
+                        { crewId }
+                    );
+                if (result.success) {
                     haptic.success();
                     setRecs([]);
                 }
@@ -824,23 +807,21 @@ const GradeAssignment = memo(function GradeAssignment({
         async function load() {
             try {
                 setLoading(true);
-                const [membersRes, gradesRes] =
-                    await Promise.all([
-                        fetch(
-                            `/api/admin/crew-members?crewId=${crewId}`
-                        ),
-                        fetch(
-                            `/api/admin/grades?crewId=${crewId}`
-                        ),
-                    ]);
-                const [mResult, gResult] = await Promise.all(
-                    [membersRes.json(), gradesRes.json()]
-                );
+                const [membersRes, gResult] = await Promise.all([
+                    fetch(
+                        `/api/admin/crew-members?crewId=${crewId}`
+                    ),
+                    getCrewGradesAction({ crewId }),
+                ]);
+                const mResult = await membersRes.json();
                 if (mResult.success) {
                     setMembers(mResult.data || []);
                 }
                 if (gResult.success) {
-                    setGrades(gResult.data || []);
+                    setGrades(
+                        (gResult.data ||
+                            []) as unknown as CrewGrade[]
+                    );
                 }
             } catch {
                 // 무시
@@ -856,22 +837,12 @@ const GradeAssignment = memo(function GradeAssignment({
         async (userId: string, gradeId: number) => {
             haptic.medium();
             try {
-                const res = await fetch(
-                    "/api/admin/grades/assign",
-                    {
-                        method: "PATCH",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-                        body: JSON.stringify({
-                            crewId,
-                            userId,
-                            gradeId,
-                        }),
-                    }
-                );
-                if (res.ok) {
+                const result = await assignUserGradeAction({
+                    crewId,
+                    userId,
+                    gradeId,
+                });
+                if (result.success) {
                     haptic.success();
                     setMembers((prev) =>
                         prev.map((m) =>
@@ -898,21 +869,12 @@ const GradeAssignment = memo(function GradeAssignment({
         async (userId: string) => {
             haptic.medium();
             try {
-                const res = await fetch(
-                    "/api/admin/grades/reset-override",
-                    {
-                        method: "PATCH",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-                        body: JSON.stringify({
-                            crewId,
-                            userId,
-                        }),
-                    }
-                );
-                if (res.ok) {
+                const result =
+                    await resetUserGradeOverrideAction({
+                        crewId,
+                        userId,
+                    });
+                if (result.success) {
                     haptic.success();
                     setMembers((prev) =>
                         prev.map((m) =>

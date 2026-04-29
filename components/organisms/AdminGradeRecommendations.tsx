@@ -3,6 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { haptic } from "@/lib/haptic";
+import {
+    getGradeRecommendationsAction,
+    approveGradeRecommendationAction,
+    approveAllGradeRecommendationsAction,
+} from "@/app/admin2/settings/grade/actions";
 
 interface Recommendation {
     user_id: string;
@@ -34,12 +39,14 @@ export default function AdminGradeRecommendations({
     const fetchRecommendations = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch(
-                `/api/admin/grade-recommendations?crewId=${crewId}`
-            );
-            if (res.ok) {
-                const data = await res.json();
-                setRecommendations(data);
+            const result = await getGradeRecommendationsAction({
+                crewId,
+            });
+            if (result.success) {
+                setRecommendations(
+                    (result.data ??
+                        []) as unknown as Recommendation[]
+                );
             }
         } catch (error) {
             console.error(
@@ -60,19 +67,16 @@ export default function AdminGradeRecommendations({
             haptic.light();
             setProcessingIds((prev) => new Set(prev).add(userId));
             try {
-                const res = await fetch(
-                    "/api/admin/grade-recommendations/approve",
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            userId,
-                            crewId,
-                            newGradeId,
-                        }),
-                    }
-                );
-                if (res.ok) {
+                if (newGradeId == null) {
+                    return;
+                }
+                const result =
+                    await approveGradeRecommendationAction({
+                        userId,
+                        crewId,
+                        newGradeId,
+                    });
+                if (result.success) {
                     haptic.success();
                     await fetchRecommendations();
                 }
@@ -122,15 +126,11 @@ export default function AdminGradeRecommendations({
         haptic.medium();
         setApprovingAll(true);
         try {
-            const res = await fetch(
-                "/api/admin/grade-recommendations/approve-all",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ crewId }),
-                }
-            );
-            if (res.ok) {
+            const result =
+                await approveAllGradeRecommendationsAction({
+                    crewId,
+                });
+            if (result.success) {
                 haptic.success();
                 await fetchRecommendations();
             }

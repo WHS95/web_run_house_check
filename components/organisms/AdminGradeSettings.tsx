@@ -16,6 +16,12 @@ import PopupNotification, {
     NotificationType,
 } from "@/components/molecules/common/PopupNotification";
 import ConfirmModal from "@/components/molecules/ConfirmModal";
+import {
+    getCrewGradesAction,
+    createCrewGradeAction,
+    updateCrewGradeAction,
+    deactivateCrewGradeAction,
+} from "@/app/admin2/settings/grade/actions";
 
 interface CrewGrade {
     id: number;
@@ -112,12 +118,12 @@ export default function AdminGradeSettings({
     const fetchGrades = useCallback(async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(
-                `/api/admin/grades?crewId=${crewId}`
-            );
-            const result = await response.json();
-            if (response.ok && result.success) {
-                setGrades(result.data);
+            const result = await getCrewGradesAction({ crewId });
+            if (result.success) {
+                setGrades(
+                    (result.data ??
+                        []) as unknown as CrewGrade[]
+                );
             }
         } catch {
             haptic.error();
@@ -139,23 +145,18 @@ export default function AdminGradeSettings({
             setActionLoading(true);
             haptic.medium();
 
-            const response = await fetch("/api/admin/grades", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    crewId,
-                    name_override: addFormData.name_override.trim(),
-                    min_attendance_count: addFormData.min_attendance_count,
-                    min_hosting_count: addFormData.min_hosting_count,
-                    can_host: addFormData.can_host,
-                    sort_order: addFormData.sort_order,
-                    promotion_period_type: periodType,
-                }),
+            const result = await createCrewGradeAction({
+                crewId,
+                gradeId: 1,
+                nameOverride: addFormData.name_override.trim(),
+                minAttendanceCount: addFormData.min_attendance_count,
+                minHostingCount: addFormData.min_hosting_count,
+                canHost: addFormData.can_host,
+                sortOrder: addFormData.sort_order,
+                promotionPeriodType: periodType,
             });
 
-            const result = await response.json();
-
-            if (response.ok && result.success) {
+            if (result.success) {
                 haptic.success();
                 setIsAddFormOpen(false);
                 setAddFormData(defaultFormData);
@@ -164,7 +165,7 @@ export default function AdminGradeSettings({
             } else {
                 haptic.error();
                 showNotification(
-                    result.error || "등급 추가에 실패했습니다.",
+                    result.message || "등급 추가에 실패했습니다.",
                     "error"
                 );
             }
@@ -192,24 +193,18 @@ export default function AdminGradeSettings({
                 setActionLoading(true);
                 haptic.medium();
 
-                const response = await fetch("/api/admin/grades", {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        crewId,
-                        gradeId,
-                        name_override: editFormData.name_override.trim(),
-                        min_attendance_count: editFormData.min_attendance_count,
-                        min_hosting_count: editFormData.min_hosting_count,
-                        can_host: editFormData.can_host,
-                        sort_order: editFormData.sort_order,
-                        promotion_period_type: periodType,
-                    }),
+                const result = await updateCrewGradeAction({
+                    crewId,
+                    gradeId,
+                    nameOverride: editFormData.name_override.trim(),
+                    minAttendanceCount: editFormData.min_attendance_count,
+                    minHostingCount: editFormData.min_hosting_count,
+                    canHost: editFormData.can_host,
+                    sortOrder: editFormData.sort_order,
+                    promotionPeriodType: periodType,
                 });
 
-                const result = await response.json();
-
-                if (response.ok && result.success) {
+                if (result.success) {
                     haptic.success();
                     setEditingGradeId(null);
                     setEditFormData(defaultFormData);
@@ -218,7 +213,7 @@ export default function AdminGradeSettings({
                 } else {
                     haptic.error();
                     showNotification(
-                        result.error || "등급 수정에 실패했습니다.",
+                        result.message || "등급 수정에 실패했습니다.",
                         "error"
                     );
                 }
@@ -255,14 +250,13 @@ export default function AdminGradeSettings({
                         setActionLoading(true);
                         haptic.medium();
 
-                        const response = await fetch(
-                            `/api/admin/grades?crewId=${crewId}&gradeId=${gradeId}`,
-                            { method: "DELETE" }
-                        );
+                        const result =
+                            await deactivateCrewGradeAction({
+                                crewId,
+                                gradeId,
+                            });
 
-                        const result = await response.json();
-
-                        if (response.ok && result.success) {
+                        if (result.success) {
                             haptic.success();
                             setOpenMenuId(null);
                             await fetchGrades();
@@ -273,7 +267,7 @@ export default function AdminGradeSettings({
                         } else {
                             haptic.error();
                             showNotification(
-                                result.error || "등급 삭제에 실패했습니다.",
+                                result.message || "등급 삭제에 실패했습니다.",
                                 "error"
                             );
                         }

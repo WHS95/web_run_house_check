@@ -2,6 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Search, Lock, ChevronDown } from "lucide-react";
+import {
+    getCrewGradesAction,
+    assignUserGradeAction,
+    resetUserGradeOverrideAction,
+} from "@/app/admin2/settings/grade/actions";
 
 interface Member {
     id: string;
@@ -87,11 +92,11 @@ export default function AdminGradeAssignment({
 
     const fetchData = useCallback(async () => {
         try {
-            const [membersRes, gradesRes] = await Promise.all([
+            const [membersRes, gradesResult] = await Promise.all([
                 fetch(
                     `/api/admin/crew-members?crewId=${crewId}`
                 ),
-                fetch(`/api/admin/grades?crewId=${crewId}`),
+                getCrewGradesAction({ crewId }),
             ]);
 
             if (membersRes.ok) {
@@ -103,13 +108,10 @@ export default function AdminGradeAssignment({
                 );
             }
 
-            if (gradesRes.ok) {
-                const gradesData = await gradesRes.json();
-                const gradesList: CrewGrade[] = Array.isArray(
-                    gradesData
-                )
-                    ? gradesData
-                    : gradesData.data ?? [];
+            if (gradesResult.success) {
+                const gradesList: CrewGrade[] = (
+                    gradesResult.data ?? []
+                ) as unknown as CrewGrade[];
                 gradesList.sort(
                     (a, b) => a.sort_order - b.sort_order
                 );
@@ -137,22 +139,13 @@ export default function AdminGradeAssignment({
         setAssigningUserId(userId);
 
         try {
-            const res = await fetch(
-                "/api/admin/grades/assign",
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        userId,
-                        crewId,
-                        gradeId,
-                    }),
-                }
-            );
+            const result = await assignUserGradeAction({
+                userId,
+                crewId,
+                gradeId,
+            });
 
-            if (!res.ok) {
+            if (!result.success) {
                 console.error("등급 할당 실패");
                 return;
             }
@@ -170,21 +163,12 @@ export default function AdminGradeAssignment({
         setAssigningUserId(userId);
 
         try {
-            const res = await fetch(
-                "/api/admin/grades/reset-override",
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        userId,
-                        crewId,
-                    }),
-                }
-            );
+            const result = await resetUserGradeOverrideAction({
+                userId,
+                crewId,
+            });
 
-            if (!res.ok) {
+            if (!result.success) {
                 console.error("자동 계산 복원 실패");
                 return;
             }

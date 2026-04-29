@@ -250,7 +250,119 @@ lib/
 - `lib/supabase/crew-auth.ts`의 `verifyCrewInviteCode`는 'use client' 모듈이라 서버에서 호출하면 안 됨 — Phase B에서 actions.ts에 동등 로직을 직접 작성하여 격리. 단 클라이언트(/admin2/...) 측에서 여전히 사용 중 (필요 시 후속 정리).
 - `getCrewVerificationStatusAction`은 현재 호출자 0건 (route GET dead code 였음). 미래 사용 가능성 있어 유지.
 
-## 11. Phase C (G2: user) 부분 완료
+## 11. 최종 진행 (Phase C ~ G 완료)
+
+### 11.0 핵심 결과
+
+- **38개 legacy `app/api/**/route.ts` 삭제 완료** (남은 2개는 ping + dev/login으로 보류)
+- **모든 mutation이 Server Actions로 통일**
+- **148 unit tests** (도메인 함수 1:1 검증)
+- **인프라(ESLint 룰 7개 + check-bff + check-domain-tests)** 가 빌드 시점에 강제
+
+### 11.1 Phase별 commit hash (Phase C ~ G)
+
+```
+[Phase C — user]
+ab4408c2 feat(domain/user): user 도메인 + mypage Server Actions
+45b1ab07 refactor(user): MemberDetailTemplate fetch → withdrawUserAction + legacy 2 routes 삭제
+6980cd95 feat(push): push token 마이그레이션
+913c3260 feat(location): crew-locations 마이그레이션
+bd678a17 chore(notifications): dead /api/notifications route 제거
+bd3ee33b chore(admin,master): dead route 2개 제거
+22594674 docs(bff): 보고서 Phase C 결과 + 최종 진행 요약 추가
+fc8ee48f docs(bff): 추가 마이그레이션 + dead route 정리 결과 보고서 추가
+
+[Phase G — master / admin/users]
+271ffd87 feat(master): G8 master 마이그레이션 — crews + crew-members
+956ce9b0 feat(admin/users): G2 잔여 admin/users 마이그레이션
+
+[Phase F — invite + crew-locations]
+b3c5c417 feat(invite): G7 invite-codes 마이그레이션 (admin + master, 3 routes)
+f9d93fdf feat(location): G6 admin/crew-locations 마이그레이션 (CRUD + toggle)
+
+[Phase E — grade + notice/push]
+dc5a59c1 feat(grade): G4 grade 6 routes 마이그레이션
+27b0cf47 feat(notice/push): G5 notice + push 5 routes 마이그레이션
+
+[Phase D — admin/attendance]
+d8fea7fd feat(attendance): G3 admin/attendance 5 routes 마이그레이션
+
+[G6 잔여 — crew-members + settings]
+9893395e feat(crew): G6 잔여 마이그레이션 — crew-members + crew-settings + settings
+```
+
+### 11.2 Phase별 도메인 폴더 구조
+
+```
+lib/domain/
+├── attendance/                  # Phase A + G3
+│   ├── policies.ts (유효한가, 미등록허용)
+│   ├── validators.ts (re-export attendanceSchema)
+│   ├── messages.ts (알림메시지_조립)
+│   ├── types.ts
+│   └── admin/                   # G3 admin 전용
+│       ├── policies.ts (recordId_유효한가, bulk_입력_유효한가 등 7개)
+│       └── types.ts
+├── auth/                        # Phase B (G1)
+│   ├── policies.ts (초대코드_유효한가, 인증된_사용자인가, 크루정보_완전한가)
+│   ├── validators.ts (signupSchema 등)
+│   ├── workflows.ts (가입_upsert_payload_조립)
+│   └── types.ts
+├── user/                        # Phase C (G2)
+│   ├── policies.ts (사용자_활성여부_판정)
+│   └── types.ts
+├── push/                        # 추가
+│   ├── validators.ts (pushTokenRegisterSchema 등)
+│   └── types.ts
+├── location/                    # 추가 + G6
+│   ├── policies.ts (위도_유효한가, 경도_유효한가, 좌표_유효한가)
+│   └── types.ts
+├── admin/                       # admin 공통
+│   └── types.ts (AdminActionResult<T>)
+├── master/                      # G8
+│   ├── policies.ts (마스터_권한인가, 유효한_크루역할인가, 유효한_크루이름인가)
+│   └── types.ts
+├── invite/                      # G7
+│   ├── policies.ts (커스텀코드_유효한가, 어드민코드_생성, 마스터코드_생성)
+│   └── types.ts
+├── grade/                       # G4
+│   ├── policies.ts (필드_DB컬럼_매핑, crew_grade_업데이트_페이로드_빌드, 등급명_정규화)
+│   └── types.ts
+├── notice/                      # G5
+│   ├── policies.ts (유효한_공지타입, 공지_푸시_타이틀, 공지_푸시_본문 등 6개)
+│   └── types.ts
+└── crew/                        # G6 잔여
+    ├── policies.ts (정확도범위_유효한가, 본인_조작_시도인가, crew_role_to_role_id 등)
+    └── types.ts
+```
+
+### 11.3 Server Actions 위치
+
+```
+app/
+├── attendance/actions.ts        # submitAttendance
+├── auth/
+│   ├── signup/actions.ts        # verifyCrewCodeAction, signupAction
+│   └── verify-crew/actions.ts   # verifyCrewMembershipAction, getCrewVerificationStatusAction
+├── mypage/actions.ts            # getUserStatusAction, withdrawUserAction, registerPushTokenAction, deactivatePushTokenAction
+├── map/actions.ts               # getCrewLocationsAction
+├── master/
+│   ├── actions.ts               # getCrewsAction, createCrewAction, getCrewMembersAction, updateCrewMemberRoleAction
+│   └── invite-codes/actions.ts  # getMasterInviteCodesAction, createMasterInviteCodeAction, updateMasterInviteCodeAction, deactivateMasterInviteCodeAction
+└── admin2/
+    ├── actions.ts               # getAdminCrewUsersAction
+    ├── attendance/actions.ts    # getAdminAttendanceAction, createBulkAttendanceAction, getDailyAttendanceAction, updateAttendanceAction, deleteAttendanceAction
+    ├── notice/actions.ts        # getCrewNoticesAction, createNoticeAction, getNoticeByIdAction, deleteNoticeAction, pushNoticeAction
+    ├── push/actions.ts          # getPushHistoryAction, sendTestPushAction
+    └── settings/
+        ├── actions.ts           # getCrewSettingsBundleAction, toggleLocationBasedAttendanceAction, updateAccuracyRangeAction, updateAllowUnregisteredLocationAction
+        ├── grade/actions.ts     # 9개 grade 액션
+        ├── invite-codes/actions.ts # getCrewInviteCodeAction, upsertCrewInviteCodeAction, deleteCrewInviteCodeAction
+        ├── locations/actions.ts # 5개 location 액션
+        └── members/actions.ts   # getCrewMembersAction, changeCrewMemberRoleAction, removeCrewMemberAction
+```
+
+### 11.4 Phase C 부분 결과 (참고용 — 이후 G2 완성됨)
 
 ### 11.1 진행 결과
 
@@ -319,46 +431,33 @@ lib/
 
 ## 12. 최종 진행 요약 (사용자 복귀 시점 기준)
 
-### 12.1 마이그레이션 커버리지
+### 12.1 마이그레이션 커버리지 (최종)
 
 | 그룹 | 진행 | 상세 |
 |------|------|------|
 | **Phase A** (attendance 본보기) | ✅ 완료 | route 1개 → actions, 13 tests |
 | **Phase B** (G1: auth) | ✅ 완료 | route 3개 → actions 4개, 22 tests |
-| **Phase C** (G2: user 부분) | 🟡 부분 | route 2/4 완료 (status, withdraw). admin/users·crew-members 보류 |
-| **추가 (push token)** | ✅ 완료 | route 1개 (`push/token`) → actions 2개, 5 tests |
-| **추가 (crew-locations)** | ✅ 완료 | route 1개 → action 1개 (도메인 types만) |
+| **Phase C** (G2: user) | ✅ 완료 | route 3개 (status, withdraw, admin/users) → actions 3개, 9 tests |
+| **Phase D** (G3: admin/attendance) | ✅ 완료 | route 5개 → actions 5개, 32 tests |
+| **Phase E** (G4: grade + G5: notice/push) | ✅ 완료 | route 11개 → actions 17개, 22 tests |
+| **Phase F** (G6: crew/location/settings + G7: invite) | ✅ 완료 | route 8개 → actions 19개, 35 tests |
+| **Phase G** (G8: master) | ✅ 완료 | route 2개 → actions 4개, 12 tests |
+| **추가 (push token, crew-locations)** | ✅ 완료 | route 2개 → actions 3개, 5 tests |
 | **Dead route 정리** | ✅ 완료 | 3개 삭제 (notifications, admin/analyze, master/admin/invite-codes) |
-| **Phase D~G 잔여** | ⏸️ 보류 | admin attendance, grade, notice/push, crew/location, invite, master 등 (총 ~24 routes) |
+| **변환 의미 적은 것 (보류)** | ⏸️ 그대로 | `app/api/ping` (헬스체크), `app/api/dev/login` (개발 도구) |
 
-### 12.2 누계 변경
+### 12.2 누계 변경 (최종)
 
-- **신규 도메인 폴더**: 5개 (`lib/domain/{attendance, auth, user, push, location}`)
-- **신규 도메인 파일**: 17개 (정책 + 검증 + 워크플로우 + 메시지 + 타입)
-- **Vitest 테스트**: 49 tests / 8 test files. 모든 도메인 파일이 *.test.ts 1:1 보유 (types.ts SKIP)
-- **Server Actions**: 11개
-    - `submitAttendance` (Phase A)
-    - `verifyCrewCodeAction`, `signupAction` (Phase B / signup)
-    - `verifyCrewMembershipAction`, `getCrewVerificationStatusAction` (Phase B / verify-crew)
-    - `getUserStatusAction`, `withdrawUserAction` (Phase C / mypage)
-    - `registerPushTokenAction`, `deactivatePushTokenAction` (push token)
-    - `getCrewLocationsAction` (crew-locations)
-    - (총 11개 중 1개 미사용 = `getCrewVerificationStatusAction`)
-- **삭제된 legacy route**: 11개
-    - `app/api/attendance` (Phase A)
-    - `app/api/auth/signup`, `app/api/auth/verify-crew-code`, `app/api/crew-verification` (Phase B)
-    - `app/api/user/status`, `app/api/user/withdraw` (Phase C)
-    - `app/api/push/token` (push)
-    - `app/api/crew-locations` (location)
-    - `app/api/notifications`, `app/api/admin/analyze`, `app/api/master/admin/invite-codes` (dead route 정리)
-- **남은 `app/api/`**: ~27개
-    - admin/* 17개 (attendance, settings, grade-recommendations × 3, grades × 2, crew-settings, crew-members, notices × 3, push-history, users, crew-locations × 2, invite-codes)
-    - master/* 4개 (crews, crew-members, invite-codes × 2)
-    - push/test 1개
-    - ping 1개 (헬스체크, 변환 의미 없음)
-    - dev/login 1개 (개발 도구, 화이트리스트)
-- **변환된 클라이언트 호출 사이트**: 11곳 (attendance 2 + auth 3 + mypage 1 + push 4 + map 1)
+- **신규 도메인 폴더**: 11개 (`lib/domain/{attendance, attendance/admin, auth, user, push, location, master, admin, invite, grade, notice, crew}`)
+- **Vitest 테스트**: **148 tests / 15 test files** PASS. 모든 도메인 파일이 *.test.ts 1:1 보유 (types.ts SKIP)
+- **Server Actions**: ~50+개 (모든 admin2/master 영역 커버)
+- **삭제된 legacy route**: 38개 (`app/api/`)
+- **남은 `app/api/`**: **2개**
+    - `app/api/ping` (헬스체크 — 변환 의미 없음)
+    - `app/api/dev/login` (개발 도구 — ESLint 화이트리스트)
+- **변환된 클라이언트 호출 사이트**: 60+ 곳
 - **인프라**: ESLint 7개 룰 (1~4 error, 5~6 warn 단계), Vitest, check-bff, check-domain-tests, build 통합 (`npm run build`)
+- **빌드 검증**: 모든 단계에서 `npm run build` 통과 (check-bff + 148 tests + lint 0 error + typecheck 0 error + next build 성공)
 
 ### 12.3 Phase별 commit hash
 

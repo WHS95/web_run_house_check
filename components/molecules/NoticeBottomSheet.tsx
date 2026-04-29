@@ -3,6 +3,7 @@
 import React, { memo, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, BellOff } from 'lucide-react';
+import { getCrewNoticesAction } from '@/app/admin2/notice/actions';
 
 interface Notice {
     id: string;
@@ -36,10 +37,13 @@ const NoticeBottomSheet = memo<NoticeBottomSheetProps>(
         useEffect(() => {
             if (!isOpen || !crewId) return;
             setLoading(true);
-            fetch(`/api/admin/notices?crewId=${crewId}`)
-                .then((res) => res.json())
-                .then((json) => {
-                    if (json.success) setNotices(json.data ?? []);
+            getCrewNoticesAction({ crewId })
+                .then((result) => {
+                    if (result.success) {
+                        setNotices(
+                            (result.data ?? []) as unknown as Notice[],
+                        );
+                    }
                 })
                 .catch(() => {})
                 .finally(() => setLoading(false));

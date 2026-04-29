@@ -9,6 +9,7 @@ import {
     useAdminNotices,
     type NoticeType,
 } from "@/lib/admin2/hooks/useAdminNotices";
+import { pushNoticeAction } from "@/app/admin2/notice/actions";
 
 const categoryOptions: {
     value: NoticeType;
@@ -58,14 +59,12 @@ const NoticeWriteForm = memo(function NoticeWriteForm() {
         if (!createdNoticeId || pushing) return;
         setPushing(true);
         try {
-            const res = await fetch(
-                `/api/admin/notices/${createdNoticeId}/push`,
-                { method: "POST" },
-            );
-            const json = await res.json();
-            if (!json?.success) {
+            const result = await pushNoticeAction({
+                noticeId: Number(createdNoticeId),
+            });
+            if (!result?.success) {
                 alert(
-                    json?.message ??
+                    result?.message ??
                         "푸시 발송에 실패했습니다. 공지는 등록되었습니다.",
                 );
             }

@@ -3,6 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Send, Trash2, Megaphone } from "lucide-react";
 import { haptic } from "@/lib/haptic";
+import {
+    getCrewNoticesAction,
+    createNoticeAction,
+    deleteNoticeAction,
+} from "@/app/admin2/notice/actions";
 
 interface Notice {
     id: string;
@@ -26,12 +31,11 @@ export default function AdminNoticeManagement({
 
     const fetchNotices = useCallback(async () => {
         try {
-            const res = await fetch(
-                `/api/admin/notices?crewId=${crewId}`
-            );
-            const data = await res.json();
-            if (data.success) {
-                setNotices(data.data || []);
+            const result = await getCrewNoticesAction({ crewId });
+            if (result.success) {
+                setNotices(
+                    (result.data ?? []) as unknown as Notice[],
+                );
             }
         } catch {
             // 조회 실패 무시
@@ -51,16 +55,13 @@ export default function AdminNoticeManagement({
         haptic.medium();
 
         try {
-            const res = await fetch("/api/admin/notices", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    crewId,
-                    content: newContent.trim(),
-                }),
+            const result = await createNoticeAction({
+                crewId,
+                title: "",
+                content: newContent.trim(),
             });
 
-            if (res.ok) {
+            if (result.success) {
                 setNewContent("");
                 await fetchNotices();
                 haptic.success();
@@ -76,13 +77,11 @@ export default function AdminNoticeManagement({
         haptic.light();
 
         try {
-            const res = await fetch("/api/admin/notices", {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ noticeId }),
+            const result = await deleteNoticeAction({
+                noticeId: Number(noticeId),
             });
 
-            if (res.ok) {
+            if (result.success) {
                 await fetchNotices();
             }
         } catch {

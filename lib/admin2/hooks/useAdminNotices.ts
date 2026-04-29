@@ -3,6 +3,10 @@ import { useCallback } from "react";
 import useSWR from "swr";
 import { useAdmin } from "@/lib/admin2/context";
 import { adminKey } from "@/lib/admin2/swr-keys";
+import {
+    createNoticeAction,
+    deleteNoticeAction,
+} from "@/app/admin2/notice/actions";
 
 export type NoticeType = "공지" | "일반" | "중요";
 
@@ -31,17 +35,17 @@ export function useAdminNotices(search?: string) {
 
     const createNotice = useCallback(
         async (input: CreateNoticeInput): Promise<NoticeRow> => {
-            const res = await fetch("/api/admin/notices", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ crewId, ...input }),
+            const result = await createNoticeAction({
+                crewId,
+                title: input.title,
+                content: input.content,
+                type: input.type,
             });
-            const json = await res.json();
-            if (!json?.success) {
-                throw new Error(json?.message || "공지 등록 실패");
+            if (!result?.success) {
+                throw new Error(result?.message || "공지 등록 실패");
             }
             await invalidate("notices");
-            return json.data as NoticeRow;
+            return result.data as unknown as NoticeRow;
         },
         [crewId, invalidate]
     );
@@ -53,14 +57,11 @@ export function useAdminNotices(search?: string) {
                 { revalidate: false }
             );
             try {
-                const res = await fetch("/api/admin/notices", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ noticeId }),
+                const result = await deleteNoticeAction({
+                    noticeId: Number(noticeId),
                 });
-                const json = await res.json();
-                if (!json?.success) {
-                    throw new Error(json?.message || "공지 삭제 실패");
+                if (!result?.success) {
+                    throw new Error(result?.message || "공지 삭제 실패");
                 }
                 await invalidate("notices");
             } catch (e) {

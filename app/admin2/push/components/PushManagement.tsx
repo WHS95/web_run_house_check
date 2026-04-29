@@ -13,6 +13,10 @@ import {
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
 import { getAdminCrewUsersAction } from "@/app/admin2/actions";
+import {
+    getPushHistoryAction,
+    sendTestPushAction,
+} from "@/app/admin2/push/actions";
 
 interface Member {
     id: string;
@@ -82,12 +86,11 @@ const PushManagement = memo(function PushManagement({
     // 발송 내역 로드
     useEffect(() => {
         let cancelled = false;
-        fetch(`/api/admin/push-history?crewId=${crewId}`)
-            .then((res) => res.json())
-            .then((json) => {
+        getPushHistoryAction({ crewId })
+            .then((result) => {
                 if (cancelled) return;
-                if (json?.success && Array.isArray(json.data)) {
-                    setHistory(json.data);
+                if (result?.success && Array.isArray(result.data)) {
+                    setHistory(result.data as PushHistoryRow[]);
                 }
             })
             .catch(() => {});
@@ -167,34 +170,33 @@ const PushManagement = memo(function PushManagement({
 
         setIsSending(true);
         try {
-            const res = await fetch("/api/push/test", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    userIds: currentIds,
-                    title: currentTitle,
-                    body: currentBody,
-                    crewId: crewIdRef.current,
-                    targetMode: modeRef.current,
-                }),
+            const result = await sendTestPushAction({
+                userIds: currentIds,
+                title: currentTitle,
+                body: currentBody,
+                crewId: crewIdRef.current,
+                targetMode: modeRef.current,
             });
 
-            const result = await res.json();
-
-            if (res.ok && result.success) {
-                if (result.history) {
+            if (result.success && result.data) {
+                if (result.data.history) {
                     setHistory((prev) =>
-                        [result.history as PushHistoryRow, ...prev].slice(0, 5),
+                        [
+                            result.data!.history as PushHistoryRow,
+                            ...prev,
+                        ].slice(0, 5),
                     );
                 }
 
                 setTitle("");
                 setBody("");
                 alert(
-                    `발송 완료 (성공: ${result.successCount}, 실패: ${result.failureCount})`,
+                    `발송 완료 (성공: ${result.data.successCount}, 실패: ${result.data.failureCount})`,
                 );
             } else {
-                alert(result.error || "발송에 실패했습니다.");
+                alert(
+                    result.message || result.error || "발송에 실패했습니다.",
+                );
             }
         } catch {
             alert("발송 중 오류가 발생했습니다.");

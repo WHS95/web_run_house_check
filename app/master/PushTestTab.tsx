@@ -15,6 +15,7 @@ import { haptic } from "@/lib/haptic";
 import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 import type { NotificationType } from
     "@/components/molecules/common/PopupNotification";
+import { sendTestPushAction } from "@/app/admin2/push/actions";
 
 interface PushTarget {
     userId: string;
@@ -127,31 +128,24 @@ export default function PushTestTab({
         haptic.medium();
         setIsSending(true);
         try {
-            const res = await fetch("/api/push/test", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    userIds: Array.from(selectedIds),
-                    title: title.trim(),
-                    body: body.trim(),
-                }),
+            const result = await sendTestPushAction({
+                userIds: Array.from(selectedIds),
+                title: title.trim(),
+                body: body.trim(),
             });
-            const result = await res.json();
-            if (!res.ok) {
+            if (!result.success || !result.data) {
                 showNotification(
-                    result.error || "발송 실패",
+                    result.message || result.error || "발송 실패",
                     "error"
                 );
                 return;
             }
             showNotification(
-                `${result.successCount}건 발송 성공`
-                    + (result.failureCount > 0
-                        ? `, ${result.failureCount}건 실패`
+                `${result.data.successCount}건 발송 성공`
+                    + (result.data.failureCount > 0
+                        ? `, ${result.data.failureCount}건 실패`
                         : ""),
-                result.failureCount > 0 ? "error" : "success"
+                result.data.failureCount > 0 ? "error" : "success"
             );
         } catch {
             showNotification("발송 중 오류 발생", "error");

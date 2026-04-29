@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { X, Megaphone } from "lucide-react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { getCrewNoticesAction } from "@/app/admin2/notice/actions";
 
 interface Notice {
     id: string;
@@ -30,12 +31,9 @@ export default function NoticeListSheet({
     const fetchNotices = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch(
-                `/api/admin/notices?crewId=${crewId}`
-            );
-            const json = await res.json();
-            if (json.success && Array.isArray(json.data)) {
-                setNotices(json.data);
+            const result = await getCrewNoticesAction({ crewId });
+            if (result.success && Array.isArray(result.data)) {
+                setNotices(result.data as unknown as Notice[]);
             }
         } catch {
             // 조회 실패 시 빈 목록 유지

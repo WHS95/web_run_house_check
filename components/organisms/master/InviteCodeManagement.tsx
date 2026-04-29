@@ -19,6 +19,10 @@ import {
   ToggleRight
 } from "lucide-react";
 import { haptic } from "@/lib/haptic";
+import {
+  createMasterInviteCodeAction,
+  updateMasterInviteCodeAction,
+} from "@/app/master/invite-codes/actions";
 
 interface Crew {
   id: string;
@@ -79,18 +83,12 @@ export default function InviteCodeManagement({
     haptic.medium();
 
     try {
-      const response = await fetch("/api/master/invite-codes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          crew_id: newInviteCode.crew_id,
-          description: newInviteCode.description.trim() || null,
-        }),
+      const result = await createMasterInviteCodeAction({
+        crewId: newInviteCode.crew_id,
+        description: newInviteCode.description.trim() || null,
       });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         showNotification("초대 코드가 성공적으로 생성되었습니다.", "success");
         setNewInviteCode({ crew_id: "", description: "" });
         onCodeCreated();
@@ -108,19 +106,14 @@ export default function InviteCodeManagement({
   // 초대 코드 수정
   const handleUpdateInviteCode = async (codeId: number) => {
     try {
-      const response = await fetch(`/api/master/invite-codes/${codeId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          invite_code: editForm.invite_code.trim(),
-          description: editForm.description.trim() || null,
-          is_active: editForm.is_active,
-        }),
+      const result = await updateMasterInviteCodeAction({
+        codeId,
+        inviteCode: editForm.invite_code.trim(),
+        description: editForm.description.trim() || null,
+        isActive: editForm.is_active,
       });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         showNotification("초대 코드가 성공적으로 수정되었습니다.", "success");
         setEditingCode(null);
         onCodeCreated(); // 데이터 새로고침

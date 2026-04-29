@@ -29,6 +29,7 @@ import {
     getCrewMembersAction,
     updateCrewMemberRoleAction,
 } from "@/app/master/actions";
+import { getMasterInviteCodesAction } from "@/app/master/invite-codes/actions";
 
 // ─── [bundle-dynamic-imports] 비활성 탭 lazy load ───
 
@@ -154,9 +155,9 @@ export default function MasterPage() {
             setIsLoading(true);
 
             // [async-parallel] 독립 요청 병렬 실행
-            const [crewsResult, codesRes] = await Promise.all([
+            const [crewsResult, codesResult] = await Promise.all([
                 getCrewsAction(),
-                fetch("/api/master/invite-codes"),
+                getMasterInviteCodesAction(),
             ]);
 
             let loadedCrews: Crew[] = [];
@@ -165,11 +166,10 @@ export default function MasterPage() {
                 loadedCrews = crewsResult.data as Crew[];
             }
 
-            if (codesRes.ok) {
-                const result = await codesRes.json();
-                if (result.success) {
-                    setInviteCodes(result.data || []);
-                }
+            if (codesResult.success) {
+                setInviteCodes(
+                    (codesResult.data || []) as InviteCode[]
+                );
             }
 
             // 멤버 병렬 로드 + [js-combine-iterations] 단일 루프로 멤버 + 카운트 처리

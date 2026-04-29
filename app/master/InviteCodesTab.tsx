@@ -16,6 +16,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { Crew, InviteCode } from "./page";
 import type { NotificationType } from "@/components/molecules/common/PopupNotification";
+import {
+    createMasterInviteCodeAction,
+    updateMasterInviteCodeAction,
+} from "@/app/master/invite-codes/actions";
 
 interface InviteCodesTabProps {
     crews: Crew[];
@@ -64,21 +68,11 @@ export default function InviteCodesTab({
         setIsCreating(true);
         haptic.medium();
         try {
-            const res = await fetch(
-                "/api/master/invite-codes",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        crew_id: newCrewId,
-                        description: newDesc.trim() || null,
-                    }),
-                }
-            );
-            const result = await res.json();
-            if (res.ok && result.success) {
+            const result = await createMasterInviteCodeAction({
+                crewId: newCrewId,
+                description: newDesc.trim() || null,
+            });
+            if (result.success) {
                 showNotification(
                     "초대 코드가 생성되었습니다.",
                     "success"
@@ -109,26 +103,14 @@ export default function InviteCodesTab({
     const handleUpdate = useCallback(
         async (codeId: number) => {
             try {
-                const res = await fetch(
-                    `/api/master/invite-codes/${codeId}`,
-                    {
-                        method: "PATCH",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-                        body: JSON.stringify({
-                            invite_code:
-                                editForm.invite_code.trim(),
-                            description:
-                                editForm.description.trim() ||
-                                null,
-                            is_active: editForm.is_active,
-                        }),
-                    }
-                );
-                const result = await res.json();
-                if (res.ok && result.success) {
+                const result = await updateMasterInviteCodeAction({
+                    codeId,
+                    inviteCode: editForm.invite_code.trim(),
+                    description:
+                        editForm.description.trim() || null,
+                    isActive: editForm.is_active,
+                });
+                if (result.success) {
                     showNotification(
                         "초대 코드가 수정되었습니다.",
                         "success"

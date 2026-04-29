@@ -16,6 +16,11 @@ import {
     AnimatedList,
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
+import {
+    getCrewInviteCodeAction,
+    upsertCrewInviteCodeAction,
+    deleteCrewInviteCodeAction,
+} from "@/app/admin2/settings/invite-codes/actions";
 
 interface InviteCode {
     id: number;
@@ -63,20 +68,11 @@ const InviteCodesTab = memo(function InviteCodesTab({
     const fetchCodes = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(
-                `/api/admin/invite-codes?crewId=${crewId}`
-            );
-            const result = await res.json();
-            if (res.ok && result.success) {
-                // API가 단일 객체 또는 배열 반환
+            const result = await getCrewInviteCodeAction({ crewId });
+            if (result.success) {
+                // 액션이 단일 객체 또는 null 반환
                 const data = result.data;
-                setCodes(
-                    Array.isArray(data)
-                        ? data
-                        : data
-                          ? [data]
-                          : []
-                );
+                setCodes(data ? [data as InviteCode] : []);
             }
         } catch {
             // 에러 무시
@@ -109,20 +105,11 @@ const InviteCodesTab = memo(function InviteCodesTab({
         haptic.medium();
 
         try {
-            const res = await fetch(
-                "/api/admin/invite-codes",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        crewId,
-                        inviteCode: newCode.trim(),
-                    }),
-                }
-            );
-            if (res.ok) {
+            const result = await upsertCrewInviteCodeAction({
+                crewId,
+                inviteCode: newCode.trim(),
+            });
+            if (result.success) {
                 haptic.success();
                 setShowForm(false);
                 setNewCode("");
@@ -141,28 +128,17 @@ const InviteCodesTab = memo(function InviteCodesTab({
         haptic.medium();
 
         try {
-            const res = await fetch(
-                `/api/admin/invite-codes?codeId=${regenerateTarget.id}`,
-                { method: "DELETE" }
-            );
-            if (res.ok) {
+            const deleteResult = await deleteCrewInviteCodeAction({
+                codeId: regenerateTarget.id,
+            });
+            if (deleteResult.success) {
                 // 삭제 후 새 코드 자동 생성
                 const newCodeStr = generateRandomCode();
-                const createRes = await fetch(
-                    "/api/admin/invite-codes",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
-                        body: JSON.stringify({
-                            crewId,
-                            inviteCode: newCodeStr,
-                        }),
-                    }
-                );
-                if (createRes.ok) {
+                const createResult = await upsertCrewInviteCodeAction({
+                    crewId,
+                    inviteCode: newCodeStr,
+                });
+                if (createResult.success) {
                     haptic.success();
                     await fetchCodes();
                 }

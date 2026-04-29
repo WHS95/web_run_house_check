@@ -24,6 +24,7 @@ import {
   getCrewMembersAction,
   updateCrewMemberRoleAction,
 } from "@/app/master/actions";
+import { createMasterInviteCodeAction } from "@/app/master/invite-codes/actions";
 
 // 간단한 Textarea 컴포넌트
 const Textarea = ({
@@ -217,20 +218,14 @@ export default function CrewManagement({
 
       // 2. 초대 코드 자동 생성 (옵션이 켜져 있을 경우)
       if (newCrew.createInviteCode) {
-        const codeResponse = await fetch("/api/master/invite-codes", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            crew_id: createdCrew.id,
-            description:
-              newCrew.inviteCodeDescription.trim() ||
-              `${newCrew.name} 기본 초대 코드`,
-          }),
+        const codeResult = await createMasterInviteCodeAction({
+          crewId: createdCrew.id,
+          description:
+            newCrew.inviteCodeDescription.trim() ||
+            `${newCrew.name} 기본 초대 코드`,
         });
 
-        const codeResult = await codeResponse.json();
-
-        if (codeResponse.ok && codeResult.success) {
+        if (codeResult.success) {
           showNotification(
             `크루 "${newCrew.name}"가 생성되고 초대 코드가 발급되었습니다.`,
             "success"

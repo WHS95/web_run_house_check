@@ -14,6 +14,7 @@ import {
     getCrewsAction,
     getCrewMembersAction,
 } from "@/app/master/actions";
+import { getMasterInviteCodesAction } from "@/app/master/invite-codes/actions";
 
 interface Crew {
     id: string;
@@ -80,9 +81,9 @@ export default function MasterAdminPage() {
     const loadData = async () => {
         try {
             setIsLoading(true);
-            const [crewsResult, codesResponse] = await Promise.all([
+            const [crewsResult, codesResult] = await Promise.all([
                 getCrewsAction(),
-                fetch("/api/master/invite-codes"),
+                getMasterInviteCodesAction(),
             ]);
 
             let loadedCrews: Crew[] = [];
@@ -92,11 +93,10 @@ export default function MasterAdminPage() {
                 setCrews(loadedCrews);
             }
 
-            if (codesResponse.ok) {
-                const codesResult = await codesResponse.json();
-                if (codesResult.success) {
-                    setInviteCodes(codesResult.data || []);
-                }
+            if (codesResult.success) {
+                setInviteCodes(
+                    (codesResult.data || []) as InviteCode[]
+                );
             }
 
             // 모든 크루의 멤버 조회

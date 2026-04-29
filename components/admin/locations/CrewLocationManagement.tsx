@@ -13,6 +13,12 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Plus, Settings } from "lucide-react";
 import { haptic } from "@/lib/haptic";
+import {
+  createAdminCrewLocationAction,
+  updateAdminCrewLocationAction,
+  deleteAdminCrewLocationAction,
+  toggleAdminCrewLocationActiveAction,
+} from "@/app/admin2/settings/locations/actions";
 
 interface CrewLocationManagementProps {
   crewId: string;
@@ -118,46 +124,45 @@ function CrewLocationManagement({
 
     try {
       const isEditing = modalState.mode === "edit" && modalState.location;
-      const url = isEditing
-        ? `/api/admin/crew-locations/${modalState.location!.id}`
-        : "/api/admin/crew-locations";
 
-      const method = isEditing ? "PUT" : "POST";
-      const requestBody = isEditing ? data : { crew_id: crewId, ...data };
+      console.log("🌐 Action 요청:");
+      console.log("  편집 모드:", !!isEditing);
+      console.log("  데이터:", JSON.stringify(data, null, 2));
 
-      console.log("🌐 API 요청:");
-      console.log("  URL:", url);
-      console.log("  Method:", method);
-      console.log("  Body:", JSON.stringify(requestBody, null, 2));
+      const result = isEditing
+        ? await updateAdminCrewLocationAction({
+            locationId: modalState.location!.id,
+            name: data.name,
+            description: data.description,
+            latitude: data.latitude,
+            longitude: data.longitude,
+          })
+        : await createAdminCrewLocationAction({
+            crewId,
+            name: data.name,
+            description: data.description,
+            latitude: data.latitude,
+            longitude: data.longitude,
+          });
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      console.log("📡 응답 상태:", response.status, response.statusText);
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("✅ API 응답 성공:", result);
+      if (result.success && result.data) {
+        console.log("✅ Action 응답 성공:", result);
 
         if (isEditing) {
-          updateLocation(result.data);
+          updateLocation(result.data as unknown as CrewLocation);
         } else {
-          addLocation(result.data);
+          addLocation(result.data as unknown as CrewLocation);
         }
 
         haptic.success();
         console.log("🎉 활동장소 저장 완료");
       } else {
-        const errorData = await response.text();
-        console.error("❌ API 응답 오류:");
-        console.error("  상태:", response.status, response.statusText);
-        console.error("  응답:", errorData);
-        throw new Error(`활동장소 저장에 실패했습니다. (${response.status})`);
+        console.error("❌ Action 응답 오류:");
+        console.error("  error:", result.error);
+        console.error("  message:", result.message);
+        throw new Error(
+          result.message || "활동장소 저장에 실패했습니다.",
+        );
       }
     } catch (error) {
       console.error("💥 활동장소 저장 오류:", error);
@@ -179,19 +184,13 @@ function CrewLocationManagement({
       setLoading(true);
 
       try {
-        const response = await fetch(
-          `/api/admin/crew-locations/${location.id}`,
-          {
-            method: "DELETE",
-          },
-        );
+        const result = await deleteAdminCrewLocationAction({
+          locationId: location.id,
+        });
 
-        console.log("📡 응답 상태:", response.status, response.statusText);
+        console.log("📡 응답 데이터:", result);
 
-        if (response.ok) {
-          const result = await response.json();
-          console.log("📡 응답 데이터:", result);
-
+        if (result.success) {
           // 전역 상태에서 삭제
           deleteLocation(location.id);
 
@@ -200,9 +199,10 @@ function CrewLocationManagement({
 
           haptic.success();
         } else {
-          const errorData = await response.json();
-          console.log("📡 에러 데이터:", errorData);
-          throw new Error(errorData.error || "활동장소 삭제에 실패했습니다.");
+          console.log("📡 에러 데이터:", result);
+          throw new Error(
+            result.message || "활동장소 삭제에 실패했습니다.",
+          );
         }
       } catch (error) {
         console.error("활동장소 삭제 오류:", error);
@@ -219,32 +219,24 @@ function CrewLocationManagement({
   const handleLocationToggle = useCallback(
     async (location: CrewLocation) => {
       try {
-        const response = await fetch(
-          `/api/admin/crew-locations/${location.id}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              is_active: !location.is_active,
-            }),
-          },
-        );
+        const result = await toggleAdminCrewLocationActiveAction({
+          locationId: location.id,
+          isActive: !location.is_active,
+        });
 
-        if (response.ok) {
-          const result = await response.json();
-
+        if (result.success && result.data) {
           // 전역 상태에서 업데이트
           const updatedLocation = {
             ...result.data,
             updated_at: new Date().toISOString(),
           };
-          updateLocation(updatedLocation);
+          updateLocation(updatedLocation as unknown as CrewLocation);
 
           haptic.success();
         } else {
-          throw new Error("활동장소 상태 변경에 실패했습니다.");
+          throw new Error(
+            result.message || "활동장소 상태 변경에 실패했습니다.",
+          );
         }
       } catch (error) {
         console.error("활동장소 상태 변경 오류:", error);

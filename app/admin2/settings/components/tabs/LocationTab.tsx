@@ -26,6 +26,11 @@ import {
     AnimatedItem,
 } from "@/components/atoms/AnimatedList";
 import MapPickerSheet from "../MapPickerSheet";
+import {
+    createAdminCrewLocationAction,
+    updateAdminCrewLocationAction,
+    deleteAdminCrewLocationAction,
+} from "@/app/admin2/settings/locations/actions";
 
 /* ── 상수 ── */
 const CLS_CARD =
@@ -244,46 +249,34 @@ const LocationTab = memo(function LocationTab({
 
         try {
             const isEditing = !!editingLocation;
-            const url = isEditing
-                ? `/api/admin/crew-locations/${editingLocation!.id}`
-                : "/api/admin/crew-locations";
-            const method =
-                isEditing ? "PUT" : "POST";
-            const body = isEditing
-                ? {
+            const result = isEditing
+                ? await updateAdminCrewLocationAction({
+                      locationId: editingLocation!.id,
                       name: formData.name.trim(),
                       latitude: lat,
                       longitude: lng,
-                  }
-                : {
-                      crew_id: crewId,
+                  })
+                : await createAdminCrewLocationAction({
+                      crewId,
                       name: formData.name.trim(),
                       latitude: lat,
                       longitude: lng,
-                  };
+                  });
 
-            const res = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                },
-                body: JSON.stringify(body),
-            });
-
-            if (res.ok) {
-                const result = await res.json();
+            if (result.success && result.data) {
                 if (isEditing) {
                     actions.updateLocation(
-                        result.data
+                        result.data as unknown as CrewLocation
                     );
                 } else {
                     actions.addLocation(
-                        result.data
+                        result.data as unknown as CrewLocation
                     );
                 }
                 haptic.success();
                 resetForm();
+            } else {
+                haptic.error();
             }
         } catch {
             haptic.error();
@@ -304,18 +297,19 @@ const LocationTab = memo(function LocationTab({
         actions.setLoading(true);
 
         try {
-            const url =
-                `/api/admin/crew-locations/${editingLocation.id}`;
-            const res = await fetch(url, {
-                method: "DELETE",
-            });
-            if (res.ok) {
+            const result =
+                await deleteAdminCrewLocationAction({
+                    locationId: editingLocation.id,
+                });
+            if (result.success) {
                 actions.deleteLocation(
                     editingLocation.id
                 );
                 haptic.success();
                 setDeleteConfirm(false);
                 resetForm();
+            } else {
+                haptic.error();
             }
         } catch {
             haptic.error();

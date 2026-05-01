@@ -117,6 +117,7 @@ html, body (overflow: hidden, overscroll-behavior: none)
 **반드시 지켜야 할 규칙:**
 1. **`<BottomNavigation />`을 개별 페이지에서 렌더링하지 마세요.** 루트 레이아웃의 `ConditionalBottomNav`이 자동으로 처리합니다.
    - 예외: `ConditionalBottomNav`이 숨기는 페이지(`/admin`, `/auth/*`, `/map`)에서 자체 바텀 내비가 필요한 경우만 허용
+   - **라우트별 전용 바텀 내비**(예: `/admin2`, `/master`)는 반드시 `ConditionalBottomNav` 분기로 렌더링하세요. 라우트 자체 layout/page에서 바텀 내비를 children 옆에 직접 두면 `main-content`(스크롤 컨테이너) **내부**에 들어가 함께 스크롤되어 하단 고정이 깨집니다. 패턴: `mobile-viewport > [main-content, ConditionalBottomNav]` 구조의 sibling으로만 위치해야 함 (참고: 루트 `/` 경로의 `BottomNavigation`이 정답 패턴).
 2. **`scroll-area-bottom` 클래스는 더 이상 필요하지 않습니다.** `main-content`가 자동으로 바텀 내비 위 영역만 차지합니다.
 3. **페이지에서 `min-h-screen` 사용 시 자동으로 `main-content` 높이 기준으로 변환됩니다.** (CSS에서 `100%`로 오버라이드)
 4. **페이지 내부 스크롤 컨테이너가 필요한 경우**, `flex-1 overflow-y-auto`를 사용하되 바텀 패딩은 불필요합니다.

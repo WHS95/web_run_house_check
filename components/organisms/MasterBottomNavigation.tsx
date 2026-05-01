@@ -36,7 +36,7 @@ const TABS = [
     },
 ] as const;
 
-export default function MasterNav() {
+export default function MasterBottomNavigation() {
     const pathname = usePathname() || "/master";
 
     return (

@@ -13,6 +13,14 @@ const AdminBottomNavigation = dynamic(
     { ssr: true },
 );
 
+const MasterBottomNavigation = dynamic(
+    () =>
+        import(
+            "@/components/organisms/MasterBottomNavigation"
+        ),
+    { ssr: true },
+);
+
 const BOTTOM_INSET_VALUE = 'calc(4.5rem + env(safe-area-inset-bottom, 0px))';
 
 export default function ConditionalBottomNav() {
@@ -24,8 +32,9 @@ export default function ConditionalBottomNav() {
     "/auth/signup",
     "/auth/callback",
     "/auth/verify-crew",
-    "/master",
     "/map",
+    "/intro",
+    "/demo",
   ];
 
   const shouldHideBottomNav = hideBottomNavPages.some(
@@ -34,6 +43,10 @@ export default function ConditionalBottomNav() {
 
   // /admin2 경로에서는 관리자 전용 바텀 네비 표시
   const isAdmin2 = pathname.startsWith("/admin2");
+
+  // /master 경로에서는 마스터 전용 바텀 네비 표시
+  const isMaster =
+    pathname === "/master" || pathname.startsWith("/master/");
 
   /* ── Bottom Inset Layer System ──
    * 바텀 내비 표시 여부에 따라 CSS 변수를 동적으로 설정.
@@ -52,6 +65,10 @@ export default function ConditionalBottomNav() {
 
   if (isAdmin2) {
     return <AdminBottomNavigation />;
+  }
+
+  if (isMaster) {
+    return <MasterBottomNavigation />;
   }
 
   return <BottomNavigation />;

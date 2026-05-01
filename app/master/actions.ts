@@ -3,11 +3,16 @@
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import * as 마스터정책 from '@/lib/domain/master/policies';
+import * as 마스터검증 from '@/lib/domain/master/validators';
+import { 마스터메시지 } from '@/lib/domain/master/messages';
+import * as 초대정책 from '@/lib/domain/invite/policies';
 import type {
     MasterActionResult,
     CrewRow,
     CrewMemberRow,
 } from '@/lib/domain/master/types';
+
+const MAX_INVITE_CODE_ATTEMPTS = 5;
 
 async function assertMaster(): Promise<
     | { ok: true; supabase: Awaited<ReturnType<typeof createClient>>; userId: string }
@@ -245,5 +250,246 @@ export async function updateCrewMemberRoleAction(input: {
             input.newRole === 'CREW_MANAGER'
                 ? '운영진으로 승격되었습니다.'
                 : '일반 멤버로 변경되었습니다.',
+    };
+}
+
+/**
+ * 크루 생성 + (옵션) first-admin 초대코드 자동 발급.
+ * 1) crew insert
+ * 2) generate_first_admin_code === true이면 crew_invite_codes에
+ *    is_first_admin_code=true row 발급 (best-effort: 실패 시 크루는 살리고 경고 메시지 반환).
+ */
+export async function createCrewWithFirstAdminCodeAction(
+    input: unknown
+): Promise<
+    MasterActionResult<{ crew: CrewRow; invite_code: string | null }>
+> {
+    const guard = await assertMaster();
+    if (!guard.ok) return guard.result;
+    const { supabase, userId } = guard;
+
+    const validated = 마스터검증.크루생성입력_검증(input);
+    if (!validated.ok) {
+        return {
+            success: false,
+            error: validated.field === 'name' ? 'invalid_name' : 'invalid_data',
+            message: validated.message,
+        };
+    }
+    const data = validated.data;
+
+    // 동일 이름 크루 중복 체크
+    const { data: existingCrew, error: checkError } = await supabase
+        .schema('attendance')
+        .from('crews')
+        .select('id')
+        .eq('name', data.name)
+        .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+        return {
+            success: false,
+            error: 'database_error',
+            message: 마스터메시지.저장실패,
+        };
+    }
+
+    if (existingCrew) {
+        return {
+            success: false,
+            error: 'crew_name_taken',
+            message: 마스터메시지.크루이름중복,
+        };
+    }
+
+    // crews insert
+    const { data: newCrew, error: createError } = await supabase
+        .schema('attendance')
+        .from('crews')
+        .insert({
+            name: data.name,
+            description: data.description ?? null,
+            region: data.region ?? null,
+        })
+        .select()
+        .single();
+
+    if (createError || !newCrew) {
+        return {
+            success: false,
+            error: 'database_error',
+            message: 마스터메시지.저장실패,
+        };
+    }
+
+    let inviteCode: string | null = null;
+    let inviteWarning: string | null = null;
+
+    // first-admin 초대코드 자동 발급 (옵션)
+    if (data.generate_first_admin_code === true) {
+        let attempts = 0;
+        let generated = '';
+        let generationOk = false;
+        while (attempts < MAX_INVITE_CODE_ATTEMPTS) {
+            generated = 초대정책.마스터코드_생성();
+            const { error: dupCheckError } = await supabase
+                .schema('attendance')
+                .from('crew_invite_codes')
+                .select('id')
+                .eq('invite_code', generated)
+                .single();
+            if (dupCheckError && dupCheckError.code === 'PGRST116') {
+                generationOk = true;
+                break;
+            }
+            attempts++;
+        }
+
+        if (!generationOk) {
+            inviteWarning =
+                '초대 코드 생성에 실패했습니다. 크루 상세에서 다시 시도해주세요.';
+        } else {
+            const { error: insertCodeError } = await supabase
+                .schema('attendance')
+                .from('crew_invite_codes')
+                .insert({
+                    crew_id: newCrew.id,
+                    invite_code: generated,
+                    is_first_admin_code: true,
+                    is_active: true,
+                    description: '첫 관리자 가입용',
+                    created_by: userId,
+                });
+            if (insertCodeError) {
+                inviteWarning =
+                    '초대 코드 저장에 실패했습니다. 크루 상세에서 다시 시도해주세요.';
+            } else {
+                inviteCode = generated;
+            }
+        }
+    }
+
+    revalidatePath('/master');
+    revalidatePath('/master/crews');
+
+    const baseMessage = 마스터메시지.크루생성성공(data.name);
+    return {
+        success: true,
+        message: inviteWarning ? `${baseMessage} (${inviteWarning})` : baseMessage,
+        data: { crew: newCrew as CrewRow, invite_code: inviteCode },
+    };
+}
+
+/**
+ * 크루 정보 수정 (이름/설명/지역/위치기반 출석 설정).
+ */
+export async function updateCrewAction(
+    crewId: string,
+    input: unknown
+): Promise<MasterActionResult<CrewRow>> {
+    const guard = await assertMaster();
+    if (!guard.ok) return guard.result;
+    const { supabase } = guard;
+
+    if (!crewId || typeof crewId !== 'string') {
+        return {
+            success: false,
+            error: 'invalid_id',
+            message: '유효하지 않은 크루 ID입니다.',
+        };
+    }
+
+    const validated = 마스터검증.크루수정입력_검증(input);
+    if (!validated.ok) {
+        return {
+            success: false,
+            error:
+                validated.field === 'name'
+                    ? 'invalid_name'
+                    : validated.field === 'accuracy_range'
+                        ? 'invalid_accuracy_range'
+                        : 'invalid_data',
+            message: validated.message,
+        };
+    }
+
+    const updateData = validated.data;
+
+    if (Object.keys(updateData).length === 0) {
+        return {
+            success: false,
+            error: 'no_changes',
+            message: '변경할 내용이 없습니다.',
+        };
+    }
+
+    // 크루 존재 확인
+    const { data: existingCrew, error: existsError } = await supabase
+        .schema('attendance')
+        .from('crews')
+        .select('id, name')
+        .eq('id', crewId)
+        .maybeSingle();
+
+    if (existsError && existsError.code !== 'PGRST116') {
+        return {
+            success: false,
+            error: 'database_error',
+            message: 마스터메시지.저장실패,
+        };
+    }
+
+    if (!existingCrew) {
+        return {
+            success: false,
+            error: 'crew_not_found',
+            message: 마스터메시지.크루없음,
+        };
+    }
+
+    // 이름이 바뀐 경우 다른 크루와 중복인지 체크
+    if (updateData.name && updateData.name !== existingCrew.name) {
+        const { data: dupCrew } = await supabase
+            .schema('attendance')
+            .from('crews')
+            .select('id')
+            .eq('name', updateData.name)
+            .neq('id', crewId)
+            .maybeSingle();
+        if (dupCrew) {
+            return {
+                success: false,
+                error: 'crew_name_taken',
+                message: 마스터메시지.크루이름중복,
+            };
+        }
+    }
+
+    const { data: updatedCrew, error: updateError } = await supabase
+        .schema('attendance')
+        .from('crews')
+        .update({
+            ...updateData,
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', crewId)
+        .select()
+        .single();
+
+    if (updateError || !updatedCrew) {
+        return {
+            success: false,
+            error: 'database_error',
+            message: 마스터메시지.저장실패,
+        };
+    }
+
+    revalidatePath('/master/crews');
+    revalidatePath(`/master/crews/${crewId}`);
+
+    return {
+        success: true,
+        message: 마스터메시지.크루수정성공(updatedCrew.name as string),
+        data: updatedCrew as CrewRow,
     };
 }

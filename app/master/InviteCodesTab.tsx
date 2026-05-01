@@ -14,8 +14,29 @@ import {
 import { haptic } from "@/lib/haptic";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Crew, InviteCode } from "./page";
 import type { NotificationType } from "@/components/molecules/common/PopupNotification";
+
+// 레거시 탭 — 새 RSC page.tsx 마이그레이션 이전에 사용되던 타입을 로컬에 보존.
+interface Crew {
+    id: string;
+    name: string;
+    description: string | null;
+    profile_image_url: string | null;
+    created_at: string;
+    updated_at: string;
+    member_count?: number;
+}
+
+interface InviteCode {
+    id: number;
+    crew_id: string;
+    invite_code: string;
+    description: string | null;
+    is_active: boolean;
+    created_by: string | null;
+    created_at: string;
+    crew_name?: string;
+}
 import {
     createMasterInviteCodeAction,
     updateMasterInviteCodeAction,

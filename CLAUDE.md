@@ -77,6 +77,9 @@ npm run build
 
 ## 주요 개발 패턴
 
+### Dev 전용 테스트 계정
+카카오를 거치지 않는 테스트 계정 시스템. 자세한 셋업은 [`docs/dev-test-auth.md`](docs/dev-test-auth.md) 참조.
+
 ### Supabase 클라이언트 사용
 ```typescript
 // 서버 컴포넌트

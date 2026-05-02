@@ -3,6 +3,7 @@ import FadeIn from "@/components/atoms/FadeIn";
 import * as 마스터워크플로우 from "@/lib/domain/master/workflows";
 import { 크루목록VM_조립 } from "./_vm/list";
 import CrewListClient from "./_components/CrewListClient";
+import HomeAction from "../_components/HomeAction";
 
 export const dynamic = "force-dynamic";
 
@@ -15,12 +16,15 @@ export default async function MasterCrewsPage() {
             <PageHeader
                 title="크루 관리"
                 rightAction={
-                    <a
-                        href="/master/crews/new"
-                        className="text-[14px] font-medium text-rh-accent"
-                    >
-                        + 등록
-                    </a>
+                    <div className="flex items-center gap-1">
+                        <a
+                            href="/master/crews/new"
+                            className="text-[14px] font-medium text-rh-accent px-2"
+                        >
+                            + 등록
+                        </a>
+                        <HomeAction />
+                    </div>
                 }
             />
             <FadeIn className="px-4 pt-4 pb-6 space-y-4">

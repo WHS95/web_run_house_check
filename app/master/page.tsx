@@ -9,6 +9,7 @@ import KpiCard from "./_components/KpiCard";
 import IdleCrewItem from "./_components/IdleCrewItem";
 import RecentSignupItem from "./_components/RecentSignupItem";
 import QuickActions from "./_components/QuickActions";
+import HomeAction from "./_components/HomeAction";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,11 @@ export default async function MasterDashboardPage() {
 
     return (
         <div className="flex flex-col">
-            <PageHeader title="마스터" iconColor="white" />
+            <PageHeader
+                title="마스터"
+                iconColor="white"
+                rightAction={<HomeAction />}
+            />
             <FadeIn className="px-4 pt-4 pb-6 space-y-6">
                 {/* KPI 그리드 */}
                 <section aria-label="서비스 KPI">

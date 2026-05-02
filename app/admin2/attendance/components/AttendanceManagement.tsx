@@ -557,12 +557,15 @@ export default function AttendanceManagement({
       const count = dateCounts[dateStr] || 0;
       const isSelected = isCurrentMonth && date.getDate() === selectedDay;
       const todayDate = mounted ? new Date() : null;
+      // 셀의 실제 date와 비교해야 함. 뷰 props(month/year)로 비교하면
+      // 다른 월 뷰에서도 같은 일자가 매치되어 오작동 (예: 6월 뷰의 6/2가
+      // 오늘=5/2로 잘못 판정됨).
       const isToday =
         !!todayDate &&
         isCurrentMonth &&
         date.getDate() === todayDate.getDate() &&
-        month === todayDate.getMonth() + 1 &&
-        year === todayDate.getFullYear();
+        date.getMonth() === todayDate.getMonth() &&
+        date.getFullYear() === todayDate.getFullYear();
       const isSaturday = date.getDay() === 6;
       /* mount 후에만 월 라벨 렌더 → hydration mismatch 방지 */
       const isMonthStart = mounted && date.getDate() === 1;

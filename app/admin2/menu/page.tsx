@@ -32,7 +32,7 @@ export default function AdminMenuPage() {
       <PageHeader
         title='메뉴'
         iconColor='white'
-        backgroundColor='bg-rh-bg-surface'
+        backgroundColor='bg-rh-bg-primary'
       />
       <FadeIn>
         <div className='flex-1 px-4 pt-4 pb-4 space-y-5'>

@@ -139,7 +139,7 @@ export default async function Admin2AnalyzePage({
                 backLink="/admin2"
                 iconColor="white"
                 backgroundColor={
-                    "bg-rh-bg-surface"
+                    "bg-rh-bg-primary"
                 }
             />
             {/* 년도/월 선택 — 스크롤 시 자동 축소 */}

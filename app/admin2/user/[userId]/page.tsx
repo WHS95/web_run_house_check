@@ -23,7 +23,7 @@ export default async function AdminUserDetailPage({
                 title="회원 상세"
                 backLink="/admin2/user"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
                 rightAction={
                     <UserDetailHeaderMenu
                         user={detail.user}

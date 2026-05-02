@@ -110,7 +110,7 @@ export default async function PlaceDetailPage({
         title='장소별 참여율 상세'
         backLink={backUrl}
         iconColor='white'
-        backgroundColor={"bg-rh-bg-surface"}
+        backgroundColor={"bg-rh-bg-primary"}
       />
       <YearMonthSelector year={year} month={month} />
       <div className={"flex-1 px-4" + " pb-4 space-y-5"}>

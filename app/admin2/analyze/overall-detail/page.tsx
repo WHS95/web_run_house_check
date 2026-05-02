@@ -126,7 +126,7 @@ export default async function OverallDetailPage({
                 }
                 iconColor="white"
                 backgroundColor={
-                    "bg-rh-bg-surface"
+                    "bg-rh-bg-primary"
                 }
             />
             <YearMonthSelector

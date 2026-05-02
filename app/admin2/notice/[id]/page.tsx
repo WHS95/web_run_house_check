@@ -66,7 +66,7 @@ export default async function AdminNoticeDetailPage({
         title='공지 상세'
         backLink='/admin2/notice'
         iconColor='white'
-        backgroundColor='bg-rh-bg-surface'
+        backgroundColor='bg-rh-bg-primary'
       />
       <FadeIn>
         <div className='flex-1 px-4 pt-4 pb-8 space-y-4'>

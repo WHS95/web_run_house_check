@@ -187,7 +187,7 @@ export default async function DayDetailPage({
         title='요일별 참여율 상세'
         backLink={backLink}
         iconColor='white'
-        backgroundColor={"bg-rh-bg-surface"}
+        backgroundColor={"bg-rh-bg-primary"}
       />
       <YearMonthSelector year={year} month={month} />
       <div className={"flex-1 px-4" + " pb-4 space-y-5"}>

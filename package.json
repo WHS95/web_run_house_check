@@ -4,9 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "next build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:domain": "vitest run lib/domain",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "check:bff": "tsx scripts/check-bff.ts && tsx scripts/check-domain-tests.ts",
+    "build": "npm run check:bff && npm run test && npm run lint && npm run typecheck && next build",
     "start": "next start",
-    "lint": "next lint"
+    "start:standalone": "node .next/standalone/server.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -54,6 +60,8 @@
     "eslint-config-next": "^14.0.4",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
-    "typescript": "^5.3.3"
+    "tsx": "^4.21.0",
+    "typescript": "^5.3.3",
+    "vitest": "^2.1.9"
   }
 }

@@ -16,7 +16,7 @@ export default async function AdminCrewEditPage() {
                 title="크루 정보 편집"
                 backLink="/admin2/menu"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
             <Suspense fallback={<CrewEditSkeleton />}>
                 <CrewEditDataServer crewId={crewId} />

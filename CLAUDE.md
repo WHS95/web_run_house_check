@@ -117,6 +117,7 @@ html, body (overflow: hidden, overscroll-behavior: none)
 **반드시 지켜야 할 규칙:**
 1. **`<BottomNavigation />`을 개별 페이지에서 렌더링하지 마세요.** 루트 레이아웃의 `ConditionalBottomNav`이 자동으로 처리합니다.
    - 예외: `ConditionalBottomNav`이 숨기는 페이지(`/admin`, `/auth/*`, `/map`)에서 자체 바텀 내비가 필요한 경우만 허용
+   - **라우트별 전용 바텀 내비**(예: `/admin2`, `/master`)는 반드시 `ConditionalBottomNav` 분기로 렌더링하세요. 라우트 자체 layout/page에서 바텀 내비를 children 옆에 직접 두면 `main-content`(스크롤 컨테이너) **내부**에 들어가 함께 스크롤되어 하단 고정이 깨집니다. 패턴: `mobile-viewport > [main-content, ConditionalBottomNav]` 구조의 sibling으로만 위치해야 함 (참고: 루트 `/` 경로의 `BottomNavigation`이 정답 패턴).
 2. **`scroll-area-bottom` 클래스는 더 이상 필요하지 않습니다.** `main-content`가 자동으로 바텀 내비 위 영역만 차지합니다.
 3. **페이지에서 `min-h-screen` 사용 시 자동으로 `main-content` 높이 기준으로 변환됩니다.** (CSS에서 `100%`로 오버라이드)
 4. **페이지 내부 스크롤 컨테이너가 필요한 경우**, `flex-1 overflow-y-auto`를 사용하되 바텀 패딩은 불필요합니다.
@@ -414,6 +415,60 @@ The result should feel like a native iOS web app: elegant, lightweight, and user
     └── db-architecture/
         └── SKILL.md
 ```
+
+## ⚠️ BFF 4계층 아키텍처 (CRITICAL)
+
+자세한 설계는 [`docs/plans/2026-04-28-bff-refactor-design.md`](docs/plans/2026-04-28-bff-refactor-design.md), 실행 계획은 [`docs/plans/2026-04-28-bff-refactor-phase-a-plan.md`](docs/plans/2026-04-28-bff-refactor-phase-a-plan.md) 참조.
+
+### 4계층 책임
+
+1. **page.tsx (RSC, BFF Controller)** — 데이터 페치 + ViewModel 조립. 비즈니스 룰·검증·state transition 금지. `revalidatePath`/`revalidateTag` import 금지.
+2. **actions.ts (Server Action, BFF Mutation)** — auth 체크 → 도메인 함수 호출 → DB write → revalidate. 인라인 비즈니스 로직 금지 (도메인 함수만 호출).
+3. **lib/domain/<name>/** — 순수 함수, 한글 함수명, Vitest 단위 테스트 1:1 필수. Supabase·Next·React import 금지.
+4. **Supabase RLS** — 2차 방어. actions.ts 권한 체크가 1차.
+
+### 파일 컨벤션
+
+- `app/<route>/{page.tsx, actions.ts, _components/, _vm/}`
+- `lib/domain/<name>/{policies, workflow, validators, messages, types, *.test}.ts`
+- **`app/api/` 신규 추가 금지** (`npm run check:bff`가 build에서 차단)
+
+### `_vm/` 도입 기준 (1개라도 해당)
+
+1. 쿼리 2개 이상
+2. DB row → ViewModel 변환 (필드/구조 다름)
+3. 가공(`.map`/`.filter`/`groupBy`/집계/정렬) 5줄+
+4. 결과 분기 redirect 2개 이상
+5. page.tsx의 데이터 페치 블록 30줄 초과
+
+### 한글 메소드명 (lib/domain/만)
+
+- `boolean` → `~인가`/`~가능한가`/`~여부`
+- `void`/`Promise<void>` → `~하기`
+- 변환·조립 → `~생성`/`~조립`
+- 검증(throw) → `~검증`
+- Type guard → `~인`
+- 타입·변수·필드는 영어 유지
+
+자세한 컨벤션은 [`lib/domain/README.md`](lib/domain/README.md) 참조.
+
+### 강제 룰
+
+- `npm run build` = `check:bff` + `vitest` + `lint` + `typecheck` + `next build`
+- ESLint 룰 7개:
+    - 룰 1~4 **error** (강제): domain → supabase/next/react/UI import 차단(룰 1~3), page.tsx → `revalidatePath`/`revalidateTag` 차단(룰 4)
+    - 룰 5~6 **warn** (Phase A 한정 단계적 활성화 → 후속 cleanup PR에서 error로 격상): page.tsx → `'use client'` 경고(룰 5), `app/**` 외 화이트리스트 → `@/lib/supabase/admin` 경고(룰 6)
+    - **이유**: Step 0 시점 기존 코드에 룰 5/6 위반 ~26건이 존재해 즉시 error로 켜면 빌드가 깨짐. Phase A 본보기 머지 후 별도 cleanup PR로 위반 일괄 해소 + 격상.
+
+### Phase 진행
+
+- A: ⏳ attendance 본보기
+- B: ⏳ auth (G1)
+- C: user (G2)
+- D: attendance(admin) (G3)
+- E: grade (G4) + notice/push (G5)
+- F: crew/location (G6) + invite (G7)
+- G: master (G8) + analyze (G9)
 
 **변경 이력:**
 | 날짜 | 변경 내용 | 대상 | 사유 |

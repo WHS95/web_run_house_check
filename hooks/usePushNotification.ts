@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getFCMToken } from "@/lib/firebase/client";
+import {
+    registerPushTokenAction,
+    deactivatePushTokenAction,
+} from "@/app/mypage/actions";
 
 interface UsePushNotificationOptions {
     crewId: string | null;
@@ -73,21 +77,11 @@ export function usePushNotification({
                         );
                         const token = await getFCMToken();
                         if (token) {
-                            const res = await fetch(
-                                "/api/push/token",
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type":
-                                            "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                        token,
-                                        crewId,
-                                    }),
-                                }
-                            );
-                            if (res.ok) {
+                            const result = await registerPushTokenAction({
+                                token,
+                                crewId,
+                            });
+                            if (result.success) {
                                 setIsTokenRegistered(true);
                             }
                         }
@@ -156,14 +150,13 @@ export function usePushNotification({
             }
 
             // 서버에 토큰 등록
-            const response = await fetch("/api/push/token", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token, crewId }),
-            });
+            const registerResult = await registerPushTokenAction({ token, crewId });
 
-            if (!response.ok) {
-                console.warn("[push] 토큰 서버 등록 실패:", response.status);
+            if (!registerResult.success) {
+                console.warn(
+                    "[push] 토큰 서버 등록 실패:",
+                    registerResult.message
+                );
                 return false;
             }
 
@@ -184,11 +177,7 @@ export function usePushNotification({
         try {
             const token = await getFCMToken();
             if (token) {
-                await fetch("/api/push/token", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token }),
-                });
+                await deactivatePushTokenAction({ token });
             }
             setIsTokenRegistered(false);
             setIsNotificationEnabled(false);

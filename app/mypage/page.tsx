@@ -2,6 +2,8 @@ import React, { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
+import { 사용자_컨텍스트_조회 } from "@/lib/access/user-context";
+import * as 접근정책 from "@/lib/domain/access/policies";
 
 // 동적 로딩으로 번들 크기 최적화
 const MemberDetailTemplate = dynamic(
@@ -38,38 +40,35 @@ const MyPageSkeleton = () => (
 // 서버에서 마이페이지 데이터 사전 로딩
 async function getMyPageData() {
     try {
-        const supabase = await createClient();
-
-        // 1. 사용자 인증 확인
-        const {
-            data: { user },
-            error: authError,
-        } = await supabase.auth.getUser();
-        if (authError || !user) {
+        // 1. 사용자 컨텍스트 조회 (auth + status + 인증 크루 정보 1회 조회)
+        const ctx = await 사용자_컨텍스트_조회();
+        if (!ctx) {
             return { needsAuth: true };
         }
 
-        // 2. 통합 마이페이지 데이터 + 인증 크루 ID 병렬 조회
-        //    (RPC는 crewId를 반환하지 않아 푸시 토큰 등록에 필요한 값을 별도로 조회)
-        const [rpcResponse, crewIdResponse] = await Promise.all([
-            supabase
-                .schema("attendance")
-                .rpc("get_mypage_data_unified", { p_user_id: user.id }),
-            supabase
-                .schema("attendance")
-                .from("users")
-                .select("verified_crew_id")
-                .eq("id", user.id)
-                .single(),
-        ]);
+        // 2. 활성 상태 가드 — 어드민이 비활성화한 유저는 / 로 강제 이동
+        if (
+            !접근정책.크루멤버_접근가능한가({
+                userStatus: ctx.userStatus,
+                userCrewStatus: ctx.userCrewStatus,
+                isCrewVerified: ctx.isCrewVerified,
+            })
+        ) {
+            return { isDeactivated: true };
+        }
 
-        const { data: result, error } = rpcResponse;
+        // 3. 통합 마이페이지 데이터 RPC 조회
+        //    verifiedCrewId 는 컨텍스트에서 이미 확보 (별도 SELECT 제거)
+        const supabase = await createClient();
+        const { data: result, error } = await supabase
+            .schema("attendance")
+            .rpc("get_mypage_data_unified", { p_user_id: ctx.userId });
 
         if (error) {
             throw new Error(error.message);
         }
 
-        // 3. 결과 처리
+        // 4. 결과 처리
         if (!result.success) {
             if (result.error === "user_not_found") {
                 return { needsAuth: true };
@@ -80,11 +79,11 @@ async function getMyPageData() {
             throw new Error(result.message || "알 수 없는 오류가 발생했습니다.");
         }
 
-        // 4. 날짜 포맷 변환 + crewId 주입
+        // 5. 날짜 포맷 변환 + crewId 주입 (컨텍스트의 verifiedCrewId 사용)
         const { userProfile: profileData, activityData } = result.data;
         const userProfile = {
             ...profileData,
-            crewId: crewIdResponse.data?.verified_crew_id ?? null,
+            crewId: ctx.verifiedCrewId,
             joinDate: profileData.joinDate
                 ? new Date(profileData.joinDate).toLocaleDateString("ko-KR")
                 : null,
@@ -93,7 +92,7 @@ async function getMyPageData() {
         return {
             userProfile,
             activityData,
-            userId: user.id,
+            userId: ctx.userId,
         };
     } catch (error) {
         console.error("마이페이지 데이터 로딩 오류:", error);
@@ -117,6 +116,11 @@ export default async function MyPage() {
     // 크루 인증이 필요한 경우
     if (data.needsCrewVerification) {
         redirect("/auth/verify-crew");
+    }
+
+    // 비활성화 유저는 홈으로 — 홈에서 ClientHomePage가 차단 모달 노출
+    if (data.isDeactivated) {
+        redirect("/");
     }
 
     return (

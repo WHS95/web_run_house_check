@@ -8,7 +8,7 @@ export default function AdminNoticeWritePage() {
                 title="공지사항 작성"
                 backLink="/admin2/notice"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
             <NoticeWriteForm />
         </div>

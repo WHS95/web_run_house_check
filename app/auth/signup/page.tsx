@@ -15,6 +15,7 @@ import PageHeader from "@/components/organisms/common/PageHeader";
 import PopupNotification, {
     type NotificationType,
 } from "@/components/molecules/common/PopupNotification";
+import { verifyCrewCodeAction, signupAction } from "@/app/auth/signup/actions";
 
 // ⚡ 개별 입력 필드 컴포넌트 (메모이제이션)
 interface InputFieldProps {
@@ -275,24 +276,19 @@ export default function SignupPage() {
         setValue("verifiedCrewId", "");
 
         try {
-            const response = await fetch("/api/auth/verify-crew-code", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ crewCode: currentCrewCode }),
-            });
-            const data = await response.json();
+            const result = await verifyCrewCodeAction({ crewCode: currentCrewCode });
 
-            if (response.ok && data.success) {
+            if (result.success && result.data) {
                 setCrewCodeVerified(true);
-                setValue("verifiedCrewId", data.crewId, { shouldValidate: true });
+                setValue("verifiedCrewId", result.data.crewId, { shouldValidate: true });
                 clearFormErrors("verifiedCrewId");
                 posthog.capture("crew_code_verified", {
-                    crew_id: data.crewId,
+                    crew_id: result.data.crewId,
                 });
             } else {
                 setFormError("crewCode", {
                     type: "manual",
-                    message: data.message || "크루 코드 인증에 실패했습니다.",
+                    message: result.message || "크루 코드 인증에 실패했습니다.",
                 });
             }
         } catch (error) {
@@ -325,14 +321,9 @@ export default function SignupPage() {
             clearFormErrors("root.serverError");
 
             try {
-                const response = await fetch("/api/auth/signup", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData),
-                });
-                const result = await response.json();
+                const result = await signupAction(formData);
 
-                if (response.ok && result.success) {
+                if (result.success) {
                     posthog.identify(formData.verifiedCrewId, {
                         crew_id: formData.verifiedCrewId,
                         name: formData.firstName,
@@ -346,8 +337,7 @@ export default function SignupPage() {
                     setIsNotificationVisible(true);
                 } else {
                     posthog.captureException(
-                        new Error(result.message || "signup_failed"),
-                        { properties: { status: response.status } }
+                        new Error(result.message || "signup_failed")
                     );
                     setNotificationMessage(result.message || "회원가입에 실패했습니다.");
                     setNotificationType("error");

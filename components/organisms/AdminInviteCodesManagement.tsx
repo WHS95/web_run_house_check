@@ -10,6 +10,11 @@ import PopupNotification, {
   NotificationType,
 } from "@/components/molecules/common/PopupNotification";
 import ConfirmModal from "@/components/molecules/ConfirmModal";
+import {
+  getCrewInviteCodeAction,
+  upsertCrewInviteCodeAction,
+  deleteCrewInviteCodeAction,
+} from "@/app/admin2/settings/invite-codes/actions";
 
 interface InviteCode {
   id: number;
@@ -59,7 +64,7 @@ export default function AdminInviteCodesManagement({
         type,
       });
     },
-    []
+    [],
   );
 
   // 알림 닫기
@@ -87,11 +92,10 @@ export default function AdminInviteCodesManagement({
   const fetchInviteCode = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/admin/invite-codes?crewId=${crewId}`);
-      const result = await response.json();
+      const result = await getCrewInviteCodeAction({ crewId });
 
-      if (response.ok && result.success) {
-        setInviteCode(result.data);
+      if (result.success) {
+        setInviteCode((result.data as InviteCode | null) ?? null);
       } else {
         //console.error("초대코드 조회 오류:", result.error);
         haptic.error();
@@ -114,36 +118,26 @@ export default function AdminInviteCodesManagement({
       setActionLoading(true);
       haptic.medium();
 
-      const requestData: any = { crewId };
-      if (editData.inviteCode.trim()) {
-        requestData.inviteCode = editData.inviteCode.trim();
-      }
-      if (editData.description) {
-        requestData.description = editData.description;
-      }
-
-      const response = await fetch("/api/admin/invite-codes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+      const result = await upsertCrewInviteCodeAction({
+        crewId,
+        inviteCode: editData.inviteCode.trim() || undefined,
+        description: editData.description || undefined,
       });
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         haptic.success();
         setIsEditing(false);
         setEditData({ inviteCode: "", description: "" });
         await fetchInviteCode();
         showNotification(
           result.message || "초대코드가 성공적으로 생성되었습니다.",
-          "success"
+          "success",
         );
       } else {
         haptic.error();
         showNotification(
-          result.error || "초대코드 생성에 실패했습니다.",
-          "error"
+          result.message || result.error || "초대코드 생성에 실패했습니다.",
+          "error",
         );
       }
     } catch (error) {
@@ -164,24 +158,19 @@ export default function AdminInviteCodesManagement({
         setActionLoading(true);
         haptic.medium();
 
-        const response = await fetch(
-          `/api/admin/invite-codes?codeId=${inviteCode.id}`,
-          {
-            method: "DELETE",
-          }
-        );
+        const result = await deleteCrewInviteCodeAction({
+          codeId: inviteCode.id,
+        });
 
-        const result = await response.json();
-
-        if (response.ok && result.success) {
+        if (result.success) {
           haptic.success();
           // 즉시 새 코드 생성
           await handleCreateInviteCode();
         } else {
           haptic.error();
           showNotification(
-            result.error || "초대코드 재생성에 실패했습니다.",
-            "error"
+            result.message || result.error || "초대코드 재생성에 실패했습니다.",
+            "error",
           );
         }
       } catch (error) {
@@ -213,14 +202,14 @@ export default function AdminInviteCodesManagement({
         showNotification("복사에 실패했습니다.", "error");
       }
     },
-    [showNotification]
+    [showNotification],
   );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}.${String(date.getDate()).padStart(2, "0")}`;
   };
 
@@ -287,9 +276,7 @@ export default function AdminInviteCodesManagement({
         <div className='flex justify-between items-center'>
           <div className='flex items-center space-x-2'>
             <Ticket className='w-5 h-5 text-rh-accent' />
-            <span className='text-lg font-bold text-white'>
-              초대코드 관리
-            </span>
+            <span className='text-lg font-bold text-white'>초대코드 관리</span>
           </div>
           {!inviteCode && (
             <button

@@ -9,6 +9,7 @@ import {
     incrementRetry,
     QueuedAttendance,
 } from "@/lib/offline/attendance-queue";
+import { submitAttendance } from "@/app/attendance/actions";
 
 interface UseOfflineAttendanceReturn {
     isOnline: boolean;
@@ -68,20 +69,16 @@ export function useOfflineAttendance(): UseOfflineAttendanceReturn {
                 }
 
                 try {
-                    const res = await fetch("/api/attendance", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            userId: entry.userId,
-                            crewId: entry.crewId,
-                            locationId: entry.locationId,
-                            exerciseTypeId: entry.exerciseTypeId,
-                            isHost: entry.isHost,
-                            attendanceTimestamp: entry.attendanceTimestamp,
-                        }),
+                    const result = await submitAttendance({
+                        userId: entry.userId,
+                        crewId: entry.crewId,
+                        locationId: String(entry.locationId),
+                        exerciseTypeId: String(entry.exerciseTypeId),
+                        isHost: entry.isHost,
+                        attendanceTimestamp: entry.attendanceTimestamp,
                     });
 
-                    if (res.ok) {
+                    if (result.success) {
                         await removeFromQueue(entry.id);
                         success++;
                     } else {

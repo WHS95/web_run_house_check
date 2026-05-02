@@ -9,6 +9,8 @@ import {
     ChevronRight,
 } from "lucide-react";
 import PageHeader from "@/components/organisms/common/PageHeader";
+import { createClient } from "@/lib/supabase/server";
+import * as 마스터정책 from "@/lib/domain/master/policies";
 
 const menuItems = [
     {
@@ -48,9 +50,28 @@ const menuItems = [
     },
 ];
 
-// 서버 컴포넌트로 변환 — JS 번들 제거
-// Link 사용으로 자동 prefetch + 즉시 네비게이션
-export default function MenuPage() {
+export const dynamic = "force-dynamic";
+
+async function 마스터_권한_보유여부() {
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    const { data: roleCheck } = await supabase
+        .schema("attendance")
+        .from("user_roles")
+        .select("role_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    return 마스터정책.마스터_권한인가(roleCheck);
+}
+
+export default async function MenuPage() {
+    const isMaster = await 마스터_권한_보유여부();
+
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             <PageHeader
@@ -58,6 +79,17 @@ export default function MenuPage() {
                 iconColor="white"
                 borderColor="rh-border"
                 backgroundColor="bg-rh-bg-primary"
+                rightAction={
+                    isMaster ? (
+                        <Link
+                            href="/master"
+                            aria-label="마스터 관리 페이지로 이동"
+                            className="text-[14px] font-medium text-rh-accent px-3 py-1.5"
+                        >
+                            관리
+                        </Link>
+                    ) : undefined
+                }
             />
 
             <div className="overflow-y-auto flex-1 px-4 pt-4 pb-4">

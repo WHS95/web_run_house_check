@@ -167,7 +167,7 @@ const UltraFastRankingTemplate: React.FC<UltraFastRankingTemplateProps> = ({ ini
 
   return (
     <div className="relative flex flex-col min-h-screen bg-rh-bg-primary text-white">
-      <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-surface" />
+      <PageHeader title="랭킹" iconColor="white" backgroundColor="bg-rh-bg-primary" />
 
 
       {/* 년월 선택 (admin2/analyze와 동일 컴포넌트 — 스크롤 시 자동 축소) */}

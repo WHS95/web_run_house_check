@@ -26,6 +26,9 @@ import PopupNotification, {
   NotificationType,
 } from "@/components/molecules/common/PopupNotification";
 import { haptic } from "@/lib/haptic";
+import { getAdminCrewUsersAction } from "@/app/admin2/actions";
+import { createBulkAttendanceAction } from "@/app/admin2/attendance/actions";
+import { getCrewSettingsBundleAction } from "@/app/admin2/settings/actions";
 
 // 나이 계산 함수
 const calculateAge = (birthYear: number | null): string => {
@@ -84,7 +87,7 @@ export default function BulkAttendanceManagement({
         type,
       });
     },
-    []
+    [],
   );
 
   // 알림 닫기
@@ -99,33 +102,24 @@ export default function BulkAttendanceManagement({
         setIsLoading(true);
 
         // 사용자 목록과 위치 목록을 병렬로 조회
-        const [usersResponse, locationsResponse] = await Promise.all([
-          fetch(`/api/admin/users?crewId=${crewId}`),
-          fetch(`/api/admin/settings?crewId=${crewId}`),
+        const [usersResult, settingsResult] = await Promise.all([
+          getAdminCrewUsersAction({ crewId }),
+          getCrewSettingsBundleAction({ crewId }),
         ]);
 
-        if (usersResponse.ok) {
-          const usersResult = await usersResponse.json();
-          if (usersResult.success && usersResult.data) {
-            setUsers(usersResult.data || []);
-          }
+        if (usersResult.success && usersResult.data) {
+          setUsers((usersResult.data as any[]) || []);
         }
 
-        if (locationsResponse.ok) {
-          const locationsResult = await locationsResponse.json();
-          if (
-            locationsResult.success &&
-            locationsResult.data &&
-            locationsResult.data.locations
-          ) {
-            setLocations(locationsResult.data.locations);
-            // 첫 번째 위치를 기본값으로 설정
-            if (locationsResult.data.locations.length > 0) {
-              setAttendanceData((prev) => ({
-                ...prev,
-                location: locationsResult.data.locations[0].id.toString(),
-              }));
-            }
+        if (settingsResult.success && settingsResult.data) {
+          const locs = (settingsResult.data.locations as Location[]) || [];
+          setLocations(locs);
+          // 첫 번째 위치를 기본값으로 설정
+          if (locs.length > 0) {
+            setAttendanceData((prev) => ({
+              ...prev,
+              location: locs[0].id.toString(),
+            }));
           }
         }
       } catch (error) {
@@ -148,7 +142,7 @@ export default function BulkAttendanceManagement({
         (user.email &&
           user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (user.phone && user.phone.includes(searchTerm)) ||
-        (user.birth_year && user.birth_year.toString().includes(searchTerm))
+        (user.birth_year && user.birth_year.toString().includes(searchTerm)),
     );
   }, [users, searchTerm]);
 
@@ -179,7 +173,7 @@ export default function BulkAttendanceManagement({
     (field: string, value: string) => {
       setAttendanceData((prev) => ({ ...prev, [field]: value }));
     },
-    []
+    [],
   );
 
   // 일괄 출석 처리
@@ -205,7 +199,7 @@ export default function BulkAttendanceManagement({
     try {
       // 한국 시간 기준으로 ISO timestamp 생성
       const attendanceDateTime = new Date(
-        `${attendanceData.date}T${attendanceData.time}:00`
+        `${attendanceData.date}T${attendanceData.time}:00`,
       );
       const attendanceTimestamp = attendanceDateTime.toISOString();
 
@@ -213,34 +207,28 @@ export default function BulkAttendanceManagement({
       // console.log("선택된 시간:", attendanceData.time);
       // console.log("생성된 타임스탬프:", attendanceTimestamp);
 
-      const response = await fetch("/api/admin/attendance/bulk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          crewId,
-          users: Array.from(selectedUsers).map((userId) => ({
-            userId,
-            isHost: false,
-          })),
-          attendanceTimestamp: attendanceTimestamp,
-          locationId: parseInt(attendanceData.location),
-        }),
-      });
+      const result = await createBulkAttendanceAction({
+        crewId,
+        users: Array.from(selectedUsers).map((userId) => ({
+          userId,
+          isHost: false,
+        })),
+        attendanceTimestamp: attendanceTimestamp,
+        locationId: parseInt(attendanceData.location),
+      } as Parameters<typeof createBulkAttendanceAction>[0]);
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         haptic.success();
         showNotification(
           `${selectedUsers.size}명의 출석이 성공적으로 처리되었습니다.`,
-          "success"
+          "success",
         );
         setSelectedUsers(new Set());
       } else {
         haptic.error();
         showNotification(
           result.message || "출석 처리 중 오류가 발생했습니다.",
-          "error"
+          "error",
         );
       }
     } catch (error) {
@@ -256,10 +244,7 @@ export default function BulkAttendanceManagement({
     return (
       <div className='space-y-3 animate-pulse'>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className='bg-rh-bg-surface rounded-rh-lg p-4'
-          >
+          <div key={i} className='bg-rh-bg-surface rounded-rh-lg p-4'>
             <div className='flex items-center space-x-3'>
               <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
               <div className='flex-1 space-y-1'>
@@ -335,7 +320,7 @@ export default function BulkAttendanceManagement({
                     className='justify-between w-full text-white border-0 bg-rh-bg-primary'
                   >
                     {locations.find(
-                      (l) => l.id.toString() === attendanceData.location
+                      (l) => l.id.toString() === attendanceData.location,
                     )?.name || "장소 선택"}
                     <MapPin className='w-4 h-4' />
                   </Button>
@@ -347,7 +332,7 @@ export default function BulkAttendanceManagement({
                       onClick={() =>
                         handleAttendanceDataChange(
                           "location",
-                          location.id.toString()
+                          location.id.toString(),
                         )
                       }
                       className='text-white hover:bg-rh-bg-muted'

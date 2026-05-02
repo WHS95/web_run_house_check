@@ -21,29 +21,18 @@ export async function fetchRankingData(
     try {
         const supabase = await createClient();
 
-        // 개발 환경 바이패스
-        let userId: string;
-        if (
-            process.env.NODE_ENV !== "production" &&
-            process.env.DEV_BYPASS_AUTH === "true" &&
-            process.env.DEV_BYPASS_USER_ID
-        ) {
-            userId = process.env.DEV_BYPASS_USER_ID;
-        } else {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
 
-            if (!user) {
-                return { data: null, error: null, redirect: "/auth/login" };
-            }
-            userId = user.id;
+        if (!user) {
+            return { data: null, error: null, redirect: "/auth/login" };
         }
 
         const { data: result, error } = await supabase
             .schema("attendance")
             .rpc("get_ranking_data_unified", {
-                p_user_id: userId,
+                p_user_id: user.id,
                 target_year: year,
                 target_month: month,
             });

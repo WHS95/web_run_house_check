@@ -51,13 +51,16 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
       }
 
       // 좌표가 없는 활동장소는 필터링
+      // 허용 반경은 크루 전역 설정(accuracy_range)을 사용한다.
+      // 장소별 allowed_radius는 admin UI에 노출되지 않아 항상 DB 기본값(50)
+      // 으로 남아 있어 전역 설정을 가리는 버그를 일으킨다.
       const validLocations = crewLocations
         .filter(loc => loc.latitude !== null && loc.longitude !== null)
         .map(loc => ({
           name: loc.name,
           latitude: loc.latitude!,
           longitude: loc.longitude!,
-          allowedRadius: loc.allowed_radius || allowedRadius,
+          allowedRadius,
         }));
 
       // 유효한 활동장소가 없는 경우

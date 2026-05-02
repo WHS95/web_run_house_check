@@ -3,6 +3,8 @@ import nextDynamic from "next/dynamic";
 import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 import { redirect } from "next/navigation";
 import { fetchRankingData } from "./actions";
+import { 사용자_컨텍스트_조회 } from "@/lib/access/user-context";
+import * as 접근정책 from "@/lib/domain/access/policies";
 
 const UltraFastRankingTemplate = nextDynamic(
     () => import("@/components/templates/UltraFastRankingTemplate"),
@@ -77,6 +79,22 @@ export default async function RankingPage({ searchParams }: RankingPageProps) {
     const year = parseInt(params.year || "") || now.getFullYear();
     const month = parseInt(params.month || "") || now.getMonth() + 1;
     const demoCount = parseInt(params.demo || "");
+
+    // 1. 사용자 활성 가드 — demo 분기보다 먼저 둬서 비활성 유저는 demo도 차단
+    //    (인증 안 된 경우는 demo 도 동일하게 막힘)
+    const ctx = await 사용자_컨텍스트_조회();
+    if (!ctx) {
+        redirect("/auth/login");
+    }
+    if (
+        !접근정책.크루멤버_접근가능한가({
+            userStatus: ctx.userStatus,
+            userCrewStatus: ctx.userCrewStatus,
+            isCrewVerified: ctx.isCrewVerified,
+        })
+    ) {
+        redirect("/");
+    }
 
     // 데모 모드: ?demo=50 으로 접속 시 목 데이터 사용
     if (demoCount > 0) {

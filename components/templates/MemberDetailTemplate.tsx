@@ -12,6 +12,7 @@ import SectionLabel from '@/components/atoms/SectionLabel';
 import ConfirmDialog from '@/components/molecules/ConfirmDialog';
 
 import { usePushNotification } from '@/hooks/usePushNotification';
+import { withdrawUserAction, deactivatePushTokenAction } from '@/app/mypage/actions';
 
 interface Activity {
     type: 'attendance' | 'create_meeting';
@@ -93,11 +94,7 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
             }
             const fcmToken = await getFCMToken();
             if (fcmToken) {
-                await fetch("/api/push/token", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: fcmToken }),
-                }).catch(() => {});
+                await deactivatePushTokenAction({ token: fcmToken }).catch(() => {});
             }
             const supabase = createBrowserClient(
                 process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -118,9 +115,8 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
         if (isWithdrawing) return;
         setIsWithdrawing(true);
         try {
-            const res = await fetch("/api/user/withdraw", { method: "DELETE" });
-            const result = await res.json();
-            if (!res.ok || !result.success) {
+            const result = await withdrawUserAction();
+            if (!result.success) {
                 alert(result.message || "탈퇴 처리 중 오류가 발생했습니다.");
                 setIsWithdrawing(false);
                 return;

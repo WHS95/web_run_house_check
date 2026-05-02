@@ -11,7 +11,7 @@ export default async function Admin2GradePage() {
                 title="등급 관리"
                 backLink="/admin2/settings"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
             <div className="flex-1 overflow-y-auto">
                 <GradeManagementWrapper crewId={crewId} />

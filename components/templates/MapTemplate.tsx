@@ -14,12 +14,14 @@ import {
     List,
     LocateFixed,
     MapPin,
+    Navigation,
     X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CrewLocation } from "@/lib/types/crew-locations";
 import NaverMapLoader from "@/components/map/NaverMapLoader";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { getCrewLocationsAction } from "@/app/map/actions";
 
 /**
  * 지도 화면의 하단 UI 상태
@@ -76,12 +78,9 @@ export default function MapTemplate() {
     useEffect(() => {
         const fetchLocations = async () => {
             try {
-                const res = await fetch(
-                    "/api/crew-locations"
-                );
-                const json = await res.json();
-                if (json.success && json.data) {
-                    setLocations(json.data);
+                const result = await getCrewLocationsAction();
+                if (result.success && result.data) {
+                    setLocations(result.data as unknown as CrewLocation[]);
                 }
             } catch (err) {
                 console.error("장소 조회 실패:", err);
@@ -351,12 +350,32 @@ export default function MapTemplate() {
             }
         }, [getCurrentLocation]);
 
+    // 네이버 지도 길찾기
+    const handleDirections = useCallback(() => {
+        if (!selectedLocation) return;
+        const loc = selectedLocation;
+        const naverMapUrl = `nmap://route/walk?dlat=${loc.latitude}&dlng=${loc.longitude}&dname=${encodeURIComponent(loc.name)}`;
+        const webFallback = `https://map.naver.com/v5/directions/-/-/-/walk?c=${loc.longitude},${loc.latitude},15,0,0,0,dh`;
+
+        const timeout = setTimeout(() => {
+            window.location.href = webFallback;
+        }, 1500);
+
+        window.location.href = naverMapUrl;
+
+        window.addEventListener(
+            "blur",
+            () => clearTimeout(timeout),
+            { once: true }
+        );
+    }, [selectedLocation]);
+
     // FAB 하단 위치 계산
     const fabBottom =
         bottomUI.type === "expanded"
             ? 306
             : bottomUI.type === "detail"
-              ? 186
+              ? 250
               : 72;
 
     return (
@@ -779,6 +798,31 @@ export default function MapTemplate() {
                                     </p>
                                 )}
 
+                                {/* Directions Button */}
+                                <button
+                                    onClick={
+                                        handleDirections
+                                    }
+                                    className="flex items-center justify-center gap-2 w-full active:opacity-90 transition-opacity"
+                                    style={{
+                                        height: 48,
+                                        borderRadius: 12,
+                                        backgroundColor:
+                                            "#669FF2",
+                                    }}
+                                >
+                                    <Navigation
+                                        className="text-white"
+                                        style={{
+                                            width: 18,
+                                            height: 18,
+                                        }}
+                                    />
+                                    <span className="text-[15px] font-semibold text-white">
+                                        네이버 지도에서
+                                        길찾기
+                                    </span>
+                                </button>
                             </motion.div>
                         </>
                     )}

@@ -14,7 +14,7 @@ export default async function Admin2UserPage() {
                 title="회원 관리"
                 backLink="/admin2"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
             <Suspense fallback={<UserListSkeleton />}>
                 <UserListServer crewId={crewId} />

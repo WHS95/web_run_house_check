@@ -2,6 +2,10 @@ import React, { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ClientHomePage from "@/components/pages/ClientHomePage";
+import {
+    활성모임_배너VM_생성,
+    type ActiveMeetBannerVM,
+} from "@/lib/domain/attendance/policies";
 
 /** 홈 페이지 스켈레톤 — 실제 레이아웃과 동일한 구조 */
 function HomePageSkeleton() {
@@ -11,8 +15,8 @@ function HomePageSkeleton() {
       <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex flex-col gap-1">
-            <div className="h-3 w-24 rounded bg-rh-bg-surface" />
-            <div className="h-5 w-36 rounded bg-rh-bg-surface" />
+            <div className="h-5 w-32 rounded bg-rh-bg-surface" />
+            <div className="h-3 w-28 rounded bg-rh-bg-surface" />
           </div>
           <div className="h-10 w-10 rounded-rh-md bg-rh-bg-surface" />
         </div>
@@ -151,6 +155,8 @@ async function getInitialHomeData() {
       attendanceRank: number | null;
       hostingRank: number | null;
     } | null = null;
+    // 최근 30분 내 동일 크루 활성 모임
+    let activeMeet: ActiveMeetBannerVM | null = null;
 
     if (crewId) {
       // 4주 범위 (전후 2주)
@@ -165,11 +171,12 @@ async function getInitialHomeData() {
       const currentYear = now.getFullYear();
       const currentMonth = now.getMonth() + 1;
 
-      // 히트맵 + 공지 + 랭킹을 병렬로 조회
+      // 히트맵 + 공지 + 랭킹 + 활성모임을 병렬로 조회
       const [
           heatmapResult,
           noticeResult,
           rankingResult,
+          activeMeetResult,
       ] = await Promise.all([
         // 나의 최근 4주 출석 기록 (히트맵용)
         supabase
@@ -205,6 +212,13 @@ async function getInitialHomeData() {
               p_user_id: user.id,
               target_year: currentYear,
               target_month: currentMonth,
+          }),
+        // 최근 30분 내 동일 크루 활성 모임
+        supabase
+          .schema("attendance")
+          .rpc("get_recent_active_meet", {
+              p_user_id: user.id,
+              p_crew_id: crewId,
           }),
       ]);
 
@@ -250,6 +264,13 @@ async function getInitialHomeData() {
         };
       }
 
+      // 활성 모임 ViewModel 조립 (도메인 정책)
+      if (activeMeetResult.data?.success) {
+        activeMeet = 활성모임_배너VM_생성(
+            activeMeetResult.data.data
+        );
+      }
+
       // 랭킹에서 현재 유저의 순위 추출
       if (rankingResult.data?.success) {
         const rd = rankingResult.data.data;
@@ -277,6 +298,7 @@ async function getInitialHomeData() {
       myAttendanceDays,
       activeNotice,
       myRanking,
+      activeMeet,
       isDeactivated,
       deactivationMessage,
     };
@@ -292,6 +314,7 @@ async function getInitialHomeData() {
       myAttendanceDays: [],
       activeNotice: null,
       myRanking: null,
+      activeMeet: null,
       isDeactivated: false,
       deactivationMessage: "",
     };
@@ -326,6 +349,9 @@ export default async function HomePage() {
         }
         myRanking={
             initialData.myRanking ?? null
+        }
+        activeMeet={
+            initialData.activeMeet ?? null
         }
         isDeactivated={
             initialData.isDeactivated ?? false

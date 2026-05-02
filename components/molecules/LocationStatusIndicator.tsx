@@ -63,13 +63,16 @@ const LocationStatusIndicator: React.FC<LocationStatusIndicatorProps> = ({
         ? crewLocations.filter(loc => loc.id === Number(selectedLocationId))
         : crewLocations;
 
+      // 허용 반경은 크루 전역 설정(accuracy_range)을 사용한다.
+      // 장소별 allowed_radius는 admin UI에 노출되지 않아 항상 DB 기본값(50)
+      // 으로 남아 있어 전역 설정을 가리는 버그를 일으킨다.
       const validLocations = targetLocations
         .filter(loc => loc.latitude !== null && loc.longitude !== null)
         .map(loc => ({
           name: loc.name,
           latitude: loc.latitude!,
           longitude: loc.longitude!,
-          allowedRadius: loc.allowed_radius || allowedRadius,
+          allowedRadius,
         }));
 
       if (validLocations.length === 0) {

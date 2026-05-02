@@ -17,8 +17,10 @@ import QuickActionButton from '../atoms/QuickActionButton';
 import SectionLabel from '../atoms/SectionLabel';
 import PushPermissionBanner from '../molecules/PushPermissionBanner';
 import WeeklyAttendanceHeatmap from '../molecules/WeeklyAttendanceHeatmap';
+import ActiveMeetBanner from '../molecules/ActiveMeetBanner';
 import { usePushNotification } from '@/hooks/usePushNotification';
 import { useOfflineAttendance } from '@/hooks/useOfflineAttendance';
+import type { ActiveMeetBannerVM } from '@/lib/domain/attendance/policies';
 
 // 바텀시트는 열릴 때만 로드 (framer-motion 번들 분리)
 const NoticeBottomSheet = nextDynamic(
@@ -50,6 +52,7 @@ interface EnhancedHomeTemplateProps {
     myAttendanceDays?: AttendanceDay[];
     activeNotice?: ActiveNotice | null;
     myRanking?: MyRanking | null;
+    activeMeet?: ActiveMeetBannerVM | null;
 }
 
 // localStorage 키 상수
@@ -63,6 +66,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
     myAttendanceDays = [],
     activeNotice = null,
     myRanking = null,
+    activeMeet = null,
 }) => {
     const router = useRouter();
     const { shouldShowBanner, requestPermission, dismissBanner } =
@@ -136,10 +140,10 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
             <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
                 <div className="flex items-center justify-between px-4 h-14">
                     <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-semibold text-rh-accent">
+                        <span className="text-lg font-bold text-white truncate">
                             {crewName ?? 'RunHouse Crew'}
                         </span>
-                        <span className="text-lg font-semibold text-white">
+                        <span className="text-xs text-rh-text-secondary">
                             안녕하세요, {username ?? '사용자'}님
                         </span>
                     </div>
@@ -158,6 +162,9 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
                 onAllow={requestPermission}
                 onDismiss={dismissBanner}
             />
+
+            {/* ── 지금 출석 중인 모임 배너 ── */}
+            <ActiveMeetBanner meet={activeMeet} />
 
             {/* ── 오프라인 출석 대기 배너 ── */}
             {queueCount > 0 && (

@@ -19,7 +19,7 @@ export default async function Admin2SettingsPage({
                 title="설정"
                 backLink="/admin2"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
             <Suspense fallback={<SettingsSkeleton />}>
                 <SettingsDataServer

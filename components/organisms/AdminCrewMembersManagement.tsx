@@ -26,6 +26,10 @@ import PopupNotification, {
 } from "@/components/molecules/common/PopupNotification";
 import { useCrewMemberContext } from "@/contexts/CrewMemberContext";
 import { CrewMember } from "@/lib/validators/crewMemberSchema";
+import {
+  getCrewMembersAction,
+  changeCrewMemberRoleAction,
+} from "@/app/admin2/settings/members/actions";
 
 interface AdminCrewMembersManagementProps {
   crewId: string;
@@ -80,11 +84,10 @@ export default function AdminCrewMembersManagement({
   const fetchMembers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/admin/crew-members?crewId=${crewId}`);
-      const result = await response.json();
+      const result = await getCrewMembersAction({ crewId });
 
-      if (response.ok && result.success) {
-        setMembers(result.data);
+      if (result.success) {
+        setMembers((result.data as unknown as CrewMember[]) ?? []);
       } else {
         //console.error("멤버 조회 오류:", result.error);
         haptic.error();
@@ -97,7 +100,7 @@ export default function AdminCrewMembersManagement({
     } finally {
       setLoading(false);
     }
-  }, [crewId, showNotification]);
+  }, [crewId, showNotification, setLoading, setMembers]);
 
   // 운영진 권한 토글
   const handleToggleAdmin = useCallback(
@@ -109,15 +112,13 @@ export default function AdminCrewMembersManagement({
         setIsUpdating(userId);
         haptic.medium();
 
-        const response = await fetch("/api/admin/crew-members", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId, isAdmin, crewId }),
+        const result = await changeCrewMemberRoleAction({
+          userId,
+          isAdmin,
+          crewId,
         });
 
-        const result = await response.json();
-
-        if (response.ok && result.success) {
+        if (result.success) {
           haptic.success();
           await fetchMembers(); // 목록 새로고침
           showNotification(
@@ -127,7 +128,7 @@ export default function AdminCrewMembersManagement({
         } else {
           haptic.error();
           showNotification(
-            result.error || "권한 변경에 실패했습니다.",
+            result.message || result.error || "권한 변경에 실패했습니다.",
             "error",
           );
         }
@@ -290,10 +291,7 @@ export default function AdminCrewMembersManagement({
     return (
       <div className='space-y-3'>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className='bg-rh-bg-surface rounded-xl p-4'
-          >
+          <div key={i} className='bg-rh-bg-surface rounded-xl p-4'>
             <div className='flex items-center space-x-3'>
               <div className='w-10 h-10 bg-rh-bg-muted rounded-full'></div>
               <div className='flex-1 space-y-1.5'>

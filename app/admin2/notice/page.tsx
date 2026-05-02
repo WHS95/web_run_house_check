@@ -13,7 +13,7 @@ export default async function AdminNoticePage() {
                 title="공지사항 관리"
                 backLink="/admin2/menu"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
             <NoticeManagement
                 fallback={{ [adminKey.notices(crewId)]: initial }}

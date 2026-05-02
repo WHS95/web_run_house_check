@@ -26,7 +26,7 @@ export default async function Admin2AttendancePage({
                 title="출석 관리"
                 backLink="/admin2"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
             <Suspense fallback={<AttendanceSkeleton />}>
                 <AttendanceDataServer

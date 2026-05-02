@@ -2,6 +2,8 @@ import React, { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ClientAttendancePage from "@/components/pages/ClientAttendancePage";
+import { 사용자_컨텍스트_조회 } from "@/lib/access/user-context";
+import * as 접근정책 from "@/lib/domain/access/policies";
 
 // 페이지 메타데이터 최적화
 export const metadata = {
@@ -12,22 +14,28 @@ export const metadata = {
 // 서버에서 출석 폼 데이터 사전 로딩
 async function getAttendanceFormData() {
   try {
-    const supabase = await createClient();
-
-    // 1. 사용자 인증 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // 1. 사용자 컨텍스트 조회 (auth + status + 인증 크루 정보 1회 조회)
+    const ctx = await 사용자_컨텍스트_조회();
+    if (!ctx) {
       return { needsAuth: true };
     }
 
-    // 2. 통합 폼 데이터 조회
+    // 2. 활성 상태 가드 — 어드민이 비활성화한 유저는 / 로 강제 이동
+    if (
+      !접근정책.출석등록_가능한가({
+        userStatus: ctx.userStatus,
+        userCrewStatus: ctx.userCrewStatus,
+      })
+    ) {
+      return { isDeactivated: true };
+    }
+
+    // 3. 출석 폼 데이터 RPC 조회
+    const supabase = await createClient();
     const { data: result, error } = await supabase
       .schema("attendance")
       .rpc("get_attendance_form_data", {
-        p_user_id: user.id,
+        p_user_id: ctx.userId,
       });
 
     if (error) {
@@ -46,7 +54,7 @@ async function getAttendanceFormData() {
 
     return {
       formData: result.data,
-      userId: user.id,
+      userId: ctx.userId,
     };
   } catch (error) {
     console.error("출석 폼 데이터 로딩 오류:", error);
@@ -90,6 +98,11 @@ export default async function AttendancePage() {
   // 크루 인증이 필요한 경우
   if (data.needsCrewVerification) {
     redirect("/auth/verify-crew");
+  }
+
+  // 비활성화 유저는 홈으로 — 홈에서 ClientHomePage가 차단 모달 노출
+  if (data.isDeactivated) {
+    redirect("/");
   }
 
   // 에러가 있는 경우 클라이언트에서 처리

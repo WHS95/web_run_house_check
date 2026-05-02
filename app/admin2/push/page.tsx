@@ -11,7 +11,7 @@ export default async function AdminPushPage() {
                 title="푸시 알림 발송"
                 backLink="/admin2/menu"
                 iconColor="white"
-                backgroundColor="bg-rh-bg-surface"
+                backgroundColor="bg-rh-bg-primary"
             />
             <PushManagement crewId={crewId} />
         </>

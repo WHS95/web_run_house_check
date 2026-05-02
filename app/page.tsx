@@ -11,8 +11,8 @@ function HomePageSkeleton() {
       <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex flex-col gap-1">
-            <div className="h-3 w-24 rounded bg-rh-bg-surface" />
-            <div className="h-5 w-36 rounded bg-rh-bg-surface" />
+            <div className="h-5 w-32 rounded bg-rh-bg-surface" />
+            <div className="h-3 w-28 rounded bg-rh-bg-surface" />
           </div>
           <div className="h-10 w-10 rounded-rh-md bg-rh-bg-surface" />
         </div>

@@ -136,10 +136,10 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
             <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
                 <div className="flex items-center justify-between px-4 h-14">
                     <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-semibold text-rh-accent">
+                        <span className="text-lg font-bold text-white truncate">
                             {crewName ?? 'RunHouse Crew'}
                         </span>
-                        <span className="text-lg font-semibold text-white">
+                        <span className="text-xs text-rh-text-secondary">
                             안녕하세요, {username ?? '사용자'}님
                         </span>
                     </div>

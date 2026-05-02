@@ -7,7 +7,10 @@ export default defineConfig({
     },
     test: {
         environment: 'node',
-        include: ['lib/domain/**/*.test.ts'],
+        include: [
+            'lib/domain/**/*.test.ts',
+            'lib/auth/**/*.test.ts',
+        ],
         passWithNoTests: true,
     },
 });

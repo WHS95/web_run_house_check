@@ -535,6 +535,19 @@
         bottom: var(--rh-bottom-inset);
     }
 
+    /* === 마르퀴 (홈 티커) === */
+    .rh-marquee {
+        display: flex;
+        width: max-content;
+        will-change: transform;
+        animation: rh-marquee-scroll 18s linear infinite;
+    }
+
+    .rh-marquee-inner {
+        display: flex;
+        align-items: center;
+    }
+
     /* 리스트 렌더링 최적화 */
     .list-item-lazy {
         content-visibility: auto;
@@ -545,6 +558,11 @@
         content-visibility: auto;
         contain-intrinsic-size: 0 56px;
     }
+}
+
+@keyframes rh-marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
 }
 
 /* 폰트 */

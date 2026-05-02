@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import QuickActionButton from '../atoms/QuickActionButton';
 import SectionLabel from '../atoms/SectionLabel';
+import MarqueeTicker from '../atoms/MarqueeTicker';
 import PushPermissionBanner from '../molecules/PushPermissionBanner';
 import WeeklyAttendanceHeatmap from '../molecules/WeeklyAttendanceHeatmap';
 import ActiveMeetBanner from '../molecules/ActiveMeetBanner';
@@ -155,6 +156,13 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
                     </button>
                 </div>
             </header>
+
+            {/* ── 크루명 마르퀴 티커 ── */}
+            {crewName && (
+                <div className="border-y border-rh-border/40 bg-rh-bg-inset py-1.5 overflow-hidden">
+                    <MarqueeTicker text={crewName} />
+                </div>
+            )}
 
             {/* ── 알림 유도 배너 ── */}
             <PushPermissionBanner

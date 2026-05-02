@@ -66,20 +66,6 @@ function getKSTTime(timestamp: string): string {
 }
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
-const MONTH_SHORT = [
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-];
 
 /* ── 캘린더 셀 ── */
 const CalendarCell = memo(function CalendarCell({
@@ -88,8 +74,6 @@ const CalendarCell = memo(function CalendarCell({
   isSelected,
   isToday,
   isSaturday,
-  isMonthStart,
-  monthShort,
   count,
   onSelect,
 }: {
@@ -98,8 +82,6 @@ const CalendarCell = memo(function CalendarCell({
   isSelected: boolean;
   isToday: boolean;
   isSaturday: boolean;
-  isMonthStart: boolean;
-  monthShort: string;
   count: number;
   onSelect: (day: number) => void;
 }) {
@@ -132,19 +114,6 @@ const CalendarCell = memo(function CalendarCell({
           aria-hidden
           className="absolute inset-1 rounded-full border-2 border-rh-accent pointer-events-none"
         />
-      )}
-      {isMonthStart && (
-        <span
-          className={`absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold leading-none pointer-events-none ${
-            isSelected
-              ? "text-white"
-              : isCurrentMonth
-                ? "text-rh-accent"
-                : "text-rh-text-muted"
-          }`}
-        >
-          {monthShort}월
-        </span>
       )}
       <span>{date.getDate()}</span>
       {hasAttendance && (
@@ -567,9 +536,6 @@ export default function AttendanceManagement({
         date.getMonth() === todayDate.getMonth() &&
         date.getFullYear() === todayDate.getFullYear();
       const isSaturday = date.getDay() === 6;
-      /* mount 후에만 월 라벨 렌더 → hydration mismatch 방지 */
-      const isMonthStart = mounted && date.getDate() === 1;
-      const monthShort = MONTH_SHORT[date.getMonth()];
       return (
         <CalendarCell
           key={idx}
@@ -578,8 +544,6 @@ export default function AttendanceManagement({
           isSelected={isSelected}
           isToday={isToday}
           isSaturday={isSaturday}
-          isMonthStart={isMonthStart}
-          monthShort={monthShort}
           count={count}
           onSelect={setSelectedDay}
         />

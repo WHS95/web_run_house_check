@@ -64,7 +64,7 @@ export default function AdminInviteCodesManagement({
         type,
       });
     },
-    []
+    [],
   );
 
   // 알림 닫기
@@ -131,13 +131,13 @@ export default function AdminInviteCodesManagement({
         await fetchInviteCode();
         showNotification(
           result.message || "초대코드가 성공적으로 생성되었습니다.",
-          "success"
+          "success",
         );
       } else {
         haptic.error();
         showNotification(
           result.message || result.error || "초대코드 생성에 실패했습니다.",
-          "error"
+          "error",
         );
       }
     } catch (error) {
@@ -170,7 +170,7 @@ export default function AdminInviteCodesManagement({
           haptic.error();
           showNotification(
             result.message || result.error || "초대코드 재생성에 실패했습니다.",
-            "error"
+            "error",
           );
         }
       } catch (error) {
@@ -202,14 +202,14 @@ export default function AdminInviteCodesManagement({
         showNotification("복사에 실패했습니다.", "error");
       }
     },
-    [showNotification]
+    [showNotification],
   );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}.${String(date.getDate()).padStart(2, "0")}`;
   };
 
@@ -276,9 +276,7 @@ export default function AdminInviteCodesManagement({
         <div className='flex justify-between items-center'>
           <div className='flex items-center space-x-2'>
             <Ticket className='w-5 h-5 text-rh-accent' />
-            <span className='text-lg font-bold text-white'>
-              초대코드 관리
-            </span>
+            <span className='text-lg font-bold text-white'>초대코드 관리</span>
           </div>
           {!inviteCode && (
             <button

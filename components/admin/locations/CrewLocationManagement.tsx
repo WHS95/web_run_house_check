@@ -154,9 +154,7 @@ function CrewLocationManagement({
         console.error("❌ Action 응답 오류:");
         console.error("  error:", result.error);
         console.error("  message:", result.message);
-        throw new Error(
-          result.message || "활동장소 저장에 실패했습니다.",
-        );
+        throw new Error(result.message || "활동장소 저장에 실패했습니다.");
       }
     } catch (error) {
       console.error("💥 활동장소 저장 오류:", error);
@@ -194,9 +192,7 @@ function CrewLocationManagement({
           haptic.success();
         } else {
           console.log("📡 에러 데이터:", result);
-          throw new Error(
-            result.message || "활동장소 삭제에 실패했습니다.",
-          );
+          throw new Error(result.message || "활동장소 삭제에 실패했습니다.");
         }
       } catch (error) {
         console.error("활동장소 삭제 오류:", error);

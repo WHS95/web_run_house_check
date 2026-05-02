@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "check:bff": "tsx scripts/check-bff.ts && tsx scripts/check-domain-tests.ts",
     "build": "npm run check:bff && npm run test && npm run lint && npm run typecheck && next build",
-    "start": "next start"
+    "start": "next start",
+    "start:standalone": "node .next/standalone/server.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

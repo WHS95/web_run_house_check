@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import {
-    can,
-    normalizeRole,
-    type AdminAction,
-    type AdminRole,
-} from "./permissions";
+import { can, type AdminAction, type AdminRole } from "./permissions";
+import { 관리자_역할_결정 } from "@/lib/domain/master/policies";
 
 export interface AdminGuardResult {
     userId: string;
@@ -63,15 +59,28 @@ export async function assertAdmin(
         );
     }
 
-    const { data: membership } = await supabase
-        .schema("attendance")
-        .from("user_crews")
-        .select("crew_role")
-        .eq("user_id", user.id)
-        .eq("crew_id", userRow.verified_crew_id)
-        .maybeSingle();
+    // 시스템 권한(MASTER_ADMIN/ADMIN)과 크루 권한 병렬 조회.
+    // 마스터(role_id=1)는 인증 크루의 crew_role과 무관하게 owner 부여.
+    const [roleRes, membershipRes] = await Promise.all([
+        supabase
+            .schema("attendance")
+            .from("user_roles")
+            .select("role_id")
+            .eq("user_id", user.id)
+            .maybeSingle(),
+        supabase
+            .schema("attendance")
+            .from("user_crews")
+            .select("crew_role")
+            .eq("user_id", user.id)
+            .eq("crew_id", userRow.verified_crew_id)
+            .maybeSingle(),
+    ]);
 
-    const role = normalizeRole(membership?.crew_role);
+    const role = 관리자_역할_결정({
+        roleId: roleRes.data?.role_id ?? null,
+        crewRole: membershipRes.data?.crew_role ?? null,
+    });
     if (!role || !can(role, action)) {
         return NextResponse.json(
             { success: false, message: "권한이 없습니다." },

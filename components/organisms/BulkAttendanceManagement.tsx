@@ -87,7 +87,7 @@ export default function BulkAttendanceManagement({
         type,
       });
     },
-    []
+    [],
   );
 
   // 알림 닫기
@@ -142,7 +142,7 @@ export default function BulkAttendanceManagement({
         (user.email &&
           user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (user.phone && user.phone.includes(searchTerm)) ||
-        (user.birth_year && user.birth_year.toString().includes(searchTerm))
+        (user.birth_year && user.birth_year.toString().includes(searchTerm)),
     );
   }, [users, searchTerm]);
 
@@ -173,7 +173,7 @@ export default function BulkAttendanceManagement({
     (field: string, value: string) => {
       setAttendanceData((prev) => ({ ...prev, [field]: value }));
     },
-    []
+    [],
   );
 
   // 일괄 출석 처리
@@ -199,7 +199,7 @@ export default function BulkAttendanceManagement({
     try {
       // 한국 시간 기준으로 ISO timestamp 생성
       const attendanceDateTime = new Date(
-        `${attendanceData.date}T${attendanceData.time}:00`
+        `${attendanceData.date}T${attendanceData.time}:00`,
       );
       const attendanceTimestamp = attendanceDateTime.toISOString();
 
@@ -221,14 +221,14 @@ export default function BulkAttendanceManagement({
         haptic.success();
         showNotification(
           `${selectedUsers.size}명의 출석이 성공적으로 처리되었습니다.`,
-          "success"
+          "success",
         );
         setSelectedUsers(new Set());
       } else {
         haptic.error();
         showNotification(
           result.message || "출석 처리 중 오류가 발생했습니다.",
-          "error"
+          "error",
         );
       }
     } catch (error) {
@@ -244,10 +244,7 @@ export default function BulkAttendanceManagement({
     return (
       <div className='space-y-3 animate-pulse'>
         {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className='bg-rh-bg-surface rounded-rh-lg p-4'
-          >
+          <div key={i} className='bg-rh-bg-surface rounded-rh-lg p-4'>
             <div className='flex items-center space-x-3'>
               <div className='w-[3rem] h-[3rem] bg-rh-bg-muted rounded-full'></div>
               <div className='flex-1 space-y-1'>
@@ -323,7 +320,7 @@ export default function BulkAttendanceManagement({
                     className='justify-between w-full text-white border-0 bg-rh-bg-primary'
                   >
                     {locations.find(
-                      (l) => l.id.toString() === attendanceData.location
+                      (l) => l.id.toString() === attendanceData.location,
                     )?.name || "장소 선택"}
                     <MapPin className='w-4 h-4' />
                   </Button>
@@ -335,7 +332,7 @@ export default function BulkAttendanceManagement({
                       onClick={() =>
                         handleAttendanceDataChange(
                           "location",
-                          location.id.toString()
+                          location.id.toString(),
                         )
                       }
                       className='text-white hover:bg-rh-bg-muted'

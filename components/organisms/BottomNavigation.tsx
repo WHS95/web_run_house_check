@@ -91,28 +91,6 @@ const BottomNavigation: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [router]);
 
-    /* API 프리페치 — mount 시 1회만 실행 */
-    useEffect(() => {
-        const currentDate = new Date();
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1;
-
-        // 두 요청을 병렬로 실행
-        Promise.all([
-            fetch("/api/ranking?prefetch=true", {
-                method: "GET",
-                cache: "force-cache",
-            }).catch(() => {}),
-            fetch(
-                `/api/ranking?year=${year}&month=${month}&prefetch=true`,
-                {
-                    method: "GET",
-                    cache: "force-cache",
-                }
-            ).catch(() => {}),
-        ]);
-    }, []);
-
     /* 활성 경로 판단 (pendingHref 우선) */
     const isActivePath = useCallback(
         (href: string) => {

@@ -7,6 +7,8 @@ import {
 } from "@/lib/admin2/queries";
 import PageHeader
     from "@/components/organisms/common/PageHeader";
+import YearMonthSelector
+    from "../components/YearMonthSelector";
 import OverallDetailClient
     from "./components/OverallDetailClient";
 
@@ -127,9 +129,13 @@ export default async function OverallDetailPage({
                     "bg-rh-bg-surface"
                 }
             />
+            <YearMonthSelector
+                year={year}
+                month={month}
+            />
             <div
                 className={
-                    "flex-1 px-4 pt-4"
+                    "flex-1 px-4"
                     + " pb-4"
                 }
             >
@@ -168,8 +174,6 @@ async function OverallDetailServer({
 
     return (
         <OverallDetailClient
-            year={year}
-            month={month}
             totalMembers={computed.totalMembers}
             attendedCount={computed.attendedCount}
             absentCount={computed.absentCount}
@@ -182,13 +186,6 @@ async function OverallDetailServer({
 function OverallDetailSkeleton() {
     return (
         <div className="space-y-4">
-            <div
-                className={
-                    "h-8 rounded-lg"
-                    + " bg-rh-bg-surface"
-                    + " w-28 mx-auto"
-                }
-            />
             <div
                 className={
                     "bg-rh-bg-surface"

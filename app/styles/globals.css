@@ -769,6 +769,44 @@ html, body {
     }
 }
 
+/* ── /intro 페이지 escape: 데스크탑에서도 풀-너비 마케팅 페이지로 ── */
+html:has(.intro-root),
+body:has(.intro-root) {
+    overflow: auto !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overscroll-behavior: auto !important;
+    position: static !important;
+}
+.mobile-viewport-wrapper:has(.intro-root) {
+    align-items: stretch !important;
+    padding: 0 !important;
+    min-height: 100vh;
+    background: #1D2530;
+}
+.mobile-viewport:has(.intro-root) {
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+.mobile-viewport:has(.intro-root)::before,
+.mobile-viewport:has(.intro-root)::after {
+    display: none !important;
+}
+.mobile-viewport:has(.intro-root) .main-content {
+    overflow: visible !important;
+    flex: 1 1 auto !important;
+}
+.mobile-viewport .intro-root {
+    position: static !important;
+    inset: auto !important;
+    z-index: auto !important;
+}
+
 /* 스플래시 로고 애니메이션 */
 @keyframes splash-pulse {
     0%, 100% {

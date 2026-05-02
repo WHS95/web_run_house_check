@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
     마스터_권한인가,
+    관리자_모드_접근가능한가,
+    관리자_역할_결정,
     유효한_크루역할인가,
     유효한_크루이름인가,
     유효한_지역인가,
@@ -21,6 +23,91 @@ describe('master 정책', () => {
         });
         it('undefined → false', () => {
             expect(마스터_권한인가(undefined)).toBe(false);
+        });
+    });
+
+    describe('관리자_모드_접근가능한가', () => {
+        it('role_id=1 (MASTER_ADMIN) → true', () => {
+            expect(
+                관리자_모드_접근가능한가({ roleId: 1, crewRole: null })
+            ).toBe(true);
+        });
+        it('role_id=1 + 크루장 동시 보유 → true', () => {
+            expect(
+                관리자_모드_접근가능한가({
+                    roleId: 1,
+                    crewRole: 'CREW_MANAGER',
+                })
+            ).toBe(true);
+        });
+        it('role_id=2 (ADMIN) → true', () => {
+            expect(
+                관리자_모드_접근가능한가({ roleId: 2, crewRole: null })
+            ).toBe(true);
+        });
+        it('crew_role=CREW_MANAGER → true', () => {
+            expect(
+                관리자_모드_접근가능한가({
+                    roleId: 3,
+                    crewRole: 'CREW_MANAGER',
+                })
+            ).toBe(true);
+        });
+        it('role_id=3 + MEMBER → false', () => {
+            expect(
+                관리자_모드_접근가능한가({ roleId: 3, crewRole: 'MEMBER' })
+            ).toBe(false);
+        });
+        it('role 없음 + crewRole 없음 → false', () => {
+            expect(
+                관리자_모드_접근가능한가({ roleId: null, crewRole: null })
+            ).toBe(false);
+        });
+        it('undefined 입력 → false', () => {
+            expect(
+                관리자_모드_접근가능한가({
+                    roleId: undefined,
+                    crewRole: undefined,
+                })
+            ).toBe(false);
+        });
+    });
+
+    describe('관리자_역할_결정', () => {
+        it('role_id=1 (MASTER_ADMIN) → owner', () => {
+            expect(
+                관리자_역할_결정({ roleId: 1, crewRole: 'MEMBER' })
+            ).toBe('owner');
+        });
+        it('role_id=1 + crewRole=null → owner', () => {
+            expect(
+                관리자_역할_결정({ roleId: 1, crewRole: null })
+            ).toBe('owner');
+        });
+        it('crew_role=OWNER → owner', () => {
+            expect(
+                관리자_역할_결정({ roleId: 3, crewRole: 'OWNER' })
+            ).toBe('owner');
+        });
+        it('role_id=2 (ADMIN) → admin', () => {
+            expect(
+                관리자_역할_결정({ roleId: 2, crewRole: 'MEMBER' })
+            ).toBe('admin');
+        });
+        it('crew_role=CREW_MANAGER → admin', () => {
+            expect(
+                관리자_역할_결정({ roleId: 3, crewRole: 'CREW_MANAGER' })
+            ).toBe('admin');
+        });
+        it('role_id=3 + MEMBER → null', () => {
+            expect(
+                관리자_역할_결정({ roleId: 3, crewRole: 'MEMBER' })
+            ).toBe(null);
+        });
+        it('null/undefined → null', () => {
+            expect(
+                관리자_역할_결정({ roleId: null, crewRole: null })
+            ).toBe(null);
         });
     });
 

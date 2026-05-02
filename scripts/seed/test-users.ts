@@ -98,13 +98,60 @@ async function main() {
     const baseGradeId = await ensureBaseGrade(supabase);
     const defaultGradeId = await ensureCrewGrade(supabase, crewId, baseGradeId);
 
-    // ── 4) 각 유저 시드 ───────────────────────────────
+    // ── 4) 운동 종류 기준 데이터 + 크루 연결 보장 ────────
+    await ensureExerciseTypes(supabase, crewId);
+
+    // ── 5) 각 유저 시드 ───────────────────────────────
     for (const u of TEST_USERS) {
         await seedUser(adminAuth, supabase, u, crewId, defaultGradeId);
     }
 
     console.log("[seed] 완료 ✅");
     console.log(`[seed] 비밀번호 (전체 공통): ${TEST_PASSWORD}`);
+}
+
+const BASE_EXERCISE_TYPES = ["달리기", "걷기", "인터벌", "페이스런"] as const;
+
+/** exercise_types 기준 데이터 + 크루 연결 보장. */
+async function ensureExerciseTypes(db: SupabaseClient, crewId: string) {
+    for (const name of BASE_EXERCISE_TYPES) {
+        const { data: ex } = await db
+            .from("exercise_types")
+            .select("id")
+            .eq("name", name)
+            .maybeSingle();
+
+        let typeId: number;
+        if (ex?.id) {
+            typeId = ex.id as number;
+        } else {
+            const { data, error } = await db
+                .from("exercise_types")
+                .insert({ name })
+                .select("id")
+                .single();
+            if (error) throw error;
+            typeId = data.id as number;
+            console.log(`[seed] exercise_type 생성: ${name} (${typeId})`);
+        }
+
+        const { data: existing } = await db
+            .from("crew_exercise_types")
+            .select("id")
+            .eq("crew_id", crewId)
+            .eq("exercise_type_id", typeId)
+            .maybeSingle();
+        if (!existing) {
+            const { error } = await db
+                .from("crew_exercise_types")
+                .insert({ crew_id: crewId, exercise_type_id: typeId });
+            if (error) {
+                console.warn(`[seed] crew_exercise_type 연결 실패 (skip):`, error.message);
+            } else {
+                console.log(`[seed] crew_exercise_type 연결: ${name}`);
+            }
+        }
+    }
 }
 
 /** attendance.grades에 기본 grade 1개 보장. id 반환. */

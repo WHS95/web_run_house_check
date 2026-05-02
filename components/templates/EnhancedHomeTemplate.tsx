@@ -159,7 +159,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
 
             {/* ── 크루명 마르퀴 티커 ── */}
             {crewName && (
-                <div className="border-y border-rh-border/40 bg-rh-bg-inset py-1.5 overflow-hidden">
+                <div className="py-2.5 overflow-hidden" style={{ backgroundColor: 'var(--rh-accent)' }}>
                     <MarqueeTicker text={crewName} />
                 </div>
             )}

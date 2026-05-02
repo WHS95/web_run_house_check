@@ -1,5 +1,6 @@
 "use client";
 import { memo, forwardRef } from "react";
+import { Check } from "lucide-react";
 
 interface AdminLabeledInputProps {
     label: string;
@@ -8,6 +9,7 @@ interface AdminLabeledInputProps {
     placeholder?: string;
     helperText?: string;
     type?: string;
+    saved?: boolean;
 }
 
 const AdminLabeledInput = memo(
@@ -20,6 +22,7 @@ const AdminLabeledInput = memo(
                 placeholder,
                 helperText,
                 type = "text",
+                saved = false,
             },
             ref,
         ) {
@@ -28,14 +31,27 @@ const AdminLabeledInput = memo(
                     <label className="text-xs font-medium text-rh-text-secondary">
                         {label}
                     </label>
-                    <input
-                        ref={ref}
-                        type={type}
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        placeholder={placeholder}
-                        className="h-12 px-4 rounded-lg bg-rh-bg-surface border border-rh-border text-sm text-white placeholder:text-rh-text-muted outline-none focus:border-rh-accent transition-colors"
-                    />
+                    <div className="relative">
+                        <input
+                            ref={ref}
+                            type={type}
+                            value={value}
+                            onChange={(e) => onChange(e.target.value)}
+                            placeholder={placeholder}
+                            className={`w-full h-12 px-4 ${saved ? "pr-10" : ""} rounded-lg bg-rh-bg-surface border text-sm text-white placeholder:text-rh-text-muted outline-none transition-colors ${
+                                saved
+                                    ? "border-rh-accent/40 focus:border-rh-accent"
+                                    : "border-rh-border focus:border-rh-accent"
+                            }`}
+                        />
+                        <div
+                            className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 ${
+                                saved ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                            }`}
+                        >
+                            <Check size={15} style={{ color: "var(--rh-accent)" }} strokeWidth={2.5} />
+                        </div>
+                    </div>
                     {helperText && (
                         <span className="text-[11px] text-rh-text-tertiary">
                             {helperText}

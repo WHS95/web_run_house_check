@@ -10,15 +10,15 @@ interface MarqueeTickerProps {
 
 const MarqueeTicker = memo<MarqueeTickerProps>(({
     text,
-    separator = '·',
+    separator = '–',
     repeatCount = 8,
 }) => {
     const items = Array.from({ length: repeatCount }, (_, i) => (
         <span key={i} className="inline-flex items-center shrink-0">
-            <span className="uppercase font-bold tracking-widest text-[11px] text-rh-accent/70">
+            <span className="uppercase font-black tracking-widest text-[13px]" style={{ color: 'var(--rh-bg-primary)' }}>
                 {text}
             </span>
-            <span className="mx-3 text-rh-accent/40 text-[10px]">
+            <span className="mx-4 text-[13px] font-black" style={{ color: 'var(--rh-bg-primary)' }}>
                 {separator}
             </span>
         </span>

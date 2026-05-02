@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, memo } from "react";
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 import FadeIn from "@/components/atoms/FadeIn";
 import { AdminLabeledInput, AdminDivider } from "@/app/admin2/components/ui";
 import LogoCropModal from "./LogoCropModal";
@@ -51,6 +51,13 @@ const CrewEditForm = memo(function CrewEditForm({
   const [region, setRegion] = useState(initialData.region);
   const [maxMembers, setMaxMembers] = useState(String(initialData.maxMembers));
   const [saving, setSaving] = useState(false);
+  const [savedValues, setSavedValues] = useState({
+    name: initialData.name,
+    description: initialData.description,
+    region: initialData.region,
+    maxMembers: String(initialData.maxMembers),
+  });
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 로고 업로드/크롭 상태
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -161,36 +168,50 @@ const CrewEditForm = memo(function CrewEditForm({
     [crewId, cropSrc, logoUrl],
   );
 
-  const handleSave = useCallback(async () => {
-    setSaving(true);
-    try {
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
-      const { error } = await supabase
-        .schema("attendance")
-        .from("crews")
-        .update({
-          name: name.trim(),
-          description: description.trim(),
-          region: region.trim(),
-          max_members: parseInt(maxMembers) || 50,
-        })
-        .eq("id", crewId);
+  // 자동 저장 (debounce 1.5s)
+  useEffect(() => {
+    const isDirty =
+      name !== savedValues.name ||
+      description !== savedValues.description ||
+      region !== savedValues.region ||
+      maxMembers !== savedValues.maxMembers;
 
-      if (error) {
-        console.error("[crew-edit] save failed:", error);
-        alert(`크루 정보 수정에 실패했습니다.\n${error.message ?? ""}`);
-        return;
+    if (!isDirty) return;
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      setSaving(true);
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const { error } = await supabase
+          .schema("attendance")
+          .from("crews")
+          .update({
+            name: name.trim(),
+            description: description.trim(),
+            region: region.trim(),
+            max_members: parseInt(maxMembers) || 50,
+          })
+          .eq("id", crewId);
+
+        if (error) {
+          console.error("[crew-edit] auto-save failed:", error);
+          return;
+        }
+        setSavedValues({ name, description, region, maxMembers });
+      } catch (err) {
+        console.error("[crew-edit] auto-save error:", err);
+      } finally {
+        setSaving(false);
       }
-      alert("크루 정보가 수정되었습니다.");
-    } catch (err) {
-      console.error("[crew-edit] unexpected save error:", err);
-      const message = err instanceof Error ? err.message : "알 수 없는 오류";
-      alert(`오류가 발생했습니다.\n${message}`);
-    } finally {
-      setSaving(false);
-    }
-  }, [crewId, name, description, region, maxMembers]);
+    }, 1500);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, description, region, maxMembers]);
 
   return (
     <FadeIn>
@@ -228,23 +249,36 @@ const CrewEditForm = memo(function CrewEditForm({
 
         {/* 편집 폼 */}
         <div className='space-y-4'>
+          {/* 자동 저장 상태 인디케이터 */}
+          <div className='flex items-center justify-end h-4'>
+            {saving && (
+              <span className='flex items-center gap-1 text-[11px] text-rh-text-tertiary'>
+                <Loader2 size={11} className='animate-spin' />
+                저장 중...
+              </span>
+            )}
+          </div>
+
           <AdminLabeledInput
             label='크루명'
             value={name}
             onChange={setName}
             placeholder='크루 이름을 입력하세요'
+            saved={name === savedValues.name}
           />
           <AdminLabeledInput
             label='크루 소개'
             value={description}
             onChange={setDescription}
             placeholder='크루 소개를 입력하세요'
+            saved={description === savedValues.description}
           />
           <AdminLabeledInput
             label='활동 지역'
             value={region}
             onChange={setRegion}
             placeholder='활동 지역을 입력하세요'
+            saved={region === savedValues.region}
           />
           <AdminLabeledInput
             label='최대 인원'
@@ -252,6 +286,7 @@ const CrewEditForm = memo(function CrewEditForm({
             onChange={setMaxMembers}
             placeholder='50'
             type='number'
+            saved={maxMembers === savedValues.maxMembers}
           />
         </div>
 
@@ -274,15 +309,6 @@ const CrewEditForm = memo(function CrewEditForm({
             </span>
           </div>
         </div>
-
-        {/* 저장 버튼 */}
-        <button
-          className='w-full py-3.5 rounded-xl bg-rh-accent text-white text-sm font-semibold disabled:opacity-50'
-          onClick={handleSave}
-          disabled={saving}
-        >
-          {saving ? "저장 중..." : "변경사항 저장"}
-        </button>
       </div>
 
       {/* 로고 크롭 모달 */}

@@ -10,6 +10,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "check:bff": "tsx scripts/check-bff.ts && tsx scripts/check-domain-tests.ts",
+    "seed:test": "tsx -r dotenv/config scripts/seed/test-users.ts dotenv_config_path=.env.local",
+    "seed:reset": "tsx -r dotenv/config scripts/seed/reset-test-users.ts dotenv_config_path=.env.local",
     "build": "npm run check:bff && npm run test && npm run lint && npm run typecheck && next build",
     "start": "next start",
     "start:standalone": "node .next/standalone/server.js"

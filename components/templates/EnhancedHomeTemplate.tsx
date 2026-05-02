@@ -17,8 +17,10 @@ import QuickActionButton from '../atoms/QuickActionButton';
 import SectionLabel from '../atoms/SectionLabel';
 import PushPermissionBanner from '../molecules/PushPermissionBanner';
 import WeeklyAttendanceHeatmap from '../molecules/WeeklyAttendanceHeatmap';
+import ActiveMeetBanner from '../molecules/ActiveMeetBanner';
 import { usePushNotification } from '@/hooks/usePushNotification';
 import { useOfflineAttendance } from '@/hooks/useOfflineAttendance';
+import type { ActiveMeetBannerVM } from '@/lib/domain/attendance/policies';
 
 // 바텀시트는 열릴 때만 로드 (framer-motion 번들 분리)
 const NoticeBottomSheet = nextDynamic(
@@ -50,6 +52,7 @@ interface EnhancedHomeTemplateProps {
     myAttendanceDays?: AttendanceDay[];
     activeNotice?: ActiveNotice | null;
     myRanking?: MyRanking | null;
+    activeMeet?: ActiveMeetBannerVM | null;
 }
 
 // localStorage 키 상수
@@ -63,6 +66,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
     myAttendanceDays = [],
     activeNotice = null,
     myRanking = null,
+    activeMeet = null,
 }) => {
     const router = useRouter();
     const { shouldShowBanner, requestPermission, dismissBanner } =
@@ -158,6 +162,9 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
                 onAllow={requestPermission}
                 onDismiss={dismissBanner}
             />
+
+            {/* ── 지금 출석 중인 모임 배너 ── */}
+            <ActiveMeetBanner meet={activeMeet} />
 
             {/* ── 오프라인 출석 대기 배너 ── */}
             {queueCount > 0 && (

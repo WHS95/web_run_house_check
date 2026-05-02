@@ -6,6 +6,7 @@ import PopupNotification, {
     NotificationType,
 } from "@/components/molecules/common/PopupNotification";
 import { haptic } from "@/lib/haptic";
+import type { ActiveMeetBannerVM } from "@/lib/domain/attendance/policies";
 
 interface HomePageData {
     userName: string;
@@ -34,6 +35,7 @@ interface ClientHomePageProps {
     myAttendanceDays?: AttendanceDay[];
     activeNotice?: ActiveNotice | null;
     myRanking?: MyRanking | null;
+    activeMeet?: ActiveMeetBannerVM | null;
     isDeactivated?: boolean;
     deactivationMessage?: string;
 }
@@ -43,6 +45,7 @@ const ClientHomePage = memo<ClientHomePageProps>(({
     myAttendanceDays = [],
     activeNotice = null,
     myRanking = null,
+    activeMeet = null,
     isDeactivated = false,
     deactivationMessage = "",
 }) => {
@@ -110,6 +113,7 @@ const ClientHomePage = memo<ClientHomePageProps>(({
                 myAttendanceDays={myAttendanceDays}
                 activeNotice={activeNotice}
                 myRanking={myRanking}
+                activeMeet={activeMeet}
             />
 
             {/* 비활성화 차단 모달 */}

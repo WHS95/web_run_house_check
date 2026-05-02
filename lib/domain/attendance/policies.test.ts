@@ -44,4 +44,84 @@ describe('출석 정책', () => {
             ).toBe(false);
         });
     });
+
+    describe('위치기반_출석필요한가', () => {
+        it('location_based_attendance=true면 위치 기반 출석 필요', () => {
+            expect(
+                출석정책.위치기반_출석필요한가({
+                    location_based_attendance: true,
+                })
+            ).toBe(true);
+        });
+
+        it('location_based_attendance=false면 위치 기반 출석 불필요', () => {
+            expect(
+                출석정책.위치기반_출석필요한가({
+                    location_based_attendance: false,
+                })
+            ).toBe(false);
+        });
+    });
+
+    describe('출석가능상태인가', () => {
+        it('두 status 모두 ACTIVE면 허용', () => {
+            expect(
+                출석정책.출석가능상태인가({
+                    userStatus: 'ACTIVE',
+                    userCrewStatus: 'ACTIVE',
+                })
+            ).toBe(true);
+        });
+
+        it('두 status 모두 null이면 허용 (legacy 데이터 호환)', () => {
+            expect(
+                출석정책.출석가능상태인가({
+                    userStatus: null,
+                    userCrewStatus: null,
+                })
+            ).toBe(true);
+        });
+
+        it('user_crews.status=SUSPENDED면 거부', () => {
+            expect(
+                출석정책.출석가능상태인가({
+                    userStatus: 'ACTIVE',
+                    userCrewStatus: 'SUSPENDED',
+                })
+            ).toBe(false);
+        });
+
+        it('users.status=SUSPENDED면 거부', () => {
+            expect(
+                출석정책.출석가능상태인가({
+                    userStatus: 'SUSPENDED',
+                    userCrewStatus: 'ACTIVE',
+                })
+            ).toBe(false);
+        });
+
+        it('대소문자 무관 (suspended 소문자도 거부)', () => {
+            expect(
+                출석정책.출석가능상태인가({
+                    userStatus: 'ACTIVE',
+                    userCrewStatus: 'suspended',
+                })
+            ).toBe(false);
+        });
+
+        it('WITHDRAWN/INACTIVE도 거부', () => {
+            expect(
+                출석정책.출석가능상태인가({
+                    userStatus: 'ACTIVE',
+                    userCrewStatus: 'WITHDRAWN',
+                })
+            ).toBe(false);
+            expect(
+                출석정책.출석가능상태인가({
+                    userStatus: 'INACTIVE',
+                    userCrewStatus: 'ACTIVE',
+                })
+            ).toBe(false);
+        });
+    });
 });

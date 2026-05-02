@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { waitUntil } from '@vercel/functions';
 import { createClient } from '@/lib/supabase/server';
+import { 사용자_컨텍스트_조회 } from '@/lib/access/user-context';
+import * as 접근정책 from '@/lib/domain/access/policies';
 import * as 출석정책 from '@/lib/domain/attendance/policies';
 import { 알림메시지_조립 } from '@/lib/domain/attendance/messages';
 import { attendanceSubmissionSchema } from '@/lib/domain/attendance/validators';
@@ -48,15 +50,76 @@ export async function submitAttendance(
         };
     }
 
+    // 인증된 사용자 컨텍스트 조회 + 입력 userId 와 일치 여부 검증
+    // (페이지 가드 우회 / 다른 사용자 ID 위조 방지)
+    const ctx = await 사용자_컨텍스트_조회();
+    if (!ctx) {
+        return {
+            success: false,
+            message: '인증이 필요합니다.',
+        };
+    }
+    if (ctx.userId !== userId) {
+        return {
+            success: false,
+            message:
+                '요청한 사용자와 인증 정보가 일치하지 않습니다.',
+        };
+    }
+
+    // 활성 상태 가드 — 어드민이 비활성화한 유저는 출석 차단
+    if (
+        !접근정책.출석등록_가능한가({
+            userStatus: ctx.userStatus,
+            userCrewStatus: ctx.userCrewStatus,
+        })
+    ) {
+        return {
+            success: false,
+            message:
+                '비활성화된 계정입니다. 운영진에게 문의해주세요.',
+        };
+    }
+
+    // crew_exercise_types 화이트리스트 검증 — 어드민이 운동 종류를 제거해도
+    // 클라이언트 캐시로 인해 deleted exercise_type_id로 출석되는 것을 방지.
+    const { data: cetRow } = await supabase
+        .schema('attendance')
+        .from('crew_exercise_types')
+        .select('exercise_type_id')
+        .eq('crew_id', crewId)
+        .eq('exercise_type_id', exerciseTypeId)
+        .maybeSingle();
+    if (!cetRow) {
+        return {
+            success: false,
+            message:
+                '선택한 운동 종류가 현재 크루에서 사용 가능한 종류가 아닙니다.',
+        };
+    }
+
+    // crews 설정을 한 번만 조회해 unregistered/일반 분기에서 재사용 (DB round-trip 절약)
+    const { data: crew, error: crewErr } = await supabase
+        .schema('attendance')
+        .from('crews')
+        .select('allow_unregistered_location, location_based_attendance')
+        .eq('id', crewId)
+        .single();
+    if (crewErr || !crew) {
+        return {
+            success: false,
+            message: '크루 정보 조회 실패',
+        };
+    }
+
     let locationName = '미등록 장소';
     if (locationId === 'unregistered') {
-        const { data: crew } = await supabase
-            .schema('attendance')
-            .from('crews')
-            .select('allow_unregistered_location')
-            .eq('id', crewId)
-            .single();
-        if (!crew || !출석정책.미등록허용(crew)) {
+        // 위치기반 출석이 ON인 경우에만 미등록 허용 정책을 강제한다.
+        // OFF인 크루는 클라이언트가 위치 모달을 거치지 않으므로 unregistered를 자유 허용.
+        if (
+            출석정책.위치기반_출석필요한가(crew) &&
+            !출석정책.미등록허용(crew)
+        ) {
             return {
                 success: false,
                 message:
@@ -64,6 +127,8 @@ export async function submitAttendance(
             };
         }
     } else {
+        // 위치기반 출석이 OFF인데 특정 location_id를 보낸 건 의심스럽지만 거부할 필요는 없음.
+        // 기존 active location 확인은 그대로 유지.
         const { data: loc, error: locErr } = await supabase
             .schema('attendance')
             .from('crew_locations')

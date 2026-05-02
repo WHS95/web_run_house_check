@@ -111,7 +111,7 @@ const CalendarCell = memo(function CalendarCell({
   } else if (isSelected) {
     cellClass += " bg-rh-accent text-white";
   } else if (isToday) {
-    cellClass += " bg-rh-accent/20 text-rh-accent";
+    cellClass += " text-rh-accent";
   } else if (isSaturday) {
     cellClass += " text-rh-accent";
   } else {
@@ -126,6 +126,13 @@ const CalendarCell = memo(function CalendarCell({
       className={cellClass}
       disabled={!isCurrentMonth}
     >
+      {/* 오늘: 빈 동그라미(ring) — 홈 히트맵과 동일 패턴, 선택된 날짜와는 겹치지 않음 */}
+      {isToday && !isSelected && isCurrentMonth && (
+        <span
+          aria-hidden
+          className="absolute inset-1 rounded-full border-2 border-rh-accent pointer-events-none"
+        />
+      )}
       {isMonthStart && (
         <span
           className={`absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold leading-none pointer-events-none ${

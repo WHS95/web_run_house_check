@@ -2,11 +2,14 @@
 
 import React from 'react';
 import KakaoLoginButton from '../organisms/KakaoLoginButton';
+import DevLoginPanel from '../organisms/DevLoginPanel';
 import { useSearchParams } from 'next/navigation';
+import { isDevAuthEnabled } from '@/lib/auth/dev-auth-guard';
 
 const LoginTemplate: React.FC = () => {
     const searchParams = useSearchParams();
     const error = searchParams.get('error');
+    const devAuth = isDevAuthEnabled();
 
     return (
         <div className='min-h-screen flex flex-col items-center justify-between bg-rh-bg-primary'>
@@ -35,6 +38,8 @@ const LoginTemplate: React.FC = () => {
                         {error}
                     </div>
                 )}
+
+                {devAuth && <DevLoginPanel />}
 
                 <p className="mt-4 text-center text-xs text-rh-text-tertiary">
                     로그인 시 이용약관에 동의합니다

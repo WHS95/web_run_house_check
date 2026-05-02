@@ -734,6 +734,13 @@ html, body {
         z-index: 9999;
     }
 
+    /* 데스크탑 미리보기의 가상 노치(28px)만큼 안전영역 오버라이드.
+       env(safe-area-inset-top)=0 이라 .pt-safe가 효과 없으므로 직접 주입.
+       실기기는 이 미디어쿼리가 적용되지 않아 영향 없음. */
+    .mobile-viewport {
+        --safe-area-inset-top: 28px;
+    }
+
     /* 하단 홈 인디케이터 */
     .mobile-viewport::after {
         content: '';

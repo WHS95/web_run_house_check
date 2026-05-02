@@ -124,4 +124,86 @@ describe('출석 정책', () => {
             ).toBe(false);
         });
     });
+
+    describe('활성모임_배너VM_생성', () => {
+        const baseRow = {
+            location: '한강 잠실',
+            attendeeCount: 3,
+            meetingStartedAt: '2026-05-12T08:20:00.000Z', // KST 17:20
+        };
+
+        it('정상 row → ViewModel 반환', () => {
+            const vm = 출석정책.활성모임_배너VM_생성(baseRow);
+            expect(vm).not.toBeNull();
+            expect(vm?.location).toBe('한강 잠실');
+            expect(vm?.attendeeCount).toBe(3);
+            expect(vm?.meetingStartedLabel).toBe('5월 12일 17:20');
+            expect(vm?.dismissKey).toContain('한강 잠실');
+            expect(vm?.dismissKey).toContain('2026-05-12T08:20:00.000Z');
+        });
+
+        it('null/undefined row → null', () => {
+            expect(출석정책.활성모임_배너VM_생성(null)).toBeNull();
+            expect(출석정책.활성모임_배너VM_생성(undefined)).toBeNull();
+        });
+
+        it('location 빈값 → null', () => {
+            expect(
+                출석정책.활성모임_배너VM_생성({ ...baseRow, location: '' })
+            ).toBeNull();
+            expect(
+                출석정책.활성모임_배너VM_생성({ ...baseRow, location: '   ' })
+            ).toBeNull();
+            expect(
+                출석정책.활성모임_배너VM_생성({ ...baseRow, location: null })
+            ).toBeNull();
+        });
+
+        it('attendeeCount 0 또는 음수 → null', () => {
+            expect(
+                출석정책.활성모임_배너VM_생성({
+                    ...baseRow,
+                    attendeeCount: 0,
+                })
+            ).toBeNull();
+            expect(
+                출석정책.활성모임_배너VM_생성({
+                    ...baseRow,
+                    attendeeCount: -1,
+                })
+            ).toBeNull();
+        });
+
+        it('meetingStartedAt 비어있음 → null', () => {
+            expect(
+                출석정책.활성모임_배너VM_생성({
+                    ...baseRow,
+                    meetingStartedAt: null,
+                })
+            ).toBeNull();
+            expect(
+                출석정책.활성모임_배너VM_생성({
+                    ...baseRow,
+                    meetingStartedAt: '',
+                })
+            ).toBeNull();
+        });
+
+        it('잘못된 날짜 문자열 → null', () => {
+            expect(
+                출석정책.활성모임_배너VM_생성({
+                    ...baseRow,
+                    meetingStartedAt: 'not-a-date',
+                })
+            ).toBeNull();
+        });
+
+        it('자정 직후 KST 시각 라벨', () => {
+            const vm = 출석정책.활성모임_배너VM_생성({
+                ...baseRow,
+                meetingStartedAt: '2026-05-11T15:05:00.000Z', // KST 5/12 00:05
+            });
+            expect(vm?.meetingStartedLabel).toBe('5월 12일 00:05');
+        });
+    });
 });

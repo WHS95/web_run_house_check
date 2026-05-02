@@ -64,3 +64,80 @@ function 활성_상태인가(raw: string | null | undefined): boolean {
     if (ACTIVE_LIKE.has(upper)) return true;
     return upper === 'ACTIVE';
 }
+
+export interface RecentActiveMeetRow {
+    location: string | null | undefined;
+    attendeeCount: number | null | undefined;
+    meetingStartedAt: string | null | undefined;
+}
+
+export interface ActiveMeetBannerVM {
+    location: string;
+    attendeeCount: number;
+    meetingStartedAt: string;
+    /** "5월 12일 17:20" 같은 사람-친화 시각 표기 (KST). */
+    meetingStartedLabel: string;
+    /** localStorage dismiss 키 — 모임 단위로 고유 */
+    dismissKey: string;
+}
+
+/**
+ * RPC 응답을 배너 ViewModel로 변환. 표시 조건 미충족 시 null.
+ *
+ * 표시 조건:
+ *   - location 비어있지 않음
+ *   - attendeeCount >= 1
+ *   - meetingStartedAt 파싱 가능
+ */
+export function 활성모임_배너VM_생성(
+    row: RecentActiveMeetRow | null | undefined
+): ActiveMeetBannerVM | null {
+    if (!row) return null;
+    const location = (row.location ?? '').trim();
+    if (!location) return null;
+    const count = Number(row.attendeeCount ?? 0);
+    if (!Number.isFinite(count) || count < 1) return null;
+    const startedAt = row.meetingStartedAt;
+    if (!startedAt) return null;
+    const startedDate = new Date(startedAt);
+    if (Number.isNaN(startedDate.getTime())) return null;
+    return {
+        location,
+        attendeeCount: count,
+        meetingStartedAt: startedAt,
+        meetingStartedLabel: 모임시작_라벨생성(startedDate),
+        dismissKey: 모임_식별키생성(location, startedAt),
+    };
+}
+
+/**
+ * "5월 12일 17:20" 형태의 KST 라벨.
+ */
+function 모임시작_라벨생성(d: Date): string {
+    const m = Number(
+        d.toLocaleString('en-US', { timeZone: KST_TZ, month: 'numeric' })
+    );
+    const day = Number(
+        d.toLocaleString('en-US', { timeZone: KST_TZ, day: 'numeric' })
+    );
+    const hh = d.toLocaleString('en-US', {
+        timeZone: KST_TZ,
+        hour: '2-digit',
+        hour12: false,
+    });
+    const mm = d.toLocaleString('en-US', {
+        timeZone: KST_TZ,
+        minute: '2-digit',
+    });
+    const hour = hh.padStart(2, '0');
+    const minute = mm.padStart(2, '0');
+    return `${m}월 ${day}일 ${hour}:${minute}`;
+}
+
+/**
+ * 닫기 처리 시 localStorage에 저장할 모임 식별 키.
+ * location + 시작시각 기준이라 같은 장소에서 새 모임이 열리면 다시 노출된다.
+ */
+function 모임_식별키생성(location: string, startedAt: string): string {
+    return `runhouse:active-meet-dismissed:${location}:${startedAt}`;
+}

@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import SectionLabel from "@/components/atoms/SectionLabel";
 import ConfirmDialog from "@/components/molecules/ConfirmDialog";
+import Toast from "@/components/molecules/Toast";
 import { usePushNotification } from "@/hooks/usePushNotification";
 import { getFCMToken } from "@/lib/firebase/client";
 import {
@@ -113,6 +114,8 @@ const MyPageSettingsTemplate = memo<MyPageSettingsTemplateProps>(
             permission,
             isNotificationEnabled,
             toggleNotification,
+            toast,
+            dismissToast,
         } = usePushNotification({ crewId });
 
         // hydration-safe
@@ -265,6 +268,13 @@ const MyPageSettingsTemplate = memo<MyPageSettingsTemplateProps>(
                     confirmLabel={isWithdrawing ? "처리 중..." : "탈퇴하기"}
                     confirmVariant='danger'
                     confirmDisabled={isWithdrawing}
+                />
+
+                <Toast
+                    open={!!toast}
+                    message={toast?.message ?? null}
+                    tone={toast?.tone}
+                    onClose={dismissToast}
                 />
             </div>
         );

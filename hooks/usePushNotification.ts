@@ -6,9 +6,15 @@ import {
     registerPushTokenAction,
     deactivatePushTokenAction,
 } from "@/app/mypage/actions";
+import type { ToastTone } from "@/components/molecules/Toast";
 
 interface UsePushNotificationOptions {
     crewId: string | null;
+}
+
+interface PushToastState {
+    message: string;
+    tone: ToastTone;
 }
 
 interface UsePushNotificationReturn {
@@ -21,6 +27,8 @@ interface UsePushNotificationReturn {
     toggleNotification: () => Promise<void>;
     dismissBanner: () => void;
     shouldShowBanner: boolean;
+    toast: PushToastState | null;
+    dismissToast: () => void;
 }
 
 const DISMISSED_KEY = "push_dismissed_at";
@@ -38,6 +46,7 @@ export function usePushNotification({
     const [isNotificationEnabled, setIsNotificationEnabled] =
         useState(false);
     const [shouldShowBanner, setShouldShowBanner] = useState(false);
+    const [toast, setToast] = useState<PushToastState | null>(null);
 
     const isSupported =
         typeof window !== "undefined" &&
@@ -50,6 +59,8 @@ export function usePushNotification({
     useEffect(() => {
         isTokenRegisteredRef.current = isTokenRegistered;
     }, [isTokenRegistered]);
+
+    const dismissToast = useCallback(() => setToast(null), []);
 
     // 초기 상태 확인 (mount + crewId 변경 시에만 실행)
     useEffect(() => {
@@ -86,7 +97,7 @@ export function usePushNotification({
                             }
                         }
                     } catch {
-                        // 토큰 재등록 실패 시 무시
+                        // 토큰 재등록 실패 시 무시 (다음 사용자 액션에서 재시도)
                     }
                 })();
             }
@@ -120,13 +131,18 @@ export function usePushNotification({
     const requestPermission = useCallback(async (): Promise<boolean> => {
         if (!isSupported) {
             console.warn("[push] 지원하지 않는 환경");
-            if (typeof window !== "undefined") {
-                alert("이 브라우저에서는 알림을 지원하지 않습니다.");
-            }
+            setToast({
+                tone: "error",
+                message: "이 브라우저에서는 알림을 지원하지 않습니다.",
+            });
             return false;
         }
         if (!crewId) {
             console.warn("[push] crewId 없음 — 토큰 등록 불가");
+            setToast({
+                tone: "error",
+                message: "크루 정보를 확인할 수 없어 알림을 등록할 수 없습니다.",
+            });
             return false;
         }
 
@@ -135,16 +151,26 @@ export function usePushNotification({
             const result = await Notification.requestPermission();
             setPermission(result);
 
-            if (result !== "granted") {
+            if (result === "denied") {
                 console.info("[push] 권한 거부:", result);
-                // 권한 거부 시 배너 닫기 (재요청 무한루프 방지)
+                setShouldShowBanner(false);
+                setToast({
+                    tone: "error",
+                    message:
+                        "브라우저에서 알림이 차단되어 있어요. 설정에서 알림 권한을 허용해주세요.",
+                });
+                return false;
+            }
+
+            if (result !== "granted") {
+                // 'default' (사용자가 닫음) — 무한루프 방지를 위해 배너만 닫음
                 setShouldShowBanner(false);
                 return false;
             }
 
             // 권한이 grant 된 시점부터 배너는 항상 닫는다.
-            // 토큰 등록이 실패해도 사용자가 다시 "허용"을 누를 필요 없이
-            // 다음 페이지 로드 시 useEffect 의 자동 재등록 분기로 처리됨.
+            // 토큰 등록이 실패해도 다음 페이지 로드의 useEffect 자동 재등록
+            // 분기로 처리됨.
             setShouldShowBanner(false);
             localStorage.removeItem(DISMISSED_KEY);
             localStorage.removeItem(DISMISSED_COUNT_KEY);
@@ -158,11 +184,11 @@ export function usePushNotification({
             const token = await getFCMToken();
             if (!token) {
                 console.warn("[push] FCM 토큰 발급 실패");
-                if (typeof window !== "undefined") {
-                    alert(
-                        "알림 권한은 허용되었으나 토큰 발급에 실패했습니다.\n잠시 후 다시 시도하거나 페이지를 새로고침해주세요."
-                    );
-                }
+                setToast({
+                    tone: "error",
+                    message:
+                        "알림 권한은 허용했지만 토큰 발급에 실패했어요. 잠시 후 다시 시도해주세요.",
+                });
                 return false;
             }
 
@@ -172,28 +198,33 @@ export function usePushNotification({
             if (!registerResult.success) {
                 console.warn(
                     "[push] 토큰 서버 등록 실패:",
+                    registerResult.code,
                     registerResult.message
                 );
-                if (typeof window !== "undefined") {
-                    alert(
+                setToast({
+                    tone: "error",
+                    message:
                         registerResult.message ||
-                            "알림 등록에 실패했습니다. 잠시 후 다시 시도해주세요."
-                    );
-                }
+                        "알림 등록에 실패했어요. 잠시 후 다시 시도해주세요.",
+                });
                 return false;
             }
 
             setIsTokenRegistered(true);
             setIsNotificationEnabled(true);
             localStorage.setItem(NOTIFICATION_ENABLED_KEY, "true");
+            setToast({
+                tone: "success",
+                message: "알림을 켰어요. 새로운 소식을 바로 받아볼 수 있어요.",
+            });
             return true;
         } catch (err) {
             console.error("[push] requestPermission 예외:", err);
-            if (typeof window !== "undefined") {
-                alert(
-                    "알림 설정 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
-                );
-            }
+            setToast({
+                tone: "error",
+                message:
+                    "알림 설정 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
+            });
             return false;
         }
     }, [isSupported, crewId]);
@@ -221,13 +252,17 @@ export function usePushNotification({
             setIsNotificationEnabled(false);
             localStorage.setItem(NOTIFICATION_ENABLED_KEY, "false");
             void unregisterToken();
+            setToast({
+                tone: "info",
+                message: "알림이 꺼졌어요.",
+            });
         } else {
             // ON: 낙관적으로 켜고 권한/토큰 등록 시도
             setIsNotificationEnabled(true);
             localStorage.setItem(NOTIFICATION_ENABLED_KEY, "true");
             const success = await requestPermission();
             if (!success) {
-                // 실패 시 롤백
+                // 실패 시 롤백 (toast 는 requestPermission 이 이미 띄움)
                 setIsNotificationEnabled(false);
                 localStorage.setItem(NOTIFICATION_ENABLED_KEY, "false");
             }
@@ -254,5 +289,7 @@ export function usePushNotification({
         toggleNotification,
         dismissBanner,
         shouldShowBanner,
+        toast,
+        dismissToast,
     };
 }

@@ -17,6 +17,7 @@ import QuickActionButton from '../atoms/QuickActionButton';
 import SectionLabel from '../atoms/SectionLabel';
 import MarqueeTicker from '../atoms/MarqueeTicker';
 import PushPermissionBanner from '../molecules/PushPermissionBanner';
+import Toast from '../molecules/Toast';
 import WeeklyAttendanceHeatmap from '../molecules/WeeklyAttendanceHeatmap';
 import ActiveMeetBanner from '../molecules/ActiveMeetBanner';
 import { usePushNotification } from '@/hooks/usePushNotification';
@@ -70,8 +71,13 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
     activeMeet = null,
 }) => {
     const router = useRouter();
-    const { shouldShowBanner, requestPermission, dismissBanner } =
-        usePushNotification({ crewId });
+    const {
+        shouldShowBanner,
+        requestPermission,
+        dismissBanner,
+        toast,
+        dismissToast,
+    } = usePushNotification({ crewId });
     const { queueCount, isOnline, isFlushing } =
         useOfflineAttendance();
 
@@ -298,6 +304,13 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(({
                     crewId={crewId}
                 />
             )}
+
+            <Toast
+                open={!!toast}
+                message={toast?.message ?? null}
+                tone={toast?.tone}
+                onClose={dismissToast}
+            />
         </div>
     );
 });

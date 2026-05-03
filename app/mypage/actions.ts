@@ -156,7 +156,11 @@ export async function registerPushTokenAction(
         data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-        return { success: false, message: '인증이 필요합니다.' };
+        return {
+            success: false,
+            code: 'unauthenticated',
+            message: '인증이 필요합니다.',
+        };
     }
 
     const rl = rateLimit({
@@ -165,12 +169,20 @@ export async function registerPushTokenAction(
         windowMs: 60_000,
     });
     if (!rl.success) {
-        return { success: false, message: '요청이 너무 많습니다.' };
+        return {
+            success: false,
+            code: 'rate_limited',
+            message: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.',
+        };
     }
 
     const parsed = pushTokenRegisterSchema.safeParse(input);
     if (!parsed.success) {
-        return { success: false, message: '토큰과 크루 ID가 필요합니다.' };
+        return {
+            success: false,
+            code: 'invalid_input',
+            message: '토큰과 크루 ID가 필요합니다.',
+        };
     }
 
     const { error } = await supabase
@@ -189,7 +201,17 @@ export async function registerPushTokenAction(
         );
 
     if (error) {
-        return { success: false, message: '토큰 등록에 실패했습니다.' };
+        console.error('[push] user_push_tokens upsert 실패', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+        });
+        return {
+            success: false,
+            code: 'db_error',
+            message: '알림 등록에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        };
     }
 
     return { success: true };

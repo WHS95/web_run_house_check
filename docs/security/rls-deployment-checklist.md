@@ -5,6 +5,30 @@
 
 ---
 
+## ⛔ STOP — 배포 전 가장 중요한 한 가지
+
+**운영 DB 에 master 권한 사용자가 시드돼 있는지 다음 한 줄로 확인하라.**
+빈 결과면 모든 master 정책이 deny → `/master/*` 페이지 전체 깨짐.
+
+```sql
+SELECT ur.user_id, u.email, ur.role_id, r.name AS role_name
+FROM attendance.user_roles ur
+LEFT JOIN attendance.users u ON u.id = ur.user_id
+LEFT JOIN attendance.roles r ON r.id = ur.role_id
+WHERE ur.role_id = 1 OR r.name = 'master';
+```
+
+빈 결과면 마이그레이션 적용 직전에 master 사용자를 시드하라:
+
+```sql
+-- (운영 DB 의 master 사용자 user_id 를 실제 값으로 치환)
+INSERT INTO attendance.user_roles (user_id, role_id)
+VALUES ('<master-user-uuid>', 1)
+ON CONFLICT DO NOTHING;
+```
+
+---
+
 ## 1. 배포 전 (운영 DB)
 
 ### 1.1 마이그레이션 일괄 적용 순서

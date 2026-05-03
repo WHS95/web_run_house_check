@@ -34,8 +34,20 @@ async function main() {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!url || !serviceKey) {
+        // CI 환경(예: Vercel build, GitHub Actions) 에서는 secret 주입을 강제한다.
+        // 로컬 개발에서는 .env.local 미존재 시 통과 (개발자 우호).
+        const isCI =
+            process.env.CI === "true" ||
+            process.env.VERCEL === "1" ||
+            process.env.GITHUB_ACTIONS === "true";
+        if (isCI) {
+            console.error(
+                "[check-rls] ❌ CI 환경에서 NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 누락 — 검사 우회 차단"
+            );
+            process.exit(1);
+        }
         console.warn(
-            "[check-rls] NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 미설정 — 스킵"
+            "[check-rls] NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 미설정 — 스킵 (로컬 dev 한정)"
         );
         return;
     }

@@ -1,18 +1,11 @@
 'use client';
 
-import React, { memo, useMemo, useCallback, useState, useEffect } from 'react';
+import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { LogOut, ChevronRight, Shield } from 'lucide-react';
-import { createBrowserClient } from '@supabase/ssr';
-import { Switch } from '@/components/ui/switch';
-import { getFCMToken } from '@/lib/firebase/client';
+import { Settings, Shield } from 'lucide-react';
 import PageHeader from '@/components/organisms/common/PageHeader';
 import SectionLabel from '@/components/atoms/SectionLabel';
-import ConfirmDialog from '@/components/molecules/ConfirmDialog';
-
-import { usePushNotification } from '@/hooks/usePushNotification';
-import { withdrawUserAction, deactivatePushTokenAction } from '@/app/mypage/actions';
+import MyActivityHistory from '@/components/organisms/mypage/MyActivityHistory';
 
 interface Activity {
     type: 'attendance' | 'create_meeting';
@@ -43,6 +36,8 @@ interface MemberDetailTemplateProps {
     userProfile: UserProfileForMyPage | null;
     activityData: ActivityData;
     userId?: string;
+    initialYear: number;
+    initialMonth: number;
 }
 
 const ErrorState = memo(() => (
@@ -69,77 +64,30 @@ const AdminButton = memo(() => (
 ));
 AdminButton.displayName = 'AdminButton';
 
-const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, activityData, userId }) => {
-    const router = useRouter();
-    const {
-        isSupported,
-        permission,
-        isNotificationEnabled,
-        toggleNotification,
-    } = usePushNotification({ crewId: userProfile?.crewId ?? null });
+const SettingsButton = memo(() => (
+    <Link
+        href="/mypage/settings"
+        aria-label="설정"
+        className="flex items-center justify-center w-9 h-9 rounded-full text-white/90 hover:bg-rh-bg-surface active:opacity-70 transition-colors"
+    >
+        <Settings size={20} strokeWidth={2} />
+    </Link>
+));
+SettingsButton.displayName = 'SettingsButton';
 
-    // hydration 안전: 클라이언트 마운트 후에만 isSupported 사용
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => { setMounted(true); }, []);
-    const showNotificationToggle = mounted && isSupported;
-
-    // 회원 탈퇴 모달 상태
-    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-    const [isWithdrawing, setIsWithdrawing] = useState(false);
-
-    const handleLogout = useCallback(async () => {
-        try {
-            if (typeof window !== "undefined" && window.navigator.vibrate) {
-                window.navigator.vibrate([50, 100, 50]);
-            }
-            const fcmToken = await getFCMToken();
-            if (fcmToken) {
-                await deactivatePushTokenAction({ token: fcmToken }).catch(() => {});
-            }
-            const supabase = createBrowserClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-            );
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                alert("로그아웃 중 오류가 발생했습니다.");
-                return;
-            }
-            router.push("/auth/login");
-        } catch {
-            alert("로그아웃 처리 중 문제가 발생했습니다.");
-        }
-    }, [router]);
-
-    const handleWithdraw = useCallback(async () => {
-        if (isWithdrawing) return;
-        setIsWithdrawing(true);
-        try {
-            const result = await withdrawUserAction();
-            if (!result.success) {
-                alert(result.message || "탈퇴 처리 중 오류가 발생했습니다.");
-                setIsWithdrawing(false);
-                return;
-            }
-            const supabase = createBrowserClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-            );
-            await supabase.auth.signOut();
-            router.replace("/auth/login");
-        } catch {
-            alert("탈퇴 처리 중 문제가 발생했습니다.");
-            setIsWithdrawing(false);
-        }
-    }, [router, isWithdrawing]);
-
+const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, activityData, initialYear, initialMonth }) => {
     const displayName = useMemo(() => {
         if (!userProfile?.firstName) return '사용자';
         return userProfile.firstName;
     }, [userProfile?.firstName]);
 
-    const adminButton = useMemo(() => {
-        return userProfile?.isAdmin ? <AdminButton /> : null;
+    const headerRightAction = useMemo(() => {
+        return (
+            <div className="flex items-center gap-2">
+                {userProfile?.isAdmin && <AdminButton />}
+                <SettingsButton />
+            </div>
+        );
     }, [userProfile?.isAdmin]);
 
     const thisMonthCount = useMemo(() => {
@@ -164,7 +112,7 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                 iconColor="white"
                 borderColor="rh-border"
                 backgroundColor="bg-rh-bg-primary"
-                rightAction={adminButton}
+                rightAction={headerRightAction}
             />
 
             {/* Content */}
@@ -208,84 +156,14 @@ const MemberDetailTemplate = memo<MemberDetailTemplateProps>(({ userProfile, act
                     </div>
                 </div>
 
-                {/* 설정 */}
-                <SectionLabel>설정</SectionLabel>
-                <div className="space-y-2">
-                    {/* 푸시 알림 토글 */}
-                    {showNotificationToggle && (
-                        <div className="flex items-center justify-between rounded-rh-lg bg-rh-bg-surface h-[52px] px-4">
-                            <span className="text-sm font-medium text-white">
-                                푸시 알림 수신
-                            </span>
-                            <Switch
-                                checked={isNotificationEnabled}
-                                onCheckedChange={toggleNotification}
-                                disabled={permission === "denied"}
-                            />
-                        </div>
-                    )}
-
-                    {/* 내정보 변경 */}
-                    <Link
-                        href="/mypage/edit"
-                        className="flex items-center justify-between rounded-rh-lg bg-rh-bg-surface px-4 py-3"
-                    >
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-sm font-medium text-white">
-                                내정보 변경
-                            </span>
-                            <span className="text-xs text-rh-text-tertiary">
-                                이름, 연락처 등 개인정보 수정
-                            </span>
-                        </div>
-                        <ChevronRight
-                            size={18}
-                            className="text-rh-text-muted"
-                        />
-                    </Link>
-                </div>
-
-                {/* 로그아웃 버튼 */}
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center justify-center gap-2 w-full h-12 rounded-xl transition-colors active:opacity-80"
-                    style={{ backgroundColor: "#2B3644" }}
-                >
-                    <LogOut size={18} style={{ color: "#3E6496" }} />
-                    <span
-                        className="text-sm font-semibold"
-                        style={{ color: "#3E6496" }}
-                    >
-                        로그아웃
-                    </span>
-                </button>
-
-                {/* 회원 탈퇴 텍스트 링크 */}
-                <div className="flex justify-center pt-1">
-                    <button
-                        onClick={() => setShowWithdrawModal(true)}
-                        className="text-rh-text-tertiary text-xs underline"
-                    >
-                        회원 탈퇴
-                    </button>
-                </div>
+                {/* 활동 기록 */}
+                <SectionLabel>활동 기록</SectionLabel>
+                <MyActivityHistory
+                    activities={activityData.activities}
+                    initialYear={initialYear}
+                    initialMonth={initialMonth}
+                />
             </div>
-
-            {/* 탈퇴 확인 모달 */}
-            <ConfirmDialog
-                open={showWithdrawModal}
-                onClose={() => {
-                    if (isWithdrawing) return;
-                    setShowWithdrawModal(false);
-                }}
-                onConfirm={handleWithdraw}
-                title="정말 탈퇴하시겠습니까?"
-                description={"계정과 개인정보(이름·이메일·연락처)가 영구 삭제되며 복구할 수 없습니다.\n\n출석 기록은 통계 보존을 위해 익명으로 남습니다."}
-                cancelLabel="취소"
-                confirmLabel={isWithdrawing ? "처리 중..." : "탈퇴하기"}
-                confirmVariant="danger"
-                confirmDisabled={isWithdrawing}
-            />
         </div>
     );
 });

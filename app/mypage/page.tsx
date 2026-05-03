@@ -123,6 +123,11 @@ export default async function MyPage() {
         redirect("/");
     }
 
+    // 활동 기록 월별 필터 초기값(서버 시간 기준) — hydration mismatch 방지
+    const now = new Date();
+    const initialYear = now.getFullYear();
+    const initialMonth = now.getMonth() + 1;
+
     return (
         <Suspense fallback={<MyPageSkeleton />}>
             <MemberDetailTemplate
@@ -133,6 +138,8 @@ export default async function MyPage() {
                     activities: [],
                 }}
                 userId={data.userId}
+                initialYear={initialYear}
+                initialMonth={initialMonth}
             />
         </Suspense>
     );

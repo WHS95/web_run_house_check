@@ -38,7 +38,8 @@ export async function getFCMToken(): Promise<string | null> {
         });
 
         return token || null;
-    } catch {
+    } catch (err) {
+        console.error("[push] getFCMToken 실패:", err);
         return null;
     }
 }

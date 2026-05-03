@@ -120,6 +120,9 @@ export function usePushNotification({
     const requestPermission = useCallback(async (): Promise<boolean> => {
         if (!isSupported) {
             console.warn("[push] 지원하지 않는 환경");
+            if (typeof window !== "undefined") {
+                alert("이 브라우저에서는 알림을 지원하지 않습니다.");
+            }
             return false;
         }
         if (!crewId) {
@@ -134,8 +137,17 @@ export function usePushNotification({
 
             if (result !== "granted") {
                 console.info("[push] 권한 거부:", result);
+                // 권한 거부 시 배너 닫기 (재요청 무한루프 방지)
+                setShouldShowBanner(false);
                 return false;
             }
+
+            // 권한이 grant 된 시점부터 배너는 항상 닫는다.
+            // 토큰 등록이 실패해도 사용자가 다시 "허용"을 누를 필요 없이
+            // 다음 페이지 로드 시 useEffect 의 자동 재등록 분기로 처리됨.
+            setShouldShowBanner(false);
+            localStorage.removeItem(DISMISSED_KEY);
+            localStorage.removeItem(DISMISSED_COUNT_KEY);
 
             // Service Worker 등록 (권한 확인 후)
             await navigator.serviceWorker.register(
@@ -146,6 +158,11 @@ export function usePushNotification({
             const token = await getFCMToken();
             if (!token) {
                 console.warn("[push] FCM 토큰 발급 실패");
+                if (typeof window !== "undefined") {
+                    alert(
+                        "알림 권한은 허용되었으나 토큰 발급에 실패했습니다.\n잠시 후 다시 시도하거나 페이지를 새로고침해주세요."
+                    );
+                }
                 return false;
             }
 
@@ -157,17 +174,26 @@ export function usePushNotification({
                     "[push] 토큰 서버 등록 실패:",
                     registerResult.message
                 );
+                if (typeof window !== "undefined") {
+                    alert(
+                        registerResult.message ||
+                            "알림 등록에 실패했습니다. 잠시 후 다시 시도해주세요."
+                    );
+                }
                 return false;
             }
 
             setIsTokenRegistered(true);
-            setShouldShowBanner(false);
-            // dismiss 상태 초기화
-            localStorage.removeItem(DISMISSED_KEY);
-            localStorage.removeItem(DISMISSED_COUNT_KEY);
+            setIsNotificationEnabled(true);
+            localStorage.setItem(NOTIFICATION_ENABLED_KEY, "true");
             return true;
         } catch (err) {
             console.error("[push] requestPermission 예외:", err);
+            if (typeof window !== "undefined") {
+                alert(
+                    "알림 설정 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+                );
+            }
             return false;
         }
     }, [isSupported, crewId]);

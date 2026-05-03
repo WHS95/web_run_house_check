@@ -38,6 +38,16 @@
                     ]
                 }]
             }
+        },
+        {
+            "files": ["components/**/*.{ts,tsx}", "hooks/**/*.{ts,tsx}"],
+            "rules": {
+                "no-restricted-imports": ["warn", {
+                    "patterns": [
+                        { "group": ["@/lib/supabase/admin"], "message": "service_role은 클라이언트 컴포넌트/훅에서 사용 금지. type-only import 또는 Server Action 통해 호출하세요." }
+                    ]
+                }]
+            }
         }
     ]
 }

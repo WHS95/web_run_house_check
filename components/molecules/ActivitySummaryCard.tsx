@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { CurrentMonthStats } from "@/lib/supabase/admin";
+import type { CurrentMonthStats } from "@/lib/supabase/admin";
 import MonthYearPicker from "./MonthYearPicker";
 
 interface ActivitySummaryCardProps {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { TrendingUp, Award, Users } from "lucide-react";
-import { UserActivityStatistics } from "@/lib/supabase/admin";
+import type { UserActivityStatistics } from "@/lib/supabase/admin";
 
 interface ActivityStatsProps {
   userId: string;

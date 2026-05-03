@@ -166,8 +166,26 @@ END $$;
 
 ---
 
-## 5. 참고
+## 5. 회귀 방지 (CI)
+
+`npm run build` 가 다음을 자동으로 수행한다:
+
+- `npm run check:rls` — `attendance.__check_rls_status__()` RPC 호출하여
+  RLS off 테이블이 화이트리스트 외에 발견되면 build fail.
+  - 화이트리스트는 `scripts/check-rls.ts` 의 `RLS_OFF_ALLOWED` (현재 비어있음).
+  - 신규 테이블 추가 시 RLS ENABLE 누락 → 빌드 단계에서 즉시 차단.
+  - 환경변수(`NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) 없으면
+    스킵 (로컬 개발에서 잠시 끊긴 상태도 통과시키기 위함).
+
+CI 환경에서는 두 환경변수를 secret 으로 주입할 것.
+
+권장: 매주 cron 으로 `mcp__supabase__get_advisors` 또는 supabase CLI
+`supabase db lint` 실행하여 새 보안 경고 감지.
+
+## 6. 참고
 
 - 보안 계획 전체: `docs/plans/2026-05-03-rls-security-plan.md`
 - 클라이언트 접근 인벤토리: `docs/audits/supabase-client-access-2026-05-03.md`
 - RLS 헬퍼 함수: `supabase/migrations/20260503_0002_rls_helpers.sql`
+- RLS 상태 RPC: `supabase/migrations/20260503_0010_rls_status_rpc.sql`
+- 회귀 방지 스크립트: `scripts/check-rls.ts`

@@ -19,11 +19,19 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: [
+          "'Asta Sans'",
+          "var(--font-do-hyeon)",
           "-apple-system",
           "BlinkMacSystemFont",
           "'Apple SD Gothic Neo'",
           "'SF Pro Text'",
           "system-ui",
+          "sans-serif",
+        ],
+        display: [
+          "var(--font-do-hyeon)",
+          "'Asta Sans'",
+          "-apple-system",
           "sans-serif",
         ],
       },

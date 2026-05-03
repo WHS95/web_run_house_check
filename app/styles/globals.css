@@ -151,7 +151,8 @@
 
     body {
         @apply bg-background text-foreground;
-        font-family: -apple-system, BlinkMacSystemFont,
+        font-family: 'Asta Sans', var(--font-do-hyeon),
+            -apple-system, BlinkMacSystemFont,
             'Apple SD Gothic Neo', 'SF Pro Text',
             system-ui, sans-serif;
         touch-action: pan-x pan-y;
@@ -337,7 +338,8 @@
         color-scheme: dark;
         color: var(--rh-text-primary);
         background-color: var(--rh-bg-surface);
-        font-family: -apple-system, BlinkMacSystemFont,
+        font-family: 'Asta Sans', var(--font-do-hyeon),
+            -apple-system, BlinkMacSystemFont,
             'Apple SD Gothic Neo', 'SF Pro Text',
             system-ui, sans-serif;
         -webkit-user-select: none;
@@ -561,8 +563,8 @@
 }
 
 @keyframes rh-marquee-scroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+    from { transform: translateX(-50%); }
+    to   { transform: translateX(0); }
 }
 
 /* 폰트 */
@@ -606,9 +608,10 @@
     src: local('SF Pro Text Semibold');
 }
 
-/* Black Han Sans 구글 폰트 */
+/* Do Hyeon 구글 폰트 (디스플레이용) */
+.font-do-hyeon,
 .black-han-sans-regular {
-    font-family: var(--font-black-han-sans), "Black Han Sans", sans-serif;
+    font-family: var(--font-do-hyeon), "Do Hyeon", sans-serif;
     font-weight: 400;
     font-style: normal;
 }

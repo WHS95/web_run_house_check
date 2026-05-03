@@ -1,12 +1,12 @@
 import "./styles/globals.css";
 import { ReactNode } from "react";
-import { Black_Han_Sans } from 'next/font/google';
+import { Do_Hyeon } from 'next/font/google';
 
-const blackHanSans = Black_Han_Sans({
+const doHyeon = Do_Hyeon({
     weight: '400',
     subsets: ['latin'],
     display: 'swap',
-    variable: '--font-black-han-sans',
+    variable: '--font-do-hyeon',
 });
 // import StagewiseWrapper from "@/components/StagewiseWrapper";
 import { StagewiseToolbar } from "@stagewise/toolbar-next";
@@ -60,7 +60,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang='ko' className={blackHanSans.variable}>
+    <html lang='ko' className={doHyeon.variable}>
       <head>
         {/* 필수 PWA 메타태그만 유지 */}
         <meta name='application-name' content='런하우스' />
@@ -74,6 +74,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         {/* 성능 최적화 메타태그 */}
         <meta name='X-DNS-Prefetch-Control' content='on' />
+
+        {/* 기본 폰트: Asta Sans (next/font 미지원 → 직접 로드) */}
+        <link rel='preconnect' href='https://fonts.googleapis.com' />
+        <link
+          rel='preconnect'
+          href='https://fonts.gstatic.com'
+          crossOrigin='anonymous'
+        />
+        <link
+          rel='stylesheet'
+          href='https://fonts.googleapis.com/css2?family=Asta+Sans:wght@300..800&display=swap'
+        />
 
         {/* 필수 링크만 유지 */}
         <link rel='apple-touch-icon' href='/apple-touch-icon.png' />

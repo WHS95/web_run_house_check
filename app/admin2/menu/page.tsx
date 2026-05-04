@@ -24,6 +24,11 @@ const menuItems = [
     subtitle: "크루명 · 소개 · 로고",
     href: "/admin2/crew-edit",
   },
+  {
+    title: "단체 사진 합성",
+    subtitle: "사진에 크루 로고 얹기",
+    href: "/admin2/photo-composite",
+  },
 ];
 
 export default function AdminMenuPage() {

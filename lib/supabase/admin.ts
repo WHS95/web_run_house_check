@@ -442,6 +442,8 @@ export interface UserForAdmin {
   status: string | null; // NULL이면 활성, 'suspended' 등이면 비활성
   last_attendance_date: string | null;
   attendance_count?: number;
+  /** 기간 필터 적용 시에도 항상 lifetime 출석 횟수. period RPC 응답에서만 채워짐. */
+  lifetime_attendance_count?: number;
   crew_grade_id?: number | null;
 }
 

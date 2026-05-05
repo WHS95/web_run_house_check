@@ -6,6 +6,7 @@ import LogoSourcePicker from "./LogoSourcePicker";
 import PresetPanel from "./PresetPanel";
 import FreePanel from "./FreePanel";
 import KonvaStage from "./KonvaStage";
+import SaveButton from "./SaveButton";
 import { 프리셋좌표산출 } from "@/lib/domain/photo-composite/presets";
 import type {
     LogoSource,
@@ -135,6 +136,12 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
                     />
                 )}
             </div>
+            <SaveButton
+                photoBitmap={photoBitmap}
+                logoBitmap={logoBitmap}
+                transform={activeTransform}
+                crewName={crewName}
+            />
             {mode === "preset" ? (
                 <PresetPanel
                     position={presetPosition}

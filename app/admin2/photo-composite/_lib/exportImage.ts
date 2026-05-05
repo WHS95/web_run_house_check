@@ -52,6 +52,10 @@ export async function exportComposite({
     return new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
             (blob) => {
+                // toBlob 후 캔버스 메모리(특히 iOS Safari GPU)를 즉시 해제.
+                // width/height를 0으로 두면 텍스처가 dispose된다.
+                canvas.width = 0;
+                canvas.height = 0;
                 if (blob) resolve(blob);
                 else reject(new Error("toBlob 실패"));
             },

@@ -46,7 +46,7 @@ export default function PhotoUploadStep({ onLoaded }: Props) {
             <input
                 ref={inputRef}
                 type='file'
-                accept='image/*'
+                accept='image/jpeg,image/png,image/webp'
                 capture='environment'
                 className='hidden'
                 onChange={(e) => {

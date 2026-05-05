@@ -36,6 +36,22 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
     const [containerWidth, setContainerWidth] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // 정리 책임을 단일 owner로: 교체 시점은 setter 콜백에서, 언마운트 시점은
+    // 아래 unmount-only effect에서 ref를 통해 처리. deps-driven cleanup과
+    // setter 콜백이 동시에 close()를 호출해 이중 close가 발생하던 버그를 차단.
+    const photoBitmapRef = useRef<ImageBitmap | null>(null);
+    const logoBitmapRef = useRef<ImageBitmap | null>(null);
+    const logoSourceRef = useRef<LogoSource | null>(null);
+    useEffect(() => {
+        photoBitmapRef.current = photoBitmap;
+    }, [photoBitmap]);
+    useEffect(() => {
+        logoBitmapRef.current = logoBitmap;
+    }, [logoBitmap]);
+    useEffect(() => {
+        logoSourceRef.current = logoSource;
+    }, [logoSource]);
+
     useEffect(() => {
         if (!containerRef.current) return;
         const ro = new ResizeObserver((entries) => {
@@ -47,24 +63,26 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
         return () => ro.disconnect();
     }, [photoBitmap]);
 
+    // unmount 단일 cleanup (deps 빈 배열). 교체 시 정리는 setter 콜백 책임.
     useEffect(() => {
         return () => {
-            photoBitmap?.close();
-            logoBitmap?.close();
-            if (logoSource?.kind === "upload") {
-                URL.revokeObjectURL(logoSource.objectUrl);
+            photoBitmapRef.current?.close();
+            logoBitmapRef.current?.close();
+            const src = logoSourceRef.current;
+            if (src?.kind === "upload") {
+                URL.revokeObjectURL(src.objectUrl);
             }
         };
-    }, [photoBitmap, logoBitmap, logoSource]);
+    }, []);
 
     const handleLogoSelected = useCallback(
         (source: LogoSource, bitmap: ImageBitmap) => {
             setLogoBitmap((prev) => {
-                prev?.close();
+                if (prev && prev !== bitmap) prev.close();
                 return bitmap;
             });
             setLogoSource((prev) => {
-                if (prev?.kind === "upload") {
+                if (prev?.kind === "upload" && prev !== source) {
                     URL.revokeObjectURL(prev.objectUrl);
                 }
                 return source;
@@ -72,6 +90,13 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
         },
         [],
     );
+
+    const handlePhotoLoaded = useCallback((bitmap: ImageBitmap) => {
+        setPhotoBitmap((prev) => {
+            if (prev && prev !== bitmap) prev.close();
+            return bitmap;
+        });
+    }, []);
 
     const presetTransform = useMemo<LogoTransform | null>(() => {
         if (!photoBitmap || !logoBitmap) return null;
@@ -109,7 +134,7 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
     }, []);
 
     if (!photoBitmap) {
-        return <PhotoUploadStep onLoaded={setPhotoBitmap} />;
+        return <PhotoUploadStep onLoaded={handlePhotoLoaded} />;
     }
 
     return (

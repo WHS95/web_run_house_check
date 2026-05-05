@@ -269,7 +269,9 @@ export async function addAttendanceToSessionAction(input: {
         };
     }
 
-    // session_members INSERT
+    // session_members INSERT.
+    // 실패 시(예: 다른 운영진과 동시 추가 race) 방금 만든 attendance_records를
+    // 보상 삭제해 dangling 'manual' record가 남지 않게 한다.
     const { error: smErr } = await supabase
         .schema('attendance')
         .from('session_members')
@@ -281,8 +283,20 @@ export async function addAttendanceToSessionAction(input: {
         });
 
     if (smErr) {
-        // attendance record는 이미 생성됨 — best effort로 진행
-        console.error('[session_members INSERT 실패]', smErr);
+        await supabase
+            .schema('attendance')
+            .from('attendance_records')
+            .delete()
+            .eq('id', record.id);
+
+        const isUnique = (smErr as { code?: string }).code === '23505';
+        return {
+            success: false,
+            error: isUnique ? 'invalid_data' : 'database_error',
+            message: isUnique
+                ? '이미 세션에 포함된 멤버입니다.'
+                : (smErr.message ?? '세션 멤버 등록에 실패했습니다.'),
+        };
     }
 
     await _감사로그_기록(supabase, {

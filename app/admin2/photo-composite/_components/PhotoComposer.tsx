@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PhotoUploadStep from "./PhotoUploadStep";
 import LogoSourcePicker from "./LogoSourcePicker";
 import PresetPanel from "./PresetPanel";
+import FreePanel from "./FreePanel";
 import KonvaStage from "./KonvaStage";
 import { 프리셋좌표산출 } from "@/lib/domain/photo-composite/presets";
 import type {
@@ -28,6 +29,9 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
         useState<PresetPosition>("bottom-right");
     const [presetSize, setPresetSize] = useState<PresetSize>("M");
     const [opacity, setOpacity] = useState(1);
+    const [freeTransform, setFreeTransform] = useState<LogoTransform | null>(
+        null,
+    );
     const [containerWidth, setContainerWidth] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -68,7 +72,7 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
         [],
     );
 
-    const transform = useMemo<LogoTransform | null>(() => {
+    const presetTransform = useMemo<LogoTransform | null>(() => {
         if (!photoBitmap || !logoBitmap) return null;
         const aspectRatio = logoBitmap.width / logoBitmap.height;
         const t = 프리셋좌표산출(
@@ -79,6 +83,29 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
         );
         return { ...t, opacity };
     }, [photoBitmap, logoBitmap, presetPosition, presetSize, opacity]);
+
+    const activeTransform =
+        mode === "free" && freeTransform
+            ? { ...freeTransform, opacity }
+            : presetTransform;
+
+    const enterFreeMode = useCallback(() => {
+        if (presetTransform) setFreeTransform(presetTransform);
+        setMode("free");
+    }, [presetTransform]);
+
+    const exitToPreset = useCallback(() => {
+        setFreeTransform(null);
+        setMode("preset");
+    }, []);
+
+    const resetToPreset = useCallback(() => {
+        if (presetTransform) setFreeTransform(presetTransform);
+    }, [presetTransform]);
+
+    const handleFreeChange = useCallback((next: LogoTransform) => {
+        setFreeTransform(next);
+    }, []);
 
     if (!photoBitmap) {
         return <PhotoUploadStep onLoaded={setPhotoBitmap} />;
@@ -101,12 +128,14 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
                     <KonvaStage
                         photoBitmap={photoBitmap}
                         logoBitmap={logoBitmap}
-                        transform={transform}
+                        transform={activeTransform}
                         containerWidth={containerWidth}
+                        selectable={mode === "free"}
+                        onTransformChange={handleFreeChange}
                     />
                 )}
             </div>
-            {mode === "preset" && (
+            {mode === "preset" ? (
                 <PresetPanel
                     position={presetPosition}
                     size={presetSize}
@@ -117,20 +146,15 @@ export default function PhotoComposer({ crewName, crewLogoUrl }: Props) {
                         if (next.opacity !== undefined)
                             setOpacity(next.opacity);
                     }}
-                    onEnterFreeMode={() => setMode("free")}
+                    onEnterFreeMode={enterFreeMode}
                 />
-            )}
-            {mode === "free" && (
-                <div className='p-3 rounded-xl bg-rh-bg-surface text-rh-text-tertiary text-xs'>
-                    자유 배치 모드는 다음 Task에서 활성화됩니다.
-                    <button
-                        type='button'
-                        onClick={() => setMode("preset")}
-                        className='mt-2 w-full h-9 rounded bg-rh-bg-muted'
-                    >
-                        프리셋으로 복귀
-                    </button>
-                </div>
+            ) : (
+                <FreePanel
+                    opacity={opacity}
+                    onOpacityChange={setOpacity}
+                    onReset={resetToPreset}
+                    onBackToPreset={exitToPreset}
+                />
             )}
         </div>
     );

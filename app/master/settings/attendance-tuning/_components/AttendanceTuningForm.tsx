@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import type { AttendanceTuningVM } from '../_vm/loadSettingsViewModel';
 import type { SystemSettings } from '@/lib/domain/system-settings/types';
 import { SystemSettingsSchema } from '@/lib/domain/system-settings/validators';
@@ -82,18 +82,29 @@ export function AttendanceTuningForm({ vm }: Props) {
         [draft],
     );
 
+    // 빈 입력은 직전 값을 유지 (0으로 떨어뜨리면 즉시 범위 오류 메시지가 나는 UX 문제).
+    // 사용자는 백스페이스로 지우고 새 숫자를 타이핑하는 패턴이 흔함.
     const handleChange = useCallback(
         (key: keyof SystemSettings) =>
             (e: React.ChangeEvent<HTMLInputElement>) => {
                 const raw = e.target.value;
+                if (raw === '') return;
                 const n = Number(raw);
+                if (!Number.isFinite(n)) return;
                 setDraft((prev) => ({
                     ...prev,
-                    [key]: Number.isFinite(n) ? Math.trunc(n) : 0,
+                    [key]: Math.trunc(n),
                 }));
             },
         [],
     );
+
+    // SSR/CSR 시각 표기 차이로 인한 hydration mismatch 방지.
+    // mounted 전에는 ISO 원본을, mounted 후에는 ko-KR 포맷을 사용.
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleSubmit = useCallback(
         (e: React.FormEvent) => {
@@ -249,10 +260,18 @@ export function AttendanceTuningForm({ vm }: Props) {
                                         {String(h.new_value)}
                                     </span>
                                 </div>
-                                <time className="text-[11px] text-rh-text-muted block mt-1">
-                                    {new Date(h.updated_at).toLocaleString(
-                                        'ko-KR',
-                                    )}
+                                <time
+                                    className="text-[11px] text-rh-text-muted block mt-1"
+                                    suppressHydrationWarning
+                                >
+                                    {mounted
+                                        ? new Date(h.updated_at).toLocaleString(
+                                              'ko-KR',
+                                          )
+                                        : h.updated_at.slice(0, 16).replace(
+                                              'T',
+                                              ' ',
+                                          )}
                                 </time>
                             </li>
                         ))}

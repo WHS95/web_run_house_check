@@ -33,7 +33,8 @@ DECLARE
     v_lat       double precision;
     v_lng       double precision;
 BEGIN
-    SELECT COALESCE((value)::int, 5) INTO v_min
+    -- jsonb → int 직접 캐스트는 throw → text 경유.
+    SELECT COALESCE((value::text)::int, 5) INTO v_min
       FROM attendance.system_settings
      WHERE key = 'auto_label_min_session_count';
     IF v_min IS NULL THEN v_min := 5; END IF;
@@ -148,7 +149,8 @@ DECLARE
     v_count        int := 0;
     v_session_rec  record;
 BEGIN
-    SELECT COALESCE((value)::int, 60) INTO v_minutes
+    -- jsonb → int 직접 캐스트는 throw → text 경유.
+    SELECT COALESCE((value::text)::int, 60) INTO v_minutes
       FROM attendance.system_settings
      WHERE key = 'session_close_minutes';
     IF v_minutes IS NULL THEN v_minutes := 60; END IF;

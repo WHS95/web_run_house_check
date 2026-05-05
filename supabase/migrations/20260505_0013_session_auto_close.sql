@@ -17,7 +17,8 @@ DECLARE
     v_minutes int;
     v_count int;
 BEGIN
-    SELECT COALESCE((value)::int, 60) INTO v_minutes
+    -- jsonb → int 직접 캐스트는 throw → text 경유.
+    SELECT COALESCE((value::text)::int, 60) INTO v_minutes
       FROM attendance.system_settings
      WHERE key = 'session_close_minutes';
     IF v_minutes IS NULL THEN v_minutes := 60; END IF;
@@ -46,12 +47,14 @@ BEGIN
     IF EXISTS (
         SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'
     ) THEN
-        -- 동일 jobname이 있으면 unschedule 후 재등록 (idempotent)
-        PERFORM cron.unschedule('attendance-close-idle-sessions')
-        WHERE EXISTS (
+        -- 동일 jobname이 있으면 unschedule 후 재등록 (idempotent).
+        -- PERFORM은 WHERE를 받지 않으므로 IF EXISTS 블록으로 감싼다.
+        IF EXISTS (
             SELECT 1 FROM cron.job
              WHERE jobname = 'attendance-close-idle-sessions'
-        );
+        ) THEN
+            PERFORM cron.unschedule('attendance-close-idle-sessions');
+        END IF;
 
         PERFORM cron.schedule(
             'attendance-close-idle-sessions',

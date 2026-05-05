@@ -36,12 +36,13 @@ DECLARE
     v_record_id  uuid;
     v_candidate_id uuid;
 BEGIN
-    -- 시스템 settings 로드 (없으면 디폴트 사용)
-    SELECT COALESCE((value)::int, 15) INTO v_window_min
+    -- 시스템 settings 로드 (없으면 디폴트 사용).
+    -- jsonb → int 직접 캐스트는 PostgreSQL에서 throw하므로 text 경유.
+    SELECT COALESCE((value::text)::int, 15) INTO v_window_min
       FROM attendance.system_settings WHERE key = 'session_window_minutes';
     IF v_window_min IS NULL THEN v_window_min := 15; END IF;
 
-    SELECT COALESCE((value)::int, 100) INTO v_radius_m
+    SELECT COALESCE((value::text)::int, 100) INTO v_radius_m
       FROM attendance.system_settings WHERE key = 'session_radius_m';
     IF v_radius_m IS NULL THEN v_radius_m := 100; END IF;
 

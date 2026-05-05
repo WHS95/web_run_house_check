@@ -251,12 +251,14 @@ BEGIN
     IF EXISTS (
         SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'
     ) THEN
+        -- PERFORM은 WHERE를 받지 않으므로 IF EXISTS 블록으로 감싼다.
         -- 매주 월 00:00 UTC = 09:00 KST 월요일
-        PERFORM cron.unschedule('attendance-churn-alerts')
-        WHERE EXISTS (
+        IF EXISTS (
             SELECT 1 FROM cron.job
              WHERE jobname = 'attendance-churn-alerts'
-        );
+        ) THEN
+            PERFORM cron.unschedule('attendance-churn-alerts');
+        END IF;
         PERFORM cron.schedule(
             'attendance-churn-alerts',
             '0 0 * * 1',
@@ -264,11 +266,12 @@ BEGIN
         );
 
         -- 매일 00:00 UTC = 09:00 KST
-        PERFORM cron.unschedule('attendance-onboarding-alerts')
-        WHERE EXISTS (
+        IF EXISTS (
             SELECT 1 FROM cron.job
              WHERE jobname = 'attendance-onboarding-alerts'
-        );
+        ) THEN
+            PERFORM cron.unschedule('attendance-onboarding-alerts');
+        END IF;
         PERFORM cron.schedule(
             'attendance-onboarding-alerts',
             '0 0 * * *',

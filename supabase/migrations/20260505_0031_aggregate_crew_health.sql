@@ -105,11 +105,13 @@ BEGIN
     IF EXISTS (
         SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'
     ) THEN
-        PERFORM cron.unschedule('attendance-aggregate-daily')
-        WHERE EXISTS (
+        -- PERFORM은 WHERE를 받지 않으므로 IF EXISTS 블록으로 감싼다.
+        IF EXISTS (
             SELECT 1 FROM cron.job
              WHERE jobname = 'attendance-aggregate-daily'
-        );
+        ) THEN
+            PERFORM cron.unschedule('attendance-aggregate-daily');
+        END IF;
 
         PERFORM cron.schedule(
             'attendance-aggregate-daily',

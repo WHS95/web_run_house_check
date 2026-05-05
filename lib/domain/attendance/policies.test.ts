@@ -206,4 +206,70 @@ describe('출석 정책', () => {
             expect(vm?.meetingStartedLabel).toBe('5월 12일 00:05');
         });
     });
+
+    describe('좌표거리_미터', () => {
+        it('동일 좌표는 0', () => {
+            const d = 출석정책.좌표거리_미터(
+                { lat: 37.5172, lng: 126.992 },
+                { lat: 37.5172, lng: 126.992 }
+            );
+            expect(d).toBeLessThan(0.001);
+        });
+
+        it('한강 인근에서 약 100m 떨어진 두 점', () => {
+            // 위도 0.0009도 ≈ 100m
+            const d = 출석정책.좌표거리_미터(
+                { lat: 37.5172, lng: 126.992 },
+                { lat: 37.5181, lng: 126.992 }
+            );
+            expect(d).toBeGreaterThan(95);
+            expect(d).toBeLessThan(110);
+        });
+
+        it('500m 이상 떨어진 두 점은 500보다 큼', () => {
+            const d = 출석정책.좌표거리_미터(
+                { lat: 37.5172, lng: 126.992 },
+                { lat: 37.53, lng: 126.992 }
+            );
+            expect(d).toBeGreaterThan(500);
+        });
+    });
+
+    describe('세션귀속_가능여부', () => {
+        const 세션 = {
+            center_lat: 37.5172,
+            center_lng: 126.992,
+            radius_m: 100,
+        };
+
+        it('100m 안 OK', () => {
+            expect(
+                출석정책.세션귀속_가능여부(
+                    { lat: 37.51725, lng: 126.99205 },
+                    세션,
+                    100
+                )
+            ).toBe(true);
+        });
+
+        it('500m 밖 NG', () => {
+            expect(
+                출석정책.세션귀속_가능여부(
+                    { lat: 37.53, lng: 126.992 },
+                    세션,
+                    100
+                )
+            ).toBe(false);
+        });
+
+        it('임계값 확장 시 멀어도 OK', () => {
+            expect(
+                출석정책.세션귀속_가능여부(
+                    { lat: 37.53, lng: 126.992 },
+                    세션,
+                    5000
+                )
+            ).toBe(true);
+        });
+    });
 });

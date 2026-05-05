@@ -141,3 +141,48 @@ function 모임시작_라벨생성(d: Date): string {
 function 모임_식별키생성(location: string, startedAt: string): string {
     return `runhouse:active-meet-dismissed:${location}:${startedAt}`;
 }
+
+/**
+ * Haversine 공식으로 두 좌표 사이의 거리를 미터로 계산.
+ *
+ * 감지 기반 출석 시스템에서 출석 좌표가 활성 세션 반경 안에 있는지
+ * 판정하기 위해 사용한다.
+ */
+export function 좌표거리_미터(
+    a: { lat: number; lng: number },
+    b: { lat: number; lng: number },
+): number {
+    const R = 6371000;
+    const toRad = (x: number) => (x * Math.PI) / 180;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const lat1 = toRad(a.lat);
+    const lat2 = toRad(b.lat);
+    const sin1 = Math.sin(dLat / 2);
+    const sin2 = Math.sin(dLng / 2);
+    const c =
+        sin1 * sin1 + sin2 * sin2 * Math.cos(lat1) * Math.cos(lat2);
+    return 2 * R * Math.asin(Math.sqrt(c));
+}
+
+/**
+ * 출석 좌표가 활성 세션 반경 안인가?
+ *
+ * 임계값(미터)은 system_settings.session_radius_m 또는 세션 자체의 radius_m
+ * 둘 중 호출자가 결정해 전달한다. (보통 더 작은 쪽)
+ */
+export function 세션귀속_가능여부(
+    출석좌표: { lat: number; lng: number },
+    세션: {
+        center_lat: number;
+        center_lng: number;
+        radius_m: number;
+    },
+    임계값_m: number,
+): boolean {
+    const dist = 좌표거리_미터(출석좌표, {
+        lat: 세션.center_lat,
+        lng: 세션.center_lng,
+    });
+    return dist <= 임계값_m;
+}

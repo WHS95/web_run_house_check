@@ -39,6 +39,17 @@ async function SettingsDataServer({
     activeTab: string;
 }) {
     const { crew, locations } = await getCrewSettingsData(crewId);
+    const crewRow = crew as
+        | (typeof crew & {
+              time_window_mode?: string | null;
+              active_hours?: unknown;
+              churn_baseline_weeks?: number | null;
+              churn_min_baseline_rate?: number | string | null;
+              churn_observation_weeks?: number | null;
+              onboarding_window_weeks?: number | null;
+              onboarding_min_count?: number | null;
+          })
+        | null;
     return (
         <SettingsManagement
             crewId={crewId}
@@ -53,6 +64,31 @@ async function SettingsDataServer({
                 crew?.allow_unregistered_location
                 || false
             }
+            initialTimeWindowMode={
+                (crewRow?.time_window_mode as
+                    | 'cluster_first'
+                    | 'active_hours'
+                    | 'anytime'
+                    | null) ?? 'cluster_first'
+            }
+            initialActiveHours={
+                Array.isArray(crewRow?.active_hours)
+                    ? (crewRow?.active_hours as never)
+                    : null
+            }
+            initialChurnRules={{
+                churn_baseline_weeks:
+                    crewRow?.churn_baseline_weeks ?? 4,
+                churn_min_baseline_rate: Number(
+                    crewRow?.churn_min_baseline_rate ?? 0.5,
+                ),
+                churn_observation_weeks:
+                    crewRow?.churn_observation_weeks ?? 2,
+                onboarding_window_weeks:
+                    crewRow?.onboarding_window_weeks ?? 4,
+                onboarding_min_count:
+                    crewRow?.onboarding_min_count ?? 2,
+            }}
             initialTab={activeTab}
         />
     );

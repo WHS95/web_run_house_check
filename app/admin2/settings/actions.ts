@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import {
     getCrewById,
     getCrewLocations,
@@ -9,8 +9,13 @@ import {
     updateAccuracyRange,
     updateAllowUnregisteredLocation,
 } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import { assertAdminAction } from '@/lib/admin2/action-auth';
 import { 정확도범위_유효한가 } from '@/lib/domain/crew/policies';
+import {
+    ChurnRulesSchema,
+    TimeWindowSchema,
+} from '@/lib/domain/crew-settings/validators';
 import type { AdminActionResult } from '@/lib/domain/admin/types';
 import type {
     CrewSettingsBundle,
@@ -244,5 +249,118 @@ export async function updateAllowUnregisteredLocationAction(input: {
     return {
         success: true,
         message: `미등록 장소 출석이 ${input.allow ? '허용' : '비허용'}으로 변경되었습니다.`,
+    };
+}
+
+/**
+ * 크루 시간 윈도우 모드 + 활성 시간대 슬롯 업데이트.
+ *
+ * 감지 기반 출석 시스템에서 출석 가능 시간을 정의한다.
+ */
+export async function updateCrewTimeWindowAction(input: {
+    crewId: string;
+    input: unknown;
+}): Promise<AdminActionResult> {
+    const guard = await assertAdminAction('crew.update');
+    if (!guard.ok) return guard.failure;
+
+    if (!input.crewId || input.crewId !== guard.auth.crewId) {
+        return {
+            success: false,
+            error: 'forbidden',
+            message: '권한이 없습니다.',
+        };
+    }
+
+    const parsed = TimeWindowSchema.safeParse(input.input);
+    if (!parsed.success) {
+        return {
+            success: false,
+            error: 'invalid_data',
+            message: '시간 윈도우 입력이 올바르지 않습니다.',
+        };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase
+        .schema('attendance')
+        .from('crews')
+        .update({
+            time_window_mode: parsed.data.time_window_mode,
+            active_hours: parsed.data.active_hours,
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', input.crewId);
+
+    if (error) {
+        return {
+            success: false,
+            error: 'database_error',
+            message: error.message,
+        };
+    }
+
+    revalidateTag(`admin:settings:${guard.auth.crewId}`);
+    revalidatePath('/admin2/settings');
+
+    return {
+        success: true,
+        message: '시간 윈도우가 업데이트되었습니다.',
+    };
+}
+
+/**
+ * 크루 이탈/온보딩 룰 업데이트.
+ *
+ * 대시보드에서 위험 멤버를 가려내는 임계값.
+ */
+export async function updateCrewChurnRulesAction(input: {
+    crewId: string;
+    input: unknown;
+}): Promise<AdminActionResult> {
+    const guard = await assertAdminAction('crew.update');
+    if (!guard.ok) return guard.failure;
+
+    if (!input.crewId || input.crewId !== guard.auth.crewId) {
+        return {
+            success: false,
+            error: 'forbidden',
+            message: '권한이 없습니다.',
+        };
+    }
+
+    const parsed = ChurnRulesSchema.safeParse(input.input);
+    if (!parsed.success) {
+        return {
+            success: false,
+            error: 'invalid_data',
+            message: '이탈/온보딩 룰 입력이 올바르지 않습니다.',
+        };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase
+        .schema('attendance')
+        .from('crews')
+        .update({
+            ...parsed.data,
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', input.crewId);
+
+    if (error) {
+        return {
+            success: false,
+            error: 'database_error',
+            message: error.message,
+        };
+    }
+
+    revalidateTag(`admin:settings:${guard.auth.crewId}`);
+    revalidatePath('/admin2/settings');
+
+    return {
+        success: true,
+        message: '이탈/온보딩 룰이 업데이트되었습니다.',
     };
 }

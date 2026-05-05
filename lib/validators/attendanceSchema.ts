@@ -49,6 +49,22 @@ export const attendanceSubmissionSchema = z.object({
             "유효한 ISO 8601 날짜 문자열 형식의 "
             + "출석 시간이 필요합니다.",
     }),
+    // 감지 기반 출석: 디바이스 GPS 좌표 (옵션).
+    // 좌표가 있으면 RPC가 클러스터링하여 sessions에 귀속시킨다.
+    // 좌표가 없으면 (사용자 권한 거부 등) 출석은 기록되지만
+    // session_id NULL로 들어가 운영진 보정 대상이 된다.
+    capturedLat: z
+        .number()
+        .min(-90)
+        .max(90)
+        .optional()
+        .nullable(),
+    capturedLng: z
+        .number()
+        .min(-180)
+        .max(180)
+        .optional()
+        .nullable(),
 });
 
 export type AttendanceSubmissionData = z.infer<

@@ -35,6 +35,14 @@ const nextConfig = {
 
   // 번들 분석 및 최적화
   webpack: (config, { dev, isServer }) => {
+    // konva가 Node 전용 'canvas' 패키지를 import 시도하지만,
+    // 우리는 react-konva를 브라우저에서만 (next/dynamic ssr:false) 사용.
+    // webpack 빌드 그래프에서 'canvas' 모듈을 외부화해 번들 실패 방지.
+    config.externals = config.externals || [];
+    if (Array.isArray(config.externals)) {
+      config.externals.push({ canvas: "commonjs canvas" });
+    }
+
     // 프로덕션 빌드에서 번들 크기 최적화
     if (!dev && !isServer) {
       // Tree shaking 최적화

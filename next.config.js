@@ -26,6 +26,12 @@ const nextConfig = {
       rules: {
         "*.svg": ["@svgr/webpack"],
       },
+      // konva가 Node 전용 'canvas' 패키지를 import 시도하지만
+      // react-konva는 브라우저에서만 (next/dynamic ssr:false) 사용.
+      // Turbopack에서는 resolveAlias로 외부화.
+      resolveAlias: {
+        canvas: "./noop.js",
+      },
     },
     // 런타임 최적화
     serverComponentsExternalPackages: ['@supabase/ssr'],

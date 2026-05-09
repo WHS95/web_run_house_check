@@ -123,7 +123,7 @@ function 모임시작_라벨생성(d: Date): string {
     const hh = d.toLocaleString('en-US', {
         timeZone: KST_TZ,
         hour: '2-digit',
-        hour12: false,
+        hourCycle: 'h23',
     });
     const mm = d.toLocaleString('en-US', {
         timeZone: KST_TZ,

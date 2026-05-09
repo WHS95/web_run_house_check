@@ -187,18 +187,11 @@ export async function registerPushTokenAction(
 
     const { error } = await supabase
         .schema('attendance')
-        .from('user_push_tokens')
-        .upsert(
-            {
-                user_id: user.id,
-                crew_id: parsed.data.crewId,
-                token: parsed.data.token,
-                platform: 'web',
-                is_active: true,
-                updated_at: new Date().toISOString(),
-            },
-            { onConflict: 'token' }
-        );
+        .rpc('upsert_push_token', {
+            p_token: parsed.data.token,
+            p_crew_id: parsed.data.crewId,
+            p_platform: 'web',
+        });
 
     if (error) {
         console.error('[push] user_push_tokens upsert 실패', {

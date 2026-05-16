@@ -5,6 +5,11 @@
   "scripts": {
     "predev": "node scripts/generate-firebase-sw.js",
     "dev": "next dev --turbo",
+    "env:prod": "cp .env.prod .env.local && echo '✅ env → prod (sazfajslhnvzhpaianhl)'",
+    "env:dev": "cp .env.dev .env.local && echo '✅ env → dev (cnjmnqevlkuxmujtmklc)'",
+    "env:show": "grep -E 'NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_ENABLE_DEV_AUTH' .env.local",
+    "dev:prod": "npm run env:prod && npm run dev",
+    "dev:dev": "npm run env:dev && npm run dev",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:domain": "vitest run lib/domain",

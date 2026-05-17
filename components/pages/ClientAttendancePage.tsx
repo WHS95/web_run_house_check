@@ -358,35 +358,6 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         `${formData.date}T${formData.time}:00`
       );
 
-      // 감지 기반 출석: 디바이스 GPS 좌표를 best-effort로 캡처.
-      // 권한 거부/타임아웃 시 null로 두면 RPC는 클러스터링을 건너뛰고
-      // attendance_record만 session_id NULL로 저장한다 (운영진 보정 대상).
-      const capturedCoords = await new Promise<{
-        lat: number | null;
-        lng: number | null;
-      }>((resolve) => {
-        if (
-          typeof navigator === "undefined" ||
-          !navigator.geolocation
-        ) {
-          resolve({ lat: null, lng: null });
-          return;
-        }
-        navigator.geolocation.getCurrentPosition(
-          (pos) =>
-            resolve({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-            }),
-          () => resolve({ lat: null, lng: null }),
-          {
-            enableHighAccuracy: false,
-            timeout: 5000,
-            maximumAge: 60000,
-          }
-        );
-      });
-
       const submissionData = {
         userId,
         crewId: initialFormData!.crewInfo.id,
@@ -394,8 +365,6 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         exerciseTypeId: formData.exerciseType,
         isHost: formData.isHost === "예",
         attendanceTimestamp: attendanceDateTime.toISOString(),
-        capturedLat: capturedCoords.lat,
-        capturedLng: capturedCoords.lng,
       };
 
       // 오프라인 상태: 큐에 저장

@@ -16,12 +16,6 @@ import PlaceBarChart
     from "./components/PlaceBarChart";
 import OverallCard
     from "./components/OverallCard";
-import { loadHealthDashboardVM } from "./_vm/loadHealthDashboardVM";
-import KpiCards from "./_components/KpiCards";
-import AttendanceHeatmap from "./_components/AttendanceHeatmap";
-import LocationLeaderboard from "./_components/LocationLeaderboard";
-import MemberPatternList from "./_components/MemberPatternList";
-import ChurnRiskBanner from "./_components/ChurnRiskBanner";
 
 /* 요일 이름 매핑 */
 const DAY_NAMES = [
@@ -164,13 +158,6 @@ export default async function Admin2AnalyzePage({
                         <AnalyticsSkeleton />
                     }
                 >
-                    <HealthDashboardServer crewId={crewId} />
-                </Suspense>
-                <Suspense
-                    fallback={
-                        <AnalyticsSkeleton />
-                    }
-                >
                     <AnalyticsChartsServer
                         crewId={crewId}
                         year={year}
@@ -179,29 +166,6 @@ export default async function Admin2AnalyzePage({
                 </Suspense>
             </div>
         </>
-    );
-}
-
-/* ── 헬스 대시보드 (Phase 4 신규) ── */
-async function HealthDashboardServer({
-    crewId,
-}: {
-    crewId: string;
-}) {
-    const vm = await loadHealthDashboardVM(crewId);
-    return (
-        <FadeIn>
-            <div className="space-y-5">
-                <KpiCards kpi={vm.kpi} />
-                <ChurnRiskBanner
-                    churnRisk={vm.churnRisk}
-                    onboardingRisk={vm.onboardingRisk}
-                />
-                <AttendanceHeatmap heatmap={vm.heatmap} />
-                <LocationLeaderboard items={vm.leaderboard} />
-                <MemberPatternList items={vm.memberPatterns} />
-            </div>
-        </FadeIn>
     );
 }
 

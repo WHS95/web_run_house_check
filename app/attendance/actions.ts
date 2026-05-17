@@ -41,8 +41,6 @@ export async function submitAttendance(
         exerciseTypeId,
         isHost,
         attendanceTimestamp,
-        capturedLat,
-        capturedLng,
     } = parsed.data;
 
     if (!출석정책.유효한가(new Date(), attendanceTimestamp)) {
@@ -149,38 +147,37 @@ export async function submitAttendance(
         locationName = loc.name;
     }
 
-    // 감지 기반 출석 RPC (자동 클러스터링).
-    // captured_lat/lng가 NULL이면 RPC는 클러스터링을 건너뛰고
-    // attendance_record만 session_id=NULL로 기록한다 (운영진 보정 대상).
     const numericLocationId =
         typeof locationId === 'number' ? locationId : null;
 
-    const { data: rpcResult, error } = await supabase
+    const insertPayload = {
+        user_id: userId,
+        crew_id: crewId,
+        attendance_timestamp: attendanceTimestamp,
+        location: locationName,
+        location_id: numericLocationId,
+        exercise_type_id: exerciseTypeId,
+        is_host: isHost,
+    };
+    const { data: inserted, error } = await supabase
         .schema('attendance')
-        .rpc('register_attendance_v2', {
-            p_user_id: userId,
-            p_crew_id: crewId,
-            p_captured_at: attendanceTimestamp,
-            p_captured_lat: capturedLat ?? null,
-            p_captured_lng: capturedLng ?? null,
-            p_location_id: numericLocationId,
-            p_exercise_type_id: exerciseTypeId,
-            p_is_host: isHost,
-            p_location_name: locationName,
-        });
+        .from('attendance_records')
+        .insert(insertPayload)
+        .select('id, user_id, crew_id')
+        .single();
 
-    if (error || !rpcResult) {
+    if (error || !inserted) {
         return {
             success: false,
             message: '출석 기록 저장 중 오류가 발생했습니다.',
         };
     }
 
-    const recordId =
-        (rpcResult as { record_id?: string } | null)?.record_id ?? null;
-    const record = recordId
-        ? { id: recordId, user_id: userId, crew_id: crewId }
-        : null;
+    const record = {
+        id: inserted.id,
+        user_id: inserted.user_id,
+        crew_id: inserted.crew_id,
+    };
 
     waitUntil(
         (async () => {

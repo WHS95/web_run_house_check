@@ -9,34 +9,54 @@ RunHouse는 러닝 커뮤니티 관리 앱으로, Next.js (App Router)와 Supaba
 
 ### 개발 서버 실행
 ```bash
-npm run dev
+npm run dev           # next dev --turbo (predev로 firebase SW 자동 생성)
 ```
 
 ### 빌드 및 배포
 ```bash
-npm run build
-npm run start
+npm run build         # 풀 검증 파이프라인 (아래 참조). 느림 — 머지 직전에만.
+npm run start         # next start
+npm run start:standalone  # node .next/standalone/server.js
 ```
 
-### 린트 검사
+### 단계별 검증 (권장 — 풀빌드 대신 빠르게)
+`npm run build`는 다음을 순차 실행합니다:
+```
+check:bff → check:rls → vitest → lint → typecheck → next build
+```
+코드 변경 후에는 풀빌드 대신 **해당 영역만** 빠르게 검증하세요:
+
 ```bash
-npm run lint
+npm run typecheck         # tsc --noEmit (단독)
+npm run lint              # next lint
+npm run test              # vitest run (전체 도메인 단위 테스트)
+npm run test:watch        # vitest (watch 모드)
+npm run test:domain       # vitest run lib/domain (도메인만 빠르게)
+npm run check:bff         # BFF 4계층 규칙 검증 (scripts/check-bff.ts + check-domain-tests.ts)
+npm run check:rls         # Supabase RLS 검증 (scripts/check-rls.ts)
 ```
 
-### 린트 및 타입 검사 (권장)
-빌드 과정에서 자동으로 린트와 타입 검사가 실행됩니다. 코드 작성 후 반드시 다음 명령어로 확인하세요:
+### Dev 테스트 계정 seed
 ```bash
-npm run build
+npm run seed:test         # 테스트 사용자 시드 (.env.local 기반)
+npm run seed:reset        # 테스트 사용자 초기화
 ```
+자세한 셋업은 [`docs/dev-test-auth.md`](docs/dev-test-auth.md) 참조.
 
 ## 기술 스택
-- **프레임워크**: Next.js 14 (App Router)
-- **스타일링**: Tailwind CSS + Radix UI
-- **백엔드**: Supabase (PostgreSQL)
-- **인증**: Supabase Auth
-- **상태 관리**: React Context API
+- **프레임워크**: Next.js 14 (App Router, Turbopack dev)
+- **스타일링**: Tailwind CSS + Radix UI (shadcn/ui)
+- **백엔드**: Supabase (PostgreSQL, RLS, Edge Functions)
+- **인증**: Supabase Auth (카카오 OAuth + dev 테스트 계정)
+- **상태 관리**: React Context API + SWR (클라이언트 캐싱)
 - **폼 검증**: Zod + React Hook Form
 - **애니메이션**: Framer Motion
+- **테스트**: Vitest (도메인 단위 테스트, `lib/domain/**/*.test.ts`)
+- **푸시 알림**: Firebase / FCM (`predev`/`prebuild`에서 `scripts/generate-firebase-sw.js`로 서비스 워커 생성)
+- **캔버스**: Konva / react-konva (단체 사진 합성 — Turbopack 외부화 처리됨, `next.config.js` 참조)
+- **모니터링**: Sentry (`sentry.{client,server,edge}.config.ts`)
+- **분석**: PostHog (`posthog-js`, `posthog-node`), Vercel Analytics
+- **런타임**: Vercel (`@vercel/functions`)
 
 ## 아키텍처 구조
 

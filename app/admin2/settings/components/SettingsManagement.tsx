@@ -7,35 +7,20 @@ import { CrewLocation } from "@/lib/validators/crewLocationSchema";
 import { CrewLocationProvider } from "@/contexts/CrewLocationContext";
 import { CrewMemberProvider } from "@/contexts/CrewMemberContext";
 import FadeIn from "@/components/atoms/FadeIn";
-import type {
-    ActiveHoursSlot,
-    TimeWindowMode,
-} from "@/lib/domain/crew-settings/types";
-import type { ChurnRulesInput } from "@/lib/domain/crew-settings/validators";
 
 const LocationTab = dynamic(() => import("./tabs/LocationTab"), { ssr: true });
 const MembersTab = dynamic(() => import("./tabs/MembersTab"), { ssr: true });
 const InviteCodesTab = dynamic(() => import("./tabs/InviteCodesTab"), {
     ssr: true,
 });
-const TimeWindowTab = dynamic(() => import("./tabs/TimeWindowTab"), {
-    ssr: true,
-});
-const ChurnRulesTab = dynamic(() => import("./tabs/ChurnRulesTab"), {
-    ssr: true,
-});
 
 type TabKey =
     | "location"
     | "members"
-    | "invites"
-    | "time-window"
-    | "churn-rules";
+    | "invites";
 
 const TABS = [
     { key: "location", label: "장소" },
-    { key: "time-window", label: "시간윈도우" },
-    { key: "churn-rules", label: "이탈룰" },
     { key: "members", label: "운영진" },
     { key: "invites", label: "초대코드" },
 ];
@@ -46,9 +31,6 @@ interface SettingsManagementProps {
     locationBasedAttendance: boolean;
     initialAccuracyRange: number;
     allowUnregisteredLocation: boolean;
-    initialTimeWindowMode: TimeWindowMode;
-    initialActiveHours: ActiveHoursSlot[] | null;
-    initialChurnRules: ChurnRulesInput;
     initialTab: string;
 }
 
@@ -58,9 +40,6 @@ const SettingsManagement = memo(function SettingsManagement({
     locationBasedAttendance,
     initialAccuracyRange,
     allowUnregisteredLocation,
-    initialTimeWindowMode,
-    initialActiveHours,
-    initialChurnRules,
     initialTab,
 }: SettingsManagementProps) {
     const [activeTab, setActiveTab] = useState<TabKey>(
@@ -92,19 +71,6 @@ const SettingsManagement = memo(function SettingsManagement({
                                 locationBasedAttendance={locationBasedAttendance}
                                 initialAccuracyRange={initialAccuracyRange}
                                 allowUnregisteredLocation={allowUnregisteredLocation}
-                            />
-                        )}
-                        {activeTab === "time-window" && (
-                            <TimeWindowTab
-                                crewId={crewId}
-                                initialMode={initialTimeWindowMode}
-                                initialActiveHours={initialActiveHours}
-                            />
-                        )}
-                        {activeTab === "churn-rules" && (
-                            <ChurnRulesTab
-                                crewId={crewId}
-                                initial={initialChurnRules}
                             />
                         )}
                         {activeTab === "members" && <MembersTab crewId={crewId} />}

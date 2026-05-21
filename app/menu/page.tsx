@@ -7,46 +7,52 @@ import {
     HeartPulse,
     CircleDot,
     ChevronRight,
+    Shield,
 } from "lucide-react";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import { createClient } from "@/lib/supabase/server";
 import * as 마스터정책 from "@/lib/domain/master/policies";
 
-const menuItems = [
+type MenuItem = {
+    icon: typeof Gauge;
+    title: string;
+    description: string;
+    href: string;
+    accent?: boolean;
+};
+
+// Service Map sc-menu 사양: 첫 항목만 lime, 나머지는 surface 통일
+const calculatorItems: MenuItem[] = [
     {
         icon: Gauge,
         title: "페이스 계산기",
-        description: "거리와 시간으로 페이스 계산",
+        description: "페이스 / 거리 / 시간",
         href: "/calculator/pace",
-        iconBg: "bg-rh-accent",
-    },
-    {
-        icon: Timer,
-        title: "완주 시간 예측기",
-        description: "기록 기반 완주 시간 예측",
-        href: "/calculator/prediction",
-        iconBg: "bg-rh-status-success",
-    },
-    {
-        icon: Split,
-        title: "스플릿 타임 계산기",
-        description: "구간별 스플릿 타임 계산",
-        href: "/calculator/split-time",
-        iconBg: "bg-rh-status-warning",
+        accent: true,
     },
     {
         icon: HeartPulse,
-        title: "심박수 존 계산기",
-        description: "최대 심박수 기반 존 계산",
+        title: "심박수 존",
+        description: "Zone 1 ~ 5",
         href: "/calculator/heart-rate",
-        iconBg: "bg-rh-status-error",
+    },
+    {
+        icon: Timer,
+        title: "완주 시간 예측",
+        description: "5K → 10K / Half / Full",
+        href: "/calculator/prediction",
+    },
+    {
+        icon: Split,
+        title: "스플릿 타임",
+        description: "구간별 페이스",
+        href: "/calculator/split-time",
     },
     {
         icon: CircleDot,
-        title: "트랙 페이스 계산기",
-        description: "트랙 거리별 페이스 변환",
+        title: "트랙 페이스",
+        description: "1·2레인 랩타임",
         href: "/calculator/track-pace",
-        iconBg: "bg-rh-bg-muted",
     },
 ];
 
@@ -72,60 +78,66 @@ async function 마스터_권한_보유여부() {
 export default async function MenuPage() {
     const isMaster = await 마스터_권한_보유여부();
 
+    const renderRow = (item: MenuItem) => {
+        const Icon = item.icon;
+        const iconClasses = item.accent
+            ? "bg-rh-accent text-rh-text-inverted"
+            : "bg-rh-bg-surface text-rh-text-secondary";
+        return (
+            <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center gap-3 py-2.5 active:opacity-80"
+            >
+                <div
+                    className={`flex justify-center items-center w-9 h-9 rounded-rh-md shrink-0 ${iconClasses}`}
+                >
+                    <Icon size={18} strokeWidth={1.6} />
+                </div>
+                <div className="flex-1 min-w-0">
+                    <div className="text-rh-body font-semibold text-rh-text-primary leading-tight">
+                        {item.title}
+                    </div>
+                    <div className="text-rh-caption text-rh-text-tertiary mt-0.5">
+                        {item.description}
+                    </div>
+                </div>
+                <ChevronRight
+                    size={16}
+                    className="shrink-0 text-rh-text-muted"
+                />
+            </Link>
+        );
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-rh-bg-primary">
             <PageHeader
-                title="러닝 계산기"
+                title="메뉴"
                 iconColor="white"
                 borderColor="rh-border"
                 backgroundColor="bg-rh-bg-primary"
-                rightAction={
-                    isMaster ? (
-                        <Link
-                            href="/master"
-                            aria-label="마스터 관리 페이지로 이동"
-                            className="text-[14px] font-medium text-rh-accent px-3 py-1.5"
-                        >
-                            관리
-                        </Link>
-                    ) : undefined
-                }
             />
 
-            <div className="overflow-y-auto flex-1 px-4 pt-4 pb-4">
-                <div className="flex flex-col gap-4">
-                    {menuItems.map((item) => {
-                        const IconComponent = item.icon;
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className="flex items-center gap-4 w-full h-[72px] px-4 rounded-xl bg-rh-bg-surface transition-colors active:opacity-80"
-                            >
-                                <div
-                                    className={`flex justify-center items-center w-11 h-11 rounded-lg shrink-0 ${item.iconBg}`}
-                                >
-                                    <IconComponent
-                                        size={22}
-                                        className="text-white"
-                                    />
-                                </div>
-                                <div className="flex-1 text-left">
-                                    <div className="text-[15px] font-semibold text-white">
-                                        {item.title}
-                                    </div>
-                                    <div className="text-xs mt-0.5 text-rh-text-tertiary">
-                                        {item.description}
-                                    </div>
-                                </div>
-                                <ChevronRight
-                                    size={18}
-                                    className="shrink-0 text-rh-text-muted"
-                                />
-                            </Link>
-                        );
-                    })}
+            <div className="overflow-y-auto flex-1 px-4 pt-3 pb-4 flex flex-col gap-3">
+                <div className="rh-eye">러닝 계산기</div>
+                <div className="flex flex-col divide-y divide-rh-border/60">
+                    {calculatorItems.map(renderRow)}
                 </div>
+
+                {isMaster ? (
+                    <>
+                        <div className="rh-eye mt-2">기타</div>
+                        <div className="flex flex-col divide-y divide-rh-border/60">
+                            {renderRow({
+                                icon: Shield,
+                                title: "관리자 (마스터)",
+                                description: "마스터 페이지로 이동",
+                                href: "/master",
+                            })}
+                        </div>
+                    </>
+                ) : null}
             </div>
         </div>
     );

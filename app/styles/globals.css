@@ -4,35 +4,43 @@
 
 @layer base {
     :root {
-        /* === RunHouse Design System Tokens (.pen 기준) === */
+        /* === RunHouse Design System Tokens v2 — Cartographic Dark ===
+         * Service Map (styles.css) 기준: 깊은 다크 + 라임 액센트 + mono 좌표.
+         * 라임 위에 올라가는 텍스트는 반드시 --rh-text-inverted (#1a1e0a) 사용. */
 
-        /* Background */
-        --rh-bg-primary: #1D2530;
-        --rh-bg-inset: #1A2029;
-        --rh-bg-surface: #2B3644;
-        --rh-bg-muted: #4C525E;
-        --rh-bg-accent: #669FF2;
+        /* Background — lifted dark, eye-friendly */
+        --rh-board: #101318;
+        --rh-bg-primary: #15181E;
+        --rh-bg-inset: #1A1E25;
+        --rh-bg-surface: #21262E;
+        --rh-bg-elev: #2A2F38;
+        --rh-bg-muted: #363B45;
+        --rh-bg-accent: #B8D964;
 
-        /* Accent */
-        --rh-accent: #669FF2;
-        --rh-accent-hover: #5A8FE0;
+        /* Accent — softened lime (sage) */
+        --rh-accent: #B8D964;
+        --rh-accent-hover: #9CBA4A;
+        --rh-accent-soft: #D4E899;
+        --rh-accent-blue: #7BA3D6;
 
         /* Border */
-        --rh-border: #374151;
-        --rh-border-subtle: #1A2029;
-        --rh-divider: #2B3644;
+        --rh-border: #2E333D;
+        --rh-border-strong: #3B4150;
+        --rh-border-subtle: #1A1E25;
+        --rh-divider: #2E333D;
 
         /* Text */
-        --rh-text-primary: #FFFFFF;
-        --rh-text-secondary: #94A3B8;
-        --rh-text-tertiary: #64748B;
-        --rh-text-muted: #475569;
-        --rh-text-inverted: #1D2530;
+        --rh-text-primary: #F4F5F7;
+        --rh-text-secondary: #C9CDD4;
+        --rh-text-tertiary: #8C92A0;
+        --rh-text-muted: #5F6573;
+        --rh-text-faint: #42485A;
+        --rh-text-inverted: #1a1e0a;
 
-        /* Status (블루 톤 테마 — 컬러풀 값 사용 금지) */
-        --rh-status-success: #8BB5F5;
-        --rh-status-warning: #5580C0;
-        --rh-status-error: #3E6496;
+        /* Status (라임 카토그래픽 톤) */
+        --rh-status-success: #9AC9A4;
+        --rh-status-warning: #E8B16C;
+        --rh-status-error: #D88A8A;
 
         /* Typography (px) */
         --rh-text-hero: 32px;
@@ -61,44 +69,44 @@
         --rh-radius-xl: 16px;
         --rh-radius-full: 100px;
 
-        /* === shadcn/ui 호환 (RunHouse 토큰 매핑) === */
-        --background: 213 24% 15%;
-        --foreground: 0 0% 100%;
-        --card: 213 22% 22%;
-        --card-foreground: 0 0% 100%;
-        --popover: 213 22% 22%;
-        --popover-foreground: 0 0% 100%;
-        --primary: 216 84% 67%;
-        --primary-foreground: 0 0% 100%;
-        --secondary: 213 22% 22%;
-        --secondary-foreground: 0 0% 100%;
-        --muted: 216 10% 33%;
-        --muted-foreground: 215 16% 47%;
-        --accent: 216 84% 67%;
-        --accent-foreground: 0 0% 100%;
-        --destructive: 213 42% 42%;
-        --destructive-foreground: 0 0% 100%;
-        --border: 218 19% 27%;
-        --input: 213 22% 22%;
-        --ring: 216 84% 67%;
+        /* === shadcn/ui 호환 (v2 라임 매핑) === */
+        --background: 220 18% 10%;
+        --foreground: 220 10% 96%;
+        --card: 217 17% 15%;
+        --card-foreground: 220 10% 96%;
+        --popover: 217 17% 15%;
+        --popover-foreground: 220 10% 96%;
+        --primary: 77 58% 62%;
+        --primary-foreground: 72 50% 8%;
+        --secondary: 217 17% 15%;
+        --secondary-foreground: 220 10% 96%;
+        --muted: 220 12% 25%;
+        --muted-foreground: 219 8% 60%;
+        --accent: 77 58% 62%;
+        --accent-foreground: 72 50% 8%;
+        --destructive: 0 50% 69%;
+        --destructive-foreground: 220 10% 96%;
+        --border: 220 14% 21%;
+        --input: 217 17% 15%;
+        --ring: 77 58% 62%;
         --radius: 0.5rem;
 
-        /* Chart */
-        --chart-1: 216 84% 67%;
-        --chart-2: 216 70% 55%;
-        --chart-3: 216 60% 45%;
-        --chart-4: 216 50% 35%;
-        --chart-5: 216 40% 25%;
+        /* Chart — lime variations */
+        --chart-1: 77 58% 62%;
+        --chart-2: 77 44% 51%;
+        --chart-3: 77 30% 42%;
+        --chart-4: 218 18% 32%;
+        --chart-5: 218 17% 22%;
 
         /* Sidebar */
-        --sidebar-background: 213 24% 15%;
-        --sidebar-foreground: 0 0% 100%;
-        --sidebar-primary: 216 84% 67%;
-        --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 213 22% 22%;
-        --sidebar-accent-foreground: 0 0% 100%;
-        --sidebar-border: 218 19% 27%;
-        --sidebar-ring: 216 84% 67%;
+        --sidebar-background: 220 18% 10%;
+        --sidebar-foreground: 220 10% 96%;
+        --sidebar-primary: 77 58% 62%;
+        --sidebar-primary-foreground: 72 50% 8%;
+        --sidebar-accent: 217 17% 15%;
+        --sidebar-accent-foreground: 220 10% 96%;
+        --sidebar-border: 220 14% 21%;
+        --sidebar-ring: 77 58% 62%;
 
         /* Safe Area */
         --safe-area-inset-top: env(safe-area-inset-top);
@@ -116,33 +124,33 @@
 
     /* 다크 모드 (기본과 동일 - 다크 퍼스트 앱) */
     .dark {
-        --background: 213 24% 15%;
-        --foreground: 0 0% 100%;
-        --card: 213 22% 22%;
-        --card-foreground: 0 0% 100%;
-        --popover: 213 22% 22%;
-        --popover-foreground: 0 0% 100%;
-        --primary: 216 84% 67%;
-        --primary-foreground: 0 0% 100%;
-        --secondary: 213 22% 22%;
-        --secondary-foreground: 0 0% 100%;
-        --muted: 216 10% 33%;
-        --muted-foreground: 215 16% 47%;
-        --accent: 216 84% 67%;
-        --accent-foreground: 0 0% 100%;
-        --destructive: 213 42% 42%;
-        --destructive-foreground: 0 0% 100%;
-        --border: 218 19% 27%;
-        --input: 213 22% 22%;
-        --ring: 216 84% 67%;
-        --sidebar-background: 213 24% 15%;
-        --sidebar-foreground: 0 0% 100%;
-        --sidebar-primary: 216 84% 67%;
-        --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 213 22% 22%;
-        --sidebar-accent-foreground: 0 0% 100%;
-        --sidebar-border: 218 19% 27%;
-        --sidebar-ring: 216 84% 67%;
+        --background: 220 18% 10%;
+        --foreground: 220 10% 96%;
+        --card: 217 17% 15%;
+        --card-foreground: 220 10% 96%;
+        --popover: 217 17% 15%;
+        --popover-foreground: 220 10% 96%;
+        --primary: 77 58% 62%;
+        --primary-foreground: 72 50% 8%;
+        --secondary: 217 17% 15%;
+        --secondary-foreground: 220 10% 96%;
+        --muted: 220 12% 25%;
+        --muted-foreground: 219 8% 60%;
+        --accent: 77 58% 62%;
+        --accent-foreground: 72 50% 8%;
+        --destructive: 0 50% 69%;
+        --destructive-foreground: 220 10% 96%;
+        --border: 220 14% 21%;
+        --input: 217 17% 15%;
+        --ring: 77 58% 62%;
+        --sidebar-background: 220 18% 10%;
+        --sidebar-foreground: 220 10% 96%;
+        --sidebar-primary: 77 58% 62%;
+        --sidebar-primary-foreground: 72 50% 8%;
+        --sidebar-accent: 217 17% 15%;
+        --sidebar-accent-foreground: 220 10% 96%;
+        --sidebar-border: 220 14% 21%;
+        --sidebar-ring: 77 58% 62%;
     }
 
     * {
@@ -151,7 +159,8 @@
 
     body {
         @apply bg-background text-foreground;
-        font-family: 'Asta Sans', var(--font-do-hyeon),
+        font-family: var(--font-inter), 'Asta Sans', 'Pretendard',
+            var(--font-do-hyeon),
             -apple-system, BlinkMacSystemFont,
             'Apple SD Gothic Neo', 'SF Pro Text',
             system-ui, sans-serif;
@@ -192,7 +201,7 @@
         height: 100%;
         overflow: hidden;
         overscroll-behavior: none;
-        background-color: #1D2530;
+        background-color: #15181E;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeSpeed;
@@ -295,7 +304,7 @@
 
     .ios-input:focus {
         box-shadow: 0 0 0 1px var(--rh-accent),
-            0 0 0 4px rgba(102, 159, 242, 0.1);
+            0 0 0 4px rgba(184, 217, 100, 0.18);
     }
 
     .ios-input::placeholder {
@@ -349,7 +358,7 @@
 
     .ios-date-input:focus {
         box-shadow: 0 0 0 1px var(--rh-accent),
-            0 0 0 4px rgba(102, 159, 242, 0.1);
+            0 0 0 4px rgba(184, 217, 100, 0.18);
     }
 
     .ios-date-input:active {
@@ -463,6 +472,123 @@
         overscroll-behavior: contain;
     }
 
+    /* === Service Map v2 — 카토그래픽 헬퍼 === */
+
+    /* mono / display 타이포 */
+    .rh-mono {
+        font-family: var(--font-jetbrains-mono),
+            ui-monospace, SFMono-Regular, monospace;
+        letter-spacing: 0.02em;
+        font-variant-numeric: tabular-nums;
+    }
+    .rh-display {
+        font-family: var(--font-archivo),
+            Inter, var(--font-do-hyeon), sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+        color: var(--rh-text-primary);
+    }
+
+    /* eyebrow 라벨 */
+    .rh-eye {
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        color: var(--rh-text-tertiary);
+        font-weight: 500;
+    }
+    .rh-eye-lime { color: var(--rh-accent-hover); }
+
+    /* live 펄스 */
+    .rh-live {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 11px;
+        color: var(--rh-accent-hover);
+        font-weight: 500;
+    }
+    .rh-live::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 99px;
+        background: var(--rh-accent);
+    }
+
+    /* 칩 */
+    .rh-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border: 1px solid var(--rh-border-strong);
+        border-radius: 99px;
+        font-size: 11px;
+        color: var(--rh-text-secondary);
+        background: var(--rh-bg-surface);
+        font-weight: 500;
+    }
+    .rh-chip[data-on="true"],
+    .rh-chip.is-on {
+        background: var(--rh-accent);
+        color: var(--rh-text-inverted);
+        border-color: transparent;
+        font-weight: 600;
+    }
+    .rh-chip[data-tone="dim"] { color: var(--rh-text-muted); }
+
+    /* 박스 카드 */
+    .rh-box {
+        background: var(--rh-bg-inset);
+        border: 1px solid var(--rh-border);
+        border-radius: 10px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .rh-box-alt { background: var(--rh-bg-surface); }
+    .rh-box-tight { padding: 12px; }
+
+    /* 28일 히트맵 */
+    .rh-heat {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 3px;
+    }
+    .rh-heat-cell {
+        aspect-ratio: 1;
+        border-radius: 3px;
+        background: var(--rh-bg-surface);
+        border: 1px solid var(--rh-border);
+    }
+    .rh-heat-cell.l1 { background: rgba(184,217,100,.22); border-color: transparent; }
+    .rh-heat-cell.l2 { background: rgba(184,217,100,.40); border-color: transparent; }
+    .rh-heat-cell.l3 { background: rgba(184,217,100,.65); border-color: transparent; }
+    .rh-heat-cell.l4 { background: var(--rh-accent); border-color: transparent; }
+
+    /* 등고선 컨투어 데코 (lime 카드 배경) */
+    .rh-contour {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: .2;
+    }
+    .rh-contour svg { width: 100%; height: 100%; }
+    .rh-contour path {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: .5;
+    }
+
+    /* 점선 구분선 */
+    .rh-sep-dash {
+        border: none;
+        border-top: 1px dashed var(--rh-border);
+        height: 0;
+        margin: 0;
+    }
 }
 
 /* Safe Area 유틸리티 */
@@ -653,7 +779,7 @@
 
 /* 앱 시작 시 깜빡임 방지 + iOS 키보드 스크롤 고정 방지 */
 html, body {
-    background-color: #0F1318 !important;
+    background-color: #101318 !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
     /* iOS 키보드 닫힘 후 viewport 밀림 방지 */
@@ -668,13 +794,13 @@ html, body {
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
-    background-color: #0F1318;
+    background-color: #101318;
 }
 
 .mobile-viewport {
     width: 100%;
     height: 100dvh;
-    background-color: #1D2530;
+    background-color: #15181E;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -810,7 +936,7 @@ body:has(.intro-root) {
     align-items: stretch !important;
     padding: 0 !important;
     min-height: 100vh;
-    background: #1D2530;
+    background: #15181E;
 }
 .mobile-viewport:has(.intro-root) {
     max-width: none !important;

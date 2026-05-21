@@ -19,7 +19,9 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: [
+          "var(--font-inter)",
           "'Asta Sans'",
+          "Pretendard",
           "var(--font-do-hyeon)",
           "-apple-system",
           "BlinkMacSystemFont",
@@ -29,10 +31,20 @@ module.exports = {
           "sans-serif",
         ],
         display: [
-          "var(--font-do-hyeon)",
+          "var(--font-archivo)",
+          "var(--font-inter)",
           "'Asta Sans'",
+          "var(--font-do-hyeon)",
           "-apple-system",
           "sans-serif",
+        ],
+        mono: [
+          "var(--font-jetbrains-mono)",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Monaco",
+          "monospace",
         ],
       },
       colors: {
@@ -70,21 +82,26 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        /* RunHouse Design Tokens */
+        /* RunHouse v2 Design Tokens — Cartographic Dark */
         rh: {
+          board: "var(--rh-board)",
           bg: {
             primary: "var(--rh-bg-primary)",
             inset: "var(--rh-bg-inset)",
             surface: "var(--rh-bg-surface)",
+            elev: "var(--rh-bg-elev)",
             muted: "var(--rh-bg-muted)",
             accent: "var(--rh-accent)",
           },
           accent: {
             DEFAULT: "var(--rh-accent)",
             hover: "var(--rh-accent-hover)",
+            soft: "var(--rh-accent-soft)",
+            blue: "var(--rh-accent-blue)",
           },
           border: {
             DEFAULT: "var(--rh-border)",
+            strong: "var(--rh-border-strong)",
             subtle: "var(--rh-border-subtle)",
           },
           divider: "var(--rh-divider)",
@@ -93,6 +110,7 @@ module.exports = {
             secondary: "var(--rh-text-secondary)",
             tertiary: "var(--rh-text-tertiary)",
             muted: "var(--rh-text-muted)",
+            faint: "var(--rh-text-faint)",
             inverted: "var(--rh-text-inverted)",
           },
           status: {
@@ -100,6 +118,12 @@ module.exports = {
             warning: "var(--rh-status-warning)",
             error: "var(--rh-status-error)",
           },
+        },
+        /* Service Map 호환 alias (lime 직접 접근용) */
+        lime: {
+          DEFAULT: "var(--rh-accent)",
+          2: "var(--rh-accent-hover)",
+          3: "var(--rh-accent-soft)",
         },
       },
       fontSize: {

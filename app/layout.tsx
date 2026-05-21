@@ -1,12 +1,33 @@
 import "./styles/globals.css";
 import { ReactNode } from "react";
-import { Do_Hyeon } from 'next/font/google';
+import { Do_Hyeon, Inter, Archivo, JetBrains_Mono } from 'next/font/google';
 
 const doHyeon = Do_Hyeon({
     weight: '400',
     subsets: ['latin'],
     display: 'swap',
     variable: '--font-do-hyeon',
+});
+
+const inter = Inter({
+    weight: ['400', '500', '600', '700', '800'],
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-inter',
+});
+
+const archivo = Archivo({
+    weight: ['500', '700', '800', '900'],
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-archivo',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+    weight: ['400', '500', '600'],
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-jetbrains-mono',
 });
 // import StagewiseWrapper from "@/components/StagewiseWrapper";
 import { StagewiseToolbar } from "@stagewise/toolbar-next";
@@ -50,7 +71,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1d2530",
+  themeColor: "#15181E",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -59,8 +80,14 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const fontVars = [
+    doHyeon.variable,
+    inter.variable,
+    archivo.variable,
+    jetbrainsMono.variable,
+  ].join(' ');
   return (
-    <html lang='ko' className={doHyeon.variable}>
+    <html lang='ko' className={fontVars}>
       <head>
         {/* 필수 PWA 메타태그만 유지 */}
         <meta name='application-name' content='런하우스' />

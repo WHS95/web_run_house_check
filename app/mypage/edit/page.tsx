@@ -9,9 +9,11 @@ import React, {
 } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { Camera, X } from "lucide-react";
+import { Camera } from "lucide-react";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import FadeIn from "@/components/atoms/FadeIn";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -31,15 +33,19 @@ interface ProfileForm {
 }
 
 const EditProfileSkeleton = React.memo(() => (
-    <div className="flex flex-col min-h-screen bg-rh-bg-primary">
-        <div className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
-            <div className="h-14 bg-rh-bg-surface" />
+    <div className='flex flex-col min-h-screen bg-rh-bg-primary'>
+        <div className='sticky top-0 z-50 bg-rh-bg-primary pt-safe'>
+            <div className='h-14 bg-rh-bg-surface' />
         </div>
-        <div className="flex-1 px-4 pt-6 space-y-6">
+        <div className='flex-1 px-4 pt-6 space-y-6'>
+            <div className='flex flex-col items-center gap-2 py-2'>
+                <div className='h-16 w-16 rounded-full bg-rh-bg-surface' />
+                <div className='h-3 w-16 rounded bg-rh-bg-surface' />
+            </div>
             {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="space-y-2">
-                    <div className="h-4 w-16 rounded bg-rh-bg-surface" />
-                    <div className="h-12 rounded-rh-md bg-rh-bg-surface" />
+                <div key={i} className='space-y-2'>
+                    <div className='h-3 w-16 rounded bg-rh-bg-surface' />
+                    <div className='h-12 rounded-rh-md bg-rh-bg-surface' />
                 </div>
             ))}
         </div>
@@ -107,8 +113,7 @@ export default function EditProfilePage() {
                         ? String(data.birth_year)
                         : "",
                     email: data.email ?? "",
-                    profileImageUrl:
-                        data.profile_image_url ?? null,
+                    profileImageUrl: data.profile_image_url ?? null,
                 });
             } catch {
                 alert("프로필 정보를 불러올 수 없습니다.");
@@ -139,10 +144,8 @@ export default function EditProfilePage() {
 
             setIsUploading(true);
             try {
-                const ext = file.name.split(".").pop()
-                    ?? "jpg";
-                const filePath =
-                    `profiles/${userId}.${ext}`;
+                const ext = file.name.split(".").pop() ?? "jpg";
+                const filePath = `profiles/${userId}.${ext}`;
 
                 // 기존 이미지 삭제 (에러 무시)
                 await supabase.storage
@@ -151,24 +154,21 @@ export default function EditProfilePage() {
                     .catch(() => {});
 
                 // 새 이미지 업로드
-                const { error: uploadError } =
-                    await supabase.storage
-                        .from("image")
-                        .upload(filePath, file, {
-                            upsert: true,
-                            cacheControl: "0",
-                        });
+                const { error: uploadError } = await supabase.storage
+                    .from("image")
+                    .upload(filePath, file, {
+                        upsert: true,
+                        cacheControl: "0",
+                    });
 
                 if (uploadError) throw uploadError;
 
                 // public URL 가져오기
-                const { data: urlData } =
-                    supabase.storage
-                        .from("image")
-                        .getPublicUrl(filePath);
+                const { data: urlData } = supabase.storage
+                    .from("image")
+                    .getPublicUrl(filePath);
 
-                const publicUrl =
-                    `${urlData.publicUrl}?t=${Date.now()}`;
+                const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
                 // DB 업데이트
                 const { error: dbError } = await supabase
@@ -186,9 +186,7 @@ export default function EditProfilePage() {
                     profileImageUrl: publicUrl,
                 }));
             } catch {
-                alert(
-                    "이미지 업로드 중 오류가 발생했습니다."
-                );
+                alert("이미지 업로드 중 오류가 발생했습니다.");
             } finally {
                 setIsUploading(false);
                 // input 초기화 (같은 파일 재선택 가능)
@@ -282,153 +280,159 @@ export default function EditProfilePage() {
         }
     }, [dialog, router]);
 
-    const handleBack = useCallback(() => {
-        router.back();
-    }, [router]);
+    const handlePickImage = useCallback(() => {
+        fileInputRef.current?.click();
+    }, []);
 
     if (isLoading) {
         return <EditProfileSkeleton />;
     }
 
+    const initial = form.firstName?.trim().charAt(0) || "?";
+
     return (
         <FadeIn>
-            <div className="flex flex-col min-h-screen bg-rh-bg-primary">
+            <div className='flex flex-col min-h-screen bg-rh-bg-primary'>
                 <PageHeader
-                    title="내정보 변경"
-                    backLink="/mypage"
-                    iconColor="white"
-                    borderColor="rh-border"
-                    backgroundColor="bg-rh-bg-surface"
+                    title='내정보 수정'
+                    backLink='/mypage'
+                    iconColor='white'
+                    borderColor='rh-border'
+                    backgroundColor='bg-rh-bg-primary'
                     rightAction={
-                        <button
-                            type="button"
-                            onClick={handleBack}
-                            aria-label="닫기"
-                            className="flex h-8 w-8 items-center justify-center rounded-full bg-rh-bg-muted/60 text-white hover:bg-rh-bg-muted active:opacity-70 transition-colors"
+                        <Button
+                            type='button'
+                            size='sm'
+                            onClick={handleSave}
+                            disabled={isSaving}
                         >
-                            <X size={16} strokeWidth={2.5} />
-                        </button>
+                            {isSaving ? "저장 중" : "저장"}
+                        </Button>
                     }
                 />
 
-                <div className="flex-1 px-4 pt-6 pb-4 flex flex-col gap-6">
-                    {/* 프로필 사진 */}
-                    <div className="flex flex-col items-center gap-3">
+                <div className='flex-1 px-4 pt-3 pb-4 flex flex-col gap-6'>
+                    {/* 프로필 사진: av xl lime + 카메라 오버레이 */}
+                    <div className='flex flex-col items-center gap-2 py-2'>
                         <button
-                            type="button"
-                            onClick={() =>
-                                fileInputRef.current?.click()
-                            }
+                            type='button'
+                            onClick={handlePickImage}
                             disabled={isUploading}
-                            className="relative group"
+                            aria-label='프로필 사진 변경'
+                            className='relative active:opacity-80 transition-opacity'
                         >
                             {form.profileImageUrl ? (
                                 <img
-                                    src={
-                                        form.profileImageUrl
-                                    }
-                                    alt="프로필"
-                                    className="h-20 w-20 rounded-full object-cover border-2 border-rh-border"
+                                    src={form.profileImageUrl}
+                                    alt='프로필'
+                                    className='h-16 w-16 rounded-full object-cover'
                                 />
                             ) : (
-                                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-rh-accent border-2 border-rh-border">
-                                    <span className="text-3xl font-bold text-white">
-                                        {form.firstName
-                                            ?.charAt(0) ??
-                                            "?"}
+                                <div
+                                    className='flex h-16 w-16 items-center justify-center
+                                        rounded-full bg-rh-accent'
+                                >
+                                    <span className='text-rh-title3 font-semibold text-rh-text-inverted'>
+                                        {initial}
                                     </span>
                                 </div>
                             )}
-                            <div className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-rh-bg-surface border border-rh-border">
-                                <Camera
-                                    size={14}
-                                    className="text-rh-text-secondary"
-                                />
+                            <div
+                                className='absolute -bottom-0.5 -right-0.5
+                                    flex h-6 w-6 items-center justify-center
+                                    rounded-full bg-rh-bg-primary
+                                    border-2 border-rh-accent
+                                    text-rh-accent'
+                                aria-hidden
+                            >
+                                <Camera size={12} strokeWidth={2} />
                             </div>
                         </button>
                         <input
                             ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
+                            type='file'
+                            accept='image/*'
                             onChange={handleImageUpload}
-                            className="hidden"
+                            className='hidden'
                         />
-                        {isUploading && (
-                            <span className="text-xs text-rh-text-tertiary">
-                                업로드 중...
-                            </span>
-                        )}
+                        <button
+                            type='button'
+                            onClick={handlePickImage}
+                            disabled={isUploading}
+                            className='text-rh-caption text-rh-text-secondary
+                                active:opacity-70 transition-opacity'
+                        >
+                            {isUploading ? "업로드 중..." : "사진 변경"}
+                        </button>
                     </div>
 
-                    {/* 이름 */}
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs font-medium text-rh-text-secondary">
-                            이름
-                        </span>
-                        <input
-                            type="text"
-                            value={form.firstName}
-                            onChange={handleChange("firstName")}
-                            placeholder="이름을 입력하세요"
-                            className="h-12 rounded-rh-md bg-rh-bg-surface px-4 text-sm text-white placeholder:text-rh-text-muted border border-rh-border focus:border-rh-accent focus:outline-none transition-colors"
-                        />
-                    </label>
+                    {/* 입력 필드 묶음 */}
+                    <div className='flex flex-col gap-5'>
+                        <label className='flex flex-col gap-1.5'>
+                            <span className='text-rh-label font-medium text-rh-text-secondary'>
+                                이름
+                            </span>
+                            <Input
+                                type='text'
+                                value={form.firstName}
+                                onChange={handleChange("firstName")}
+                                placeholder='이름을 입력하세요'
+                                autoFocus
+                            />
+                        </label>
 
-                    {/* 연락처 */}
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs font-medium text-rh-text-secondary">
-                            연락처
-                        </span>
-                        <input
-                            type="tel"
-                            value={form.phone}
-                            onChange={handleChange("phone")}
-                            placeholder="010-1234-5678"
-                            className="h-12 rounded-rh-md bg-rh-bg-surface px-4 text-sm text-white placeholder:text-rh-text-muted border border-rh-border focus:border-rh-accent focus:outline-none transition-colors"
-                        />
-                    </label>
+                        <label className='flex flex-col gap-1.5'>
+                            <span className='text-rh-label font-medium text-rh-text-secondary'>
+                                연락처
+                            </span>
+                            <Input
+                                type='tel'
+                                value={form.phone}
+                                onChange={handleChange("phone")}
+                                placeholder='010-1234-5678'
+                            />
+                        </label>
 
-                    {/* 이메일 (읽기 전용) */}
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs font-medium text-rh-text-secondary">
-                            이메일
-                        </span>
-                        <input
-                            type="email"
-                            value={form.email}
-                            disabled
-                            className="h-12 rounded-rh-md bg-rh-bg-surface px-4 text-sm text-rh-text-tertiary border border-rh-border opacity-60 cursor-not-allowed"
-                        />
-                        <span className="text-[11px] text-rh-text-tertiary">
-                            이메일은 변경할 수 없습니다
-                        </span>
-                    </label>
+                        <label className='flex flex-col gap-1.5'>
+                            <span className='text-rh-label font-medium text-rh-text-secondary'>
+                                출생연도
+                            </span>
+                            <Input
+                                type='number'
+                                value={form.birthYear}
+                                onChange={handleChange("birthYear")}
+                                placeholder='1995'
+                            />
+                        </label>
 
-                    {/* 출생연도 */}
-                    <label className="flex flex-col gap-1.5">
-                        <span className="text-xs font-medium text-rh-text-secondary">
-                            출생연도
-                        </span>
-                        <input
-                            type="number"
-                            value={form.birthYear}
-                            onChange={handleChange("birthYear")}
-                            placeholder="1990"
-                            className="h-12 rounded-rh-md bg-rh-bg-surface px-4 text-sm text-white placeholder:text-rh-text-muted border border-rh-border focus:border-rh-accent focus:outline-none transition-colors"
-                        />
-                    </label>
+                        {/* 이메일 (읽기 전용 — 기존 기능 보존) */}
+                        <label className='flex flex-col gap-1.5'>
+                            <span className='text-rh-label font-medium text-rh-text-secondary'>
+                                이메일
+                            </span>
+                            <Input
+                                type='email'
+                                value={form.email}
+                                disabled
+                            />
+                            <span className='text-rh-label text-rh-text-tertiary'>
+                                이메일은 변경할 수 없습니다
+                            </span>
+                        </label>
+                    </div>
 
-                    {/* Spacer */}
-                    <div className="flex-1" />
+                    {/* spacer: 저장 버튼을 하단으로 밀어내기 */}
+                    <div className='flex-1' />
 
-                    {/* 저장 버튼 */}
-                    <button
+                    {/* 저장 (full lime) */}
+                    <Button
+                        type='button'
+                        className='w-full'
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="h-11 w-full rounded-rh-lg bg-rh-accent text-sm font-semibold text-white disabled:opacity-50 transition-opacity active:opacity-80"
                     >
-                        {isSaving ? "저장 중..." : "저장하기"}
-                    </button>
+                        {isSaving ? "저장 중..." : "저장"}
+                    </Button>
                 </div>
             </div>
 
@@ -448,7 +452,7 @@ export default function EditProfilePage() {
                     <AlertDialogFooter>
                         <AlertDialogAction
                             onClick={handleDialogClose}
-                            className="w-full"
+                            className='w-full'
                         >
                             확인
                         </AlertDialogAction>

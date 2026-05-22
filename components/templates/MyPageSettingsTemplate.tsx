@@ -7,14 +7,13 @@ import {
     Bell,
     User as UserIcon,
     LogOut,
-    UserX,
     ChevronRight,
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/organisms/common/PageHeader";
-import SectionLabel from "@/components/atoms/SectionLabel";
 import ConfirmDialog from "@/components/molecules/ConfirmDialog";
 import Toast from "@/components/molecules/Toast";
 import { usePushNotification } from "@/hooks/usePushNotification";
@@ -28,20 +27,18 @@ interface MyPageSettingsTemplateProps {
     crewId: string | null;
 }
 
-const ROW_HEIGHT = "h-[52px]";
-const ICON_SIZE = 18;
-
 interface SettingRowProps {
     icon: React.ReactNode;
     label: string;
     description?: string;
-    action: React.ReactNode;
+    action?: React.ReactNode;
     onClick?: () => void;
     href?: string;
     danger?: boolean;
     disabled?: boolean;
 }
 
+// av sm sq: 32x32 둥근 사각형 아이콘 박스 (surface 배경)
 const SettingRow: React.FC<SettingRowProps> = ({
     icon,
     label,
@@ -52,40 +49,44 @@ const SettingRow: React.FC<SettingRowProps> = ({
     danger = false,
     disabled = false,
 }) => {
-    const labelColor = danger ? "text-rh-status-error" : "text-white";
-    const iconColor = danger
+    const labelColor = danger
         ? "text-rh-status-error"
-        : "text-rh-text-secondary";
+        : "text-rh-text-primary";
+    const iconWrapClasses = danger
+        ? "bg-rh-bg-surface text-rh-status-error"
+        : "bg-rh-bg-surface text-rh-text-secondary";
 
     const inner = (
         <>
-            <span
-                className={`flex h-8 w-8 shrink-0 items-center justify-center ${iconColor}`}
+            <div
+                className={`flex justify-center items-center w-8 h-8 rounded-rh-md shrink-0 ${iconWrapClasses}`}
                 aria-hidden
             >
                 {icon}
-            </span>
+            </div>
             <div className='flex-1 min-w-0'>
-                <span className={`block text-sm font-medium ${labelColor}`}>
+                <div
+                    className={`text-rh-body font-semibold leading-tight ${labelColor}`}
+                >
                     {label}
-                </span>
+                </div>
                 {description && (
-                    <span className='block text-xs text-rh-text-tertiary'>
+                    <div className='text-rh-caption text-rh-text-tertiary mt-0.5'>
                         {description}
-                    </span>
+                    </div>
                 )}
             </div>
-            <span className='shrink-0'>{action}</span>
+            {action ? <div className='shrink-0'>{action}</div> : null}
         </>
     );
 
-    const className = `flex items-center gap-3 px-4 ${
-        description ? "py-3" : ROW_HEIGHT
-    } ${disabled ? "opacity-50" : ""}`;
+    const baseClasses = `flex items-center gap-3 py-2.5 ${
+        disabled ? "opacity-50" : ""
+    }`;
 
     if (href) {
         return (
-            <Link href={href} className={className}>
+            <Link href={href} className={`${baseClasses} active:opacity-80`}>
                 {inner}
             </Link>
         );
@@ -96,13 +97,13 @@ const SettingRow: React.FC<SettingRowProps> = ({
                 type='button'
                 onClick={onClick}
                 disabled={disabled}
-                className={`${className} text-left active:opacity-80 transition-opacity w-full`}
+                className={`${baseClasses} text-left active:opacity-80 transition-opacity w-full`}
             >
                 {inner}
             </button>
         );
     }
-    return <div className={className}>{inner}</div>;
+    return <div className={baseClasses}>{inner}</div>;
 };
 
 const MyPageSettingsTemplate = memo<MyPageSettingsTemplateProps>(
@@ -118,7 +119,7 @@ const MyPageSettingsTemplate = memo<MyPageSettingsTemplateProps>(
             dismissToast,
         } = usePushNotification({ crewId });
 
-        // hydration-safe
+        // hydration-safe: 클라이언트에서만 푸시 지원 여부 확정
         const [mounted, setMounted] = useState(false);
         useEffect(() => {
             setMounted(true);
@@ -191,13 +192,14 @@ const MyPageSettingsTemplate = memo<MyPageSettingsTemplateProps>(
                     backgroundColor='bg-rh-bg-primary'
                 />
 
-                <div className='flex-1 px-4 pt-4 pb-4 space-y-5'>
-                    {/* 첫 번째 카드 — 일반 (라벨 없음) */}
-                    <div className='overflow-hidden rounded-rh-md bg-rh-bg-surface divide-y divide-rh-border-subtle'>
+                <div className='flex-1 flex flex-col px-4 pt-3 pb-4 gap-3'>
+                    {/* 계정 섹션 */}
+                    <div className='rh-eye'>계정</div>
+                    <div className='flex flex-col divide-y divide-rh-border/60'>
                         {showNotificationToggle && (
                             <SettingRow
-                                icon={<Bell size={ICON_SIZE} />}
-                                label='푸시 알림 수신'
+                                icon={<Bell size={16} strokeWidth={1.6} />}
+                                label='푸시 알림'
                                 action={
                                     <Switch
                                         checked={isNotificationEnabled}
@@ -209,48 +211,38 @@ const MyPageSettingsTemplate = memo<MyPageSettingsTemplateProps>(
                         )}
 
                         <SettingRow
-                            icon={<UserIcon size={ICON_SIZE} />}
+                            icon={<UserIcon size={16} strokeWidth={1.6} />}
                             label='내정보 변경'
                             description='이름, 연락처 등 개인정보 수정'
                             href='/mypage/edit'
                             action={
                                 <ChevronRight
-                                    size={18}
+                                    size={16}
                                     className='text-rh-text-muted'
                                 />
                             }
                         />
+
+                        <SettingRow
+                            icon={<LogOut size={16} strokeWidth={1.6} />}
+                            label='로그아웃'
+                            onClick={handleLogout}
+                            danger
+                        />
                     </div>
 
-                    {/* 계정 섹션 */}
-                    <div>
-                        <SectionLabel>계정</SectionLabel>
-                        <div className='overflow-hidden rounded-rh-md bg-rh-bg-surface divide-y divide-rh-border-subtle'>
-                            <SettingRow
-                                icon={<LogOut size={ICON_SIZE} />}
-                                label='로그아웃'
-                                onClick={handleLogout}
-                                action={
-                                    <ChevronRight
-                                        size={18}
-                                        className='text-rh-text-muted'
-                                    />
-                                }
-                            />
-                            <SettingRow
-                                icon={<UserX size={ICON_SIZE} />}
-                                label='회원 탈퇴'
-                                onClick={() => setShowWithdrawModal(true)}
-                                danger
-                                action={
-                                    <ChevronRight
-                                        size={18}
-                                        className='text-rh-text-muted'
-                                    />
-                                }
-                            />
-                        </div>
-                    </div>
+                    {/* spacer: danger CTA를 하단으로 밀어내기 */}
+                    <div className='flex-1' />
+
+                    {/* danger CTA: 투명 배경 + 에러 색 테두리 */}
+                    <Button
+                        type='button'
+                        variant='destructive'
+                        className='w-full'
+                        onClick={() => setShowWithdrawModal(true)}
+                    >
+                        회원 탈퇴
+                    </Button>
                 </div>
 
                 <ConfirmDialog

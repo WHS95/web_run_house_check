@@ -4,6 +4,8 @@ import { ChevronLeft } from "lucide-react";
 
 interface PageHeaderProps {
   title: string;
+  /** 타이틀 아래 보조 텍스트 (예: 크루명·멤버 수) */
+  sub?: string;
   backLink?: string;
   iconColor?: "white" | "black";
   borderColor?: string;
@@ -13,6 +15,7 @@ interface PageHeaderProps {
 
 const PageHeader: React.FC<PageHeaderProps> = ({
   title,
+  sub,
   backgroundColor,
   backLink,
   iconColor = "white",
@@ -45,8 +48,13 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         )}
 
         {/* 타이틀 */}
-        <div className={`flex-1 pr-2 ${backLink ? "pl-1" : "pl-4"}`}>
-          <h1 className='text-[18px] font-semibold text-white truncate'>{title}</h1>
+        <div className={`flex-1 pr-2 min-w-0 ${backLink ? "pl-1" : "pl-4"}`}>
+          <h1 className='text-[18px] font-semibold text-white truncate leading-tight'>{title}</h1>
+          {sub && (
+            <p className='text-[11px] text-rh-text-tertiary truncate leading-tight mt-0.5'>
+              {sub}
+            </p>
+          )}
         </div>
 
         {/* 우측 액션 */}

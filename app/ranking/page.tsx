@@ -70,6 +70,7 @@ function generateDemoData(count: number, year: number, month: number) {
         attendanceRanking: attendance,
         hostingRanking: hosting,
         crewName: "데모 크루",
+        memberCount: count,
     };
 }
 

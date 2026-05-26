@@ -13,16 +13,22 @@ export default function YearMonthSelector({
   month,
   onChange,
   disabled = false,
+  pickerOpen: pickerOpenProp,
+  onPickerOpenChange,
 }: {
   year: number;
   month: number;
   /** 선택 시 커스텀 핸들러. 지정되면 URL 라우팅 대신 호출됨 */
   onChange?: (year: number, month: number) => void;
   disabled?: boolean;
+  /** 외부에서 picker 열림 상태를 제어 (controlled). 미지정 시 내부 상태로 fallback */
+  pickerOpen?: boolean;
+  onPickerOpenChange?: (open: boolean) => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerOpenInternal, setPickerOpenInternal] = useState(false);
+  const pickerOpen = pickerOpenProp ?? pickerOpenInternal;
 
   /* 현재 KST 년도 기준 ±2년 */
   const years = useMemo(() => {
@@ -32,11 +38,13 @@ export default function YearMonthSelector({
   }, []);
 
   const openPicker = useCallback(() => {
-    setPickerOpen(true);
-  }, []);
+    if (onPickerOpenChange) onPickerOpenChange(true);
+    else setPickerOpenInternal(true);
+  }, [onPickerOpenChange]);
   const closePicker = useCallback(() => {
-    setPickerOpen(false);
-  }, []);
+    if (onPickerOpenChange) onPickerOpenChange(false);
+    else setPickerOpenInternal(false);
+  }, [onPickerOpenChange]);
 
   const navigate = useCallback(
     (y: number, m: number) => {

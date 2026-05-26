@@ -8,7 +8,7 @@ import React, {
     memo,
 } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronUp } from "lucide-react";
+import { ChevronUp, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PageHeader from "@/components/organisms/common/PageHeader";
 import YearMonthSelector from "@/app/admin2/analyze/components/YearMonthSelector";
@@ -45,7 +45,13 @@ export interface RankingData {
     attendanceRanking: RankItem[];
     hostingRanking: RankItem[];
     crewName?: string | null;
+    /** 헤더 sub 표시용 활성 멤버 수 (sc-rank 사양: "크루명 · N명") */
+    memberCount?: number | null;
 }
+
+/* 메달 색은 sc-rank 사양 명시값 — 토큰화하지 않는 디자인 의도 예외 */
+const MEDAL_SILVER_HEX = "#C0C0C0"; // 2위 실버
+const MEDAL_BRONZE_HEX = "#CD7F32"; // 3위 브론즈
 
 interface UltraFastRankingTemplateProps {
     initialData?: RankingData | null;
@@ -79,20 +85,39 @@ const TopPodium = memo(function TopPodium({
     }: {
         item: RankItem;
         size: number;
-        tone: "lime" | "surface";
-    }) => (
-        <div
-            className={`rounded-full flex items-center justify-center font-semibold shrink-0 ${
-                tone === "lime"
-                    ? "bg-rh-text-inverted/15 text-rh-text-inverted"
-                    : "bg-rh-bg-inset text-rh-text-secondary"
-            }`}
-            style={{ width: size, height: size, fontSize: size * 0.4 }}
-            aria-hidden
-        >
-            {(item.name || "?").slice(0, 1)}
-        </div>
-    );
+        tone: "lime" | "silver" | "bronze" | "surface";
+    }) => {
+        // 메달 색은 sc-rank 사양 명시값(인라인 style 예외).
+        // 그 외는 토큰 클래스 사용.
+        let className =
+            "rounded-full flex items-center justify-center font-semibold shrink-0";
+        const style: React.CSSProperties = {
+            width: size,
+            height: size,
+            fontSize: size * 0.4,
+        };
+        if (tone === "lime") {
+            className +=
+                " bg-rh-text-inverted/15 text-rh-text-inverted";
+        } else if (tone === "silver") {
+            style.background = MEDAL_SILVER_HEX;
+            style.color = "#000";
+        } else if (tone === "bronze") {
+            style.background = MEDAL_BRONZE_HEX;
+            style.color = "#000";
+        } else {
+            className += " bg-rh-bg-inset text-rh-text-secondary";
+        }
+        return (
+            <div
+                className={className}
+                style={style}
+                aria-hidden
+            >
+                {(item.name || "?").slice(0, 1)}
+            </div>
+        );
+    };
 
     const SideCard = ({
         item,
@@ -124,7 +149,11 @@ const TopPodium = memo(function TopPodium({
                 style={{ minHeight: 140 }}
             >
                 <span className="rh-eye">{rank}위</span>
-                <Avatar item={item} size={44} tone="surface" />
+                <Avatar
+                    item={item}
+                    size={44}
+                    tone={rank === 2 ? "silver" : "bronze"}
+                />
                 <div className="flex flex-col items-center min-w-0 gap-0.5">
                     <span className="text-rh-body font-medium text-rh-text-primary truncate max-w-full">
                         {item.name || "—"}
@@ -250,6 +279,7 @@ const UltraFastRankingTemplate: React.FC<
                 attendanceRanking: initialData.attendanceRanking || [],
                 hostingRanking: initialData.hostingRanking || [],
                 crewName: initialData.crewName,
+                memberCount: initialData.memberCount ?? null,
             };
         }
         // SSR-safe 기본값 — 클라이언트 마운트 후 보정
@@ -259,6 +289,7 @@ const UltraFastRankingTemplate: React.FC<
             attendanceRanking: [],
             hostingRanking: [],
             crewName: null,
+            memberCount: null,
         };
     });
 
@@ -278,6 +309,7 @@ const UltraFastRankingTemplate: React.FC<
 
     const [activeTab, setActiveTab] = useState("attendance");
     const [isDataLoading, setIsDataLoading] = useState(!initialData);
+    const [pickerOpen, setPickerOpen] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
     const [notificationType, setNotificationType] =
         useState<NotificationType | null>(null);
@@ -310,6 +342,7 @@ const UltraFastRankingTemplate: React.FC<
                     result.data.attendanceRanking || [],
                 hostingRanking: result.data.hostingRanking || [],
                 crewName: result.data.crewName,
+                memberCount: result.data.memberCount ?? null,
             });
         },
         [router]
@@ -430,22 +463,56 @@ const UltraFastRankingTemplate: React.FC<
         el?.scrollTo({ top: 0, behavior: "smooth" });
     }, []);
 
+    // sc-rank 사양: sub = "크루명 · N명"
+    // crewName/memberCount 모두 서버 props에서 옴 → SSR/CSR 동일하므로 hydration 안전.
+    const headerSub = useMemo(() => {
+        const name = currentData.crewName?.trim();
+        const cnt = currentData.memberCount;
+        if (name && typeof cnt === "number") {
+            return `${name} · ${cnt}명`;
+        }
+        if (name) return name;
+        if (typeof cnt === "number") return `${cnt}명`;
+        return undefined;
+    }, [currentData.crewName, currentData.memberCount]);
+
+    const openMonthPicker = useCallback(() => {
+        // YearMonthSelector 가 마운트되어야 picker(AdminModal) 가 표시됨
+        if (!mounted || currentData.selectedYear <= 0) return;
+        haptic.light();
+        setPickerOpen(true);
+    }, [mounted, currentData.selectedYear]);
+
     return (
         <div className="relative flex flex-col min-h-screen bg-rh-bg-primary">
             <PageHeader
                 title="랭킹"
+                sub={headerSub}
                 iconColor="white"
                 backgroundColor="bg-rh-bg-primary"
                 borderColor="rh-border"
+                rightAction={
+                    <button
+                        type="button"
+                        onClick={openMonthPicker}
+                        aria-label="월 선택"
+                        className="flex items-center justify-center w-9 h-9 rounded-full text-rh-text-secondary hover:text-rh-text-primary active:scale-95 transition"
+                    >
+                        <Calendar className="w-5 h-5" />
+                    </button>
+                }
             />
 
-            {/* 월 선택 (sticky collapse) — 월 필터 chip 역할 */}
+            {/* 월 선택 (sticky collapse) — 월 필터 chip 역할
+                pickerOpen 은 헤더 cal 아이콘과 공유되어 외부 트리거 가능. */}
             {mounted && currentData.selectedYear > 0 && (
                 <YearMonthSelector
                     year={currentData.selectedYear}
                     month={currentData.selectedMonth}
                     onChange={handleMonthChange}
                     disabled={isDataLoading}
+                    pickerOpen={pickerOpen}
+                    onPickerOpenChange={setPickerOpen}
                 />
             )}
 

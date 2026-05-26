@@ -68,7 +68,45 @@ export async function fetchRankingData(
             };
         }
 
-        return { data: result.data, error: null, redirect: null };
+        // 헤더 sub("크루명 · N명")용 활성 멤버 수 조회.
+        // 실패해도 랭킹 자체에는 영향 없도록 안전 처리.
+        let memberCount: number | null = null;
+        try {
+            const crewId = result.data?.crewId ?? null;
+            // RPC가 crewId를 안 주는 경우 users 테이블에서 보강
+            let resolvedCrewId: string | null = crewId;
+            if (!resolvedCrewId) {
+                const { data: userRow } = await supabase
+                    .schema("attendance")
+                    .from("users")
+                    .select("verified_crew_id")
+                    .eq("id", user.id)
+                    .maybeSingle();
+                resolvedCrewId = userRow?.verified_crew_id ?? null;
+            }
+            if (resolvedCrewId) {
+                const { count } = await supabase
+                    .schema("attendance")
+                    .from("user_crews")
+                    .select("user_id", {
+                        count: "exact",
+                        head: true,
+                    })
+                    .eq("crew_id", resolvedCrewId)
+                    .eq("status", "ACTIVE");
+                if (typeof count === "number") {
+                    memberCount = count;
+                }
+            }
+        } catch {
+            // 무시 — 멤버 수는 보조 정보
+        }
+
+        return {
+            data: { ...result.data, memberCount },
+            error: null,
+            redirect: null,
+        };
     } catch (e: any) {
         return {
             data: null,

@@ -12,7 +12,6 @@ import {
     ChevronRight,
     ChevronUp,
     List,
-    LocateFixed,
     MapPin,
     Minus,
     Navigation,
@@ -429,19 +428,39 @@ export default function MapTemplate() {
                 className="relative flex flex-col w-full bg-rh-bg-primary overflow-hidden"
                 style={{ height: "100%" }}
             >
-                {/* Floating 뒤로가기 버튼 (헤더 대신 — sc-map 사양: 검색바 없음) */}
-                <div className="absolute top-0 left-0 right-0 z-20 flex items-center h-14 px-4 gap-3 pointer-events-none">
-                    <button
-                        onClick={() => router.back()}
-                        aria-label="뒤로가기"
-                        className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-rh-full bg-rh-bg-surface/90 border border-rh-border backdrop-blur-md shrink-0 active:scale-95 transition-transform"
-                    >
-                        <ChevronLeft className="h-5 w-5 text-rh-text-primary" />
-                    </button>
-                    <div className="pointer-events-auto rh-eye rh-eye-lime px-3 py-1.5 rounded-rh-full bg-rh-bg-surface/90 border border-rh-border backdrop-blur-md">
-                        러닝 장소
-                    </div>
+                {/* 좌상단 좌표 카드 (.map .crd — sc-map 사양)
+                    bg: rgba(21,24,30,.85) = var(--rh-bg-primary)/85
+                    내용: <b>{장소명}</b> · {위도}°N
+                    선택된 장소 > 첫 활성 장소 > 내 위치 > 기본값 순서 */}
+                <div
+                    className="absolute top-2.5 left-3 z-20 inline-flex items-center gap-1 rounded-md border border-rh-border bg-rh-bg-primary/85 px-2 py-1 font-mono text-[10px] text-rh-text-secondary backdrop-blur-md"
+                >
+                    <b className="font-medium text-rh-accent-hover">
+                        {selectedLocation?.name ??
+                            locations[0]?.name ??
+                            "내 위치"}
+                    </b>
+                    <span>
+                        ·{" "}
+                        {(
+                            selectedLocation?.latitude ??
+                            locations[0]?.latitude ??
+                            myLocation?.latitude ??
+                            37.5167
+                        ).toFixed(4)}
+                        °N
+                    </span>
                 </div>
+
+                {/* 뒤로가기 버튼 (사양엔 없으나 네비게이션 보존을 위해 좌하단 카드 위에 배치하지 않고
+                    우상단 컨트롤 위쪽에 별도 배치 — 36x36 사양과 동일 토큰) */}
+                <button
+                    onClick={() => router.back()}
+                    aria-label="뒤로가기"
+                    className="absolute top-2.5 right-3 z-[2000] flex h-9 w-9 items-center justify-center rounded-md border border-rh-border bg-rh-bg-primary/85 backdrop-blur-md active:scale-95 transition-transform"
+                >
+                    <ChevronLeft className="h-4 w-4 text-rh-text-primary" />
+                </button>
 
                 {/* 지도 영역 */}
                 <div
@@ -467,9 +486,11 @@ export default function MapTemplate() {
                     }}
                 />
 
-                {/* ===== 우측 컨트롤: +, -, 타겟(내위치) ===== */}
+                {/* ===== 우측 컨트롤: +, -, 타겟(내위치) — sc-map 사양: 36x36, gap 6px =====
+                    +/-: bg rgba(21,24,30,.85) = var(--rh-bg-primary)/85, border var(--line) = var(--rh-border), radius 8px
+                    target: bg var(--lime) = var(--rh-accent), color #1a1e0a = var(--rh-text-inverted) */}
                 <div
-                    className="absolute right-4 flex flex-col gap-2"
+                    className="absolute right-3.5 flex flex-col gap-1.5"
                     style={{
                         zIndex: 2000,
                         bottom: controlsBottom,
@@ -479,64 +500,134 @@ export default function MapTemplate() {
                     <button
                         onClick={handleZoomIn}
                         aria-label="확대"
-                        className="flex h-11 w-11 items-center justify-center rounded-rh-md bg-rh-bg-surface border border-rh-border shadow-md active:scale-95 transition-transform"
+                        className="flex h-9 w-9 items-center justify-center rounded-md border border-rh-border bg-rh-bg-primary/85 backdrop-blur-md active:scale-95 transition-transform"
                     >
-                        <Plus className="h-5 w-5 text-rh-text-primary" />
+                        <Plus className="h-4 w-4 text-rh-text-primary" />
                     </button>
                     <button
                         onClick={handleZoomOut}
                         aria-label="축소"
-                        className="flex h-11 w-11 items-center justify-center rounded-rh-md bg-rh-bg-surface border border-rh-border shadow-md active:scale-95 transition-transform"
+                        className="flex h-9 w-9 items-center justify-center rounded-md border border-rh-border bg-rh-bg-primary/85 backdrop-blur-md active:scale-95 transition-transform"
                     >
-                        <Minus className="h-5 w-5 text-rh-text-primary" />
+                        <Minus className="h-4 w-4 text-rh-text-primary" />
                     </button>
                     <button
                         onClick={handleMoveToMyLocation}
                         aria-label="내 위치"
-                        className="flex h-11 w-11 items-center justify-center rounded-rh-md bg-rh-accent border border-transparent shadow-md active:scale-95 transition-transform"
+                        className="flex h-9 w-9 items-center justify-center rounded-md bg-rh-accent active:scale-95 transition-transform"
                     >
-                        <LocateFixed className="h-5 w-5 text-rh-text-inverted" />
+                        <MapPin className="h-4 w-4 text-rh-text-inverted" />
                     </button>
                 </div>
 
                 {/* ===== 하단 UI: 3가지 상태를 하나의 AnimatePresence로 관리 ===== */}
 
-                {/* Collapsed: "장소 목록 보기" floating 카드 */}
+                {/* Collapsed: 활성/선택 장소 메타 카드 (sc-map 사양)
+                    bg rgba(21,24,30,.95) = var(--rh-bg-primary)/95, border var(--line), radius 10px, padding 12px, gap 6px
+                    row 1: t1(장소명) + chip.ok(오늘)
+                    row 2: t4(거리 · 모임명 · 시간)
+                    우측 list 버튼: expanded 진입 보존 */}
                 <AnimatePresence>
-                    {bottomUI.type === "collapsed" && (
-                        <motion.button
-                            key="collapsed-btn"
-                            initial={{ y: 80 }}
-                            animate={{ y: 0 }}
-                            exit={{ y: 80 }}
-                            transition={SPRING_FAST}
-                            onClick={() =>
-                                setBottomUI({
-                                    type: "expanded",
-                                })
-                            }
-                            className="absolute bottom-4 left-4 right-4 flex items-center gap-3 rh-box rh-box-tight"
-                            style={{
-                                zIndex: 2000,
-                                flexDirection: "row",
-                                alignItems: "center",
-                                gap: 12,
-                            }}
-                        >
-                            <div className="flex h-10 w-10 items-center justify-center rounded-rh-md bg-rh-accent shrink-0">
-                                <List className="h-5 w-5 text-rh-text-inverted" />
-                            </div>
-                            <div className="flex-1 min-w-0 text-left">
-                                <div className="text-[15px] font-semibold text-rh-text-primary">
-                                    장소 목록 보기
+                    {bottomUI.type === "collapsed" &&
+                        (() => {
+                            const activeLoc =
+                                locations.find(
+                                    (l) => l.is_active
+                                ) ?? locations[0];
+                            if (!activeLoc) return null;
+                            return (
+                                <motion.div
+                                    key="collapsed-card"
+                                    initial={{ y: 80 }}
+                                    animate={{ y: 0 }}
+                                    exit={{ y: 80 }}
+                                    transition={SPRING_FAST}
+                                    className="absolute bottom-3.5 left-3.5 right-3.5 flex flex-col gap-1.5 rounded-[10px] border border-rh-border bg-rh-bg-primary/95 p-3 backdrop-blur-md"
+                                    style={{ zIndex: 2000 }}
+                                >
+                                    <div className="flex items-center justify-between gap-2">
+                                        <button
+                                            onClick={() =>
+                                                setBottomUI({
+                                                    type: "detail",
+                                                    location:
+                                                        activeLoc,
+                                                })
+                                            }
+                                            className="flex-1 min-w-0 text-left active:opacity-80 transition-opacity"
+                                        >
+                                            <span className="block truncate text-sm font-semibold text-rh-text-primary leading-snug">
+                                                {activeLoc.name}
+                                            </span>
+                                        </button>
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            {activeLoc.is_active && (
+                                                <span
+                                                    className="inline-flex items-center rounded-full border border-rh-border-strong bg-rh-bg-surface px-2.5 py-[3px] text-[11px] font-medium text-rh-accent-hover"
+                                                >
+                                                    오늘
+                                                </span>
+                                            )}
+                                            <button
+                                                onClick={() =>
+                                                    setBottomUI(
+                                                        {
+                                                            type: "expanded",
+                                                        }
+                                                    )
+                                                }
+                                                aria-label="장소 목록"
+                                                className="flex h-7 w-7 items-center justify-center rounded-md border border-rh-border bg-rh-bg-surface active:scale-95 transition-transform"
+                                            >
+                                                <List className="h-3.5 w-3.5 text-rh-text-secondary" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="text-xs text-rh-text-tertiary leading-snug">
+                                        {[
+                                            activeLoc.description,
+                                            `${locations.length}개 장소`,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(" · ")}
+                                    </div>
+                                </motion.div>
+                            );
+                        })()}
+                </AnimatePresence>
+
+                {/* 장소 없을 때 fallback: 작은 list 버튼만 */}
+                <AnimatePresence>
+                    {bottomUI.type === "collapsed" &&
+                        locations.length === 0 && (
+                            <motion.button
+                                key="empty-list-btn"
+                                initial={{ y: 80 }}
+                                animate={{ y: 0 }}
+                                exit={{ y: 80 }}
+                                transition={SPRING_FAST}
+                                onClick={() =>
+                                    setBottomUI({
+                                        type: "expanded",
+                                    })
+                                }
+                                className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center gap-3 rounded-[10px] border border-rh-border bg-rh-bg-primary/95 p-3 backdrop-blur-md"
+                                style={{ zIndex: 2000 }}
+                            >
+                                <div className="flex h-9 w-9 items-center justify-center rounded-md bg-rh-bg-surface shrink-0">
+                                    <List className="h-4 w-4 text-rh-text-secondary" />
                                 </div>
-                                <div className="text-[12px] text-rh-text-tertiary mt-0.5">
-                                    {locations.length}개 등록됨
+                                <div className="flex-1 min-w-0 text-left">
+                                    <div className="text-sm font-semibold text-rh-text-primary">
+                                        등록된 장소 없음
+                                    </div>
+                                    <div className="text-xs text-rh-text-tertiary mt-0.5">
+                                        목록 보기
+                                    </div>
                                 </div>
-                            </div>
-                            <ChevronUp className="h-5 w-5 text-rh-text-tertiary shrink-0" />
-                        </motion.button>
-                    )}
+                                <ChevronUp className="h-4 w-4 text-rh-text-tertiary shrink-0" />
+                            </motion.button>
+                        )}
                 </AnimatePresence>
 
                 {/* Expanded: 장소 목록 패널 */}

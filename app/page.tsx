@@ -7,41 +7,36 @@ import {
     type ActiveMeetBannerVM,
 } from "@/lib/domain/attendance/policies";
 
-/** 홈 페이지 스켈레톤 — 실제 레이아웃과 동일한 구조 */
+/** 홈 페이지 스켈레톤 — v2 sc-home 레이아웃과 동일한 구조 (정적) */
 function HomePageSkeleton() {
   return (
     <div className="flex flex-col min-h-screen bg-rh-bg-primary">
-      {/* 헤더 스켈레톤 */}
-      <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe">
+      {/* 헤더 */}
+      <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe border-b border-rh-border">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex flex-col gap-1">
-            <div className="h-5 w-32 rounded bg-rh-bg-surface" />
+            <div className="h-4 w-32 rounded bg-rh-bg-surface" />
             <div className="h-3 w-28 rounded bg-rh-bg-surface" />
           </div>
           <div className="h-10 w-10 rounded-rh-md bg-rh-bg-surface" />
         </div>
       </header>
 
-      <div className="flex-1 px-4 pt-4 pb-6 space-y-5">
-        {/* 공지 카드 스켈레톤 */}
-        <div className="h-12 rounded-rh-lg bg-rh-bg-surface" />
+      <div className="flex-1 px-4 pt-4 pb-6 flex flex-col gap-4">
+        {/* Hero CTA */}
+        <div className="h-[120px] rounded-rh-lg bg-rh-bg-surface" />
 
-        {/* 빠른 액션 3개 */}
-        <div className="flex gap-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex-1 h-[72px] rounded-rh-lg bg-rh-bg-surface"
-            />
-          ))}
+        {/* 공지 box */}
+        <div className="h-[64px] rounded-rh-lg bg-rh-bg-inset border border-rh-border" />
+
+        {/* 2열 통계 */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="h-[96px] rounded-rh-lg bg-rh-bg-inset border border-rh-border" />
+          <div className="h-[96px] rounded-rh-lg bg-rh-bg-surface border border-rh-border" />
         </div>
 
-        {/* 러닝 장소 카드 */}
-        <div className="h-[62px] rounded-rh-lg bg-rh-bg-surface" />
-
-        {/* 나의 최근 활동 섹션 */}
-        <div className="h-4 w-28 rounded bg-rh-bg-surface" />
-        <div className="h-[200px] rounded-rh-lg bg-rh-bg-surface" />
+        {/* 28일 heatmap */}
+        <div className="h-[120px] rounded-rh-lg bg-rh-bg-inset border border-rh-border" />
       </div>
     </div>
   );

@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import PushPermissionBanner from "../molecules/PushPermissionBanner";
 import Toast from "../molecules/Toast";
-import ActiveMeetBanner from "../molecules/ActiveMeetBanner";
 import { usePushNotification } from "@/hooks/usePushNotification";
 import { useOfflineAttendance } from "@/hooks/useOfflineAttendance";
 import type { ActiveMeetBannerVM } from "@/lib/domain/attendance/policies";
@@ -82,30 +81,41 @@ function toDateKey(date: Date): string {
     );
 }
 
-// contour SVG 배경 (Hero CTA 데코)
+// contour SVG 배경 (Hero CTA 데코 — sc-home 사양: 8개 라인, multiply blend)
 const ContourBg = memo(function ContourBg() {
+    const lines = Array.from({ length: 8 }, (_, i) => 10 + i * 22);
     return (
         <div
-            className="rh-contour text-rh-text-inverted"
+            className="rh-contour"
             aria-hidden
+            style={{ opacity: 0.2, mixBlendMode: "multiply" }}
         >
-            <svg
-                viewBox="0 0 320 160"
-                preserveAspectRatio="none"
-            >
-                <path d="M-10,30 Q60,10 130,40 T280,30 T420,50" />
-                <path d="M-10,60 Q60,40 130,70 T280,60 T420,80" />
-                <path d="M-10,90 Q60,70 130,100 T280,90 T420,110" />
-                <path d="M-10,120 Q60,100 130,130 T280,120 T420,140" />
-                <path d="M-10,150 Q60,130 130,160 T280,150 T420,170" />
+            <svg viewBox="0 0 240 160" preserveAspectRatio="none">
+                {lines.map((y) => (
+                    <path
+                        key={y}
+                        d={`M 0 ${y} Q 60 ${y - 15} 120 ${y} T 240 ${y}`}
+                        style={{ stroke: "#000" }}
+                    />
+                ))}
             </svg>
         </div>
     );
 });
 
+// "5월 12일 17:20" → "17:20" 추출 (실패 시 원문 반환)
+function extractTimeFromLabel(label: string): string {
+    const m = label.match(/(\d{1,2}:\d{2})\s*$/);
+    return m ? m[1] : label;
+}
+
 const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
     ({
-        username,
+        // username/rankName/noticeText는 외부 시그니처 보존 차원에서 받지만
+        // sc-home 사양상 본문에서 사용하지 않는다.
+        username: _username,
+        rankName: _rankName,
+        noticeText: _noticeText,
         crewId,
         crewName,
         myAttendanceDays = [],
@@ -217,15 +227,21 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
 
         return (
             <div className="flex flex-col min-h-screen bg-rh-bg-primary">
-                {/* ── Header ── */}
+                {/* ── Header (sc-home 사양: 라임 워드마크 + crew sub) ── */}
                 <header className="sticky top-0 z-50 bg-rh-bg-primary pt-safe border-b border-rh-border">
                     <div className="flex items-center justify-between px-4 h-14">
                         <div className="flex flex-col gap-0.5 min-w-0">
-                            <span className="text-rh-body font-semibold text-rh-text-primary truncate">
-                                {crewName ?? "RunHouse Crew"}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                                <span
+                                    aria-hidden
+                                    className="h-3.5 w-3.5 rounded-[3px] bg-rh-accent"
+                                />
+                                <span className="text-[13px] font-semibold text-rh-text-primary leading-none">
+                                    RunHouse
+                                </span>
+                            </div>
                             <span className="text-rh-caption text-rh-text-tertiary truncate">
-                                안녕하세요, {username ?? "사용자"}님
+                                {crewName ?? "러닝 크루"}
                             </span>
                         </div>
                         <button
@@ -247,9 +263,6 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
                     onAllow={requestPermission}
                     onDismiss={dismissBanner}
                 />
-
-                {/* ── 활성 모임 배너 ── */}
-                <ActiveMeetBanner meet={activeMeet} />
 
                 {/* ── 오프라인 출석 대기 ── */}
                 {queueCount > 0 && (
@@ -275,7 +288,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
 
                 {/* ── 메인 콘텐츠 ── */}
                 <div className="overflow-y-auto flex-1 px-4 pt-4 pb-6 flex flex-col gap-4">
-                    {/* Hero CTA — lime + contour */}
+                    {/* Hero CTA — lime + contour (sc-home 사양) */}
                     <button
                         type="button"
                         onClick={() =>
@@ -284,21 +297,64 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
                         className="relative overflow-hidden rounded-rh-lg bg-rh-accent text-left active:opacity-90 transition-opacity"
                     >
                         <ContourBg />
-                        <div className="relative px-5 py-6 flex items-center gap-4">
-                            <div className="flex-1 min-w-0">
-                                <div className="rh-eye text-rh-text-inverted/70">
-                                    TODAY
-                                </div>
-                                <div className="rh-display text-[28px] text-rh-text-inverted mt-1">
-                                    오늘 출석하기
-                                </div>
-                                <div className="text-rh-caption text-rh-text-inverted/80 mt-1.5">
-                                    러닝 시작 전 1분이면 충분해요
-                                </div>
-                            </div>
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-rh-text-inverted/15 text-rh-text-inverted">
-                                <ChevronRight className="h-6 w-6" />
-                            </div>
+                        <div className="relative z-[2] flex flex-col gap-1.5 px-3.5 py-3.5">
+                            {activeMeet ? (
+                                <>
+                                    {/* 상단 row: 시간 · 장소 */}
+                                    <div className="flex items-center justify-between">
+                                        <span className="rh-eye text-rh-text-inverted">
+                                            오늘{" "}
+                                            {extractTimeFromLabel(
+                                                activeMeet.meetingStartedLabel
+                                            )}
+                                        </span>
+                                        <span className="text-[11px] text-rh-text-inverted/60">
+                                            {activeMeet.location}
+                                        </span>
+                                    </div>
+                                    {/* 큰 타이틀: 장소 + 모임명 (2줄) */}
+                                    <div className="text-[22px] font-bold leading-[1.05] tracking-[-0.02em] text-rh-text-inverted">
+                                        {activeMeet.location}
+                                        <br />
+                                        오늘의 모임
+                                    </div>
+                                    {/* 하단 row: 부가 정보 · pill 버튼 */}
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[11px] text-rh-text-inverted/60">
+                                            {activeMeet.attendeeCount}명
+                                            출석 중
+                                        </span>
+                                        <span className="rounded-full bg-rh-bg-primary px-2.5 py-1 text-[11px] font-semibold text-rh-accent">
+                                            출석하기 →
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    {/* 상단 row: 안내 라벨 */}
+                                    <div className="flex items-center justify-between">
+                                        <span className="rh-eye text-rh-text-inverted">
+                                            TODAY
+                                        </span>
+                                        <span className="text-[11px] text-rh-text-inverted/60">
+                                            오늘의 러닝
+                                        </span>
+                                    </div>
+                                    {/* 큰 타이틀: fallback 카피 */}
+                                    <div className="text-[22px] font-bold leading-[1.05] tracking-[-0.02em] text-rh-text-inverted">
+                                        오늘 출석하기
+                                    </div>
+                                    {/* 하단 row: 안내 · pill 버튼 */}
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[11px] text-rh-text-inverted/60">
+                                            1분이면 충분해요
+                                        </span>
+                                        <span className="rounded-full bg-rh-bg-primary px-2.5 py-1 text-[11px] font-semibold text-rh-accent">
+                                            출석하기 →
+                                        </span>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </button>
 

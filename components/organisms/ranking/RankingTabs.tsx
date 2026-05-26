@@ -1,50 +1,62 @@
 import React from "react";
 
 export interface TabItem {
-  id: string;
-  label: string;
+    id: string;
+    label: string;
 }
 
 interface RankingTabsProps {
-  tabs: TabItem[];
-  activeTabId: string;
-  onTabChange: (tabId: string) => void;
+    tabs: TabItem[];
+    activeTabId: string;
+    onTabChange: (tabId: string) => void;
 }
 
+/**
+ * v2 라임 카토그래픽 — 탭은 underline + 라임 강조 패턴.
+ * 활성 탭: text-rh-text-primary + 하단 라임 바
+ * 비활성 탭: text-rh-text-tertiary
+ */
 const RankingTabs: React.FC<RankingTabsProps> = ({
-  tabs,
-  activeTabId,
-  onTabChange,
+    tabs,
+    activeTabId,
+    onTabChange,
 }) => {
-  const handleTabClick = (tabId: string) => {
-    if (onTabChange) {
-      onTabChange(tabId);
+    if (!tabs || tabs.length === 0) {
+        return null;
     }
-  };
 
-  if (!tabs || tabs.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className='flex h-10 p-1 gap-1 rounded-rh-md bg-rh-bg-surface'>
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => handleTabClick(tab.id)}
-          className={`flex-1 flex items-center justify-center rounded-rh-sm text-[13px] transition-colors duration-200
-            ${
-              activeTabId === tab.id
-                ? "bg-rh-accent text-white font-semibold"
-                : "text-rh-text-tertiary"
-            }
-          `}
+    return (
+        <div
+            className="flex items-stretch border-b border-rh-border"
+            role="tablist"
         >
-          {tab.label}
-        </button>
-      ))}
-    </div>
-  );
+            {tabs.map((tab) => {
+                const on = activeTabId === tab.id;
+                return (
+                    <button
+                        key={tab.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={on}
+                        onClick={() => onTabChange(tab.id)}
+                        className={`relative flex-1 h-11 text-[13px] transition-colors ${
+                            on
+                                ? "font-semibold text-rh-text-primary"
+                                : "font-medium text-rh-text-tertiary"
+                        }`}
+                    >
+                        {tab.label}
+                        {on && (
+                            <span
+                                aria-hidden
+                                className="absolute left-0 right-0 -bottom-px h-[2px] bg-rh-accent"
+                            />
+                        )}
+                    </button>
+                );
+            })}
+        </div>
+    );
 };
 
 export default RankingTabs;

@@ -29,6 +29,7 @@ import FadeIn from "@/components/atoms/FadeIn";
 import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 import { haptic } from "@/lib/haptic";
 import { useOfflineAttendance } from "@/hooks/useOfflineAttendance";
+import { useGeolocation } from "@/hooks/useGeolocation";
 import { submitAttendance } from "@/app/attendance/actions";
 
 // 한국 시간 유틸: UTC+9 기준으로 안정적 계산
@@ -131,7 +132,7 @@ const DEFAULT_ACCURACY_RANGE = 200;
 
 /* ============================================================
  * MiniMap — sc-att 사양: 카토그래픽 미니맵 + GPS 핀 + 점선 사거리
- * 실제 지도 라이브러리 없이 SVG로 카토그래픽 일러스트 표현
+ * 좌상단 .crd 카드(장소명·거리), 우상단 .scl 스케일 라벨 floating
  * ============================================================ */
 const MiniMap = memo(function MiniMap({
     locationLabel,
@@ -141,115 +142,95 @@ const MiniMap = memo(function MiniMap({
     accuracyRange: number;
 }) {
     return (
-        <div className="rh-box rh-box-tight relative overflow-hidden">
-            {/* 등고선 데코 */}
-            <div className="rh-contour text-rh-accent">
-                <svg
-                    viewBox="0 0 320 140"
-                    preserveAspectRatio="none"
-                    aria-hidden
-                >
-                    <path d="M 0 30 Q 80 10 160 35 T 320 25" />
-                    <path d="M 0 60 Q 80 45 160 65 T 320 55" />
-                    <path d="M 0 90 Q 80 75 160 95 T 320 85" />
-                    <path d="M 0 120 Q 80 105 160 125 T 320 115" />
-                </svg>
+        <div className="relative h-[150px] rounded-rh-md bg-rh-bg-surface overflow-hidden border border-rh-border">
+            {/* 격자(거리) SVG */}
+            <svg
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 320 150"
+                preserveAspectRatio="none"
+                aria-hidden
+            >
+                {/* 도로 라인 (가로) */}
+                <line
+                    x1="0"
+                    y1="48"
+                    x2="320"
+                    y2="48"
+                    stroke="var(--rh-border)"
+                    strokeWidth="1"
+                />
+                <line
+                    x1="0"
+                    y1="104"
+                    x2="320"
+                    y2="104"
+                    stroke="var(--rh-border)"
+                    strokeWidth="1"
+                />
+                {/* 도로 라인 (세로) */}
+                <line
+                    x1="100"
+                    y1="0"
+                    x2="100"
+                    y2="150"
+                    stroke="var(--rh-border)"
+                    strokeWidth="1"
+                />
+                <line
+                    x1="220"
+                    y1="0"
+                    x2="220"
+                    y2="150"
+                    stroke="var(--rh-border)"
+                    strokeWidth="1"
+                />
+                {/* 점선 사거리 (정확도 반경) */}
+                <circle
+                    cx="160"
+                    cy="75"
+                    r="44"
+                    fill="rgba(184,217,100,0.10)"
+                    stroke="var(--rh-accent)"
+                    strokeWidth="1"
+                    strokeDasharray="3 3"
+                />
+                <circle
+                    cx="160"
+                    cy="75"
+                    r="28"
+                    fill="rgba(184,217,100,0.18)"
+                    stroke="var(--rh-accent)"
+                    strokeWidth="1"
+                    strokeDasharray="2 2"
+                    opacity="0.6"
+                />
+            </svg>
+
+            {/* 좌상단 floating crd 카드 (장소·거리) */}
+            <div className="absolute top-2.5 left-3 rh-mono text-[10px] text-rh-text-secondary bg-rh-bg-primary/80 backdrop-blur-sm border border-rh-border rounded-md px-2 py-1 max-w-[60%] truncate">
+                <b className="font-medium text-rh-accent-hover">
+                    {locationLabel}
+                </b>
+                <span className="ml-1">· {accuracyRange}m</span>
             </div>
 
-            {/* 미니맵 영역 */}
-            <div className="relative h-32 rounded-rh-md bg-rh-bg-surface overflow-hidden">
-                {/* 격자(거리) SVG */}
-                <svg
-                    className="absolute inset-0 w-full h-full"
-                    viewBox="0 0 320 128"
-                    preserveAspectRatio="none"
-                    aria-hidden
-                >
-                    {/* 도로 라인 (가로) */}
-                    <line
-                        x1="0"
-                        y1="40"
-                        x2="320"
-                        y2="40"
-                        stroke="var(--rh-border)"
-                        strokeWidth="1"
-                    />
-                    <line
-                        x1="0"
-                        y1="88"
-                        x2="320"
-                        y2="88"
-                        stroke="var(--rh-border)"
-                        strokeWidth="1"
-                    />
-                    {/* 도로 라인 (세로) */}
-                    <line
-                        x1="100"
-                        y1="0"
-                        x2="100"
-                        y2="128"
-                        stroke="var(--rh-border)"
-                        strokeWidth="1"
-                    />
-                    <line
-                        x1="220"
-                        y1="0"
-                        x2="220"
-                        y2="128"
-                        stroke="var(--rh-border)"
-                        strokeWidth="1"
-                    />
-                    {/* 점선 사거리 (정확도 반경) */}
-                    <circle
-                        cx="160"
-                        cy="64"
-                        r="44"
-                        fill="rgba(184,217,100,0.10)"
-                        stroke="var(--rh-accent)"
-                        strokeWidth="1"
-                        strokeDasharray="3 3"
-                    />
-                    <circle
-                        cx="160"
-                        cy="64"
-                        r="28"
-                        fill="rgba(184,217,100,0.18)"
-                        stroke="var(--rh-accent)"
-                        strokeWidth="1"
-                        strokeDasharray="2 2"
-                        opacity="0.6"
-                    />
-                </svg>
+            {/* 우상단 floating scl 스케일 라벨 */}
+            <div className="absolute top-2.5 right-3 rh-mono text-[10px] text-rh-text-tertiary bg-rh-bg-primary/80 backdrop-blur-sm border border-rh-border rounded-md px-2 py-1">
+                {accuracyRange}m
+            </div>
 
-                {/* GPS 핀 (라임) */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <div className="relative">
-                        <div className="absolute inset-0 -m-1.5 rounded-full bg-rh-accent/30 animate-ping" />
-                        <div className="relative flex h-7 w-7 items-center justify-center rounded-full bg-rh-accent shadow-lg">
-                            <MapPin
-                                size={14}
-                                strokeWidth={2.4}
-                                className="text-rh-text-inverted"
-                            />
-                        </div>
+            {/* GPS 핀 (라임) */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="relative">
+                    <div className="absolute inset-0 -m-1.5 rounded-full bg-rh-accent/30 animate-ping" />
+                    <div className="relative flex h-7 w-7 items-center justify-center rounded-full bg-rh-accent shadow-lg">
+                        <MapPin
+                            size={14}
+                            strokeWidth={2.4}
+                            className="text-rh-text-inverted"
+                        />
                     </div>
                 </div>
-            </div>
-
-            {/* 미니맵 하단 메타 */}
-            <div className="flex items-center justify-between px-1 pt-1">
-                <div className="flex items-center gap-1.5 min-w-0">
-                    <MapPin
-                        size={12}
-                        className="shrink-0 text-rh-accent"
-                    />
-                    <span className="text-rh-caption font-medium text-rh-text-primary truncate">
-                        {locationLabel}
-                    </span>
-                </div>
-                <span className="text-[10px] rh-mono text-rh-text-tertiary shrink-0">
-                    R {accuracyRange}m
-                </span>
             </div>
         </div>
     );
@@ -294,6 +275,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
     const router = useRouter();
     const { isOnline, queueCount, enqueue, isFlushing } =
         useOfflineAttendance();
+    const { location: geoLocation } = useGeolocation();
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
@@ -493,8 +475,11 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         setShowNotification(true);
 
         try {
+            // 출석 등록은 항상 오늘 기준 — 디자인은 시각만 노출하고
+            // 날짜는 KST 오늘로 자동 고정 (자정 경계 페이지 stale 방지)
+            const todayKst = getTodayString();
             const attendanceDateTime = new Date(
-                `${formData.date}T${formData.time}:00`,
+                `${todayKst}T${formData.time}:00`,
             );
 
             const submissionData = {
@@ -599,7 +584,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
             return;
         }
 
-        if (isFutureDateTime(formData.date, formData.time)) {
+        if (isFutureDateTime(getTodayString(), formData.time)) {
             haptic.error();
             setNotificationType("error");
             setNotificationMessage("허용된 시간 범위를 초과했습니다.");
@@ -746,14 +731,26 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
 
                     {/* 미니맵 + GPS 핀 (sc-att 핵심) */}
                     <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
-                            <div className="rh-eye">현재 위치</div>
-                            <div className="rh-live">실시간</div>
-                        </div>
                         <MiniMap
                             locationLabel={selectedLocationLabel}
                             accuracyRange={accuracyRange}
                         />
+                        {/* GPS 인증 상태 + 좌표 (sc-att row between) */}
+                        <div className="flex items-center justify-between">
+                            <span className="rh-eye rh-eye-lime">
+                                {mounted && geoLocation
+                                    ? "GPS 인증됨"
+                                    : "GPS 확인 중"}
+                            </span>
+                            <span
+                                className="text-rh-caption rh-mono text-rh-text-tertiary"
+                                suppressHydrationWarning
+                            >
+                                {mounted && geoLocation
+                                    ? `${geoLocation.latitude.toFixed(4)} · ${geoLocation.longitude.toFixed(4)}`
+                                    : "—— · ——"}
+                            </span>
+                        </div>
                     </div>
 
                     {/* 장소 선택 (chip 행) */}
@@ -782,57 +779,34 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                         />
                     </div>
 
-                    {/* 날짜 / 시간 (rh-box 그리드) */}
+                    {/* 시작 시간 (sc-att 단일 input — date는 오늘 자동) */}
                     <div className="flex flex-col gap-2">
-                        <div className="rh-eye">시간</div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <label className="rh-box rh-box-tight !gap-1">
-                                <span className="text-rh-label text-rh-text-tertiary">
-                                    날짜
-                                </span>
-                                <input
-                                    type="date"
-                                    value={formData.date}
-                                    onChange={(e) =>
-                                        handleFormChange(
-                                            "date",
-                                            e.target.value,
-                                        )
-                                    }
-                                    className="bg-transparent text-rh-body font-medium text-rh-text-primary outline-none rh-mono"
-                                    suppressHydrationWarning
-                                />
-                            </label>
-                            <label className="rh-box rh-box-tight !gap-1">
-                                <span className="text-rh-label text-rh-text-tertiary">
-                                    시각
-                                </span>
-                                <select
-                                    value={formData.time}
-                                    onChange={(e) =>
-                                        handleFormChange(
-                                            "time",
-                                            e.target.value,
-                                        )
-                                    }
-                                    className="bg-transparent text-rh-body font-medium text-rh-text-primary outline-none rh-mono appearance-none"
-                                >
-                                    <option value="" disabled>
-                                        시각 선택
+                        <div className="rh-eye">시작 시간</div>
+                        <label className="flex items-center justify-between rounded-rh-md bg-rh-bg-inset border border-rh-border-strong px-3.5 h-[44px]">
+                            <select
+                                value={formData.time}
+                                onChange={(e) =>
+                                    handleFormChange(
+                                        "time",
+                                        e.target.value,
+                                    )
+                                }
+                                className="flex-1 bg-transparent text-rh-body font-medium text-rh-text-primary outline-none rh-mono appearance-none"
+                                suppressHydrationWarning
+                            >
+                                <option value="" disabled>
+                                    시각 선택
+                                </option>
+                                {availableTimeOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
                                     </option>
-                                    {availableTimeOptions.map(
-                                        (option) => (
-                                            <option
-                                                key={option.value}
-                                                value={option.value}
-                                            >
-                                                {option.label}
-                                            </option>
-                                        ),
-                                    )}
-                                </select>
-                            </label>
-                        </div>
+                                ))}
+                            </select>
+                        </label>
                     </div>
 
                     {/* 개설자 여부 (SwitchRow) */}

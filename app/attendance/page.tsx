@@ -67,22 +67,33 @@ async function getAttendanceFormData() {
   }
 }
 
-// 로딩 폴백 컴포넌트
+// 로딩 폴백 — v2 톤(정적 placeholder, animate-pulse 금지)
 const AttendancePageFallback = () => (
-  <div className='min-h-screen bg-rh-bg-primary'>
+  <div className='flex flex-col min-h-screen bg-rh-bg-primary'>
     <div className='pt-safe'>
-      <div className='flex items-center justify-between w-full px-4 py-4 border-b border-rh-border'>
-        <div className='w-20 h-[1.5rem] rounded bg-rh-bg-surface'></div>
-        <div className='w-[1.5rem] h-[1.5rem] rounded bg-rh-bg-surface'></div>
+      <div className='flex items-center justify-between w-full px-4 h-14 border-b border-rh-border'>
+        <div className='w-20 h-4 rounded bg-rh-bg-surface'></div>
+        <div className='w-12 h-3 rounded bg-rh-bg-surface'></div>
       </div>
     </div>
-    <div className='px-4 pt-6 space-y-3'>
-      {Array.from({ length: 5 }).map((_, index) => (
-        <div key={index}>
-          <div className='mb-3 w-24 h-[1rem] rounded bg-rh-bg-surface'></div>
-          <div className='h-12 rounded-xl bg-rh-bg-surface'></div>
-        </div>
-      ))}
+    <div className='flex-1 px-4 pt-3 pb-4 flex flex-col gap-4'>
+      <div className='h-3 w-16 rounded bg-rh-bg-surface'></div>
+      <div className='h-36 rounded-rh-md bg-rh-bg-inset border border-rh-border'></div>
+      <div className='h-3 w-16 rounded bg-rh-bg-surface'></div>
+      <div className='flex gap-2'>
+        <div className='h-7 w-16 rounded-full bg-rh-bg-surface'></div>
+        <div className='h-7 w-20 rounded-full bg-rh-bg-surface'></div>
+        <div className='h-7 w-16 rounded-full bg-rh-bg-surface'></div>
+      </div>
+      <div className='h-3 w-16 rounded bg-rh-bg-surface'></div>
+      <div className='grid grid-cols-2 gap-2'>
+        <div className='h-16 rounded-rh-md bg-rh-bg-inset border border-rh-border'></div>
+        <div className='h-16 rounded-rh-md bg-rh-bg-inset border border-rh-border'></div>
+      </div>
+      <div className='h-[52px] rounded-rh-lg bg-rh-bg-surface'></div>
+    </div>
+    <div className='shrink-0 px-4 pt-2 pb-3'>
+      <div className='h-12 rounded-rh-lg bg-rh-bg-surface'></div>
     </div>
   </div>
 );

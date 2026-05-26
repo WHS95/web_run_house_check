@@ -70,7 +70,7 @@ export default function MapBottomSheet({
                         onDragEnd={(_, info) => {
                             if (info.offset.y > 100) onClose();
                         }}
-                        className="absolute bottom-0 left-0 right-0 z-40 rounded-t-2xl bg-rh-bg-surface pb-safe"
+                        className="absolute bottom-0 left-0 right-0 z-40 rounded-t-rh-xl bg-rh-bg-surface border-t border-rh-border pb-safe"
                     >
                         {/* 드래그 핸들 */}
                         <div className="flex justify-center pt-3 pb-2">
@@ -81,11 +81,11 @@ export default function MapBottomSheet({
                         <div className="flex items-start justify-between px-5 pb-3">
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="text-lg font-bold text-white truncate">
+                                    <h3 className="text-lg font-bold text-rh-text-primary truncate">
                                         {location.name}
                                     </h3>
                                     {location.is_active && (
-                                        <span className="shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-full bg-rh-accent/20 text-rh-accent">
+                                        <span className="rh-chip is-on shrink-0">
                                             활성
                                         </span>
                                     )}
@@ -98,19 +98,19 @@ export default function MapBottomSheet({
                             </div>
                             <button
                                 onClick={onClose}
-                                className="shrink-0 ml-3 flex h-8 w-8 items-center justify-center rounded-full bg-rh-bg-muted"
+                                className="shrink-0 ml-3 flex h-8 w-8 items-center justify-center rounded-rh-full bg-rh-bg-muted"
                             >
                                 <X className="h-4 w-4 text-rh-text-secondary" />
                             </button>
                         </div>
 
-                        {/* 길찾기 버튼 */}
+                        {/* 길찾기 버튼 — 라임 위 텍스트는 text-rh-text-inverted */}
                         <div className="px-5 pb-5">
                             <button
                                 onClick={handleDirections}
-                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-rh-accent py-3.5 text-white font-semibold text-[15px] active:bg-rh-accent-hover transition-colors"
+                                className="flex w-full items-center justify-center gap-2 rounded-rh-lg bg-rh-accent py-3.5 text-rh-text-inverted font-semibold text-[15px] active:bg-rh-accent-hover transition-colors"
                             >
-                                <Navigation className="h-4.5 w-4.5" />
+                                <Navigation className="h-[18px] w-[18px]" />
                                 네이버 지도에서 길찾기
                             </button>
                         </div>

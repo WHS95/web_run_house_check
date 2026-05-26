@@ -14,7 +14,9 @@ import {
     List,
     LocateFixed,
     MapPin,
+    Minus,
     Navigation,
+    Plus,
     X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,6 +35,14 @@ type BottomUIState =
     | { type: "collapsed" }
     | { type: "expanded" }
     | { type: "detail"; location: CrewLocation };
+
+// v2 라임 카토그래픽 토큰 (인라인 SVG 마커용 — Tailwind 클래스가 적용되지 않는 영역)
+// globals.css 의 --rh-* 변수와 동기화 유지
+const RH_ACCENT_HEX = "#B8D964"; // --rh-accent
+const RH_TEXT_MUTED_HEX = "#5F6573"; // --rh-text-muted
+const RH_TEXT_INVERTED_HEX = "#1a1e0a"; // --rh-text-inverted (라임 위 텍스트)
+const RH_TEXT_PRIMARY_HEX = "#F4F5F7"; // --rh-text-primary
+const RH_BG_PRIMARY_HEX = "#15181E"; // --rh-bg-primary (마커 보더)
 
 // 인라인 객체 호이스팅 (매 렌더마다 재생성 방지)
 const DRAG_CONSTRAINTS_TOP = { top: 0 };
@@ -168,28 +178,38 @@ export default function MapTemplate() {
     }, [isMapReady]);
 
     // 마커 아이콘 생성 헬퍼
+    // v2 라임 카토그래픽: 활성 = 라임(--rh-accent), 비활성/dim = muted
     const createMarkerIcon = useCallback(
         (isSelected: boolean) => {
-            const size = isSelected ? 40 : 32;
-            const dotSize = isSelected ? 14 : 10;
+            const size = isSelected ? 40 : 30;
+            const dotSize = isSelected ? 14 : 9;
+            const bg = isSelected
+                ? RH_ACCENT_HEX
+                : RH_TEXT_MUTED_HEX;
+            const dotColor = isSelected
+                ? RH_TEXT_INVERTED_HEX
+                : RH_TEXT_PRIMARY_HEX;
+            const shadow = isSelected
+                ? `0 2px 12px ${RH_ACCENT_HEX}66`
+                : "0 1px 4px rgba(0,0,0,0.35)";
             return {
                 content: `
                     <div style="
                         width: ${size}px;
                         height: ${size}px;
-                        background: #669FF2;
+                        background: ${bg};
                         border-radius: 50%;
-                        border: 3px solid white;
+                        border: 2.5px solid ${RH_BG_PRIMARY_HEX};
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         transition: all 0.2s ease;
-                        ${isSelected ? "box-shadow: 0 2px 12px #669FF266;" : "box-shadow: 0 2px 8px rgba(0,0,0,0.3);"}
+                        box-shadow: ${shadow};
                     ">
                         <div style="
                             width: ${dotSize}px;
                             height: ${dotSize}px;
-                            background: white;
+                            background: ${dotColor};
                             border-radius: 50%;
                         "></div>
                     </div>
@@ -276,7 +296,7 @@ export default function MapTemplate() {
         selectedLocationIdRef.current = selectedId;
     }, [selectedLocation, createMarkerIcon]);
 
-    // 내 위치 마커
+    // 내 위치 마커 (라임 펄스)
     useEffect(() => {
         const map = mapInstanceRef.current;
         if (!map || !isMapReady || !myLocation) return;
@@ -305,7 +325,7 @@ export default function MapTemplate() {
                             top: 50%; left: 50%;
                             transform: translate(-50%, -50%);
                             width: 40px; height: 40px;
-                            background: #669FF226;
+                            background: ${RH_ACCENT_HEX}33;
                             border-radius: 50%;
                             animation: mapPulse 2s ease-out infinite;
                         "></div>
@@ -314,9 +334,9 @@ export default function MapTemplate() {
                             top: 50%; left: 50%;
                             transform: translate(-50%, -50%);
                             width: 14px; height: 14px;
-                            background: #669FF2;
+                            background: ${RH_ACCENT_HEX};
                             border-radius: 50%;
-                            border: 3px solid white;
+                            border: 2.5px solid ${RH_BG_PRIMARY_HEX};
                         "></div>
                     </div>
                 `,
@@ -350,6 +370,21 @@ export default function MapTemplate() {
             }
         }, [getCurrentLocation]);
 
+    // 줌 컨트롤
+    const handleZoomIn = useCallback(() => {
+        const map = mapInstanceRef.current;
+        if (!map) return;
+        const z = map.getZoom();
+        map.setZoom(Math.min(z + 1, 21), true);
+    }, []);
+
+    const handleZoomOut = useCallback(() => {
+        const map = mapInstanceRef.current;
+        if (!map) return;
+        const z = map.getZoom();
+        map.setZoom(Math.max(z - 1, 6), true);
+    }, []);
+
     // 네이버 지도 길찾기
     const handleDirections = useCallback(() => {
         if (!selectedLocation) return;
@@ -370,13 +405,13 @@ export default function MapTemplate() {
         );
     }, [selectedLocation]);
 
-    // FAB 하단 위치 계산
-    const fabBottom =
+    // 우측 컨트롤 stack 의 하단 위치 — 하단 카드 상태에 따라 위로 밀어 올림
+    const controlsBottom =
         bottomUI.type === "expanded"
-            ? 306
+            ? 320
             : bottomUI.type === "detail"
-              ? 250
-              : 72;
+              ? 260
+              : 88;
 
     return (
         <NaverMapLoader>
@@ -394,27 +429,18 @@ export default function MapTemplate() {
                 className="relative flex flex-col w-full bg-rh-bg-primary overflow-hidden"
                 style={{ height: "100%" }}
             >
-                {/* TranslucentHeader */}
-                <div
-                    className="absolute top-0 left-0 right-0 z-20 flex items-center h-14 px-4 gap-3"
-                    style={{
-                        backgroundColor: "#2B364480",
-                        backdropFilter: "blur(20px)",
-                        WebkitBackdropFilter: "blur(20px)",
-                    }}
-                >
+                {/* Floating 뒤로가기 버튼 (헤더 대신 — sc-map 사양: 검색바 없음) */}
+                <div className="absolute top-0 left-0 right-0 z-20 flex items-center h-14 px-4 gap-3 pointer-events-none">
                     <button
                         onClick={() => router.back()}
-                        className="flex h-9 w-9 items-center justify-center rounded-full shrink-0"
-                        style={{
-                            backgroundColor: "#2B364499",
-                        }}
+                        aria-label="뒤로가기"
+                        className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-rh-full bg-rh-bg-surface/90 border border-rh-border backdrop-blur-md shrink-0 active:scale-95 transition-transform"
                     >
-                        <ChevronLeft className="h-5 w-5 text-white" />
+                        <ChevronLeft className="h-5 w-5 text-rh-text-primary" />
                     </button>
-                    <h1 className="text-[17px] font-bold text-white">
+                    <div className="pointer-events-auto rh-eye rh-eye-lime px-3 py-1.5 rounded-rh-full bg-rh-bg-surface/90 border border-rh-border backdrop-blur-md">
                         러닝 장소
-                    </h1>
+                    </div>
                 </div>
 
                 {/* 지도 영역 */}
@@ -437,89 +463,90 @@ export default function MapTemplate() {
                         zIndex: 1000,
                         height: 56,
                         background:
-                            "linear-gradient(to top, #1D2530 60%, transparent 100%)",
+                            "linear-gradient(to top, var(--rh-bg-primary) 60%, transparent 100%)",
                     }}
                 />
 
-                {/* MyLocation FAB */}
-                <button
-                    onClick={handleMoveToMyLocation}
-                    className="absolute flex items-center justify-center active:scale-95 transition-all duration-300 ease-in-out"
+                {/* ===== 우측 컨트롤: +, -, 타겟(내위치) ===== */}
+                <div
+                    className="absolute right-4 flex flex-col gap-2"
                     style={{
                         zIndex: 2000,
-                        width: 48,
-                        height: 48,
-                        right: 16,
-                        bottom: fabBottom,
-                        borderRadius: 100,
-                        backgroundColor: "#2B3644",
-                        border: "1px solid #374151",
-                        boxShadow:
-                            "0 2px 8px rgba(0,0,0,0.2)",
+                        bottom: controlsBottom,
+                        transition: "bottom 250ms cubic-bezier(0.32, 0.72, 0, 1)",
                     }}
                 >
-                    <LocateFixed
-                        className="text-rh-accent"
-                        style={{ width: 22, height: 22 }}
-                    />
-                </button>
+                    <button
+                        onClick={handleZoomIn}
+                        aria-label="확대"
+                        className="flex h-11 w-11 items-center justify-center rounded-rh-md bg-rh-bg-surface border border-rh-border shadow-md active:scale-95 transition-transform"
+                    >
+                        <Plus className="h-5 w-5 text-rh-text-primary" />
+                    </button>
+                    <button
+                        onClick={handleZoomOut}
+                        aria-label="축소"
+                        className="flex h-11 w-11 items-center justify-center rounded-rh-md bg-rh-bg-surface border border-rh-border shadow-md active:scale-95 transition-transform"
+                    >
+                        <Minus className="h-5 w-5 text-rh-text-primary" />
+                    </button>
+                    <button
+                        onClick={handleMoveToMyLocation}
+                        aria-label="내 위치"
+                        className="flex h-11 w-11 items-center justify-center rounded-rh-md bg-rh-accent border border-transparent shadow-md active:scale-95 transition-transform"
+                    >
+                        <LocateFixed className="h-5 w-5 text-rh-text-inverted" />
+                    </button>
+                </div>
 
                 {/* ===== 하단 UI: 3가지 상태를 하나의 AnimatePresence로 관리 ===== */}
 
-                {/* Collapsed: "장소 목록 보기" 버튼 */}
+                {/* Collapsed: "장소 목록 보기" floating 카드 */}
                 <AnimatePresence>
                     {bottomUI.type === "collapsed" && (
                         <motion.button
                             key="collapsed-btn"
-                            initial={{ y: 60 }}
+                            initial={{ y: 80 }}
                             animate={{ y: 0 }}
-                            exit={{ y: 60 }}
+                            exit={{ y: 80 }}
                             transition={SPRING_FAST}
                             onClick={() =>
                                 setBottomUI({
                                     type: "expanded",
                                 })
                             }
-                            className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2"
+                            className="absolute bottom-4 left-4 right-4 flex items-center gap-3 rh-box rh-box-tight"
                             style={{
                                 zIndex: 2000,
-                                padding: "14px 20px",
-                                backgroundColor: "#2B3644",
-                                borderRadius:
-                                    "16px 16px 0 0",
-                                boxShadow:
-                                    "0 -2px 12px rgba(0,0,0,0.19)",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 12,
                             }}
                         >
-                            <List
-                                className="text-rh-accent"
-                                style={{
-                                    width: 18,
-                                    height: 18,
-                                }}
-                            />
-                            <span className="text-[15px] font-semibold text-white">
-                                장소 목록 보기
-                            </span>
-                            <ChevronUp
-                                className="text-rh-text-tertiary"
-                                style={{
-                                    width: 16,
-                                    height: 16,
-                                }}
-                            />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-rh-md bg-rh-accent shrink-0">
+                                <List className="h-5 w-5 text-rh-text-inverted" />
+                            </div>
+                            <div className="flex-1 min-w-0 text-left">
+                                <div className="text-[15px] font-semibold text-rh-text-primary">
+                                    장소 목록 보기
+                                </div>
+                                <div className="text-[12px] text-rh-text-tertiary mt-0.5">
+                                    {locations.length}개 등록됨
+                                </div>
+                            </div>
+                            <ChevronUp className="h-5 w-5 text-rh-text-tertiary shrink-0" />
                         </motion.button>
                     )}
                 </AnimatePresence>
 
-                {/* Expanded: LocationListPanel */}
+                {/* Expanded: 장소 목록 패널 */}
                 <AnimatePresence>
                     {bottomUI.type === "expanded" && (
                         <motion.div
                             key="expanded-panel"
-                            initial={{ y: 300 }}
+                            initial={{ y: 320 }}
                             animate={{ y: 0 }}
-                            exit={{ y: 300 }}
+                            exit={{ y: 320 }}
                             transition={SPRING_MEDIUM}
                             drag="y"
                             dragConstraints={DRAG_CONSTRAINTS_TOP}
@@ -531,39 +558,29 @@ export default function MapTemplate() {
                                     });
                                 }
                             }}
-                            className="absolute bottom-0 left-0 right-0 flex flex-col"
+                            className="absolute bottom-0 left-0 right-0 flex flex-col bg-rh-bg-inset border-t border-rh-border"
                             style={{
                                 zIndex: 2000,
-                                backgroundColor:
-                                    "#1D2530",
-                                borderRadius:
-                                    "20px 20px 0 0",
+                                borderTopLeftRadius: 20,
+                                borderTopRightRadius: 20,
                                 boxShadow:
-                                    "0 -4px 16px rgba(0,0,0,0.25)",
+                                    "0 -4px 16px rgba(0,0,0,0.35)",
                                 padding:
-                                    "16px 16px 20px 16px",
-                                maxHeight: "50%",
+                                    "12px 16px 24px 16px",
+                                maxHeight: "55%",
                             }}
                         >
                             {/* Handle Bar */}
                             <div className="flex justify-center mb-2">
-                                <div
-                                    className="rounded-full"
-                                    style={{
-                                        width: 36,
-                                        height: 4,
-                                        backgroundColor:
-                                            "#475569",
-                                    }}
-                                />
+                                <div className="h-1 w-9 rounded-full bg-rh-bg-muted" />
                             </div>
 
                             {/* Section Header */}
-                            <div className="flex items-center justify-between py-2 px-0 mb-1">
-                                <span className="text-[15px] font-bold text-white">
-                                    장소 목록
+                            <div className="flex items-center justify-between py-2 px-1 mb-2">
+                                <span className="rh-eye rh-eye-lime">
+                                    LOCATIONS
                                 </span>
-                                <span className="text-[13px] text-rh-text-tertiary">
+                                <span className="text-[12px] text-rh-text-tertiary">
                                     {locations.length}개
                                 </span>
                             </div>
@@ -580,45 +597,46 @@ export default function MapTemplate() {
                                     {locations.map(
                                         (loc) => (
                                             <button
-                                                key={
-                                                    loc.id
-                                                }
-                                                onClick={() =>
-                                                    {
-                                                        setBottomUI(
-                                                            {
-                                                                type: "detail",
-                                                                location:
-                                                                    loc,
-                                                            }
-                                                        );
-                                                        const map =
-                                                            mapInstanceRef.current;
-                                                        if (
-                                                            map &&
-                                                            loc.latitude &&
-                                                            loc.longitude
-                                                        ) {
-                                                            map.panTo(
-                                                                new window.naver.maps.LatLng(
-                                                                    loc.latitude,
-                                                                    loc.longitude
-                                                                )
-                                                            );
+                                                key={loc.id}
+                                                onClick={() => {
+                                                    setBottomUI(
+                                                        {
+                                                            type: "detail",
+                                                            location:
+                                                                loc,
                                                         }
+                                                    );
+                                                    const map =
+                                                        mapInstanceRef.current;
+                                                    if (
+                                                        map &&
+                                                        loc.latitude &&
+                                                        loc.longitude
+                                                    ) {
+                                                        map.panTo(
+                                                            new window.naver.maps.LatLng(
+                                                                loc.latitude,
+                                                                loc.longitude
+                                                            )
+                                                        );
                                                     }
-                                                }
-                                                className="flex items-center justify-between w-full text-left active:opacity-80 transition-opacity"
+                                                }}
+                                                className="flex items-center gap-3 w-full text-left rh-box rh-box-tight active:opacity-80 transition-opacity"
                                                 style={{
-                                                    padding:
-                                                        "12px 16px",
-                                                    backgroundColor:
-                                                        "#2B3644",
-                                                    borderRadius: 12,
+                                                    flexDirection:
+                                                        "row",
+                                                    alignItems:
+                                                        "center",
+                                                    gap: 12,
+                                                    background:
+                                                        "var(--rh-bg-surface)",
                                                 }}
                                             >
-                                                <div className="flex flex-col gap-0.5 min-w-0">
-                                                    <span className="text-sm font-medium text-white truncate">
+                                                <div className="flex h-9 w-9 items-center justify-center rounded-rh-md bg-rh-bg-muted shrink-0">
+                                                    <MapPin className="h-4 w-4 text-rh-accent" />
+                                                </div>
+                                                <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                                                    <span className="text-sm font-semibold text-rh-text-primary truncate">
                                                         {
                                                             loc.name
                                                         }
@@ -631,29 +649,18 @@ export default function MapTemplate() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <ChevronRight
-                                                    className="text-rh-text-muted shrink-0 ml-2"
-                                                    style={{
-                                                        width: 18,
-                                                        height: 18,
-                                                    }}
-                                                />
+                                                <ChevronRight className="h-4 w-4 text-rh-text-muted shrink-0" />
                                             </button>
                                         )
                                     )}
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-center py-8 gap-3">
-                                    <MapPin
-                                        className="text-rh-text-muted"
-                                        style={{
-                                            width: 32,
-                                            height: 32,
-                                        }}
-                                    />
+                                <div className="flex flex-col items-center justify-center py-10 gap-3">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-rh-full bg-rh-bg-surface">
+                                        <MapPin className="h-6 w-6 text-rh-text-muted" />
+                                    </div>
                                     <span className="text-sm text-rh-text-tertiary">
-                                        등록된 장소가
-                                        없습니다
+                                        등록된 장소가 없습니다
                                     </span>
                                 </div>
                             )}
@@ -672,12 +679,8 @@ export default function MapTemplate() {
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={FADE_TRANSITION}
-                                className="absolute inset-0"
-                                style={{
-                                    zIndex: 2001,
-                                    backgroundColor:
-                                        "#1D253066",
-                                }}
+                                className="absolute inset-0 bg-rh-bg-primary/60"
+                                style={{ zIndex: 2001 }}
                                 onClick={() =>
                                     setBottomUI({
                                         type: "collapsed",
@@ -685,7 +688,7 @@ export default function MapTemplate() {
                                 }
                             />
 
-                            {/* 시트 */}
+                            {/* 시트 — sc-map 하단 floating 카드 */}
                             <motion.div
                                 key="detail-sheet"
                                 initial={{ y: "100%" }}
@@ -696,64 +699,59 @@ export default function MapTemplate() {
                                 dragConstraints={DRAG_CONSTRAINTS_TOP}
                                 dragElastic={0.1}
                                 onDragEnd={(_, info) => {
-                                    if (
-                                        info.offset.y >
-                                        100
-                                    )
+                                    if (info.offset.y > 100)
                                         setBottomUI({
                                             type: "collapsed",
                                         });
                                 }}
-                                className="absolute bottom-0 left-0 right-0 flex flex-col pb-safe"
+                                className="absolute bottom-0 left-0 right-0 flex flex-col bg-rh-bg-surface border-t border-rh-border pb-safe"
                                 style={{
                                     zIndex: 2002,
-                                    backgroundColor:
-                                        "#2B3644",
-                                    borderRadius:
-                                        "16px 16px 0 0",
+                                    borderTopLeftRadius: 20,
+                                    borderTopRightRadius: 20,
+                                    boxShadow:
+                                        "0 -4px 16px rgba(0,0,0,0.35)",
                                     padding:
-                                        "12px 20px 32px 20px",
-                                    gap: 16,
+                                        "12px 20px 28px 20px",
+                                    gap: 14,
                                 }}
                             >
                                 {/* Handle */}
                                 <div className="flex justify-center">
-                                    <div
-                                        className="rounded-full"
-                                        style={{
-                                            width: 40,
-                                            height: 4,
-                                            backgroundColor:
-                                                "#4C525E",
-                                        }}
-                                    />
+                                    <div className="h-1 w-10 rounded-full bg-rh-bg-muted" />
                                 </div>
 
-                                {/* Title Row */}
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 min-w-0">
-                                        <h3 className="text-lg font-bold text-white truncate">
-                                            {
-                                                bottomUI
-                                                    .location
-                                                    .name
-                                            }
-                                        </h3>
-                                        {bottomUI
-                                            .location
-                                            .is_active && (
-                                            <span
-                                                className="shrink-0 text-[11px] font-medium rounded-full"
-                                                style={{
-                                                    padding:
-                                                        "2px 8px",
-                                                    backgroundColor:
-                                                        "#669FF233",
-                                                    color: "#669FF2",
-                                                }}
-                                            >
-                                                활성
-                                            </span>
+                                {/* Top Row: thumbnail + info + close */}
+                                <div className="flex items-start gap-3">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-rh-lg bg-rh-bg-inset border border-rh-border shrink-0">
+                                        <MapPin className="h-6 w-6 text-rh-accent" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h3 className="text-lg font-bold text-rh-text-primary truncate">
+                                                {
+                                                    bottomUI
+                                                        .location
+                                                        .name
+                                                }
+                                            </h3>
+                                            {bottomUI
+                                                .location
+                                                .is_active && (
+                                                <span className="rh-chip is-on shrink-0">
+                                                    활성
+                                                </span>
+                                            )}
+                                        </div>
+                                        {bottomUI.location
+                                            .description && (
+                                            <p className="mt-1 text-sm text-rh-text-secondary leading-snug line-clamp-2">
+                                                {
+                                                    bottomUI
+                                                        .location
+                                                        .description
+                                                }
+                                            </p>
                                         )}
                                     </div>
                                     <button
@@ -762,65 +760,23 @@ export default function MapTemplate() {
                                                 type: "collapsed",
                                             })
                                         }
-                                        className="shrink-0 flex items-center justify-center"
-                                        style={{
-                                            width: 32,
-                                            height: 32,
-                                            borderRadius: 100,
-                                            backgroundColor:
-                                                "#4C525E",
-                                        }}
+                                        aria-label="닫기"
+                                        className="shrink-0 flex h-8 w-8 items-center justify-center rounded-rh-full bg-rh-bg-muted active:scale-95 transition-transform"
                                     >
-                                        <X
-                                            className="text-rh-text-secondary"
-                                            style={{
-                                                width: 16,
-                                                height: 16,
-                                            }}
-                                        />
+                                        <X className="h-4 w-4 text-rh-text-secondary" />
                                     </button>
                                 </div>
 
-                                {/* Description */}
-                                {bottomUI.location
-                                    .description && (
-                                    <p
-                                        className="text-sm text-rh-text-secondary"
-                                        style={{
-                                            lineHeight: 1.4,
-                                        }}
-                                    >
-                                        {
-                                            bottomUI
-                                                .location
-                                                .description
-                                        }
-                                    </p>
-                                )}
-
-                                {/* Directions Button */}
+                                {/* Directions Button — 라임 위 텍스트는 text-rh-text-inverted */}
                                 <button
                                     onClick={
                                         handleDirections
                                     }
-                                    className="flex items-center justify-center gap-2 w-full active:opacity-90 transition-opacity"
-                                    style={{
-                                        height: 48,
-                                        borderRadius: 12,
-                                        backgroundColor:
-                                            "#669FF2",
-                                    }}
+                                    className="flex items-center justify-center gap-2 w-full h-12 rounded-rh-lg bg-rh-accent active:bg-rh-accent-hover transition-colors"
                                 >
-                                    <Navigation
-                                        className="text-white"
-                                        style={{
-                                            width: 18,
-                                            height: 18,
-                                        }}
-                                    />
-                                    <span className="text-[15px] font-semibold text-white">
-                                        네이버 지도에서
-                                        길찾기
+                                    <Navigation className="h-[18px] w-[18px] text-rh-text-inverted" />
+                                    <span className="text-[15px] font-semibold text-rh-text-inverted">
+                                        네이버 지도에서 길찾기
                                     </span>
                                 </button>
                             </motion.div>

@@ -22,7 +22,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CrewLocation } from "@/lib/types/crew-locations";
 import NaverMapLoader from "@/components/map/NaverMapLoader";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { getCrewLocationsAction } from "@/app/map/actions";
+import {
+    getCrewLocationsAction,
+    getActiveMeetAction,
+} from "@/app/map/actions";
+import { calculateDistance, formatDistance } from "@/lib/utils/distance";
+import type { ActiveMeetBannerVM } from "@/lib/domain/attendance/policies";
 
 /**
  * 지도 화면의 하단 UI 상태
@@ -67,6 +72,8 @@ export default function MapTemplate() {
     const [locations, setLocations] = useState<
         CrewLocation[]
     >([]);
+    const [activeMeet, setActiveMeet] =
+        useState<ActiveMeetBannerVM | null>(null);
     const [isMapReady, setIsMapReady] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -83,22 +90,30 @@ export default function MapTemplate() {
     const { location: myLocation, getCurrentLocation } =
         useGeolocation();
 
-    // 장소 데이터 fetch
+    // 장소 + 활성 모임 데이터 병렬 fetch
     useEffect(() => {
-        const fetchLocations = async () => {
+        const fetchData = async () => {
             try {
-                const result = await getCrewLocationsAction();
-                if (result.success && result.data) {
-                    setLocations(result.data as unknown as CrewLocation[]);
+                const [locResult, meetResult] = await Promise.all([
+                    getCrewLocationsAction(),
+                    getActiveMeetAction(),
+                ]);
+                if (locResult.success && locResult.data) {
+                    setLocations(
+                        locResult.data as unknown as CrewLocation[],
+                    );
+                }
+                if (meetResult.success) {
+                    setActiveMeet(meetResult.data);
                 }
             } catch (err) {
-                console.error("장소 조회 실패:", err);
+                console.error("지도 데이터 조회 실패:", err);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchLocations();
+        fetchData();
         getCurrentLocation();
     }, []);
 
@@ -535,6 +550,52 @@ export default function MapTemplate() {
                                     (l) => l.is_active
                                 ) ?? locations[0];
                             if (!activeLoc) return null;
+                            // sc-map 사양 row 2: 거리 · 모임명 · 시간
+                            const distance =
+                                myLocation &&
+                                activeLoc.latitude != null &&
+                                activeLoc.longitude != null
+                                    ? calculateDistance(
+                                          {
+                                              latitude:
+                                                  myLocation.latitude,
+                                              longitude:
+                                                  myLocation.longitude,
+                                          },
+                                          {
+                                              latitude:
+                                                  activeLoc.latitude,
+                                              longitude:
+                                                  activeLoc.longitude,
+                                          },
+                                      )
+                                    : null;
+                            // activeMeet이 같은 장소에서 진행 중이면 모임 메타 사용
+                            const meetMatchesLoc =
+                                activeMeet?.location.trim() ===
+                                activeLoc.name.trim();
+                            // meetingStartedAt(ISO) → KST HH:mm 직접 포맷
+                            const meetTime =
+                                meetMatchesLoc &&
+                                activeMeet?.meetingStartedAt
+                                    ? new Date(
+                                          activeMeet.meetingStartedAt,
+                                      ).toLocaleTimeString("ko-KR", {
+                                          timeZone: "Asia/Seoul",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          hour12: false,
+                                      })
+                                    : null;
+                            const metaParts = [
+                                distance !== null
+                                    ? formatDistance(distance)
+                                    : null,
+                                meetMatchesLoc
+                                    ? `${activeMeet?.attendeeCount}명 출석 중`
+                                    : activeLoc.description,
+                                meetTime,
+                            ].filter(Boolean);
                             return (
                                 <motion.div
                                     key="collapsed-card"
@@ -584,12 +645,9 @@ export default function MapTemplate() {
                                         </div>
                                     </div>
                                     <div className="text-xs text-rh-text-tertiary leading-snug">
-                                        {[
-                                            activeLoc.description,
-                                            `${locations.length}개 장소`,
-                                        ]
-                                            .filter(Boolean)
-                                            .join(" · ")}
+                                        {metaParts.length > 0
+                                            ? metaParts.join(" · ")
+                                            : `${locations.length}개 장소`}
                                     </div>
                                 </motion.div>
                             );

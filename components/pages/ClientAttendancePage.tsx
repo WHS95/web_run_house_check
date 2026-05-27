@@ -30,6 +30,7 @@ import LoadingSpinner from "@/components/atoms/LoadingSpinner";
 import { haptic } from "@/lib/haptic";
 import { useOfflineAttendance } from "@/hooks/useOfflineAttendance";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { calculateDistance, formatDistance } from "@/lib/utils/distance";
 import { submitAttendance } from "@/app/attendance/actions";
 
 // 한국 시간 유틸: UTC+9 기준으로 안정적 계산
@@ -133,14 +134,31 @@ const DEFAULT_ACCURACY_RANGE = 200;
 /* ============================================================
  * MiniMap — sc-att 사양: 카토그래픽 미니맵 + GPS 핀 + 점선 사거리
  * 좌상단 .crd 카드(장소명·거리), 우상단 .scl 스케일 라벨 floating
+ *
+ * 정적 SVG 미니맵: 실제 지도 줌이 없으므로 외곽 점선 원(r=44)이
+ * accuracyRange를 시각적으로 표현하고, .scl은 그에 대응하는
+ * 스케일 바 길이(accuracyRange / 2 반올림) 라벨을 노출.
+ * .crd 거리는 GPS-크루좌표 haversine 실측(distanceMeters)으로 표시,
+ * 미수신/미선택 시 accuracyRange fallback.
  * ============================================================ */
 const MiniMap = memo(function MiniMap({
     locationLabel,
     accuracyRange,
+    distanceMeters,
 }: {
     locationLabel: string;
     accuracyRange: number;
+    distanceMeters: number | null;
 }) {
+    const distanceLabel =
+        distanceMeters !== null && Number.isFinite(distanceMeters)
+            ? formatDistance(distanceMeters)
+            : `${accuracyRange}m 이내`;
+    // 시각 스케일바: accuracyRange의 절반을 10m 단위로 라운딩 (최소 10m)
+    const scaleBarMeters = Math.max(
+        10,
+        Math.round(accuracyRange / 20) * 10,
+    );
     return (
         <div className="relative h-[150px] rounded-rh-md bg-rh-bg-surface overflow-hidden border border-rh-border">
             {/* 격자(거리) SVG */}
@@ -206,17 +224,21 @@ const MiniMap = memo(function MiniMap({
                 />
             </svg>
 
-            {/* 좌상단 floating crd 카드 (장소·거리) */}
+            {/* 좌상단 floating crd 카드 (장소·실거리) */}
             <div className="absolute top-2.5 left-3 rh-mono text-[10px] text-rh-text-secondary bg-rh-bg-primary/80 backdrop-blur-sm border border-rh-border rounded-md px-2 py-1 max-w-[60%] truncate">
                 <b className="font-medium text-rh-accent-hover">
                     {locationLabel}
                 </b>
-                <span className="ml-1">· {accuracyRange}m</span>
+                <span className="ml-1">· {distanceLabel}</span>
             </div>
 
-            {/* 우상단 floating scl 스케일 라벨 */}
-            <div className="absolute top-2.5 right-3 rh-mono text-[10px] text-rh-text-tertiary bg-rh-bg-primary/80 backdrop-blur-sm border border-rh-border rounded-md px-2 py-1">
-                {accuracyRange}m
+            {/* 우상단 floating scl 스케일 바 (정적 SVG → accuracyRange 기반 시각 스케일) */}
+            <div className="absolute top-2.5 right-3 flex items-center gap-1 rh-mono text-[10px] text-rh-text-tertiary bg-rh-bg-primary/80 backdrop-blur-sm border border-rh-border rounded-md px-2 py-1">
+                <span
+                    aria-hidden
+                    className="inline-block h-px w-5 bg-rh-text-tertiary"
+                />
+                <span>{scaleBarMeters}m</span>
             </div>
 
             {/* GPS 핀 (라임) */}
@@ -641,6 +663,36 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         initialFormData?.crewInfo?.accuracy_range ??
         DEFAULT_ACCURACY_RANGE;
 
+    // 선택된 크루 장소 좌표 (haversine 실거리 계산용)
+    const selectedCrewLocation = useMemo(() => {
+        if (!formData.location || !initialFormData?.crewLocations)
+            return null;
+        return (
+            initialFormData.crewLocations.find(
+                (cl) => String(cl.id) === formData.location,
+            ) ?? null
+        );
+    }, [formData.location, initialFormData?.crewLocations]);
+
+    const distanceMeters = useMemo(() => {
+        if (
+            !geoLocation ||
+            !selectedCrewLocation?.latitude ||
+            !selectedCrewLocation?.longitude
+        )
+            return null;
+        return calculateDistance(
+            {
+                latitude: geoLocation.latitude,
+                longitude: geoLocation.longitude,
+            },
+            {
+                latitude: selectedCrewLocation.latitude,
+                longitude: selectedCrewLocation.longitude,
+            },
+        );
+    }, [geoLocation, selectedCrewLocation]);
+
     // 에러 상태 처리
     if (error) {
         return (
@@ -734,6 +786,9 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
                         <MiniMap
                             locationLabel={selectedLocationLabel}
                             accuracyRange={accuracyRange}
+                            distanceMeters={
+                                mounted ? distanceMeters : null
+                            }
                         />
                         {/* GPS 인증 상태 + 좌표 (sc-att row between) */}
                         <div className="flex items-center justify-between">

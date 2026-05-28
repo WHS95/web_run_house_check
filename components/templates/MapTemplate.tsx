@@ -42,11 +42,11 @@ type BottomUIState =
 
 // v2 라임 카토그래픽 토큰 (인라인 SVG 마커용 — Tailwind 클래스가 적용되지 않는 영역)
 // globals.css 의 --rh-* 변수와 동기화 유지
-const RH_ACCENT_HEX = "#B8D964"; // --rh-accent
-const RH_TEXT_MUTED_HEX = "#5F6573"; // --rh-text-muted
-const RH_TEXT_INVERTED_HEX = "#1a1e0a"; // --rh-text-inverted (라임 위 텍스트)
-const RH_TEXT_PRIMARY_HEX = "#F4F5F7"; // --rh-text-primary
-const RH_BG_PRIMARY_HEX = "#15181E"; // --rh-bg-primary (마커 보더)
+const RH_ACCENT_HEX = "#C7FF00"; // --rh-accent
+const RH_TEXT_MUTED_HEX = "#5C5C58"; // --rh-text-muted (≈ rgba(242,242,238,.24) on #0B0C0A)
+const RH_TEXT_INVERTED_HEX = "#0B0C0A"; // --rh-text-inverted (라임 위 텍스트)
+const RH_TEXT_PRIMARY_HEX = "#F2F2EE"; // --rh-text-primary
+const RH_BG_PRIMARY_HEX = "#0B0C0A"; // --rh-bg-primary (마커 보더)
 
 // 인라인 객체 호이스팅 (매 렌더마다 재생성 방지)
 const DRAG_CONSTRAINTS_TOP = { top: 0 };
@@ -502,8 +502,8 @@ export default function MapTemplate() {
                 />
 
                 {/* ===== 우측 컨트롤: +, -, 타겟(내위치) — sc-map 사양: 36x36, gap 6px =====
-                    +/-: bg rgba(21,24,30,.85) = var(--rh-bg-primary)/85, border var(--line) = var(--rh-border), radius 8px
-                    target: bg var(--lime) = var(--rh-accent), color #1a1e0a = var(--rh-text-inverted) */}
+                    +/-: bg var(--rh-bg-primary)/85, border var(--rh-border), radius 8px
+                    target: bg var(--rh-accent), color var(--rh-text-inverted) */}
                 <div
                     className="absolute right-3.5 flex flex-col gap-1.5"
                     style={{

@@ -75,7 +75,7 @@ export function SelectTrigger({
     <button
       type='button'
       className={cn(
-        "flex justify-between items-center px-4 py-3 w-full h-12 text-rh-body bg-rh-bg-surface text-rh-text-primary rounded-rh-md border border-rh-border focus:outline-none focus:shadow-[0_0_0_1px_var(--rh-accent),0_0_0_4px_rgba(184,217,100,0.18)] disabled:cursor-not-allowed disabled:opacity-40",
+        "flex justify-between items-center px-4 py-3 w-full h-12 text-rh-body bg-rh-bg-surface text-rh-text-primary rounded-rh-md border border-rh-border focus:outline-none focus:shadow-[0_0_0_1px_var(--rh-accent),0_0_0_4px_rgba(199,255,0,0.18)] disabled:cursor-not-allowed disabled:opacity-40",
         className,
       )}
       onClick={() => context.setOpen(!context.open)}

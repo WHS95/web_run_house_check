@@ -5,37 +5,38 @@
 @layer base {
     :root {
         /* === RunHouse Design System Tokens v2 — Cartographic Dark ===
-         * Service Map (styles.css) 기준: 깊은 다크 + 라임 액센트 + mono 좌표.
-         * 라임 위에 올라가는 텍스트는 반드시 --rh-text-inverted (#1a1e0a) 사용. */
+         * RunningCrewMap 정렬: 웜 잉크 다크 + 고채도 라임 + 헤어라인 only + 전수치 mono.
+         * 라임 위에 올라가는 텍스트는 반드시 --rh-text-inverted (#0B0C0A) 사용. */
 
-        /* Background — lifted dark, eye-friendly */
-        --rh-board: #101318;
-        --rh-bg-primary: #15181E;
-        --rh-bg-inset: #1A1E25;
-        --rh-bg-surface: #21262E;
-        --rh-bg-elev: #2A2F38;
-        --rh-bg-muted: #363B45;
-        --rh-bg-accent: #B8D964;
+        /* Background — 웜 잉크 다크 (지도 종이/잉크 메타포) */
+        --rh-board: #0B0C0A;
+        --rh-bg-primary: #0B0C0A;
+        --rh-bg-inset: #141512;
+        --rh-bg-surface: #1A1B19;
+        --rh-bg-elev: #22231F;
+        --rh-bg-muted: #2D2E29;
+        --rh-bg-accent: #C7FF00;
 
-        /* Accent — softened lime (sage) */
-        --rh-accent: #B8D964;
-        --rh-accent-hover: #9CBA4A;
-        --rh-accent-soft: #D4E899;
+        /* Accent — 고채도 라임 (지도 마커) */
+        --rh-accent: #C7FF00;
+        --rh-accent-hover: #A8CC00;
+        --rh-accent-soft: #B8D964;
         --rh-accent-blue: #7BA3D6;
 
-        /* Border */
-        --rh-border: #2E333D;
-        --rh-border-strong: #3B4150;
-        --rh-border-subtle: #1A1E25;
-        --rh-divider: #2E333D;
+        /* Border — 헤어라인 시스템(8% white) */
+        --rh-rule: rgba(242, 242, 238, 0.08);
+        --rh-border: rgba(242, 242, 238, 0.08);
+        --rh-border-strong: rgba(242, 242, 238, 0.15);
+        --rh-border-subtle: rgba(242, 242, 238, 0.04);
+        --rh-divider: rgba(242, 242, 238, 0.08);
 
-        /* Text */
-        --rh-text-primary: #F4F5F7;
-        --rh-text-secondary: #C9CDD4;
-        --rh-text-tertiary: #8C92A0;
-        --rh-text-muted: #5F6573;
-        --rh-text-faint: #42485A;
-        --rh-text-inverted: #1a1e0a;
+        /* Text — 웜다크 위 잉크 톤 */
+        --rh-text-primary: #F2F2EE;
+        --rh-text-secondary: rgba(242, 242, 238, 0.62);
+        --rh-text-tertiary: rgba(242, 242, 238, 0.38);
+        --rh-text-muted: rgba(242, 242, 238, 0.24);
+        --rh-text-faint: rgba(242, 242, 238, 0.14);
+        --rh-text-inverted: #0B0C0A;
 
         /* Status (라임 카토그래픽 톤) */
         --rh-status-success: #9AC9A4;
@@ -69,44 +70,44 @@
         --rh-radius-xl: 16px;
         --rh-radius-full: 100px;
 
-        /* === shadcn/ui 호환 (v2 라임 매핑) === */
-        --background: 220 18% 10%;
-        --foreground: 220 10% 96%;
-        --card: 217 17% 15%;
-        --card-foreground: 220 10% 96%;
-        --popover: 217 17% 15%;
-        --popover-foreground: 220 10% 96%;
-        --primary: 77 58% 62%;
-        --primary-foreground: 72 50% 8%;
-        --secondary: 217 17% 15%;
-        --secondary-foreground: 220 10% 96%;
-        --muted: 220 12% 25%;
-        --muted-foreground: 219 8% 60%;
-        --accent: 77 58% 62%;
-        --accent-foreground: 72 50% 8%;
+        /* === shadcn/ui 호환 (카토그래픽 매핑 — 웜다크 + 고채도 라임) === */
+        --background: 80 6% 4%;
+        --foreground: 60 9% 94%;
+        --card: 75 6% 8%;
+        --card-foreground: 60 9% 94%;
+        --popover: 75 6% 8%;
+        --popover-foreground: 60 9% 94%;
+        --primary: 72 100% 50%;
+        --primary-foreground: 80 6% 4%;
+        --secondary: 75 6% 8%;
+        --secondary-foreground: 60 9% 94%;
+        --muted: 60 4% 16%;
+        --muted-foreground: 60 9% 62%;
+        --accent: 72 100% 50%;
+        --accent-foreground: 80 6% 4%;
         --destructive: 0 50% 69%;
-        --destructive-foreground: 220 10% 96%;
-        --border: 220 14% 21%;
-        --input: 217 17% 15%;
-        --ring: 77 58% 62%;
+        --destructive-foreground: 60 9% 94%;
+        --border: 60 9% 94% / 0.08;
+        --input: 75 6% 8%;
+        --ring: 72 100% 50%;
         --radius: 0.5rem;
 
         /* Chart — lime variations */
-        --chart-1: 77 58% 62%;
-        --chart-2: 77 44% 51%;
-        --chart-3: 77 30% 42%;
-        --chart-4: 218 18% 32%;
-        --chart-5: 218 17% 22%;
+        --chart-1: 72 100% 50%;
+        --chart-2: 72 80% 42%;
+        --chart-3: 72 60% 34%;
+        --chart-4: 60 4% 32%;
+        --chart-5: 60 4% 22%;
 
         /* Sidebar */
-        --sidebar-background: 220 18% 10%;
-        --sidebar-foreground: 220 10% 96%;
-        --sidebar-primary: 77 58% 62%;
-        --sidebar-primary-foreground: 72 50% 8%;
-        --sidebar-accent: 217 17% 15%;
-        --sidebar-accent-foreground: 220 10% 96%;
-        --sidebar-border: 220 14% 21%;
-        --sidebar-ring: 77 58% 62%;
+        --sidebar-background: 80 6% 4%;
+        --sidebar-foreground: 60 9% 94%;
+        --sidebar-primary: 72 100% 50%;
+        --sidebar-primary-foreground: 80 6% 4%;
+        --sidebar-accent: 75 6% 8%;
+        --sidebar-accent-foreground: 60 9% 94%;
+        --sidebar-border: 60 9% 94% / 0.08;
+        --sidebar-ring: 72 100% 50%;
 
         /* Safe Area */
         --safe-area-inset-top: env(safe-area-inset-top);
@@ -201,7 +202,7 @@
         height: 100%;
         overflow: hidden;
         overscroll-behavior: none;
-        background-color: #15181E;
+        background-color: #0B0C0A;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeSpeed;
@@ -304,7 +305,7 @@
 
     .ios-input:focus {
         box-shadow: 0 0 0 1px var(--rh-accent),
-            0 0 0 4px rgba(184, 217, 100, 0.18);
+            0 0 0 4px rgba(199, 255, 0, 0.18);
     }
 
     .ios-input::placeholder {
@@ -358,7 +359,7 @@
 
     .ios-date-input:focus {
         box-shadow: 0 0 0 1px var(--rh-accent),
-            0 0 0 4px rgba(184, 217, 100, 0.18);
+            0 0 0 4px rgba(199, 255, 0, 0.18);
     }
 
     .ios-date-input:active {
@@ -563,9 +564,9 @@
         background: var(--rh-bg-surface);
         border: 1px solid var(--rh-border);
     }
-    .rh-heat-cell.l1 { background: rgba(184,217,100,.22); border-color: transparent; }
-    .rh-heat-cell.l2 { background: rgba(184,217,100,.40); border-color: transparent; }
-    .rh-heat-cell.l3 { background: rgba(184,217,100,.65); border-color: transparent; }
+    .rh-heat-cell.l1 { background: rgba(199,255,0,.22); border-color: transparent; }
+    .rh-heat-cell.l2 { background: rgba(199,255,0,.40); border-color: transparent; }
+    .rh-heat-cell.l3 { background: rgba(199,255,0,.65); border-color: transparent; }
     .rh-heat-cell.l4 { background: var(--rh-accent); border-color: transparent; }
 
     /* 등고선 컨투어 데코 (lime 카드 배경) */
@@ -800,7 +801,7 @@ html, body {
 .mobile-viewport {
     width: 100%;
     height: 100dvh;
-    background-color: #15181E;
+    background-color: #0B0C0A;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -936,7 +937,7 @@ body:has(.intro-root) {
     align-items: stretch !important;
     padding: 0 !important;
     min-height: 100vh;
-    background: #15181E;
+    background: #0B0C0A;
 }
 .mobile-viewport:has(.intro-root) {
     max-width: none !important;

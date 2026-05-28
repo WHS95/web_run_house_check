@@ -308,7 +308,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
                                                 activeMeet.meetingStartedLabel
                                             )}
                                         </span>
-                                        <span className="text-[12px] text-rh-text-inverted/60">
+                                        <span className="text-[12px] text-rh-text-inverted">
                                             {activeMeet.location}
                                         </span>
                                     </div>
@@ -320,7 +320,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
                                     </div>
                                     {/* 하단 row: 부가 정보 · pill 버튼 */}
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[12px] text-rh-text-inverted/60">
+                                        <span className="text-[12px] text-rh-text-inverted">
                                             {activeMeet.attendeeCount}명
                                             출석 중
                                         </span>
@@ -336,7 +336,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
                                         <span className="rh-eye text-rh-text-inverted">
                                             TODAY
                                         </span>
-                                        <span className="text-[12px] text-rh-text-inverted/60">
+                                        <span className="text-[12px] text-rh-text-inverted">
                                             오늘의 러닝
                                         </span>
                                     </div>
@@ -346,7 +346,7 @@ const EnhancedHomeTemplate = memo<EnhancedHomeTemplateProps>(
                                     </div>
                                     {/* 하단 row: 안내 · pill 버튼 */}
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[12px] text-rh-text-inverted/60">
+                                        <span className="text-[12px] text-rh-text-inverted">
                                             1분이면 충분해요
                                         </span>
                                         <span className="rounded-full bg-rh-bg-primary px-2.5 py-1 text-[12px] font-semibold text-rh-accent">

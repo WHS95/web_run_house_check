@@ -42,7 +42,7 @@ type BottomUIState =
 
 // v2 라임 카토그래픽 토큰 (인라인 SVG 마커용 — Tailwind 클래스가 적용되지 않는 영역)
 // globals.css 의 --rh-* 변수와 동기화 유지
-const RH_ACCENT_HEX = "#C7FF00"; // --rh-accent
+const RH_ACCENT_HEX = "#B8E61F"; // --rh-accent
 const RH_TEXT_MUTED_HEX = "#5C5C58"; // --rh-text-muted (≈ rgba(242,242,238,.24) on #0B0C0A)
 const RH_TEXT_INVERTED_HEX = "#0B0C0A"; // --rh-text-inverted (라임 위 텍스트)
 const RH_TEXT_PRIMARY_HEX = "#F2F2EE"; // --rh-text-primary

@@ -82,47 +82,55 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        /* RunHouse v2 Design Tokens — Cartographic Dark */
+        /* RunHouse v2 Design Tokens — Cartographic Dark
+         * 알파 modifier(`bg-rh-accent/20` 등)가 표준 `rgb(... / α)` 출력으로
+         * 컴파일되도록 rgb-triplet 패턴(`rgb(var(--rh-x-rgb) / <alpha-value>)`)
+         * 사용. 구형 모바일 브라우저(<Safari 16.4 / <Chrome 111)에서 color-mix()
+         * 미지원으로 인한 흰색 fallback 방지. 인라인 `var(--rh-accent)`(hex)
+         * 사용은 그대로 유지된다(globals.css에 두 변수가 병존). */
         rh: {
-          board: "var(--rh-board)",
+          board: "rgb(var(--rh-bg-primary-rgb) / <alpha-value>)",
           bg: {
-            primary: "var(--rh-bg-primary)",
-            inset: "var(--rh-bg-inset)",
-            surface: "var(--rh-bg-surface)",
-            elev: "var(--rh-bg-elev)",
-            muted: "var(--rh-bg-muted)",
-            accent: "var(--rh-accent)",
+            primary: "rgb(var(--rh-bg-primary-rgb) / <alpha-value>)",
+            inset: "rgb(var(--rh-bg-inset-rgb) / <alpha-value>)",
+            surface: "rgb(var(--rh-bg-surface-rgb) / <alpha-value>)",
+            elev: "rgb(var(--rh-bg-elev-rgb) / <alpha-value>)",
+            muted: "rgb(var(--rh-bg-muted-rgb) / <alpha-value>)",
+            accent: "rgb(var(--rh-accent-rgb) / <alpha-value>)",
           },
           accent: {
-            DEFAULT: "var(--rh-accent)",
-            hover: "var(--rh-accent-hover)",
+            DEFAULT: "rgb(var(--rh-accent-rgb) / <alpha-value>)",
+            hover: "rgb(var(--rh-accent-hover-rgb) / <alpha-value>)",
             soft: "var(--rh-accent-soft)",
             blue: "var(--rh-accent-blue)",
           },
+          /* border-rh-border 등 default(/N 없는) 사용은 기존 rgba(.08/.15/.04)
+           * 톤을 유지. 알파 modifier가 필요한 경우 `border-rh-rule/N` 사용. */
           border: {
             DEFAULT: "var(--rh-border)",
             strong: "var(--rh-border-strong)",
             subtle: "var(--rh-border-subtle)",
           },
+          rule: "rgb(var(--rh-rule-rgb) / <alpha-value>)",
           divider: "var(--rh-divider)",
           text: {
-            primary: "var(--rh-text-primary)",
-            secondary: "var(--rh-text-secondary)",
-            tertiary: "var(--rh-text-tertiary)",
-            muted: "var(--rh-text-muted)",
-            faint: "var(--rh-text-faint)",
-            inverted: "var(--rh-text-inverted)",
+            primary: "rgb(var(--rh-text-primary-rgb) / <alpha-value>)",
+            secondary: "rgb(var(--rh-text-primary-rgb) / 0.62)",
+            tertiary: "rgb(var(--rh-text-primary-rgb) / 0.38)",
+            muted: "rgb(var(--rh-text-primary-rgb) / 0.24)",
+            faint: "rgb(var(--rh-text-primary-rgb) / 0.14)",
+            inverted: "rgb(var(--rh-text-inverted-rgb) / <alpha-value>)",
           },
           status: {
-            success: "var(--rh-status-success)",
-            warning: "var(--rh-status-warning)",
-            error: "var(--rh-status-error)",
+            success: "rgb(var(--rh-status-success-rgb) / <alpha-value>)",
+            warning: "rgb(var(--rh-status-warning-rgb) / <alpha-value>)",
+            error: "rgb(var(--rh-status-error-rgb) / <alpha-value>)",
           },
         },
         /* Service Map 호환 alias (lime 직접 접근용) */
         lime: {
-          DEFAULT: "var(--rh-accent)",
-          2: "var(--rh-accent-hover)",
+          DEFAULT: "rgb(var(--rh-accent-rgb) / <alpha-value>)",
+          2: "rgb(var(--rh-accent-hover-rgb) / <alpha-value>)",
           3: "var(--rh-accent-soft)",
         },
       },

@@ -6,7 +6,29 @@
     :root {
         /* === RunHouse Design System Tokens v2 — Cartographic Dark ===
          * RunningCrewMap 정렬: 웜 잉크 다크 + 고채도 라임 + 헤어라인 only + 전수치 mono.
-         * 라임 위에 올라가는 텍스트는 반드시 --rh-text-inverted (#0B0C0A) 사용. */
+         * 라임 위에 올라가는 텍스트는 반드시 --rh-text-inverted (#0B0C0A) 사용.
+         *
+         * 변수 구조:
+         *  - `--rh-x`        : hex/rgba — 인라인 `var(--rh-x)`로 직접 사용
+         *  - `--rh-x-rgb`    : 공백 구분 rgb triplet — tailwind에서
+         *                       `rgb(var(--rh-x-rgb) / <alpha-value>)`로 wrap.
+         *  알파 modifier(`bg-rh-accent/20` 등)가 표준 `rgb(... / α)`로 컴파일되도록 병존.
+         */
+
+        /* === RGB triplet 컴패니언 (tailwind 알파 modifier 용) === */
+        --rh-bg-primary-rgb: 11 12 10;
+        --rh-bg-inset-rgb: 20 21 18;
+        --rh-bg-surface-rgb: 26 27 25;
+        --rh-bg-elev-rgb: 34 35 31;
+        --rh-bg-muted-rgb: 45 46 41;
+        --rh-accent-rgb: 184 230 31;
+        --rh-accent-hover-rgb: 149 190 21;
+        --rh-text-primary-rgb: 242 242 238;
+        --rh-text-inverted-rgb: 11 12 10;
+        --rh-rule-rgb: 242 242 238;
+        --rh-status-success-rgb: 154 201 164;
+        --rh-status-warning-rgb: 232 177 108;
+        --rh-status-error-rgb: 216 138 138;
 
         /* Background — 웜 잉크 다크 (지도 종이/잉크 메타포) */
         --rh-board: #0B0C0A;

@@ -152,7 +152,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
         </div>
 
         {/* 제목 */}
-        <h3 className="mb-2 text-lg font-semibold text-white">위치 확인</h3>
+        <h3 className="mb-2 text-lg font-semibold text-rh-text-primary">위치 확인</h3>
 
         {/* 메시지 */}
         <p className="mb-4 text-sm text-rh-text-secondary whitespace-pre-line">
@@ -165,7 +165,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
             <SectionLabel className="mb-2">등록된 활동장소</SectionLabel>
             <div className="space-y-1">
               {crewLocations.map((location) => (
-                <div key={location.id} className="flex items-center text-sm text-white">
+                <div key={location.id} className="flex items-center text-sm text-rh-text-primary">
                   <MapPin className="mr-2 w-3 h-3 text-rh-text-secondary" />
                   {location.name}
                 </div>
@@ -194,7 +194,7 @@ const LocationVerificationModal: React.FC<LocationVerificationModalProps> = ({
               {(verificationStatus === 'failed' || verificationStatus === 'error') && (
                 <button
                   onClick={handleLocationCheck}
-                  className="flex-1 py-3 font-medium text-white rounded-lg bg-rh-accent hover:bg-blue-600"
+                  className="flex-1 py-3 font-medium text-rh-text-inverted rounded-lg bg-rh-accent hover:bg-rh-accent-hover"
                 >
                   다시 시도
                 </button>

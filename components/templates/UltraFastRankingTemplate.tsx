@@ -220,10 +220,7 @@ const TopPodium = memo(function TopPodium({
                     </svg>
                 </div>
                 <div className="relative flex flex-col items-center gap-2">
-                    <span
-                        className="rh-eye"
-                        style={{ color: "var(--rh-text-inverted)" }}
-                    >
+                    <span className="rh-eye text-rh-text-inverted">
                         1위
                     </span>
                     <Avatar item={first} size={56} tone="lime" />

@@ -101,8 +101,8 @@ module.exports = {
           accent: {
             DEFAULT: "rgb(var(--rh-accent-rgb) / <alpha-value>)",
             hover: "rgb(var(--rh-accent-hover-rgb) / <alpha-value>)",
-            soft: "var(--rh-accent-soft)",
-            blue: "var(--rh-accent-blue)",
+            soft: "rgb(var(--rh-accent-soft-rgb) / <alpha-value>)",
+            blue: "rgb(var(--rh-accent-blue-rgb) / <alpha-value>)",
           },
           /* border-rh-border 등 default(/N 없는) 사용은 기존 rgba(.08/.15/.04)
            * 톤을 유지. 알파 modifier가 필요한 경우 `border-rh-rule/N` 사용. */

@@ -29,6 +29,8 @@
         --rh-status-success-rgb: 154 201 164;
         --rh-status-warning-rgb: 232 177 108;
         --rh-status-error-rgb: 216 138 138;
+        --rh-accent-soft-rgb: 184 217 100;
+        --rh-accent-blue-rgb: 123 163 214;
 
         /* Background — 웜 잉크 다크 (지도 종이/잉크 메타포) */
         --rh-board: #0B0C0A;
@@ -586,9 +588,9 @@
         background: var(--rh-bg-surface);
         border: 1px solid var(--rh-border);
     }
-    .rh-heat-cell.l1 { background: rgba(184,230,31,.22); border-color: transparent; }
-    .rh-heat-cell.l2 { background: rgba(184,230,31,.40); border-color: transparent; }
-    .rh-heat-cell.l3 { background: rgba(184,230,31,.65); border-color: transparent; }
+    .rh-heat-cell.l1 { background: rgb(var(--rh-accent-rgb) / 0.22); border-color: transparent; }
+    .rh-heat-cell.l2 { background: rgb(var(--rh-accent-rgb) / 0.40); border-color: transparent; }
+    .rh-heat-cell.l3 { background: rgb(var(--rh-accent-rgb) / 0.65); border-color: transparent; }
     .rh-heat-cell.l4 { background: var(--rh-accent); border-color: transparent; }
 
     /* 등고선 컨투어 데코 (lime 카드 배경) */

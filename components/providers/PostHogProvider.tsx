@@ -43,6 +43,20 @@ export default function PostHogProvider({
             person_profiles: "identified_only",
             loaded: (ph) => {
                 if (process.env.NODE_ENV === "development") ph.debug();
+                // 플릿 공통 앱 식별자 등록
+                ph.register({ app_name: "attendance" });
+                // 크로스앱 익명 ID 스티칭
+                try {
+                    const urlAnon = new URLSearchParams(
+                        window.location.search
+                    ).get("rh_anon");
+                    const anon =
+                        urlAnon || localStorage.getItem("rh_anon");
+                    if (anon) {
+                        localStorage.setItem("rh_anon", anon);
+                        ph.register({ rh_anon: anon });
+                    }
+                } catch {}
             },
         });
     }, []);

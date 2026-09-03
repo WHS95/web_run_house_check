@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import posthog from "posthog-js";
+import { analytics } from "@/lib/analytics";
 import {
   motion,
   useMotionValue,
@@ -376,7 +376,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
           isHost: submissionData.isHost,
           attendanceTimestamp: submissionData.attendanceTimestamp,
         });
-        posthog.capture("attendance_queued_offline", {
+        analytics.capture("attendance_queued_offline", {
           crew_id: submissionData.crewId,
           location_id: submissionData.locationId,
           exercise_type_id: submissionData.exerciseTypeId,
@@ -393,7 +393,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
       const result = await submitAttendance(submissionData);
 
       if (result.success) {
-        posthog.capture("attendance_submitted", {
+        analytics.capture("attendance_submitted", {
           crew_id: submissionData.crewId,
           location_id: submissionData.locationId,
           exercise_type_id: submissionData.exerciseTypeId,
@@ -403,7 +403,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         setNotificationType("success");
         setNotificationMessage("출석이 완료되었습니다!");
       } else {
-        posthog.captureException(
+        analytics.captureException(
           new Error(result.message || "attendance_failed")
         );
         haptic.error();
@@ -413,7 +413,7 @@ const ClientAttendancePage: React.FC<ClientAttendancePageProps> = ({
         );
       }
     } catch (error) {
-      posthog.captureException(error);
+      analytics.captureException(error);
       haptic.error();
       setNotificationType("error");
       setNotificationMessage("네트워크 오류가 발생했습니다.");

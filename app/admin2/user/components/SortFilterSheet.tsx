@@ -1,9 +1,7 @@
 "use client";
 import { memo, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import AdminFilterPill from "@/app/admin2/components/ui/AdminFilterPill";
-import { useModalViewportPortal } from "@/hooks/useModalViewportPortal";
+import DragSheet from "@/components/ui/DragSheet";
 
 export type SortKey = "name" | "lastAttendance" | "count";
 export type SortDir = "asc" | "desc";
@@ -64,7 +62,6 @@ const SortFilterSheet = memo(function SortFilterSheet({
   const [key, setKey] = useState<SortKey>(initKey);
   const [dir, setDir] = useState<SortDir>(initDir);
   const [status, setStatus] = useState<StatusFilter>(initStatus);
-  const portalContainer = useModalViewportPortal(open);
 
   useEffect(() => {
     if (open) {
@@ -74,35 +71,9 @@ const SortFilterSheet = memo(function SortFilterSheet({
     }
   }, [open, initKey, initDir, initStatus]);
 
-  if (!portalContainer) return null;
-
-  return createPortal(
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          className='absolute inset-0 z-[100] flex flex-col justify-end'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className='absolute inset-0 bg-black/50' onClick={onClose} />
-          <motion.div
-            className='relative z-10 flex flex-col gap-5 bg-rh-bg-surface rounded-t-2xl p-5 pb-[calc(env(safe-area-inset-bottom,0px)+20px)]'
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{
-              type: "spring",
-              damping: 30,
-              stiffness: 300,
-            }}
-          >
-            {/* 드래그 핸들 */}
-            <div className='flex justify-center -mt-2'>
-              <div className='w-10 h-1 rounded-full bg-rh-bg-muted' />
-            </div>
-
+  return (
+    <DragSheet open={open} onClose={onClose} label='정렬 및 필터'>
+      <div className='flex flex-col gap-5 p-5 pb-[calc(env(safe-area-inset-bottom,0px)+20px)]'>
             <h3 className='text-center text-base font-semibold text-white'>
               정렬 기준
             </h3>
@@ -164,11 +135,8 @@ const SortFilterSheet = memo(function SortFilterSheet({
             >
               적용
             </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>,
-    portalContainer,
+      </div>
+    </DragSheet>
   );
 });
 

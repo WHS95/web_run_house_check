@@ -7,6 +7,12 @@ import React, {
     useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import { 닫아야_하는가 } from "@/lib/motion/gesture";
+import {
+    스프링설정,
+    기본_스프링,
+    시트_스프링,
+} from "@/lib/motion/spring";
 import {
     ChevronLeft,
     ChevronRight,
@@ -36,17 +42,26 @@ type BottomUIState =
 
 // 인라인 객체 호이스팅 (매 렌더마다 재생성 방지)
 const DRAG_CONSTRAINTS_TOP = { top: 0 };
-const SPRING_FAST = {
-    type: "spring" as const,
-    damping: 25,
-    stiffness: 300,
-};
-const SPRING_MEDIUM = {
-    type: "spring" as const,
-    damping: 28,
-    stiffness: 300,
-};
+// 스프링 값은 직접 쓰지 않고 lib/motion 프리셋에서 파생시킨다 (CLAUDE.md 애니메이션 규칙 6)
+const SPRING_FAST = 스프링설정(기본_스프링);
+const SPRING_MEDIUM = 스프링설정(시트_스프링);
 const FADE_TRANSITION = { duration: 0.2 };
+
+/**
+ * 이 시트는 collapsed/detail 스냅 포인트를 갖는 다단계 시트라
+ * 열림/닫힘 이분 모델인 <DragSheet> 로 대체할 수 없다.
+ * 대신 **판정 물리만** lib/motion 순수 함수로 통일한다.
+ */
+function 접어야_하는가(
+    info: { offset: { y: number }; velocity: { y: number } },
+    size: number
+): boolean {
+    return 닫아야_하는가({
+        offset: info.offset.y,
+        velocity: info.velocity.y,
+        size,
+    }).shouldDismiss;
+}
 
 export default function MapTemplate() {
     const router = useRouter();
@@ -525,7 +540,7 @@ export default function MapTemplate() {
                             dragConstraints={DRAG_CONSTRAINTS_TOP}
                             dragElastic={0.1}
                             onDragEnd={(_, info) => {
-                                if (info.offset.y > 80) {
+                                if (접어야_하는가(info, 300)) {
                                     setBottomUI({
                                         type: "collapsed",
                                     });
@@ -697,8 +712,10 @@ export default function MapTemplate() {
                                 dragElastic={0.1}
                                 onDragEnd={(_, info) => {
                                     if (
-                                        info.offset.y >
-                                        100
+                                        접어야_하는가(
+                                            info,
+                                            400
+                                        )
                                     )
                                         setBottomUI({
                                             type: "collapsed",

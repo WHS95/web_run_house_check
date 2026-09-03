@@ -21,7 +21,6 @@
 
 # production
 /build
-/docs/
 
 # misc
 .DS_Store
@@ -34,6 +33,16 @@
 *.sql
 *.json
 *.md
+
+# 위 *.md 는 스크래치 메모를 걸러내기 위한 것이다.
+# 컨벤션·아키텍처 문서는 코드와 함께 살아야 하므로 되살린다.
+!CLAUDE.md
+!README.md
+!docs/**/*.md
+!lib/**/README.md
+!**/CONVENTIONS.md
+!TESTFLIGHT.md
+!OBSERVABILITY.md
 
 
 # debug
@@ -58,3 +67,12 @@ next-env.d.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Capacitor / iOS
+/ios/App/App/public
+/ios/App/Pods
+/ios/App/App.xcworkspace/xcuserdata
+/ios/App/App.xcodeproj/xcuserdata
+/ios/DerivedData
+/signing
+/.asc

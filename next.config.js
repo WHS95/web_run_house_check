@@ -35,31 +35,15 @@ const nextConfig = {
 
   // 번들 분석 및 최적화
   webpack: (config, { dev, isServer }) => {
-    // 프로덕션 빌드에서 번들 크기 최적화
-    if (!dev && !isServer) {
-      // Tree shaking 최적화
-      config.optimization.usedExports = true;
-      config.optimization.sideEffects = false;
-      
-      // 청크 분할 최적화
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            priority: 10,
-            chunks: 'all',
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            priority: 5,
-            chunks: 'all',
-          },
-        },
-      };
-    }
+    // ⚠️ 커스텀 splitChunks 를 다시 넣지 말 것.
+    //
+    // 이전 설정은 모든 node_modules 를 `name: 'vendors'` 단일 청크로 강제 병합해서
+    // (chunks: 'all') **모든 동적 import 를 무효화**했다. 라우트마다 페이지 코드는
+    // 300B~6.5kB 인데 공용 청크 637kB 를 받던 원인이 이것이다.
+    // 또한 `optimization.sideEffects = false` 는 주석과 달리 webpack 이
+    // package.json 의 sideEffects 플래그를 **무시**하게 만들어 tree shaking 을 약화시킨다.
+    //
+    // Next.js 14 의 기본 청킹(framework / lib / commons / shared)이 이 앱에 더 낫다.
 
     return config;
   },

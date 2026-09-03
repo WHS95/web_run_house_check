@@ -3,7 +3,7 @@
 import React from "react";
 import { signInWithKakao } from "@/lib/auth";
 import NoticeModal from "@/components/molecules/NoticeModal";
-import posthog from "posthog-js";
+import { analytics } from "@/lib/analytics";
 
 const KakaoLoginButton: React.FC = () => {
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -12,7 +12,7 @@ const KakaoLoginButton: React.FC = () => {
   const handleLogin = async () => {
     try {
       setLoading(true);
-      posthog.capture("kakao_login_initiated");
+      analytics.capture("kakao_login_initiated");
       await signInWithKakao();
     } catch (err) {
       //console.error("로그인 중 오류 발생:", err);

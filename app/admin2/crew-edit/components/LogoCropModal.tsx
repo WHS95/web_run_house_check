@@ -1,7 +1,14 @@
 "use client";
 
 import { memo, useCallback, useState } from "react";
-import Cropper, { Area } from "react-easy-crop";
+import nextDynamic from "next/dynamic";
+import type { Area } from "react-easy-crop";
+// 크롭 UI 는 로고 편집 시에만 필요하다.
+// next/dynamic 은 제네릭·기본 props 타입을 잃으므로 원본 타입으로 복원한다.
+const Cropper = nextDynamic(() => import("react-easy-crop"), {
+    ssr: false,
+    loading: () => <div className='h-full w-full bg-rh-bg-inset' />,
+}) as typeof import("react-easy-crop").default;
 import AdminModal from "@/app/admin2/components/ui/AdminModal";
 
 interface LogoCropModalProps {

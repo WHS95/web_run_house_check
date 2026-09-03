@@ -13,7 +13,13 @@ import { StagewiseToolbar } from "@stagewise/toolbar-next";
 import { Analytics } from "@vercel/analytics/react";
 import ConditionalBottomNav from "@/components/ConditionalBottomNav";
 import { NavigationProvider } from "@/components/providers/NavigationProvider";
-import FCMForegroundProvider from "@/components/providers/FCMForegroundProvider";
+import nextDynamic from "next/dynamic";
+// firebase(app+messaging)를 공용 청크에서 분리한다.
+// 포그라운드 푸시 토스트는 첫 페인트에 필요하지 않다.
+const FCMForegroundProvider = nextDynamic(
+  () => import("@/components/providers/FCMForegroundProvider"),
+  { ssr: false }
+);
 import SplashScreen from "@/components/molecules/common/SplashScreen";
 import KeyboardScrollFix from "@/components/providers/KeyboardScrollFix";
 import PostHogProvider from "@/components/providers/PostHogProvider";

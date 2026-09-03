@@ -6,13 +6,11 @@ import {
     useMemo,
     useState,
 } from "react";
-import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import AdminAvatar from "./AdminAvatar";
 import AdminSearchBar from "./AdminSearchBar";
 import AdminCheckbox from "./AdminCheckbox";
 import { haptic } from "@/lib/haptic";
-import { useModalViewportPortal } from "@/hooks/useModalViewportPortal";
+import DragSheet from "@/components/ui/DragSheet";
 
 export interface PickerMember {
     id: string;
@@ -36,7 +34,6 @@ const AdminMemberPickerSheet = memo(function AdminMemberPickerSheet({
 }: AdminMemberPickerSheetProps) {
     const [query, setQuery] = useState("");
     const [draft, setDraft] = useState<Set<string>>(selectedIds);
-    const portalContainer = useModalViewportPortal(open);
 
     // 시트 열릴 때마다 draft 초기화
     useEffect(() => {
@@ -85,38 +82,13 @@ const AdminMemberPickerSheet = memo(function AdminMemberPickerSheet({
         onClose();
     }, [draft, onConfirm, onClose]);
 
-    if (!portalContainer) return null;
-
-    return createPortal(
-        <AnimatePresence>
-            {open && (
-                <motion.div
-                    className="absolute inset-0 z-[100] flex flex-col justify-end"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                >
-                    <div
-                        className="absolute inset-0 bg-black/50"
-                        onClick={onClose}
-                    />
-                    <motion.div
-                        className="relative z-10 flex flex-col bg-rh-bg-surface rounded-t-2xl max-h-[85%]"
-                        initial={{ y: "100%" }}
-                        animate={{ y: 0 }}
-                        exit={{ y: "100%" }}
-                        transition={{
-                            type: "spring",
-                            damping: 30,
-                            stiffness: 300,
-                        }}
-                    >
-                        {/* 드래그 핸들 */}
-                        <div className="flex justify-center pt-3 pb-2">
-                            <div className="w-10 h-1 rounded-full bg-rh-bg-muted" />
-                        </div>
-
+    return (
+        <DragSheet
+            open={open}
+            onClose={onClose}
+            label="크루원 선택"
+            maxHeightClassName="max-h-[85%]"
+        >
                         {/* 헤더 */}
                         <div className="flex items-center justify-between px-5 pb-3">
                             <h3 className="text-lg font-semibold text-white">
@@ -174,11 +146,7 @@ const AdminMemberPickerSheet = memo(function AdminMemberPickerSheet({
                                 {draft.size}명 선택 완료
                             </button>
                         </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>,
-        portalContainer
+        </DragSheet>
     );
 });
 

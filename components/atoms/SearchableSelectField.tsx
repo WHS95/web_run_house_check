@@ -1,5 +1,14 @@
 import React from "react";
-import Select, { StylesConfig } from "react-select";
+import nextDynamic from "next/dynamic";
+import type { StylesConfig } from "react-select";
+// react-select 는 gzip 74 kB 다. 이 컴포넌트를 실제로 쓰는 화면에서만 받는다.
+// next/dynamic 은 제네릭을 잃으므로 원본 타입으로 복원한다.
+const Select = nextDynamic(() => import("react-select"), {
+    ssr: false,
+    loading: () => (
+        <div className='h-[42px] w-full rounded-lg bg-rh-bg-surface' />
+    ),
+}) as typeof import("react-select").default;
 
 interface Option {
   value: string;

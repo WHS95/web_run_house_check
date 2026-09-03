@@ -2,15 +2,16 @@ const KST_TZ = 'Asia/Seoul';
 const ALLOW_AHEAD_MS = 2 * 60 * 60 * 1000;
 
 /**
- * KST 기준 현재 + 2시간 이내인지 검사.
- * 현재 시각을 KST로 변환한 뒤 ALLOW_AHEAD_MS만큼 더한 값과 비교.
+ * 출석 시각이 현재 + 2시간 이내인지 검사.
+ *
+ * 현재/출석시각 모두 절대 시점(instant)이므로 타임존 변환이 필요 없다.
+ * 이전 구현은 toLocaleString('en-US', KST) 결과를 다시 new Date()로 파싱해
+ * 실행 머신의 로컬 타임존을 KST로 간주했다. 그래서 KST 머신에서는
+ * 우연히 맞고 UTC 서버(Vercel)에서는 허용 폭이 +11시간으로 벌어졌다.
  */
 export function 유효한가(현재: Date, 출석시각: string): boolean {
-    const koreaTime = new Date(
-        현재.toLocaleString('en-US', { timeZone: KST_TZ })
-    );
-    const max = new Date(koreaTime.getTime() + ALLOW_AHEAD_MS);
-    return new Date(출석시각) <= max;
+    const max = 현재.getTime() + ALLOW_AHEAD_MS;
+    return new Date(출석시각).getTime() <= max;
 }
 
 /**

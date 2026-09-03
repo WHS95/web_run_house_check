@@ -2,41 +2,97 @@
     "extends": "next",
     "overrides": [
         {
-            "files": ["lib/domain/**/*.ts"],
+            "files": [
+                "lib/domain/**/*.ts",
+                "lib/motion/**/*.ts"
+            ],
             "rules": {
-                "no-restricted-imports": ["error", {
-                    "patterns": [
-                        { "group": ["@/lib/supabase/*"], "message": "domain은 Supabase를 import할 수 없습니다." },
-                        { "group": ["next/*"], "message": "domain은 Next 의존성을 가질 수 없습니다." },
-                        { "group": ["react", "react-dom"], "message": "domain은 React 의존성을 가질 수 없습니다." },
-                        { "group": ["@/app/**", "@/components/**"], "message": "domain은 UI를 역참조할 수 없습니다." }
-                    ]
-                }]
+                "no-restricted-imports": [
+                    "error",
+                    {
+                        "patterns": [
+                            {
+                                "group": [
+                                    "@/lib/supabase/*"
+                                ],
+                                "message": "domain은 Supabase를 import할 수 없습니다."
+                            },
+                            {
+                                "group": [
+                                    "next/*"
+                                ],
+                                "message": "domain은 Next 의존성을 가질 수 없습니다."
+                            },
+                            {
+                                "group": [
+                                    "react",
+                                    "react-dom"
+                                ],
+                                "message": "domain은 React 의존성을 가질 수 없습니다."
+                            },
+                            {
+                                "group": [
+                                    "@/app/**",
+                                    "@/components/**"
+                                ],
+                                "message": "domain은 UI를 역참조할 수 없습니다."
+                            }
+                        ]
+                    }
+                ]
             }
         },
         {
-            "files": ["app/**/page.tsx"],
+            "files": [
+                "app/**/page.tsx"
+            ],
             "rules": {
-                "no-restricted-imports": ["error", {
-                    "paths": [
-                        { "name": "next/cache", "importNames": ["revalidatePath", "revalidateTag"], "message": "page.tsx는 mutation 책임이 없습니다 — actions.ts에서 호출하세요." }
-                    ]
-                }],
-                "no-restricted-syntax": ["warn", {
-                    "selector": "Program > ExpressionStatement[expression.value='use client']",
-                    "message": "page.tsx는 Server Component여야 합니다. (Phase A: warn → 후속 cleanup PR에서 error로 격상)"
-                }]
+                "no-restricted-imports": [
+                    "error",
+                    {
+                        "paths": [
+                            {
+                                "name": "next/cache",
+                                "importNames": [
+                                    "revalidatePath",
+                                    "revalidateTag"
+                                ],
+                                "message": "page.tsx는 mutation 책임이 없습니다 — actions.ts에서 호출하세요."
+                            }
+                        ]
+                    }
+                ],
+                "no-restricted-syntax": [
+                    "warn",
+                    {
+                        "selector": "Program > ExpressionStatement[expression.value='use client']",
+                        "message": "page.tsx는 Server Component여야 합니다. (Phase A: warn → 후속 cleanup PR에서 error로 격상)"
+                    }
+                ]
             }
         },
         {
-            "files": ["app/**/*.{ts,tsx}"],
-            "excludedFiles": ["app/api/dev/**", "app/**/page.tsx"],
+            "files": [
+                "app/**/*.{ts,tsx}"
+            ],
+            "excludedFiles": [
+                "app/api/dev/**",
+                "app/**/page.tsx"
+            ],
             "rules": {
-                "no-restricted-imports": ["warn", {
-                    "patterns": [
-                        { "group": ["@/lib/supabase/admin"], "message": "service_role은 화이트리스트(app/api/dev)만 사용 가능합니다. (Phase A: warn → 후속 cleanup PR에서 error로 격상)" }
-                    ]
-                }]
+                "no-restricted-imports": [
+                    "warn",
+                    {
+                        "patterns": [
+                            {
+                                "group": [
+                                    "@/lib/supabase/admin"
+                                ],
+                                "message": "service_role은 화이트리스트(app/api/dev)만 사용 가능합니다. (Phase A: warn → 후속 cleanup PR에서 error로 격상)"
+                            }
+                        ]
+                    }
+                ]
             }
         }
     ]

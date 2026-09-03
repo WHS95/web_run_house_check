@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { X, Megaphone } from "lucide-react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import DragSheet from "@/components/ui/DragSheet";
 import { getCrewNoticesAction } from "@/app/admin2/notice/actions";
 
 interface Notice {
@@ -26,7 +26,6 @@ export default function NoticeListSheet({
 }: NoticeListSheetProps) {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(false);
-  const sheetRef = useRef<HTMLDivElement>(null);
 
   const fetchNotices = useCallback(async () => {
     setLoading(true);
@@ -54,15 +53,6 @@ export default function NoticeListSheet({
     };
   }, [isOpen, fetchNotices]);
 
-  const handleDragEnd = (
-    _: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo,
-  ) => {
-    if (info.offset.y > 100 || info.velocity.y > 300) {
-      onClose();
-    }
-  };
-
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const year = date.getFullYear();
@@ -72,41 +62,12 @@ export default function NoticeListSheet({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* 오버레이 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className='fixed inset-0 z-50 bg-rh-bg-primary/60'
-            onClick={onClose}
-          />
-
-          {/* 바텀시트 */}
-          <motion.div
-            ref={sheetRef}
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{
-              type: "spring",
-              damping: 30,
-              stiffness: 300,
-            }}
-            drag='y'
-            dragConstraints={{ top: 0 }}
-            dragElastic={0.2}
-            onDragEnd={handleDragEnd}
-            className='fixed inset-x-0 bottom-0 z-50 flex max-h-[75vh] flex-col rounded-t-[20px] bg-rh-bg-surface pb-safe'
-          >
-            {/* 드래그 핸들 */}
-            <div className='flex justify-center pt-3 pb-1'>
-              <div className='h-1 w-10 rounded-full bg-rh-bg-muted' />
-            </div>
-
+    <DragSheet
+      open={isOpen}
+      onClose={onClose}
+      label='공지사항'
+      maxHeightClassName='max-h-[75%]'
+    >
             {/* 헤더 */}
             <div className='flex items-center justify-between px-5 pb-3 pt-1'>
               <h2 className='text-[17px] font-semibold text-white'>공지사항</h2>
@@ -180,9 +141,6 @@ export default function NoticeListSheet({
                 </div>
               )}
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+    </DragSheet>
   );
 }

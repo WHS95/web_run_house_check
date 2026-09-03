@@ -5,6 +5,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 프로젝트 개요
 RunHouse는 러닝 커뮤니티 관리 앱으로, Next.js (App Router)와 Supabase를 사용하여 구축된 출석 관리 및 크루 관리 시스템입니다.
 
+## ⚠️ 아키텍처 문서 갱신 의무 (CRITICAL)
+
+`docs/architecture/`는 ISO/IEC/IEEE 42010 기반 Architecture Description(AD)입니다.
+**모든 개발 작업(기능 추가/변경, 스키마 마이그레이션, API·Server Action 변경, 컴포넌트/컨테이너 구조 변경)을 완료할 때마다 관련 문서를 반드시 함께 갱신하세요.**
+
+- 테이블/컬럼 변경 → `02-data/erd.md`, `02-data/tables.md`
+- API·Server Action·라우트 변경 → `04-interface/api-and-actions.md`, 필요 시 `03-process/sequences.md`
+- 도메인 규칙·유스케이스 변경 → `01-domain/*`
+- 컴포넌트·컨테이너·외부 연동 변경 → `05-architecture/c4-*.md`
+- 이해관계자·품질속성 변경 → `00-overview/*`, `06-quality/quality-attributes.md`
+- 새 View를 추가하면 `architecture-description.md`의 Stakeholder→Concern→Viewpoint→View 매핑표와 `README.md` 링크도 갱신
+- 코드와 문서가 어긋난 채로 작업을 종료하지 마세요. 문서 갱신은 "완료(done)"의 일부입니다.
+
 ## 주요 명령어
 
 ### 개발 서버 실행
@@ -178,6 +191,29 @@ export default function MyPage() {
 - 대용량 데이터 페이지네이션
 - 비동기 처리 활용
 
+### ⚠️ 번들 규칙 (CRITICAL)
+
+**`next.config.js`에 커스텀 `optimization.splitChunks`를 넣지 마세요.**
+
+과거에 모든 `node_modules`를 `name: 'vendors'` 단일 청크로 병합하는 설정이 있었고
+(`chunks: 'all'`), 이것이 **모든 동적 import를 무효화**했습니다. 결과적으로 페이지 코드가
+300B~6.5kB인 라우트가 공용 청크 **653 kB**를 받고 있었습니다. 설정을 제거해 Next 14 기본
+청킹으로 되돌리자 **167 kB (−74%)** 가 됐습니다.
+
+같은 블록의 `optimization.sideEffects = false`도 주석("Tree shaking 최적화")과 정반대로,
+webpack이 package.json의 `sideEffects` 플래그를 **무시**하게 만들어 tree shaking을 약화시킵니다.
+
+**지켜야 할 것:**
+1. 청크 분할은 Next.js 기본값에 맡긴다. 커스텀 `splitChunks` 금지.
+2. **무거운 라이브러리는 루트 레이아웃에서 정적 import 하지 않는다.** 루트에서 import하면
+   모든 라우트의 공용 청크로 끌려 올라간다. `next/dynamic`을 쓴다.
+   - 분석(`posthog-js`) → `lib/analytics.ts` 지연 래퍼 사용. **직접 import 금지.**
+   - Sentry Session Replay → `sentry.client.config.ts`가 유휴 시점에 `lazyLoadIntegration`으로 로드.
+     `integrations` 배열에 `replayIntegration()`을 정적으로 넣지 말 것 (+38.7 kB).
+   - `firebase/messaging`, `react-select`, `react-easy-crop` → 사용 화면에서만 동적 로드.
+3. **빌드 후 `First Load JS shared by all`을 확인한다.** 200 kB를 넘으면 무언가 공용 청크로
+   샜다는 신호다. 원인은 대개 루트 레이아웃의 새 정적 import다.
+
 ## 주요 기능 모듈
 
 ### 관리자 기능 (`/lib/supabase/admin.ts`)
@@ -229,6 +265,24 @@ export default function MyPage() {
    - [ ] Suspense fallback 스켈레톤에 `animate-pulse` 없는지 확인
    - [ ] 리스트가 있으면 `AnimatedList`/`AnimatedItem` 적용
    - [ ] 비리스트 콘텐츠는 `FadeIn`으로 감싸기
+
+5. **제스처 UI(드래그로 여는 시트·스와이프)는 반드시 `<DragSheet>`를 사용**
+   - `import DragSheet from '@/components/ui/DragSheet'`
+   - `motion.div`에 `drag`를 직접 붙이지 말 것. 속도 판정·속도 인계·모멘텀 투사·러버밴딩·
+     스크림 동기화·햅틱·reduced-motion이 전부 빠진 채로 구현되어 시트마다 동작이 갈린다.
+   - 물리 계산은 `lib/motion/`(순수 함수, 커버리지 100%)에만 둔다. 컴포넌트 인라인 금지.
+   - 상세 규칙: [`lib/motion/README.md`](lib/motion/README.md)
+
+6. **제스처가 개입하는 모션에 고정 시간 트윈(`duration`) 금지 — 스프링만 사용**
+   - `transition={{ duration: 0.2 }}`는 중간에 잡아서 되돌릴 수 없다.
+   - 스프링 값은 직접 숫자를 쓰지 말고 `lib/motion/spring.ts`의 프리셋을 쓴다.
+   - 비제스처 등장/퇴장(페이드인 등)에는 `duration` 트윈을 써도 된다.
+
+7. **햅틱은 `lib/haptic.ts`만 사용**
+   - `navigator.vibrate`를 직접 호출하지 말 것 — **iOS Safari는 Vibration API를 지원하지 않아
+     아이폰에서 조용히 무시된다.** `lib/haptic.ts`가 네이티브 셸에서는 `@capacitor/haptics`로,
+     웹에서는 Vibration API로 분기한다.
+   - 시각 피드백과 **같은 순간**에 발화시킨다.
 
 ```tsx
 // ✅ 올바른 스켈레톤 (정적)
